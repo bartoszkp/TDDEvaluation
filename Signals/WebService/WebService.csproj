@@ -51,6 +51,10 @@
     <Compile Include="Signals.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{753af1ca-26dd-444d-8011-2251671cc444}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Domain\Domain.csproj">
       <Project>{7643117c-25cb-4b38-8d3d-efa38e2dc719}</Project>
       <Name>Domain</Name>

@@ -43,7 +43,7 @@ namespace WebService
 
             var signalData = data[signal.Id.Value];
 
-            foreach (var timestamp in new Domain.TimeEnumerator(fromIncluded, toExcluded, signal.Granularity))
+            foreach (var timestamp in new Domain.Infrastructure.TimeEnumerator(fromIncluded, toExcluded, signal.Granularity))
             {
                 Domain.Datum<object> result = null;
                 signalData.TryGetValue(timestamp, out result);
@@ -57,7 +57,7 @@ namespace WebService
             var signal = signalDto.ToDomain<Domain.Signal>();
             var dataDict = data.ToDictionary(d => d.Timestamp, d => d.ToDomain<Domain.Datum<object>>());
 
-            this.data[signal.Id.Value] = (new Domain.TimeEnumerator(fromIncluded, dataDict.Count, signal.Granularity))
+            this.data[signal.Id.Value] = (new Domain.Infrastructure.TimeEnumerator(fromIncluded, dataDict.Count, signal.Granularity))
                 .ToDictionary(ts => ts, ts => dataDict[ts]);
         }
     }

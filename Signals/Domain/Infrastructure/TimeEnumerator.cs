@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Domain
+namespace Domain.Infrastructure
 {
     public class TimeEnumerator : IEnumerator<DateTime>, IEnumerable<DateTime>
     {

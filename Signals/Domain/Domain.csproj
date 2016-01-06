@@ -46,8 +46,9 @@
     <Compile Include="Granulation.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\ISignalRepository.cs" />
     <Compile Include="Signal.cs" />
-    <Compile Include="TimeEnumerator.cs" />
+    <Compile Include="Infrastructure\TimeEnumerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
