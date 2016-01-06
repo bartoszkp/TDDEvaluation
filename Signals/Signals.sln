@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{7643117C-25CB-4B38-8D3D-EFA38E2DC719}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService", "WebService\WebService.csproj", "{84086867-4954-4565-82C6-344061B45FCD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E54DD54B-5F62-4276-90FE-F9E98BE74931} = {E54DD54B-5F62-4276-90FE-F9E98BE74931}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hosting", "Hosting\Hosting.csproj", "{585125A4-ACC3-4CA1-A1E7-C6F6BEC2FD70}"
 EndProject

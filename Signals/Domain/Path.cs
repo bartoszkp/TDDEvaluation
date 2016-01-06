@@ -8,9 +8,10 @@ namespace Signals.Domain
 
         public static Path FromString(string str)
         {
-            var path = new Path();
-            path.Components = str.Split('/');
-            return path;
+            return new Path()
+            {
+                Components = str.Split('/')
+            };
         }
 
         public override string ToString()
