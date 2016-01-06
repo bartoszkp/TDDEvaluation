@@ -17,7 +17,10 @@ namespace Signals.WebService
         {
             var path = pathDto.ToDomain();
 
-            return signals[path.ToString()].ToDto();
+            Domain.Signal s = null;
+            if (signals.TryGetValue(path.ToString(), out s))
+                return s.ToDto();
+            throw new FaultException(); // OR: return null;
         }
 
         public Dto.Signal Add(Dto.Signal signalDto)

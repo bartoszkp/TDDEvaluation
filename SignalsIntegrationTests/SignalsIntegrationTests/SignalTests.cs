@@ -5,7 +5,7 @@ using Signals.Dto.Conversions;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class UnitTest1
+    public class SignalTests
     {
         private WS.SignalsClient signalsClient;
         
@@ -15,11 +15,19 @@ namespace SignalsIntegrationTests
             signalsClient = new WS.SignalsClient();
         }
 
+        // TODO Get from empty db
+
+        [TestMethod]
+        public void RequestForNonExistingSignalThrowsOrReturnsNull()
+        {
+            var path = Path.FromString("/not/existing/path");
+            Utils.AssertReturnsNullOrThrows(() => signalsClient.Get(path.ToDto()));
+        }
+
         [TestMethod]
         public void CanAddAndGetSignal()
         {
-            var path = new Path();
-            path.Components = new[] { string.Empty };
+            var path = Path.FromString(string.Empty);
 
             var signal = new Signal()
             {
