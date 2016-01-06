@@ -1,31 +1,41 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Signals.Domain;
+using Signals.Dto.Conversions;
 
 namespace SignalsIntegrationTests
 {
     [TestClass]
     public class UnitTest1
     {
-        private Signals.SignalsClient signalsClient;
+        private WS.SignalsClient signalsClient;
         
         [TestInitialize]
         public void TestInitialize()
         {
-            signalsClient = new Signals.SignalsClient();
+            signalsClient = new WS.SignalsClient();
         }
 
         [TestMethod]
         public void CanAddAndGetSignal()
         {
-            var path = new Signals.Path();
+            var path = new Path();
             path.Components = new[] { string.Empty };
-            signalsClient.Add(path, typeof(int).ToString(), Signals.Granularity.Hour);
 
-            var result = signalsClient.Get(path);
+            var signal = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+
+            signalsClient.Add(signal.ToDto());
+
+            var result = signalsClient.Get(path.ToDto()).ToDomain();
 
             Assert.AreEqual(0, result.Id);
-            Assert.AreEqual(typeof(int).ToString(), result.DataType);
+            Assert.AreEqual(DataType.Integer, result.DataType);
             Assert.AreEqual(path.ToString(), result.Path.ToString());
-            Assert.AreEqual(Signals.Granularity.Hour, result.Granularity);
+            Assert.AreEqual(Granularity.Day, result.Granularity);
         }
     }
 }
