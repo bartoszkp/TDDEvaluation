@@ -35,26 +35,70 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void CanAddAndGetSignal()
+        public void AddingSignalSetsItsId()
         {
-            var path = Path.FromString(string.Empty);
-
             var signal = new Signal()
             {
-                Path = path,
+                Path = Path.FromString("/new/signal"),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
 
-            signalsClient.Add(signal.ToDto());
+            signal = signalsClient.Add(signal.ToDto()).ToDomain();
 
-            var result = signalsClient.Get(path.ToDto()).ToDomain();
-
-            Assert.AreEqual(0, result.Id);
-            Assert.AreEqual(DataType.Integer, result.DataType);
-            Assert.AreEqual(path.ToString(), result.Path.ToString());
-            Assert.AreEqual(Granularity.Day, result.Granularity);
+            Assert.IsNotNull(signal.Id);
         }
+
+        [TestMethod]
+        public void AddedSignalCanBeRetrieved()
+        {
+            var newSignal = new Signal()
+            {
+                Path = Path.FromString("/new/signal"),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+
+            signalsClient.Add(newSignal.ToDto());
+            var received = signalsClient.Get(newSignal.Path.ToDto()).ToDomain();
+
+            Assert.AreEqual(newSignal.DataType, received.DataType);
+            Assert.AreEqual(newSignal.Path, received.Path);
+            Assert.AreEqual(received.Granularity, received.Granularity);
+        }
+
+        [TestMethod]
+        public void MultipleSignalsCanBeStoredSimultanously()
+        {
+            var newSignal1 = new Signal()
+            {
+                Path = Path.FromString("/new/signal/1"),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+            var newSignal2 = new Signal()
+            {
+                Path = Path.FromString("/new/signal/2"),
+                Granularity = Granularity.Hour,
+                DataType = DataType.Double
+            };
+
+            signalsClient.Add(newSignal1.ToDto());
+            signalsClient.Add(newSignal2.ToDto());
+            var received1 = signalsClient.Get(newSignal1.Path.ToDto()).ToDomain();
+            var received2 = signalsClient.Get(newSignal2.Path.ToDto()).ToDomain();
+
+            Assert.AreEqual(newSignal1.Path, received1.Path);
+            Assert.AreEqual(newSignal2.Path, received2.Path);
+            Assert.AreNotEqual(received1.Id, received2.Id);
+        }
+
+        // TODO multiple times adding same signal (expected behaviour?)
+        // TODO removing?
+        // TODO editing?
+        // TODO changing path?
+
+            // TODO persistency tests
 
         [TestCleanup]
         public void TestCleanup()

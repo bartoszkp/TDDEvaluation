@@ -18,5 +18,11 @@ namespace Signals.Domain
         {
             return string.Join("/", Components);
         }
+
+        public override bool Equals(object obj)
+        {
+            Path pathObj = obj as Path;
+            return (pathObj != null) && (ToString() == pathObj.ToString());
+        }
     }
 }
