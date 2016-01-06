@@ -10,6 +10,14 @@ namespace SignalsIntegrationTests.Infrastructure
 
         private Process serviceProcess = null;
 
+        /// <summary>
+        /// Either run VS as administrator or execute this command in a console with administrative priviledges:
+        /// 
+        /// netsh http add urlacl url=http://+:8080/signals user=[DOMAIN]\[USER]
+        /// 
+        /// where [DOMAIN] and [USER] should be replaced with values appropriate for the credentials
+        /// you want to use when working with this solution.
+        /// </summary>
         public void StartService()
         {
             if (serviceProcess != null)
@@ -35,7 +43,6 @@ namespace SignalsIntegrationTests.Infrastructure
                 RedirectStandardInput = true,
                 FileName = executableFileInfo.FullName,
                 WorkingDirectory = executableFileInfo.DirectoryName,
-                Verb = "runas",
                 UseShellExecute = false
             };
 
