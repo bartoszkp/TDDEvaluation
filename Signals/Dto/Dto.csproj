@@ -48,7 +48,6 @@
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />
     <Compile Include="Granulation.cs" />
-    <Compile Include="Infrastructure\EnumMapper.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Signal.cs" />
