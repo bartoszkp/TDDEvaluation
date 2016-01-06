@@ -1,4 +1,4 @@
-﻿namespace Signals.Dto
+﻿namespace Dto
 {
     public class Signal
     {

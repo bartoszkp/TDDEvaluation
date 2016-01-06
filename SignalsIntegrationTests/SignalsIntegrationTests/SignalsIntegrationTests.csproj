@@ -80,6 +80,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Properties\DataSources\Dto.Datum.datasource" />
+    <None Include="Properties\DataSources\Dto.Signal.datasource" />
     <None Include="Properties\DataSources\Signals.Dto.Datum.datasource" />
     <None Include="Properties\DataSources\Signals.Dto.Signal.datasource" />
     <None Include="Properties\Settings.settings">

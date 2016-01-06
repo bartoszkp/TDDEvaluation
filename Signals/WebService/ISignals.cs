@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel;
-using Signals.Dto;
+using Dto;
 
-namespace Signals.WebService
+namespace WebService
 {
     [ServiceContract]
     public interface ISignals

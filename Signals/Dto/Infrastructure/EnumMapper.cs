@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Signals.Dto.Infrastructure
+namespace Dto.Infrastructure
 {
     public static class EnumMapper
     {
