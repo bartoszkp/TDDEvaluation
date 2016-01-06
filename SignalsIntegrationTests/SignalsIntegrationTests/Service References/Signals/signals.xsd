@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/Signals.Domain" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Signals.Domain" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8080/signals?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="Path">
+    <xs:sequence>
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Components" nillable="true" type="q1:ArrayOfstring" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Path" nillable="true" type="tns:Path" />
+  <xs:complexType name="Signal">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="DataType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Granularity" type="tns:Granularity" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Path" nillable="true" type="tns:Path" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Signal" nillable="true" type="tns:Signal" />
+  <xs:simpleType name="Granularity">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Second" />
+      <xs:enumeration value="Minute" />
+      <xs:enumeration value="Hour" />
+      <xs:enumeration value="Day" />
+      <xs:enumeration value="Week" />
+      <xs:enumeration value="Month" />
+      <xs:enumeration value="Year" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Granularity" nillable="true" type="tns:Granularity" />
+  <xs:complexType name="ArrayOfDatumOfanyType">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DatumOfanyType" nillable="true" type="tns:DatumOfanyType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDatumOfanyType" nillable="true" type="tns:ArrayOfDatumOfanyType" />
+  <xs:complexType name="DatumOfanyType">
+    <xs:annotation>
+      <xs:appinfo>
+        <GenericType Name="DatumOf{0}{#}" Namespace="http://schemas.datacontract.org/2004/07/Signals.Domain" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+          <GenericParameter Name="anyType" Namespace="http://www.w3.org/2001/XMLSchema" />
+        </GenericType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Timestamp" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Value" nillable="true" type="xs:anyType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DatumOfanyType" nillable="true" type="tns:DatumOfanyType" />
+</xs:schema>
