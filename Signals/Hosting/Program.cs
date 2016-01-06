@@ -2,7 +2,7 @@
 using System.ServiceModel;
 using System.ServiceModel.Description;
 
-namespace Signals.Hosting
+namespace Hosting
 {
     class Program
     {
@@ -10,7 +10,7 @@ namespace Signals.Hosting
         {
             Uri baseAddress = new Uri("http://localhost:8080/signals");
 
-            using (ServiceHost host = new ServiceHost(typeof(Signals.WebService.Signals), baseAddress))
+            using (ServiceHost host = new ServiceHost(typeof(WebService.Signals), baseAddress))
             {
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
                 smb.HttpGetEnabled = true;

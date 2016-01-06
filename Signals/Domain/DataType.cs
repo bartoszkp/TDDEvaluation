@@ -1,4 +1,4 @@
-﻿namespace Signals.Domain
+﻿namespace Domain
 {
     public enum DataType
     {

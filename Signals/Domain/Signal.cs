@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Signals.Domain
+namespace Domain
 {
     public class Signal
     {

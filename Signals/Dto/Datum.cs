@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Signals.Dto
+namespace Dto
 {
     public class Datum
     {

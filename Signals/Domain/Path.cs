@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Signals.Domain
+namespace Domain
 {
     public class Path
     {
