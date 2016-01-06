@@ -19,7 +19,10 @@ namespace Signals.WebService
 
             Domain.Signal s = null;
             if (signals.TryGetValue(path.ToString(), out s))
+            {
                 return s.ToDto();
+            }
+
             throw new FaultException(); // OR: return null;
         }
 

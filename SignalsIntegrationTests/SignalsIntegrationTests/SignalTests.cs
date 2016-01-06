@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Signals.Domain;
 using Signals.Dto.Conversions;
+using SignalsIntegrationTests.Infrastructure;
 
 namespace SignalsIntegrationTests
 {
@@ -20,8 +21,9 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void RequestForNonExistingSignalThrowsOrReturnsNull()
         {
-            var path = Path.FromString("/not/existing/path");
-            Utils.AssertReturnsNullOrThrows(() => signalsClient.Get(path.ToDto()));
+            var path = Path.FromString("/non/existent/path");
+
+            Assertions.AssertReturnsNullOrThrows(() => signalsClient.Get(path.ToDto()));
         }
 
         [TestMethod]
