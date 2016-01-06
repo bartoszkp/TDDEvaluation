@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Signals.Domain
+﻿namespace Signals.Dto
 {
     public class Signal
     {

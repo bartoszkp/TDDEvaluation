@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SignalsIntegrationTests</RootNamespace>
     <AssemblyName>SignalsIntegrationTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -16,6 +16,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Domain">
+      <HintPath>..\..\Signals\Domain\bin\Debug\Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="Dto">
+      <HintPath>..\..\Signals\Dto\bin\Debug\Dto.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -53,7 +60,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Service References\Signals\Reference.cs">
+    <Compile Include="Service References\WS\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -66,40 +73,36 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Service References\Signals\Signals.wsdl" />
-    <None Include="Service References\Signals\signals.xsd">
+    <None Include="Properties\DataSources\Signals.Dto.Datum.datasource" />
+    <None Include="Properties\DataSources\Signals.Dto.Signal.datasource" />
+    <None Include="Service References\WS\Signals.wsdl" />
+    <None Include="Service References\WS\signals.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\Signals\signals1.xsd">
+    <None Include="Service References\WS\signals1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\Signals\signals2.xsd">
+    <None Include="Service References\WS\signals2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\Signals\signals5.xsd">
+    <None Include="Service References\WS\signals3.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\Signals\SignalsIntegrationTests.Signals.DatumOfanyType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\Signals\SignalsIntegrationTests.Signals.Signal.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadataStorage Include="Service References\Signals\" />
+    <WCFMetadataStorage Include="Service References\WS\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\Signals\signals.disco" />
+    <None Include="Service References\WS\signals.disco" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\Signals\configuration91.svcinfo" />
+    <None Include="Service References\WS\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\Signals\configuration.svcinfo" />
+    <None Include="Service References\WS\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\Signals\Reference.svcmap">
+    <None Include="Service References\WS\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>

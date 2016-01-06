@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using Signals.Dto;
 
 namespace Signals.WebService
 {
@@ -8,15 +9,15 @@ namespace Signals.WebService
     public interface ISignals
     {
         [OperationContract]
-        global::Signals.Domain.Signal Get(global::Signals.Domain.Path path);
+        Signal Get(Path path);
 
         [OperationContract]
-        global::Signals.Domain.Signal Add(global::Signals.Domain.Path path, string dataType, global::Signals.Domain.Granularity granularity);
+        Signal Add(Signal signal);
 
         [OperationContract]
-        IEnumerable<global::Signals.Domain.Datum<object>> GetData(global::Signals.Domain.Signal signal, DateTime fromIncluded, DateTime toExcluded);
+        IEnumerable<Datum> GetData(Signal signal, DateTime fromIncluded, DateTime toExcluded);
 
         [OperationContract]
-        void SetData(global::Signals.Domain.Signal signal, DateTime fromIncluded, IEnumerable<global::Signals.Domain.Datum<object>> data);
+        void SetData(Signal signal, DateTime fromIncluded, IEnumerable<Datum> data);
     }
 }
