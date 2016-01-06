@@ -18,8 +18,7 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void CanAddAndGetSignal()
         {
-            var path = new Path();
-            path.Components = new[] { string.Empty };
+            var path = Path.FromString(string.Empty);
 
             var signal = new Signal()
             {
