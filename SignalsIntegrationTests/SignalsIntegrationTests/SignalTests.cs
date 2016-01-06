@@ -8,8 +8,16 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SignalTests
     {
+        private static ServiceManager serviceManager;
         private WS.SignalsClient signalsClient;
-        
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext testContext)
+        {
+            serviceManager = new ServiceManager();
+            serviceManager.StartService();
+        }
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -46,6 +54,17 @@ namespace SignalsIntegrationTests
             Assert.AreEqual(DataType.Integer, result.DataType);
             Assert.AreEqual(path.ToString(), result.Path.ToString());
             Assert.AreEqual(Granularity.Day, result.Granularity);
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+        }
+
+        [ClassCleanup]
+        public static void ClassCleanup()
+        {
+            serviceManager.StopService();
         }
     }
 }
