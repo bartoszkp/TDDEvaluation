@@ -24,5 +24,10 @@ namespace Signals.Domain
             Path pathObj = obj as Path;
             return (pathObj != null) && (ToString() == pathObj.ToString());
         }
+
+        public override int GetHashCode()
+        {
+            return this.Components.GetHashCode();
+        }
     }
 }
