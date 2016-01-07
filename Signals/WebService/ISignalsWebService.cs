@@ -6,7 +6,7 @@ using Dto;
 namespace WebService
 {
     [ServiceContract]
-    public interface ISignals
+    public interface ISignalsWebService
     {
         [OperationContract]
         Signal Get(Path path);
