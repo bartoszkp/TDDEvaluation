@@ -2,12 +2,12 @@
 {
     public class Signal
     {
-        public int? Id { get; set; }
+        public virtual int? Id { get; set; }
 
-        public DataType DataType { get; set; }
+        public virtual DataType DataType { get; set; }
 
-        public Granularity Granularity { get; set; }
+        public virtual Granularity Granularity { get; set; }
 
-        public Path Path { get; set; }
+        public virtual Path Path { get; set; }
     }
 }

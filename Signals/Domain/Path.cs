@@ -4,19 +4,31 @@ namespace Domain
 {
     public class Path
     {
-        public IEnumerable<string> Components { get; set; }
+        public const char Delimiter = '/';
+
+        public static IEnumerable<string> ParseComponents(string str)
+        {
+            return str.Split(Delimiter);
+        }
+
+        public static string JoinComponents(IEnumerable<string> components)
+        {
+            return string.Join(Delimiter.ToString(), components);
+        }
 
         public static Path FromString(string str)
         {
             return new Path()
             {
-                Components = str.Split('/')
+                Components = ParseComponents(str)
             };
         }
 
+        public virtual IEnumerable<string> Components { get; set; }
+
         public override string ToString()
         {
-            return string.Join("/", Components);
+            return JoinComponents(this.Components);
         }
 
         public override bool Equals(object obj)
