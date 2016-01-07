@@ -9,7 +9,7 @@ namespace SignalsIntegrationTests
     public class SignalTests
     {
         private static ServiceManager serviceManager;
-        private WS.SignalsClient signalsClient;
+        private WS.SignalsWebServiceClient client;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -21,7 +21,7 @@ namespace SignalsIntegrationTests
         [TestInitialize]
         public void TestInitialize()
         {
-            signalsClient = new WS.SignalsClient();
+            client = new WS.SignalsWebServiceClient();
         }
 
         // TODO Get from empty db
@@ -31,7 +31,7 @@ namespace SignalsIntegrationTests
         {
             var path = Path.FromString("/non/existent/path");
 
-            Assertions.AssertReturnsNullOrThrows(() => signalsClient.Get(path.ToDto<Dto.Path>()));
+            Assertions.AssertReturnsNullOrThrows(() => client.Get(path.ToDto<Dto.Path>()));
         }
 
         [TestMethod]
@@ -44,7 +44,7 @@ namespace SignalsIntegrationTests
                 DataType = DataType.Integer
             };
 
-            signal = signalsClient.Add(signal.ToDto<Dto.Signal>()).ToDomain<Domain.Signal>();
+            signal = client.Add(signal.ToDto<Dto.Signal>()).ToDomain<Domain.Signal>();
 
             Assert.IsNotNull(signal.Id);
         }
@@ -59,8 +59,8 @@ namespace SignalsIntegrationTests
                 DataType = DataType.Integer
             };
 
-            signalsClient.Add(newSignal.ToDto<Dto.Signal>());
-            var received = signalsClient.Get(newSignal.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
+            client.Add(newSignal.ToDto<Dto.Signal>());
+            var received = client.Get(newSignal.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
 
             Assert.AreEqual(newSignal.DataType, received.DataType);
             Assert.AreEqual(newSignal.Path, received.Path);
@@ -83,10 +83,10 @@ namespace SignalsIntegrationTests
                 DataType = DataType.Double
             };
 
-            signalsClient.Add(newSignal1.ToDto<Dto.Signal>());
-            signalsClient.Add(newSignal2.ToDto<Dto.Signal>());
-            var received1 = signalsClient.Get(newSignal1.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
-            var received2 = signalsClient.Get(newSignal2.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
+            client.Add(newSignal1.ToDto<Dto.Signal>());
+            client.Add(newSignal2.ToDto<Dto.Signal>());
+            var received1 = client.Get(newSignal1.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
+            var received2 = client.Get(newSignal2.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
 
             Assert.AreEqual(newSignal1.Path, received1.Path);
             Assert.AreEqual(newSignal2.Path, received2.Path);

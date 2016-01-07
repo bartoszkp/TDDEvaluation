@@ -12,58 +12,58 @@ namespace SignalsIntegrationTests.WS {
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WS.ISignals")]
-    public interface ISignals {
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WS.ISignalsWebService")]
+    public interface ISignalsWebService {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/Get", ReplyAction="http://tempuri.org/ISignals/GetResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Get", ReplyAction="http://tempuri.org/ISignalsWebService/GetResponse")]
         Dto.Signal Get(Dto.Path path);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/Get", ReplyAction="http://tempuri.org/ISignals/GetResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Get", ReplyAction="http://tempuri.org/ISignalsWebService/GetResponse")]
         System.Threading.Tasks.Task<Dto.Signal> GetAsync(Dto.Path path);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/Add", ReplyAction="http://tempuri.org/ISignals/AddResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Add", ReplyAction="http://tempuri.org/ISignalsWebService/AddResponse")]
         Dto.Signal Add(Dto.Signal signal);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/Add", ReplyAction="http://tempuri.org/ISignals/AddResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Add", ReplyAction="http://tempuri.org/ISignalsWebService/AddResponse")]
         System.Threading.Tasks.Task<Dto.Signal> AddAsync(Dto.Signal signal);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/GetData", ReplyAction="http://tempuri.org/ISignals/GetDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetData", ReplyAction="http://tempuri.org/ISignalsWebService/GetDataResponse")]
         Dto.Datum[] GetData(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/GetData", ReplyAction="http://tempuri.org/ISignals/GetDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetData", ReplyAction="http://tempuri.org/ISignalsWebService/GetDataResponse")]
         System.Threading.Tasks.Task<Dto.Datum[]> GetDataAsync(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/SetData", ReplyAction="http://tempuri.org/ISignals/SetDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetData", ReplyAction="http://tempuri.org/ISignalsWebService/SetDataResponse")]
         void SetData(Dto.Signal signal, System.DateTime fromIncluded, Dto.Datum[] data);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignals/SetData", ReplyAction="http://tempuri.org/ISignals/SetDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetData", ReplyAction="http://tempuri.org/ISignalsWebService/SetDataResponse")]
         System.Threading.Tasks.Task SetDataAsync(Dto.Signal signal, System.DateTime fromIncluded, Dto.Datum[] data);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface ISignalsChannel : SignalsIntegrationTests.WS.ISignals, System.ServiceModel.IClientChannel {
+    public interface ISignalsWebServiceChannel : SignalsIntegrationTests.WS.ISignalsWebService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class SignalsClient : System.ServiceModel.ClientBase<SignalsIntegrationTests.WS.ISignals>, SignalsIntegrationTests.WS.ISignals {
+    public partial class SignalsWebServiceClient : System.ServiceModel.ClientBase<SignalsIntegrationTests.WS.ISignalsWebService>, SignalsIntegrationTests.WS.ISignalsWebService {
         
-        public SignalsClient() {
+        public SignalsWebServiceClient() {
         }
         
-        public SignalsClient(string endpointConfigurationName) : 
+        public SignalsWebServiceClient(string endpointConfigurationName) : 
                 base(endpointConfigurationName) {
         }
         
-        public SignalsClient(string endpointConfigurationName, string remoteAddress) : 
+        public SignalsWebServiceClient(string endpointConfigurationName, string remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public SignalsClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public SignalsWebServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public SignalsClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public SignalsWebServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
         }
         

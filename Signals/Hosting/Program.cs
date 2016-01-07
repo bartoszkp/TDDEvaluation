@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
 using System.ServiceModel.Description;
+using Microsoft.Practices.Unity;
 
 namespace Hosting
 {
@@ -8,9 +9,14 @@ namespace Hosting
     {
         static void Main(string[] args)
         {
+            var unityContainer = new UnityContainer();
+            new Bootstrapper.Bootstrapper().Run(unityContainer);
+
             Uri baseAddress = new Uri("http://localhost:8080/signals");
 
-            using (ServiceHost host = new ServiceHost(typeof(WebService.Signals), baseAddress))
+            var serviceInstance = unityContainer.Resolve<WebService.ISignalsWebService>();
+
+            using (var host = new ServiceHost(serviceInstance, baseAddress))
             {
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
                 smb.HttpGetEnabled = true;

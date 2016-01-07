@@ -3,13 +3,15 @@ using System.Threading;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using NHibernate;
+using NHibernate.Cfg;
 
 namespace DataAccess
 {
-    public class UnitOfWorkProvider : ISessionProvider, IDisposable
+    public class UnitOfWorkProvider : IUnitOfWorkProvider, ISessionProvider, IDisposable
     {
-        private readonly ISessionFactory sessionFactory;
+        public Configuration NHibernateConfiguration { get; private set; }
 
+        private readonly ISessionFactory sessionFactory;
         private ThreadLocal<ISession> sessionLocal = new ThreadLocal<ISession>(() => null);
 
         public UnitOfWorkProvider()
@@ -19,11 +21,13 @@ namespace DataAccess
 
         private ISessionFactory CreateSessionFactory()
         {
-            return Fluently.Configure()
+            this.NHibernateConfiguration = Fluently.Configure()
                 .Database(FluentNHibernate.Cfg.Db.MsSqlConfiguration.MsSql2012.ConnectionString(
                     b => b.FromConnectionStringWithKey("signals")))
                 .Mappings(m => m.AutoMappings.Add(AutoMap.AssemblyOf<Domain.Signal>()))
-                .BuildSessionFactory();
+                .BuildConfiguration();
+
+            return this.NHibernateConfiguration.BuildSessionFactory();
         }
 
         public ISession Session
