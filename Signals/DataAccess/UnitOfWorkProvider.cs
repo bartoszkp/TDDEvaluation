@@ -21,10 +21,15 @@ namespace DataAccess
 
         private ISessionFactory CreateSessionFactory()
         {
-            this.NHibernateConfiguration = Fluently.Configure()
+            var mappings = AutoMap
+                .AssemblyOf<Domain.Signal>(new SignalAutoMappingConfiguration())
+                .UseOverridesFromAssemblyOf<UnitOfWorkProvider>();
+                
+            this.NHibernateConfiguration = Fluently
+                .Configure()
                 .Database(FluentNHibernate.Cfg.Db.MsSqlConfiguration.MsSql2012.ConnectionString(
                     b => b.FromConnectionStringWithKey("signals")))
-                .Mappings(m => m.AutoMappings.Add(AutoMap.AssemblyOf<Domain.Signal>()))
+                .Mappings(m => m.AutoMappings.Add(mappings))
                 .BuildConfiguration();
 
             return this.NHibernateConfiguration.BuildSessionFactory();

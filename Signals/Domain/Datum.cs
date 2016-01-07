@@ -4,8 +4,8 @@ namespace Domain
 {
     public class Datum<T>
     {
-        public DateTime Timestamp { get; set; }
+        public virtual DateTime Timestamp { get; set; }
 
-        public T Value { get; set; }
+        public virtual T Value { get; set; }
     }
 }
