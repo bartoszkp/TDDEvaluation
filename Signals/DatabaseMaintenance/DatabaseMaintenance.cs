@@ -14,7 +14,8 @@ namespace DatabaseMaintenance
 
         public void RebuildDatabase()
         {
-            new SchemaExport(this.sessionProvider.NHibernateConfiguration).Execute(true, true, false);
+            new SchemaExport(this.sessionProvider.NHibernateConfiguration)
+                .Execute(true, true, false);
         }
     }
 }

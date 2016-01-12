@@ -2,6 +2,7 @@
 
 namespace Domain
 {
+    [Infrastructure.Component]
     public class Path
     {
         public const char Delimiter = '/';

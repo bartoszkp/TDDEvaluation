@@ -44,6 +44,7 @@
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />
     <Compile Include="Granulation.cs" />
+    <Compile Include="Infrastructure\ComponentAttribute.cs" />
     <Compile Include="Infrastructure\DataTypeUtils.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

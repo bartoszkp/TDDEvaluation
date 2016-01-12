@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
+using DataAccess.AutoMappingOverrides;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
+using FluentNHibernate.Conventions.Helpers;
 using NHibernate;
 using NHibernate.Cfg;
 
