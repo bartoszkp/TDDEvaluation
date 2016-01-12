@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using DataAccess.AutoMappingOverrides;
 using FluentNHibernate.Automapping;
@@ -25,7 +26,8 @@ namespace DataAccess
         private ISessionFactory CreateSessionFactory()
         {
             var mappings = AutoMap
-                .AssemblyOf<Domain.Signal>(new SignalAutoMappingConfiguration())
+                .Assemblies(new SignalAutoMappingConfiguration(), typeof(Domain.Signal).Assembly, typeof(UnitOfWorkProvider).Assembly)
+                .IgnoreBase(typeof(Domain.Datum<>))
                 .UseOverridesFromAssemblyOf<UnitOfWorkProvider>();
                 
             this.NHibernateConfiguration = Fluently

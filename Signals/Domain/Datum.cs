@@ -2,9 +2,10 @@
 
 namespace Domain
 {
-    [Infrastructure.Component]
     public class Datum<T>
     {
+        public virtual int Id { get; set; }
+
         public virtual Signal Signal { get; set; }
 
         public virtual DateTime Timestamp { get; set; }
