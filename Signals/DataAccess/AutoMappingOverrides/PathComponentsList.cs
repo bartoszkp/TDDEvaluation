@@ -9,7 +9,7 @@ using NHibernate.UserTypes;
 
 namespace DataAccess.AutoMappingOverrides
 {
-    class PathComponentsList : IUserType
+    public class PathComponentsList : IUserType
     {
         public bool IsMutable {  get { return true; } }
 
