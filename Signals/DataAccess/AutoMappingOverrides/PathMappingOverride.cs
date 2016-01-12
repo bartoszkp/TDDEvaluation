@@ -8,7 +8,10 @@ namespace DataAccess.AutoMappingOverrides
     {
         public void Override(AutoMapping<Path> mapping)
         {
-            mapping.Map(p => p.Components).CustomType<PathComponentsList>();
+            mapping
+                .Map(p => p.Components)
+                .CustomType<PathComponentsList>()
+                .Column(string.Empty);
         }
     }
 }

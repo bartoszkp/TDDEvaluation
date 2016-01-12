@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="AutoMappingOverrides\PathComponentsList.cs" />
     <Compile Include="AutoMappingOverrides\PathMappingOverride.cs" />
+    <Compile Include="GenericInstantiations\Datum.cs" />
     <Compile Include="ISessionProvider.cs" />
     <Compile Include="IUnitOfWorkProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
