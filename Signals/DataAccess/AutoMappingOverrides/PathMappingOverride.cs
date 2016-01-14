@@ -11,7 +11,8 @@ namespace DataAccess.AutoMappingOverrides
             mapping
                 .Map(p => p.Components)
                 .CustomType<PathComponentsList>()
-                .Column(string.Empty);
+                .Column(string.Empty)
+                .Unique();
         }
     }
 }

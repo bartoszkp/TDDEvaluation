@@ -5,19 +5,25 @@ using System.ServiceModel;
 using Domain.Infrastructure;
 using Domain.Services;
 using Dto.Conversions;
+using Microsoft.Practices.Unity;
+using WebService.Infrastructure;
 
 namespace WebService
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, IncludeExceptionDetailInFaults = true)]
     public class SignalsWebService : ISignalsWebService
     {
+        public IUnityContainer UnityContainer { get; private set; }
+
         private readonly ISignalsDomainService signalsDomainService;
 
-        public SignalsWebService(ISignalsDomainService signalsDomainService)
+        public SignalsWebService(IUnityContainer unityContainer, ISignalsDomainService signalsDomainService)
         {
+            this.UnityContainer = unityContainer;
             this.signalsDomainService = signalsDomainService;
         }     
 
+        [DatabaseTransaction]
         public Dto.Signal Get(Dto.Path pathDto)
         {
             var path = pathDto.ToDomain<Domain.Path>();
@@ -25,6 +31,7 @@ namespace WebService
             return this.signalsDomainService.Get(path).ToDto<Dto.Signal>();
         }
 
+        [DatabaseTransaction]
         public Dto.Signal Add(Dto.Signal signalDto)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
@@ -32,6 +39,7 @@ namespace WebService
             return this.signalsDomainService.Add(signal).ToDto<Dto.Signal>();
         }
 
+        [DatabaseTransaction]
         public IEnumerable<Dto.Datum> GetData(Dto.Signal signalDto, DateTime fromIncluded, DateTime toExcluded)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
@@ -42,6 +50,7 @@ namespace WebService
                 .ToDto<IEnumerable<Dto.Datum>>();
         }
 
+        [DatabaseTransaction]
         public void SetData(Dto.Signal signalDto, DateTime fromIncluded, IEnumerable<Dto.Datum> data)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();

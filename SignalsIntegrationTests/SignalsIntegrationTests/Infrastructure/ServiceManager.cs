@@ -7,8 +7,18 @@ namespace SignalsIntegrationTests.Infrastructure
     public class ServiceManager
     {
         private const string ExecutableHostPathSettingName = "SignalsHostExecutablePath";
+        private const string ExecutableDatabaseMaintenanceToolPathSettingName = "DatabaseMaintenanceToolExecutablePath";
 
         private Process serviceProcess = null;
+
+        public static void RebuildDatabase()
+        {
+            var databaseMaintenanceToolExecutable = GetExecutableFromSetting(ExecutableDatabaseMaintenanceToolPathSettingName);
+
+            var process = Process.Start(databaseMaintenanceToolExecutable.FullName, "rebuild");
+
+            process.WaitForExit();
+        }
 
         /// <summary>
         /// Either run VS as administrator or execute this command in a console with administrative priviledges:
@@ -25,24 +35,14 @@ namespace SignalsIntegrationTests.Infrastructure
                 throw new InvalidOperationException();
             }
 
-            FileInfo executableFileInfo = new FileInfo(Properties.Settings.Default[ExecutableHostPathSettingName] as string);
-
-            if (!executableFileInfo.Exists)
-            {
-                throw new InvalidOperationException(
-                    "Executable host: '"
-                    + executableFileInfo.FullName
-                    + "' does not exist. Please set the Visual Studio Project's setting '"
-                    + ExecutableHostPathSettingName
-                    + "' to contain full path to the correct executable file");
-            }
+            var serviceExecutable = GetExecutableFromSetting(ExecutableHostPathSettingName);
 
             ProcessStartInfo psi = new ProcessStartInfo()
             {
                 ErrorDialog = false,
                 RedirectStandardInput = true,
-                FileName = executableFileInfo.FullName,
-                WorkingDirectory = executableFileInfo.DirectoryName,
+                FileName = serviceExecutable.FullName,
+                WorkingDirectory = serviceExecutable.DirectoryName,
                 UseShellExecute = false
             };
 
@@ -66,6 +66,23 @@ namespace SignalsIntegrationTests.Infrastructure
             }
 
             serviceProcess = null;
+        }
+
+        private static FileInfo GetExecutableFromSetting(string settingName)
+        {
+            FileInfo executableFileInfo = new FileInfo(Properties.Settings.Default[settingName] as string);
+
+            if (!executableFileInfo.Exists)
+            {
+                throw new InvalidOperationException(
+                    "Executable host: '"
+                    + executableFileInfo.FullName
+                    + "' does not exist. Please set the Visual Studio Project's setting '"
+                    + ExecutableHostPathSettingName
+                    + "' to contain full path to the correct executable file");
+            }
+
+            return executableFileInfo;
         }
     }
 }

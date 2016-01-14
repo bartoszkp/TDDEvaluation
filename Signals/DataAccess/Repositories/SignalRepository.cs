@@ -18,11 +18,9 @@ namespace DataAccess.Repositories
 
         public Signal Get(Path path)
         {
-            var pathString = path.ToString();
-
             return Session
                 .QueryOver<Signal>()
-                .Where(s => s.Path.ToString() == pathString)
+                .Where(s => s.Path == path)
                 .SingleOrDefault();
         }
 

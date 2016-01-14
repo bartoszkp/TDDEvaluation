@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
-using DataAccess.AutoMappingOverrides;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
-using FluentNHibernate.Conventions.Helpers;
 using NHibernate;
 using NHibernate.Cfg;
 
@@ -16,7 +12,17 @@ namespace DataAccess
         public Configuration NHibernateConfiguration { get; private set; }
 
         private readonly ISessionFactory sessionFactory;
-        private ThreadLocal<ISession> sessionLocal = new ThreadLocal<ISession>(() => null);
+        private ThreadLocal<UnitOfWork> unitOfWorkLocal = new ThreadLocal<UnitOfWork>(() => null);
+
+        public UnitOfWork CurrentUnitOfWork
+        {
+            get { return unitOfWorkLocal.Value; }
+        }
+
+        public ISession Session
+        {
+            get { return unitOfWorkLocal.Value.Session; }
+        }
 
         public UnitOfWorkProvider()
         {
@@ -28,7 +34,8 @@ namespace DataAccess
             var mappings = AutoMap
                 .Assemblies(new SignalAutoMappingConfiguration(), typeof(Domain.Signal).Assembly, typeof(UnitOfWorkProvider).Assembly)
                 .IgnoreBase(typeof(Domain.Datum<>))
-                .UseOverridesFromAssemblyOf<UnitOfWorkProvider>();
+                .UseOverridesFromAssemblyOf<UnitOfWorkProvider>()
+                .Conventions.AddFromAssemblyOf<UnitOfWorkProvider>();
                 
             this.NHibernateConfiguration = Fluently
                 .Configure()
@@ -40,17 +47,13 @@ namespace DataAccess
             return this.NHibernateConfiguration.BuildSessionFactory();
         }
 
-        public ISession Session
-        {
-            get { return sessionLocal.Value; }
-        }
-
         private UnitOfWork OpenUnitOfWork(bool readOnly)
         {
-            if (sessionLocal.Value == null)
+            if (unitOfWorkLocal.Value == null)
             {
-                sessionLocal.Value = sessionFactory.OpenSession();
-                var unitOfWork = new UnitOfWork(sessionLocal.Value, readOnly);
+                var session = sessionFactory.OpenSession();
+                var unitOfWork = new UnitOfWork(session, readOnly);
+                unitOfWorkLocal.Value = unitOfWork;
                 unitOfWork.Closed += new EventHandler(OnUnitOfWorkClosed);
                 return unitOfWork;
             }
@@ -75,7 +78,7 @@ namespace DataAccess
             UnitOfWork unitOfWork = (UnitOfWork)sender;
             unitOfWork.Closed -= OnUnitOfWorkClosed;
 
-            sessionLocal.Value = null;
+            unitOfWorkLocal.Value = null;
         }
 
         public void Dispose()
@@ -88,7 +91,7 @@ namespace DataAccess
         {
             if (disposing)
             {
-                sessionLocal.Dispose();
+                unitOfWorkLocal.Dispose();
                 sessionFactory.Dispose();
             }
         }

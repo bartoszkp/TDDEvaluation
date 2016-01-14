@@ -5,5 +5,8 @@
     <Setting Name="SignalsHostExecutablePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\..\..\Signals\Hosting\bin\Debug\Hosting.exe</Value>
     </Setting>
+    <Setting Name="DatabaseMaintenanceToolExecutablePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\..\Signals\DatabaseMaintenanceTool\bin\Debug\DatabaseMaintenanceTool.exe</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

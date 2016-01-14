@@ -1,38 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Repositories;
 
 namespace Domain.Services.Implementation
 {
     public class SignalsDomainService : ISignalsDomainService
     {
-        private int currentId = 0;
+        private readonly ISignalRepository signalRepository;
+
         private Dictionary<string, Signal> signals = new Dictionary<string, Signal>();
         private Dictionary<int, Dictionary<DateTime, Datum<object>>> data = new Dictionary<int, Dictionary<DateTime, Datum<object>>>();
 
+        public SignalsDomainService(ISignalRepository signalRepository)
+        {
+            this.signalRepository = signalRepository;
+        }
+
         public Signal Get(Path path)
         {
-            Signal s = null;
-            if (signals.TryGetValue(path.ToString(), out s))
+            var result = this.signalRepository.Get(path);
+
+            if (result == null)
             {
-                return s;
+                throw new KeyNotFoundException();
             }
 
-            throw new KeyNotFoundException(); // OR: return null;
+            return result;
         }
 
         public Signal Add(Signal signal)
         {
-            signal.Id = currentId++;
-
-            signals[signal.Path.ToString()] = signal;
-
-            return signal;
+            return this.signalRepository.Add(signal);
         }
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
-            var signalData = data[signal.Id.Value];
+            var signalData = data[signal.Id];
 
             foreach (var timestamp in new Infrastructure.TimeEnumerator(fromIncluded, toExcluded, signal.Granularity))
             {
@@ -49,7 +53,7 @@ namespace Domain.Services.Implementation
         {
             var dataDict = data.ToDictionary(d => d.Timestamp, d => d);
 
-            this.data[signal.Id.Value] = (new Infrastructure.TimeEnumerator(fromIncluded, dataDict.Count, signal.Granularity))
+            this.data[signal.Id] = (new Infrastructure.TimeEnumerator(fromIncluded, dataDict.Count, signal.Granularity))
                 .ToDictionary(ts => ts, ts => new Datum<object>() { Timestamp = ts, Value = dataDict[ts].Value });
         }
     }
