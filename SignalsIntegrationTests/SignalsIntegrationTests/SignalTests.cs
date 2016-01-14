@@ -14,6 +14,8 @@ namespace SignalsIntegrationTests
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
+            ServiceManager.RebuildDatabase();
+
             serviceManager = new ServiceManager();
             serviceManager.StartService();
         }
@@ -39,7 +41,7 @@ namespace SignalsIntegrationTests
         {
             var signal = new Signal()
             {
-                Path = Path.FromString("/new/signal"),
+                Path = Path.FromString("/new/signal1"),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -54,7 +56,7 @@ namespace SignalsIntegrationTests
         {
             var newSignal = new Signal()
             {
-                Path = Path.FromString("/new/signal"),
+                Path = Path.FromString("/new/signal2"),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -72,13 +74,13 @@ namespace SignalsIntegrationTests
         {
             var newSignal1 = new Signal()
             {
-                Path = Path.FromString("/new/signal/1"),
+                Path = Path.FromString("/new/signal/3"),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
             var newSignal2 = new Signal()
             {
-                Path = Path.FromString("/new/signal/2"),
+                Path = Path.FromString("/new/signal/4"),
                 Granularity = Granularity.Hour,
                 DataType = DataType.Double
             };

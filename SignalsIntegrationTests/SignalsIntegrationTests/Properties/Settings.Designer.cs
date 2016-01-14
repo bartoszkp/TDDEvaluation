@@ -34,5 +34,18 @@ namespace SignalsIntegrationTests.Properties {
                 this["SignalsHostExecutablePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\..\\Signals\\DatabaseMaintenanceTool\\bin\\Debug\\DatabaseMaintenanceTool.exe" +
+            "")]
+        public string DatabaseMaintenanceToolExecutablePath {
+            get {
+                return ((string)(this["DatabaseMaintenanceToolExecutablePath"]));
+            }
+            set {
+                this["DatabaseMaintenanceToolExecutablePath"] = value;
+            }
+        }
     }
 }

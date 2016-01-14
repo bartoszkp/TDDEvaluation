@@ -14,6 +14,8 @@ namespace Bootstrapper
         {
             UnityContainer = unityContainer;
 
+            UnityContainer.RegisterInstance<IUnityContainer>(UnityContainer, new ExternallyControlledLifetimeManager());
+
             SetupDataAccess();
 
             SetupDomain();

@@ -16,7 +16,7 @@ namespace Hosting
 
             Uri baseAddress = new Uri("http://localhost:8080/signals");
 
-            using (var host = new UnityServiceHost(unityContainer, typeof(SignalsWebService)))
+            using (var host = new ServiceHost(unityContainer.Resolve<ISignalsWebService>(), baseAddress))
             {
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
                 smb.HttpGetEnabled = true;
