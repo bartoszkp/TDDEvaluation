@@ -1,5 +1,4 @@
 ﻿using System;
-using FluentNHibernate;
 
 namespace DataAccess
 {
