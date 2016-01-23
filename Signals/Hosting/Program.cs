@@ -3,7 +3,6 @@ using System.ServiceModel;
 using System.ServiceModel.Description;
 using Microsoft.Practices.Unity;
 using WebService;
-using WebService.Infrastructure;
 
 namespace Hosting
 {
