@@ -21,7 +21,15 @@ namespace DataAccess
 
         public ISession Session
         {
-            get { return unitOfWorkLocal.Value.Session; }
+            get
+            {
+                if (unitOfWorkLocal.Value == null)
+                {
+                    throw new InvalidOperationException("No transaction opened");
+                }
+
+                return unitOfWorkLocal.Value.Session;
+            }
         }
 
         public UnitOfWorkProvider()
