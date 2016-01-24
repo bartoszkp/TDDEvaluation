@@ -21,21 +21,27 @@ namespace Dto.Conversions
                 var nativeType = datumType.BaseType.GenericTypeArguments[0];
 
                 configureDatumMapping
-                    .MakeGenericMethod(nativeType)
+                    .MakeGenericMethod(nativeType, datumType)
                     .Invoke(null, null);
             }
         }
 
-        private static void ConfigureDatumMapping<T>()
+        private static void ConfigureDatumMapping<NativeT, DatumT>() where DatumT : Domain.Datum<NativeT>
         {
             FastMapper
-                .TypeAdapterConfig<Domain.Datum<T>, Dto.Datum>
+                .TypeAdapterConfig<Domain.Datum<NativeT>, Dto.Datum>
                 .NewConfig()
                 .MapFrom(target => target.Value, source => source.Value)
                 .MapFrom(target => target.Timestamp, source => source.Timestamp);
 
             FastMapper
-                .TypeAdapterConfig<Dto.Datum, Domain.Datum<T>>
+                .TypeAdapterConfig<DatumT, Dto.Datum>
+                .NewConfig()
+                .MapFrom(target => target.Value, source => source.Value)
+                .MapFrom(target => target.Timestamp, source => source.Timestamp);
+
+            FastMapper
+                .TypeAdapterConfig<Dto.Datum, Domain.Datum<NativeT>>
                 .NewConfig()
                 .MapFrom(target => target.Value, source => source.Value)
                 .MapFrom(target => target.Timestamp, source => source.Timestamp);

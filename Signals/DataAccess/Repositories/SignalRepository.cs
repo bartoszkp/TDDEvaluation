@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using DataAccess.GenericInstantiations;
 using Domain;
+using FastMapper;
 using NHibernate.Criterion;
 
 namespace DataAccess.Repositories
@@ -12,6 +14,18 @@ namespace DataAccess.Repositories
         public SignalRepository(ISessionProvider sessionProvider)
             : base(sessionProvider)
         {
+            var datumTypes = Assembly
+                .GetExecutingAssembly()
+                .GetTypes()
+                .Where(t => t.BaseType != null)
+                .Where(t => t.BaseType.IsGenericType)
+                .Where(t => t.BaseType.GetGenericTypeDefinition().Equals(typeof(Domain.Datum<>)))
+                .ToArray();
+
+            foreach (var datumType in datumTypes)
+            {
+                genericTypeMappinges.Add(datumType.BaseType, datumType);
+            }
         }
 
         public Signal Add(Signal signal)
@@ -40,7 +54,11 @@ namespace DataAccess.Repositories
         {
             foreach (var datum in data)
             {
-                Session.SaveOrUpdate(datum);
+                var mappingType = genericTypeMappinges[datum.GetType()];
+
+                var mappedDatum = TypeAdapter.Adapt(datum, datum.GetType(), mappingType);
+
+                Session.SaveOrUpdate(mappedDatum);
             }
         }
 
@@ -63,5 +81,7 @@ namespace DataAccess.Repositories
                 .List()
                 .Cast<Datum<T>>();
         }
+
+        private Dictionary<Type, Type> genericTypeMappinges = new Dictionary<Type, Type>(); 
     }
 }
