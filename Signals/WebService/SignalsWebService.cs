@@ -71,7 +71,7 @@ namespace WebService
 
             var setData = GetAppropriateSetDataMethod(signal.DataType);
 
-            setData.Invoke(this.signalsDomainService, new object[] { signal, fromIncluded, concreteData });
+            setData.Invoke(this.signalsDomainService, new object[] { signal, concreteData });
         }
 
         private static MethodInfo GetAppropriateGetDataMethod(Domain.DataType dataType)
@@ -85,7 +85,7 @@ namespace WebService
         private static MethodInfo GetAppropriateSetDataMethod(Domain.DataType dataType)
         {
             var methodInfo = ReflectionUtils
-                .GetMethodInfo<ISignalsDomainService>(x => x.SetData<object>(null, default(DateTime), null));
+                .GetMethodInfo<ISignalsDomainService>(x => x.SetData<object>(null, null));
 
             return GetAppropriateMethod(methodInfo.GetGenericMethodDefinition(), dataType);
         }
