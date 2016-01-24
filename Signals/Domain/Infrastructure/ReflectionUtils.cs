@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace WebService.Infrastructure
+namespace Domain.Infrastructure
 {
     public static class ReflectionUtils
     {

@@ -46,6 +46,7 @@
     <Compile Include="Granulation.cs" />
     <Compile Include="Infrastructure\ComponentAttribute.cs" />
     <Compile Include="Infrastructure\DataTypeUtils.cs" />
+    <Compile Include="Infrastructure\ReflectionUtils.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ISignalRepository.cs" />
