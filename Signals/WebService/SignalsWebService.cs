@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using Domain.Infrastructure;
@@ -42,8 +44,14 @@ namespace WebService
 
             var getData = GetAppropriateGetDataMethod(signal.DataType);
 
-            return getData.Invoke(this.signalsDomainService, new object[] { signal, fromIncluded, toExcluded })
-                .ToDto<IEnumerable<Dto.Datum>>();
+            var result = getData
+                .Invoke(this.signalsDomainService, new object[] { signal, fromIncluded, toExcluded })
+                as IEnumerable;
+
+            return result
+                .Cast<object>()
+                .Select(d => d.ToDto<Dto.Datum>())
+                .ToArray();
         }
 
         public void SetData(Dto.Signal signalDto, DateTime fromIncluded, IEnumerable<Dto.Datum> data)
@@ -52,17 +60,23 @@ namespace WebService
 
             var genericDatum = typeof(Domain.Datum<object>).GetGenericTypeDefinition();
             var concreteDatum = genericDatum.MakeGenericType(signal.DataType.GetNativeType());
-            var genericIEnumerable = typeof(IEnumerable<object>).GetGenericTypeDefinition();
-            var concreteIEnumerable = genericIEnumerable.MakeGenericType(concreteDatum);
+
+            var dataArray = data.ToArray();
+            var concreteData = Array.CreateInstance(concreteDatum, dataArray.Length);
+
+            for (int i = 0;i < dataArray.Length;++i)
+            {
+                concreteData.SetValue(dataArray[i].ToDomain(concreteDatum), i);
+            }
 
             var setData = GetAppropriateSetDataMethod(signal.DataType);
 
-            setData.Invoke(this.signalsDomainService, new object[] { signal, fromIncluded, concreteIEnumerable });
+            setData.Invoke(this.signalsDomainService, new object[] { signal, fromIncluded, concreteData });
         }
 
         private static MethodInfo GetAppropriateGetDataMethod(Domain.DataType dataType)
         {
-            var methodInfo = Infrastructure.ReflectionUtils
+            var methodInfo = ReflectionUtils
                 .GetMethodInfo<ISignalsDomainService>(x => x.GetData<object>(null, default(DateTime), default(DateTime)));
 
             return GetAppropriateMethod(methodInfo.GetGenericMethodDefinition(), dataType);
@@ -70,7 +84,7 @@ namespace WebService
 
         private static MethodInfo GetAppropriateSetDataMethod(Domain.DataType dataType)
         {
-            var methodInfo = Infrastructure.ReflectionUtils
+            var methodInfo = ReflectionUtils
                 .GetMethodInfo<ISignalsDomainService>(x => x.SetData<object>(null, default(DateTime), null));
 
             return GetAppropriateMethod(methodInfo.GetGenericMethodDefinition(), dataType);

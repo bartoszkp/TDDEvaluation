@@ -1,4 +1,5 @@
-﻿using FastMapper;
+﻿using System;
+using FastMapper;
 
 namespace Dto.Conversions
 {
@@ -7,6 +8,11 @@ namespace Dto.Conversions
         public static T ToDomain<T>(this object @this)
         {
             return TypeAdapter.Adapt<T>(@this);
+        }
+
+        public static object ToDomain(this object @this, Type targetType)
+        {
+            return TypeAdapter.Adapt(@this, @this.GetType(), targetType);
         }
     }
 }

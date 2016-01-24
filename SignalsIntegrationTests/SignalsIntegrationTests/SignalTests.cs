@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Domain;
 using Dto.Conversions;
 using SignalsIntegrationTests.Infrastructure;
+using System;
 
 namespace SignalsIntegrationTests
 {
@@ -93,6 +95,42 @@ namespace SignalsIntegrationTests
             Assert.AreEqual(newSignal1.Path, received1.Path);
             Assert.AreEqual(newSignal2.Path, received2.Path);
             Assert.AreNotEqual(received1.Id, received2.Id);
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveData()
+        {
+            var newSignal1 = new Signal()
+            {
+                Path = Path.FromString("/new/signal/5"),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+
+            client.Add(newSignal1.ToDto<Dto.Signal>());
+            var signal = client.Get(Path.FromString("/new/signal/5").ToDto<Dto.Path>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Signal = newSignal1,
+                    Timestamp = new DateTime(2019, 4, 14),
+                    Value = 4
+                }
+            };
+
+            client.SetData(
+                signal,
+                new DateTime(2019, 4, 14),
+                data.Select(d => new Dto.Datum() { Timestamp = d.Timestamp, Value = d.Value })
+                .ToArray());
+
+            var retrievedData = client.GetData(signal, new DateTime(2019, 4, 14), new DateTime(2019, 4, 15));
+
+            Assert.AreEqual(data.Length, retrievedData.Length);
+            Assert.AreEqual(data[0].Value, retrievedData[0].Value);
+            Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
         }
 
         // TODO multiple times adding same signal (expected behaviour?)

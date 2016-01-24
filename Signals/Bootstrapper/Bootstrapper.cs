@@ -2,6 +2,7 @@
 using DataAccess.Infrastructure;
 using Domain.Repositories;
 using Domain.Services;
+using Dto.Conversions;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.InterceptionExtension;
 using WebService;
@@ -24,6 +25,8 @@ namespace Bootstrapper
             SetupDomain();
 
             SetupWebService();
+
+            TypeAdapterConfiguration.Initialize();
         }
 
         public void SetupDataAccess()
