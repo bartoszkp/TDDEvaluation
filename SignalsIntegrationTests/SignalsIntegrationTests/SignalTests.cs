@@ -123,8 +123,7 @@ namespace SignalsIntegrationTests
             client.SetData(
                 signal,
                 new DateTime(2019, 4, 14),
-                data.Select(d => new Dto.Datum() { Timestamp = d.Timestamp, Value = d.Value })
-                .ToArray());
+                data.ToDto());
 
             var retrievedData = client.GetData(signal, new DateTime(2019, 4, 14), new DateTime(2019, 4, 15));
 
