@@ -5,6 +5,7 @@ using Dto.Conversions;
 using SignalsIntegrationTests.Infrastructure;
 using System;
 using System.Threading;
+using System.ServiceModel;
 
 namespace SignalsIntegrationTests
 {
@@ -35,8 +36,6 @@ namespace SignalsIntegrationTests
         {
             client = new WS.SignalsWebServiceClient();
         }
-
-        // TODO Get from empty db
 
         [TestMethod]
         public void RequestForNonExistingSignalThrowsOrReturnsNull()
@@ -109,6 +108,7 @@ namespace SignalsIntegrationTests
         public void CanWriteAndRetrieveData()
         {
             var path = GenerateUniqueSignalPath();
+            var timestamp = new DateTime(2019, 4, 14);
 
             var newSignal1 = new Signal()
             {
@@ -117,37 +117,72 @@ namespace SignalsIntegrationTests
                 DataType = DataType.Integer
             };
 
-            client.Add(newSignal1.ToDto<Dto.Signal>());
-            var signal = client.Get(path.ToDto<Dto.Path>());
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
 
             var data = new[]
             {
                 new Datum<int>()
                 {
                     Signal = newSignal1,
-                    Timestamp = new DateTime(2019, 4, 14),
+                    Timestamp = timestamp,
                     Value = 4
                 }
             };
 
-            client.SetData(
-                signal,
-                new DateTime(2019, 4, 14),
-                data.ToDto());
-
-            var retrievedData = client.GetData(signal, new DateTime(2019, 4, 14), new DateTime(2019, 4, 15));
+            client.SetData(signal, timestamp, data.ToDto());
+            var retrievedData = client.GetData(signal, timestamp, timestamp.AddDays(1));
 
             Assert.AreEqual(data.Length, retrievedData.Length);
             Assert.AreEqual(data[0].Value, retrievedData[0].Value);
             Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
         }
 
+        [TestMethod]
+        public void GetDataUsingIncompleteSignalsThrowsOrReturnsNull()
+        {
+            var newSignal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+
+            Assertions.AssertReturnsNullOrThrows(() => client.GetData(newSignal.ToDto<Dto.Signal>(), new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
+         }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataUsingIncompleteSignalsThrowsOrReturnsNull()
+        {
+            var timestamp = new DateTime(2019, 4, 14);
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Signal = signal,
+                    Timestamp = timestamp,
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), timestamp, data.ToDto());
+        }
+
+        // TODO data outside range
+        // TODO different "missing" data  behaviour
+
         // TODO multiple times adding same signal (expected behaviour?)
         // TODO removing?
         // TODO editing?
         // TODO changing path?
 
-            // TODO persistency tests
+        // TODO persistency tests - problem - sequential run of unit tests...
 
         [TestCleanup]
         public void TestCleanup()
