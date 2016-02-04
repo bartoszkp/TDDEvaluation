@@ -4,14 +4,22 @@ using Domain;
 using Dto.Conversions;
 using SignalsIntegrationTests.Infrastructure;
 using System;
+using System.Threading;
 
 namespace SignalsIntegrationTests
 {
     [TestClass]
     public class SignalTests
     {
+        private static int signalCounter = 0;
         private static ServiceManager serviceManager;
         private WS.SignalsWebServiceClient client;
+
+        private static Path GenerateUniqueSignalPath()
+        {
+            Interlocked.Increment(ref signalCounter);
+            return Path.FromString("/new/signal" + signalCounter.ToString());
+        }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -43,7 +51,7 @@ namespace SignalsIntegrationTests
         {
             var signal = new Signal()
             {
-                Path = Path.FromString("/new/signal1"),
+                Path = GenerateUniqueSignalPath(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -58,7 +66,7 @@ namespace SignalsIntegrationTests
         {
             var newSignal = new Signal()
             {
-                Path = Path.FromString("/new/signal2"),
+                Path = GenerateUniqueSignalPath(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -76,13 +84,13 @@ namespace SignalsIntegrationTests
         {
             var newSignal1 = new Signal()
             {
-                Path = Path.FromString("/new/signal/3"),
+                Path = GenerateUniqueSignalPath(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
             var newSignal2 = new Signal()
             {
-                Path = Path.FromString("/new/signal/4"),
+                Path = GenerateUniqueSignalPath(),
                 Granularity = Granularity.Hour,
                 DataType = DataType.Double
             };
@@ -100,15 +108,17 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void CanWriteAndRetrieveData()
         {
+            var path = GenerateUniqueSignalPath();
+
             var newSignal1 = new Signal()
             {
-                Path = Path.FromString("/new/signal/5"),
+                Path = path,
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
 
             client.Add(newSignal1.ToDto<Dto.Signal>());
-            var signal = client.Get(Path.FromString("/new/signal/5").ToDto<Dto.Path>());
+            var signal = client.Get(path.ToDto<Dto.Path>());
 
             var data = new[]
             {
