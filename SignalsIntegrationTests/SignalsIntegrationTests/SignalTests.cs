@@ -174,10 +174,41 @@ namespace SignalsIntegrationTests
             client.SetData(signal.ToDto<Dto.Signal>(), timestamp, data.ToDto());
         }
 
+        [TestMethod]
+        public void TryingToAddSignalWithExistingPathThrowsOrReturnsNull()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+
+            client.Add(signal.ToDto<Dto.Signal>());
+
+            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+        }
+
+        [TestMethod]
+        public void TryingToAddSignalWithNotNullIdThrowsOrReturnsNull()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer,
+                Id = 42
+            };
+
+            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+        }
+
+ 
+        // TODO trying to set data with wrong granulation - expected behavior?
+
         // TODO data outside range
         // TODO different "missing" data  behaviour
 
-        // TODO multiple times adding same signal (expected behaviour?)
         // TODO removing?
         // TODO editing?
         // TODO changing path?
