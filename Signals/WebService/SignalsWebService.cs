@@ -11,7 +11,7 @@ using Microsoft.Practices.Unity;
 
 namespace WebService
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, IncludeExceptionDetailInFaults = true)]
+    [ServiceBehavior(IncludeExceptionDetailInFaults = true)]
     public class SignalsWebService : ISignalsWebService
     {
         public IUnityContainer UnityContainer { get; private set; }
