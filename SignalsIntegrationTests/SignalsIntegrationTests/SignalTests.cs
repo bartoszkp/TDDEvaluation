@@ -228,8 +228,51 @@ namespace SignalsIntegrationTests
             }
         }
 
-        // TODO bad timestamps in SetData
-        // TODO bad timestamps in GetData
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataWithSecondGranularityChecksDatumTimestampHasZeroMilliseconds()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Second,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 44, 123),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), new DateTime(2014, 2, 3), data.ToDto());
+        }
+
+        /*
+    TODO bad timestamps in SetData
+    Minute,
+    Hour,
+    Day,
+    Week,
+    Month,
+    Year
+        */
+
+        /*
+TODO bad timestamps in GetData
+Second,
+Minute,
+Hour,
+Day,
+Week,
+Month,
+Year
+*/
 
         // TODO GetData with different MissingValuePolicy
 

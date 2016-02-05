@@ -43,6 +43,7 @@ namespace Domain.Services.Implementation
             foreach (var d in data)
             {
                 d.Signal = signal;
+                signal.Granularity.ValidateTimestamp(d.Timestamp);
             }
 
             this.signalRepository.SetData<T>(data);
