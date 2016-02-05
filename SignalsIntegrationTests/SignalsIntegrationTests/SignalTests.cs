@@ -129,7 +129,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal, timestamp, data.ToDto());
+            client.SetData(signal, data.ToDto());
             var retrievedData = client.GetData(signal, timestamp, timestamp.AddDays(1));
 
             Assert.AreEqual(data.Length, retrievedData.Length);
@@ -171,7 +171,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), timestamp, data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
         }
 
         [TestMethod]
@@ -250,7 +250,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), new DateTime(2014, 2, 3), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
         }
 
         /*
