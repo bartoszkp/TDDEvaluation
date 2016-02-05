@@ -11,5 +11,7 @@ namespace Domain
         public virtual DateTime Timestamp { get; set; }
 
         public virtual T Value { get; set; }
+
+        public virtual Quality Quality { get; set; }
     }
 }
