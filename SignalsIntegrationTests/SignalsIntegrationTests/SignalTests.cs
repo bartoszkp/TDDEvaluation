@@ -230,7 +230,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
-        public void SetDataWithSecondGranularityChecksDatumTimestampHasZeroMilliseconds()
+        public void SetDataForSecondGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = new Signal()
             {
@@ -253,33 +253,645 @@ namespace SignalsIntegrationTests
             client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
         }
 
-        /*
-    TODO bad timestamps in SetData
-    Minute,
-    Hour,
-    Day,
-    Week,
-    Month,
-    Year
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForMinuteGranularityRequiresZerosMillisecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Minute,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 123),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForMinuteGranularityRequiresZerosSecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Minute,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForHourGranularityRequiresZerosMillisecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Hour,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForHourGranularityRequiresZerosSecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Hour,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForHourGranularityRequiresZerosMinutesInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Hour,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForDayGranularityRequiresZerosMillisecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForDayGranularityRequiresZerosSecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForDayGranularityRequiresZerosMinutesInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForDayGranularityRequiresZerosHoursInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForWeekGranularityRequiresZerosMillisecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Week,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForWeekGranularityRequiresZerosSecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Week,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForWeekGranularityRequiresZerosMinutesInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Week,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForWeekGranularityRequiresZerosHoursInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Week,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForWeekGranularityRequiresMondayInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Week,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForMonthGranularityRequiresZerosMillisecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Month,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForMonthGranularityRequiresZerosSecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Month,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForMonthGranularityRequiresZerosMinutesInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Month,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForMonthGranularityRequiresZerosHoursInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Month,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForMonthGranularityRequiresFirstDayOfMonthInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Month,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForYearGranularityRequiresZerosMillisecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForYearGranularityRequiresZerosSecondsInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForYearGranularityRequiresZerosMinutesInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForYearGranularityRequiresZerosHoursInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForYearGranularityRequiresFirstDayOfMonthInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 10, 2),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        public void SetDataForYearGranularityRequiresFirstMonthInTimestamps()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = new DateTime(2016, 2, 1),
+                    Value = 4
+                }
+            };
+
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+        }
+
+        /* TODO bad timestamps in GetData
+                Second,
+                Minute,
+                Hour,
+                Day,
+                Week,
+                Month,
+                Year
         */
 
-        /*
-TODO bad timestamps in GetData
-Second,
-Minute,
-Hour,
-Day,
-Week,
-Month,
-Year
-*/
+        // TODO GetData range validation
 
         // TODO GetData with different MissingValuePolicy
-
-        // TODO trying to set data with wrong granulation - expected behavior?
-
-        // TODO data outside range
-        // TODO different "missing" data  behaviour
 
         // TODO removing?
         // TODO editing?
