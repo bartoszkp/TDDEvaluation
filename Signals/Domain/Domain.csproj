@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Infrastructure\GranularityUtils.cs" />
     <Compile Include="Quality.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />
