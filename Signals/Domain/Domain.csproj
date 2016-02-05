@@ -44,7 +44,7 @@
     <Compile Include="Quality.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />
-    <Compile Include="Granulation.cs" />
+    <Compile Include="Granularity.cs" />
     <Compile Include="Infrastructure\ComponentAttribute.cs" />
     <Compile Include="Infrastructure\DataTypeUtils.cs" />
     <Compile Include="Infrastructure\ReflectionUtils.cs" />
