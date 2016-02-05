@@ -203,7 +203,35 @@ namespace SignalsIntegrationTests
             Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
-        // TODO GetData with "None" qualities
+        [TestMethod]
+        public void SignalWithoutDataReturnsNoneQualityDatumsForEachTimerangeStep()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            const int numberOfDays = 5;
+            var timestamp = new DateTime(2019, 1, 1);
+            var receivedData = client.GetData(signal, timestamp, timestamp.AddDays(numberOfDays));
+
+            Assert.AreEqual(numberOfDays, receivedData.Length);
+            foreach (var datum in receivedData)
+            {
+                Assert.AreEqual(timestamp, datum.Timestamp);
+                Assert.AreEqual(Dto.Quality.None, datum.Quality);
+                timestamp = timestamp.AddDays(1);
+            }
+        }
+
+        // TODO bad timestamps in SetData
+        // TODO bad timestamps in GetData
+
+        // TODO GetData with different MissingValuePolicy
 
         // TODO trying to set data with wrong granulation - expected behavior?
 
