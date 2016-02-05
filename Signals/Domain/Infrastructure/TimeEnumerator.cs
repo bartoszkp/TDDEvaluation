@@ -8,19 +8,32 @@ namespace Domain.Infrastructure
     {
         public DateTime FromIncluded { get; private set; }
 
-        public int Steps { get; private set; }
+        public DateTime ToExcluded { get; private set; }
 
-        public DateTime? ToExcluded { get; private set; }
+        public long Steps
+        {
+            get
+            {
+                return (ToExcluded - FromIncluded).Ticks / granularityTimeSpan[Granularity].Ticks;
+            }
+        }
 
         public Granularity Granularity { get; private set; }
 
-        private int currentStep;
         private DateTime? current;
         public DateTime Current
         {
             get
             {
                 return current.Value;
+            }
+        }
+
+        public long CurrentStep
+        {
+            get
+            {
+                return (Current - FromIncluded).Ticks / granularityTimeSpan[Granularity].Ticks;
             }
         }
 
@@ -43,8 +56,7 @@ namespace Domain.Infrastructure
         public TimeEnumerator(DateTime fromIncluded, int steps, Granularity granularity)
         {
             this.FromIncluded = fromIncluded;
-            this.ToExcluded = null;
-            this.Steps = steps;
+            this.ToExcluded = fromIncluded + TimeSpan.FromTicks(granularityTimeSpan[granularity].Ticks * steps);
             this.Granularity = granularity;
             this.Reset();
         }
@@ -61,23 +73,14 @@ namespace Domain.Infrastructure
                 return true;
             }
 
-            this.currentStep += 1;
             this.current = this.current.Value + granularityTimeSpan[this.Granularity];
 
-            if (this.ToExcluded.HasValue)
-            {
-                return this.current.Value < this.ToExcluded;
-            }
-            else
-            {
-                return this.currentStep < this.Steps;
-            }
+            return this.current.Value < this.ToExcluded;
         }
 
         public void Reset()
         {
             this.current = null;
-            this.currentStep = 0;
         }
 
         private static Dictionary<Granularity, TimeSpan> InitializeGranularityTimeSpan()
