@@ -123,9 +123,9 @@ namespace SignalsIntegrationTests
             {
                 new Datum<int>()
                 {
-                    Signal = newSignal1,
                     Timestamp = timestamp,
-                    Value = 4
+                    Value = 4,
+                    Quality = Quality.Fair
                 }
             };
 
@@ -135,6 +135,7 @@ namespace SignalsIntegrationTests
             Assert.AreEqual(data.Length, retrievedData.Length);
             Assert.AreEqual(data[0].Value, retrievedData[0].Value);
             Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
+            Assert.AreEqual(data[0].Quality, retrievedData[0].ToDomain<Domain.Datum<int>>().Quality);
         }
 
         [TestMethod]
@@ -165,7 +166,6 @@ namespace SignalsIntegrationTests
             {
                 new Datum<int>()
                 {
-                    Signal = signal,
                     Timestamp = timestamp,
                     Value = 4
                 }
@@ -203,7 +203,8 @@ namespace SignalsIntegrationTests
             Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
- 
+        // TODO GetData with "None" qualities
+
         // TODO trying to set data with wrong granulation - expected behavior?
 
         // TODO data outside range

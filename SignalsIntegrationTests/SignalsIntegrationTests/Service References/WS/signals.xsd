@@ -46,9 +46,20 @@
   <xs:element name="ArrayOfDatum" nillable="true" type="tns:ArrayOfDatum" />
   <xs:complexType name="Datum">
     <xs:sequence>
+      <xs:element minOccurs="0" name="Quality" type="tns:Quality" />
       <xs:element minOccurs="0" name="Timestamp" type="xs:dateTime" />
       <xs:element minOccurs="0" name="Value" nillable="true" type="xs:anyType" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Datum" nillable="true" type="tns:Datum" />
+  <xs:simpleType name="Quality">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="Good" />
+      <xs:enumeration value="Fair" />
+      <xs:enumeration value="Poor" />
+      <xs:enumeration value="Bad" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Quality" nillable="true" type="tns:Quality" />
 </xs:schema>
