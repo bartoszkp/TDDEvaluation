@@ -7,20 +7,16 @@ using System.ServiceModel;
 using Domain.Infrastructure;
 using Domain.Services;
 using Dto.Conversions;
-using Microsoft.Practices.Unity;
 
 namespace WebService
 {
     [ServiceBehavior(IncludeExceptionDetailInFaults = true)]
     public class SignalsWebService : ISignalsWebService
     {
-        public IUnityContainer UnityContainer { get; private set; }
-
         private readonly ISignalsDomainService signalsDomainService;
 
-        public SignalsWebService(IUnityContainer unityContainer, ISignalsDomainService signalsDomainService)
+        public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-            this.UnityContainer = unityContainer;
             this.signalsDomainService = signalsDomainService;
         }     
 
