@@ -18,6 +18,6 @@ namespace WebService
         IEnumerable<Datum> GetData(Signal signal, DateTime fromIncluded, DateTime toExcluded);
 
         [OperationContract]
-        void SetData(Signal signal, DateTime fromIncluded, IEnumerable<Datum> data);
+        void SetData(Signal signal, IEnumerable<Datum> data);
     }
 }

@@ -49,7 +49,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="signal" nillable="true" type="q7:Signal" />
-        <xs:element minOccurs="0" name="fromIncluded" type="xs:dateTime" />
         <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="data" nillable="true" type="q8:ArrayOfDatum" />
       </xs:sequence>
     </xs:complexType>

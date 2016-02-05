@@ -54,7 +54,7 @@ namespace WebService
                 .ToArray();
         }
 
-        public void SetData(Dto.Signal signalDto, DateTime fromIncluded, IEnumerable<Dto.Datum> data)
+        public void SetData(Dto.Signal signalDto, IEnumerable<Dto.Datum> data)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
