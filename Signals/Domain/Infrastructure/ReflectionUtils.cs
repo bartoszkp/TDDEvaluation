@@ -8,11 +8,6 @@ namespace Domain.Infrastructure
     {
         public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)
         {
-            return GetMethodInfo((LambdaExpression)expression);
-        }
-
-        public static MethodInfo GetMethodInfo(LambdaExpression expression)
-        {
             MethodCallExpression outermostExpression = expression.Body as MethodCallExpression;
 
             if (outermostExpression == null)
@@ -21,6 +16,18 @@ namespace Domain.Infrastructure
             }
 
             return outermostExpression.Method;
+        }
+
+        public static MemberInfo GetMemberInfo<TSource, TProperty>(Expression<Func<TSource, TProperty>> expression)
+        {
+            MemberExpression outermostExpression = expression.Body as MemberExpression;
+
+            if (outermostExpression == null)
+            {
+                throw new ArgumentException("Invalid Expression. Expression should consist of a Property access only.");
+            }
+
+            return outermostExpression.Member;
         }
     }
 }
