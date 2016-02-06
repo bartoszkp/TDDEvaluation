@@ -12,5 +12,7 @@ namespace Domain.Services
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
 
         void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
+
+        MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal);
     }
 }

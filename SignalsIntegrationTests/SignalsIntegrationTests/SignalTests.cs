@@ -879,6 +879,23 @@ namespace SignalsIntegrationTests
             client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
         }
 
+        [TestMethod]
+        public void NewSignalHasNoneQualityMissingValuePolicy()
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer,
+            }.ToDto<Dto.Signal>();
+
+            signal = client.Add(signal);
+
+            var result = client.GetMissingValuePolicyConfig(signal);
+
+            Assert.AreEqual(result.Policy, Dto.MissingValuePolicy.NoneQuality);
+        }
+
         /* TODO bad timestamps in GetData
                 Second,
                 Minute,

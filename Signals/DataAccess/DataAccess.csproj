@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMappingOverrides\PathComponentsList.cs" />
+    <Compile Include="AutoMappingOverrides\SignalMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathMappingOverride.cs" />
     <Compile Include="GenericInstantiations\Datum.cs" />
     <Compile Include="Infrastructure\DatabaseTransactionInterception.cs" />
