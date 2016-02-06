@@ -153,7 +153,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
-        public void SetDataUsingIncompleteSignalsThrowsOrReturnsNull()
+        public void SetDataUsingIncompleteSignalsThrows()
         {
             var timestamp = new DateTime(2019, 4, 14);
             var signal = new Signal()
@@ -379,7 +379,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true )]
         public void SetDataForDayGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = new Signal()
