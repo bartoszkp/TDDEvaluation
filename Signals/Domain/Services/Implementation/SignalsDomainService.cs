@@ -35,6 +35,7 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
             var readData = this.signalRepository.GetData<T>(signal, fromIncluded, toExcluded);
+
             return this.FillMissingData(signal, new TimeEnumerator(fromIncluded, toExcluded, signal.Granularity), readData);
         }
 
@@ -51,19 +52,11 @@ namespace Domain.Services.Implementation
 
         private IEnumerable<Datum<T>> FillMissingData<T>(Signal signal, TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData)
         {
-            var leftJoin = from timestamp in timeEnumerator
-                           join data in readData
-                           on timestamp equals data.Timestamp into joined
-                           from newData in joined.DefaultIfEmpty()
-                           select new Datum<T>
-                           {
-                               Signal = signal,
-                               Id = newData != null ? newData.Id : 0,
-                               Timestamp = timestamp,
-                               Quality = newData != null ? newData.Quality : Quality.None,
-                               Value = newData != null ? newData.Value : default(T)
-                           };
-            return leftJoin.ToArray();
+            var readDataDict = readData.ToDictionary(d => d.Timestamp, d => d);
+
+            return timeEnumerator
+                .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.None(signal, ts))
+                .ToArray();
         }
     }
 }
