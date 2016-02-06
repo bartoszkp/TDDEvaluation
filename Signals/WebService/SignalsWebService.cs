@@ -17,7 +17,7 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-            this.signalsDomainService = signalsDomainService;
+             this.signalsDomainService = signalsDomainService;
         }     
 
         public Dto.Signal Get(Dto.Path pathDto)
@@ -89,6 +89,11 @@ namespace WebService
         private static MethodInfo GetAppropriateMethod(MethodInfo genericMethodInfo, Domain.DataType dataType)
         {
             return genericMethodInfo.MakeGenericMethod(dataType.GetNativeType());
+        }
+
+        public Dto.MissingValuePolicyConfig GetMissingValuePolicyConfig(Dto.Signal signal)
+        {
+            return this.signalsDomainService.GetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>()).ToDto<Dto.MissingValuePolicyConfig>();
         }
     }
 }

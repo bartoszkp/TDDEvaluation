@@ -19,5 +19,8 @@ namespace WebService
 
         [OperationContract]
         void SetData(Signal signal, IEnumerable<Datum> data);
+
+        [OperationContract]
+        MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal);
     }
 }

@@ -12,6 +12,7 @@ namespace Domain.Services.Implementation
 
         public SignalsDomainService(ISignalsRepository signalRepository)
         {
+           
             this.signalRepository = signalRepository;
         }
 
@@ -29,6 +30,7 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal signal)
         {
+            signal.MissingValuePolicyConfig = new MissingValuePolicyConfig();
             return this.signalRepository.Add(signal);
         }
 
@@ -57,6 +59,11 @@ namespace Domain.Services.Implementation
             return timeEnumerator
                 .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.None(signal, ts))
                 .ToArray();
+        }
+
+        public MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal)
+        {
+           return this.signalRepository.Get(signal.Path).MissingValuePolicyConfig;
         }
     }
 }
