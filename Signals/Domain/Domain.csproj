@@ -51,7 +51,7 @@
     <Compile Include="Infrastructure\ReflectionUtils.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\ISignalRepository.cs" />
+    <Compile Include="Repositories\ISignalsRepository.cs" />
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />
     <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />

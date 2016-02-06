@@ -37,7 +37,7 @@ namespace Bootstrapper
 
         public void SetupDomain()
         {
-            UnityContainer.RegisterType<ISignalRepository, DataAccess.Repositories.SignalRepository>();
+            UnityContainer.RegisterType<ISignalsRepository, DataAccess.Repositories.SignalsRepository>();
 
             UnityContainer.RegisterType<ISignalsDomainService, Domain.Services.Implementation.SignalsDomainService>();
         }

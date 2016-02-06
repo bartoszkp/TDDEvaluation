@@ -2,7 +2,7 @@
 
 namespace DataAccess
 {
-    public class SignalAutoMappingConfiguration : FluentNHibernate.Automapping.DefaultAutomappingConfiguration
+    public class SignalsAutoMappingConfiguration : FluentNHibernate.Automapping.DefaultAutomappingConfiguration
     {
         public override bool ShouldMap(Type type)
         {

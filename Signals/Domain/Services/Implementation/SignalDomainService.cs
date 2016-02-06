@@ -6,11 +6,11 @@ using System.Linq;
 
 namespace Domain.Services.Implementation
 {
-    public class SignalsDomainService : ISignalsDomainService
+    public class SignalDomainService : ISignalDomainService
     {
-        private readonly ISignalsRepository signalRepository;
+        private readonly ISignalRepository signalRepository;
 
-        public SignalsDomainService(ISignalsRepository signalRepository)
+        public SignalDomainService(ISignalRepository signalRepository)
         {
             this.signalRepository = signalRepository;
         }

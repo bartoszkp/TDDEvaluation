@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Domain.Repositories
 {
-    public interface ISignalRepository
+    public interface ISignalsRepository
     {
         Signal Get(Path path);
 

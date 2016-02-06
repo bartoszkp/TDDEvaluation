@@ -9,9 +9,9 @@ using NHibernate.Criterion;
 
 namespace DataAccess.Repositories
 {
-    public class SignalRepository : RepositoryBase, Domain.Repositories.ISignalRepository
+    public class SignalsRepository : RepositoryBase, Domain.Repositories.ISignalsRepository
     {
-        public SignalRepository(ISessionProvider sessionProvider)
+        public SignalsRepository(ISessionProvider sessionProvider)
             : base(sessionProvider)
         {
             var datumTypes = Assembly
