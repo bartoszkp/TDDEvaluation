@@ -38,6 +38,12 @@
   <wsdl:message name="ISignalsWebService_GetMissingValuePolicyConfig_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetMissingValuePolicyConfigResponse" />
   </wsdl:message>
+  <wsdl:message name="ISignalsWebService_SetMissingValuePolicyConfig_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetMissingValuePolicyConfig" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_SetMissingValuePolicyConfig_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetMissingValuePolicyConfigResponse" />
+  </wsdl:message>
   <wsdl:portType name="ISignalsWebService">
     <wsdl:operation name="Get">
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Get" message="tns:ISignalsWebService_Get_InputMessage" />
@@ -58,6 +64,10 @@
     <wsdl:operation name="GetMissingValuePolicyConfig">
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfig" message="tns:ISignalsWebService_GetMissingValuePolicyConfig_InputMessage" />
       <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfigResponse" message="tns:ISignalsWebService_GetMissingValuePolicyConfig_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetMissingValuePolicyConfig">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfig" message="tns:ISignalsWebService_SetMissingValuePolicyConfig_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfigResponse" message="tns:ISignalsWebService_SetMissingValuePolicyConfig_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_ISignalsWebService" type="tns:ISignalsWebService">
@@ -100,6 +110,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetMissingValuePolicyConfig">
       <soap:operation soapAction="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfig" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetMissingValuePolicyConfig">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfig" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
