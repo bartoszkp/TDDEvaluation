@@ -233,7 +233,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 44, 123),
-                    Value = 4
                 }
             };
 
@@ -251,7 +250,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 123),
-                    Value = 4
                 }
             };
 
@@ -269,7 +267,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                    Value = 4
                 }
             };
 
@@ -287,7 +284,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                    Value = 4
                 }
             };
 
@@ -305,7 +301,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                    Value = 4
                 }
             };
 
@@ -323,7 +318,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -341,7 +335,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                    Value = 4
                 }
             };
 
@@ -359,7 +352,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                    Value = 4
                 }
             };
 
@@ -377,7 +369,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -395,7 +386,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -413,7 +403,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                    Value = 4
                 }
             };
 
@@ -431,7 +420,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                    Value = 4
                 }
             };
 
@@ -449,7 +437,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -467,7 +454,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -485,7 +471,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -503,7 +488,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                    Value = 4
                 }
             };
 
@@ -521,7 +505,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                    Value = 4
                 }
             };
 
@@ -539,7 +522,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -557,7 +539,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -575,7 +556,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2),
-                    Value = 4
                 }
             };
 
@@ -594,7 +574,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                    Value = 4
                 }
             };
 
@@ -612,7 +591,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                    Value = 4
                 }
             };
 
@@ -632,7 +610,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -650,7 +627,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                    Value = 4
                 }
             };
 
@@ -668,7 +644,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 10, 2),
-                    Value = 4
                 }
             };
 
@@ -686,7 +661,6 @@ namespace SignalsIntegrationTests
                 new Datum<int>()
                 {
                     Timestamp = new DateTime(2016, 2, 1),
-                    Value = 4
                 }
             };
 
@@ -700,7 +674,7 @@ namespace SignalsIntegrationTests
 
             var result = client.GetMissingValuePolicyConfig(signal);
 
-            Assert.AreEqual(result.Policy, Dto.MissingValuePolicy.NoneQuality);
+            Assert.AreEqual(Dto.MissingValuePolicy.NoneQuality, result.Policy);
         }
 
         private Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second)
@@ -715,6 +689,18 @@ namespace SignalsIntegrationTests
             return client.Add(signal.ToDto<Dto.Signal>());
         }
 
+        [TestMethod]
+        public void MissingValuePolicyCanBeSetForSignal()
+        {
+            var signal = AddNewIntegerSignal();
+
+            var newConfig = new MissingValuePolicyConfig() { Policy = MissingValuePolicy.SpecificValue };
+
+            client.SetMissingValuePolicyConfig(signal, newConfig.ToDto<Dto.MissingValuePolicyConfig>());
+            var result = client.GetMissingValuePolicyConfig(signal);
+
+            Assert.AreEqual(newConfig.Policy, result.ToDomain<Domain.MissingValuePolicyConfig>().Policy);
+        }
         /* TODO bad timestamps in GetData
                 Second,
                 Minute,
@@ -725,7 +711,7 @@ namespace SignalsIntegrationTests
                 Year
         */
 
-        /* TODO correct timestamps in GetData
+        /* TODO correct timestamps in GetData (?)
                 Second,
                 Minute, 
                 Hour,
@@ -745,7 +731,7 @@ namespace SignalsIntegrationTests
                     Year
         */
 
-
+        // TODO SetMissing.... validates Params (?)
         // TODO GetData range validation
 
         // TODO GetData with different MissingValuePolicy

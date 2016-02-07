@@ -6,6 +6,7 @@ using System.Reflection;
 using System.ServiceModel;
 using Domain.Infrastructure;
 using Domain.Services;
+using Dto;
 using Dto.Conversions;
 
 namespace WebService
@@ -94,6 +95,11 @@ namespace WebService
         public Dto.MissingValuePolicyConfig GetMissingValuePolicyConfig(Dto.Signal signal)
         {
             return this.signalsDomainService.GetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>()).ToDto<Dto.MissingValuePolicyConfig>();
+        }
+
+        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config)
+        {
+            this.signalsDomainService.SetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>(), config.ToDomain<Domain.MissingValuePolicyConfig>());
         }
     }
 }

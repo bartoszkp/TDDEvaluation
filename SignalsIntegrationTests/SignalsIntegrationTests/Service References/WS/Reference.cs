@@ -44,6 +44,12 @@ namespace SignalsIntegrationTests.WS {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfigResponse")]
         System.Threading.Tasks.Task<Dto.MissingValuePolicyConfig> GetMissingValuePolicyConfigAsync(Dto.Signal signal);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfigResponse")]
+        void SetMissingValuePolicyConfig(Dto.Signal signal, Dto.MissingValuePolicyConfig config);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfigResponse")]
+        System.Threading.Tasks.Task SetMissingValuePolicyConfigAsync(Dto.Signal signal, Dto.MissingValuePolicyConfig config);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -111,6 +117,14 @@ namespace SignalsIntegrationTests.WS {
         
         public System.Threading.Tasks.Task<Dto.MissingValuePolicyConfig> GetMissingValuePolicyConfigAsync(Dto.Signal signal) {
             return base.Channel.GetMissingValuePolicyConfigAsync(signal);
+        }
+        
+        public void SetMissingValuePolicyConfig(Dto.Signal signal, Dto.MissingValuePolicyConfig config) {
+            base.Channel.SetMissingValuePolicyConfig(signal, config);
+        }
+        
+        public System.Threading.Tasks.Task SetMissingValuePolicyConfigAsync(Dto.Signal signal, Dto.MissingValuePolicyConfig config) {
+            return base.Channel.SetMissingValuePolicyConfigAsync(signal, config);
         }
     }
 }
