@@ -206,14 +206,8 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void SignalWithoutDataReturnsNoneQualityDatumsForEachTimerangeStep()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            // TODO this test can be removed after extensive MissingDataPolicyConfig tests
+            var signal = AddNewIntegerSignal(Granularity.Day);
 
             const int numberOfDays = 5;
             var timestamp = new DateTime(2019, 1, 1);
@@ -232,14 +226,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForSecondGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Second,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Second);
 
             var data = new[]
             {
@@ -257,14 +244,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMinuteGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Minute,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Minute);
 
             var data = new[]
             {
@@ -282,14 +262,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMinuteGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Minute,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Minute);
 
             var data = new[]
             {
@@ -307,14 +280,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForHourGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Hour,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Hour);
 
             var data = new[]
             {
@@ -332,14 +298,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForHourGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Hour,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Hour);
 
             var data = new[]
             {
@@ -357,14 +316,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForHourGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Hour,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Hour);
 
             var data = new[]
             {
@@ -382,14 +334,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true )]
         public void SetDataForDayGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Day);
 
             var data = new[]
             {
@@ -407,14 +352,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForDayGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Day);
 
             var data = new[]
             {
@@ -432,14 +370,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForDayGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Day);
 
             var data = new[]
             {
@@ -457,14 +388,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForDayGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Day);
 
             var data = new[]
             {
@@ -482,14 +406,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Week,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Week);
 
             var data = new[]
             {
@@ -507,14 +424,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Week,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Week);
 
             var data = new[]
             {
@@ -532,14 +442,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Week,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Week);
 
             var data = new[]
             {
@@ -557,14 +460,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Week,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Week);
 
             var data = new[]
             {
@@ -582,14 +478,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresMondayInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Week,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Week);
 
             var data = new[]
             {
@@ -607,14 +496,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Month,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Month);
 
             var data = new[]
             {
@@ -632,14 +514,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Month,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Month);
 
             var data = new[]
             {
@@ -657,14 +532,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Month,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Month);
 
             var data = new[]
             {
@@ -682,14 +550,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Month,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Month);
 
             var data = new[]
             {
@@ -707,14 +568,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresFirstDayOfMonthInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Month,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Month);
 
             var data = new[]
             {
@@ -733,14 +587,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Year,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Year);
 
             var data = new[]
             {
@@ -758,14 +605,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Year,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Year);
 
             var data = new[]
             {
@@ -783,12 +623,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Year,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
+            var signal = AddNewIntegerSignal(Granularity.Year);
 
             signal = client.Add(signal);
 
@@ -808,14 +643,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Year,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Year);
 
             var data = new[]
             {
@@ -833,14 +661,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresFirstDayOfMonthInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Year,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Year);
 
             var data = new[]
             {
@@ -858,14 +679,7 @@ namespace SignalsIntegrationTests
         [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresFirstMonthInTimestamps()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Year,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal(Granularity.Year);
 
             var data = new[]
             {
@@ -882,18 +696,23 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void NewSignalHasNoneQualityMissingValuePolicy()
         {
-            var signal = new Signal()
-            {
-                Path = GenerateUniqueSignalPath(),
-                Granularity = Granularity.Year,
-                DataType = DataType.Integer,
-            }.ToDto<Dto.Signal>();
-
-            signal = client.Add(signal);
+            var signal = AddNewIntegerSignal();
 
             var result = client.GetMissingValuePolicyConfig(signal);
 
             Assert.AreEqual(result.Policy, Dto.MissingValuePolicy.NoneQuality);
+        }
+
+        private Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second)
+        {
+            var signal = new Signal()
+            {
+                Path = GenerateUniqueSignalPath(),
+                Granularity = granularity,
+                DataType = DataType.Integer,
+            };
+
+            return client.Add(signal.ToDto<Dto.Signal>());
         }
 
         /* TODO bad timestamps in GetData
@@ -905,6 +724,27 @@ namespace SignalsIntegrationTests
                 Month,
                 Year
         */
+
+        /* TODO correct timestamps in GetData
+                Second,
+                Minute, 
+                Hour,
+                Day,    
+                Week,
+                Month,
+                Year
+        */
+
+        /* TODO correct timestamps in SetData (?)
+                    Second,
+                    Minute,
+                    Hour,
+                    Day,
+                    Week,
+                    Month,
+                    Year
+        */
+
 
         // TODO GetData range validation
 
