@@ -21,21 +21,21 @@ namespace WebService
              this.signalsDomainService = signalsDomainService;
         }     
 
-        public Dto.Signal Get(Dto.Path pathDto)
+        public Signal Get(Path pathDto)
         {
             var path = pathDto.ToDomain<Domain.Path>();
 
-            return this.signalsDomainService.Get(path).ToDto<Dto.Signal>();
+            return this.signalsDomainService.Get(path).ToDto<Signal>();
         }
 
-        public Dto.Signal Add(Dto.Signal signalDto)
+        public Signal Add(Signal signalDto)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
-            return this.signalsDomainService.Add(signal).ToDto<Dto.Signal>();
+            return this.signalsDomainService.Add(signal).ToDto<Signal>();
         }
 
-        public IEnumerable<Dto.Datum> GetData(Dto.Signal signalDto, DateTime fromIncluded, DateTime toExcluded)
+        public IEnumerable<Datum> GetData(Signal signalDto, DateTime fromIncluded, DateTime toExcluded)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
@@ -47,11 +47,11 @@ namespace WebService
 
             return result
                 .Cast<object>()
-                .Select(d => d.ToDto<Dto.Datum>())
+                .Select(d => d.ToDto<Datum>())
                 .ToArray();
         }
 
-        public void SetData(Dto.Signal signalDto, IEnumerable<Dto.Datum> data)
+        public void SetData(Signal signalDto, IEnumerable<Datum> data)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
@@ -92,9 +92,9 @@ namespace WebService
             return genericMethodInfo.MakeGenericMethod(dataType.GetNativeType());
         }
 
-        public Dto.MissingValuePolicyConfig GetMissingValuePolicyConfig(Dto.Signal signal)
+        public MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal)
         {
-            return this.signalsDomainService.GetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>()).ToDto<Dto.MissingValuePolicyConfig>();
+            return this.signalsDomainService.GetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>()).ToDto<MissingValuePolicyConfig>();
         }
 
         public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config)
