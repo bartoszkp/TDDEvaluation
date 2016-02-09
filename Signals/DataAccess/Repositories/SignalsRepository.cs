@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using DataAccess.GenericInstantiations;
 using Domain;
-using FastMapper;
+using Mapster;
 using NHibernate.Criterion;
 
 namespace DataAccess.Repositories
