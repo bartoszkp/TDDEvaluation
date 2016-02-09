@@ -3,16 +3,16 @@ using System.IO;
 
 namespace DatabaseMaintenanceTool
 {
-    class Program
+    public class Program
     {
-        private static void setupDataDirectory()
+        private static void SetupDataDirectory()
         {
             var relativeDataDirectory = Properties.Settings.Default["RelativeDataDirectory"] as string;
             var absoluteDataDirectory = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativeDataDirectory));
             AppDomain.CurrentDomain.SetData("DataDirectory", absoluteDataDirectory);
         }
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             if (args.Length == 0)
             {
@@ -24,7 +24,7 @@ namespace DatabaseMaintenanceTool
             {
                 Console.WriteLine("Rebuilding database...");
 
-                setupDataDirectory();
+                SetupDataDirectory();
 
                 DatabaseMaintenance.DatabaseMaintenance dm = new DatabaseMaintenance.DatabaseMaintenance(new DataAccess.UnitOfWorkProvider());
 
