@@ -57,7 +57,7 @@ namespace Domain.Services.Implementation
             var readDataDict = readData.ToDictionary(d => d.Timestamp, d => d);
 
             return timeEnumerator
-                .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.None(signal, ts))
+                .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.CreateNone(signal, ts))
                 .ToArray();
         }
 
