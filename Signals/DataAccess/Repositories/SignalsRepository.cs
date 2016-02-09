@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DataAccess.GenericInstantiations;
 using Domain;
 using Mapster;
 using NHibernate.Criterion;
@@ -19,12 +18,12 @@ namespace DataAccess.Repositories
                 .GetTypes()
                 .Where(t => t.BaseType != null)
                 .Where(t => t.BaseType.IsGenericType)
-                .Where(t => t.BaseType.GetGenericTypeDefinition().Equals(typeof(Domain.Datum<>)))
+                .Where(t => t.BaseType.GetGenericTypeDefinition().Equals(typeof(Datum<>)))
                 .ToArray();
 
             foreach (var datumType in datumTypes)
             {
-                genericTypeMappinges.Add(datumType.BaseType, datumType);
+                genericConcreteDatumTypePairs.Add(Tuple.Create(datumType.BaseType, datumType));
             }
         }
 
@@ -52,11 +51,11 @@ namespace DataAccess.Repositories
 
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
+            var concreteDatumType = GetConcreteDatumType<T>();
+
             foreach (var datum in data)
             {
-                var mappingType = genericTypeMappinges[datum.GetType()];
-
-                var mappedDatum = TypeAdapter.Adapt(datum, datum.GetType(), mappingType);
+                var mappedDatum = TypeAdapter.Adapt(datum, datum.GetType(), concreteDatumType);
 
                 Session.SaveOrUpdate(mappedDatum);
             }
@@ -64,24 +63,25 @@ namespace DataAccess.Repositories
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
-            var dictionary = new Dictionary<Type, Type>()
-            {
-              { typeof(bool), typeof(DatumBoolean) },
-              { typeof(int), typeof(DatumInteger) },
-              { typeof(double), typeof(DatumDouble) },
-              { typeof(decimal), typeof(DatumDecimal) }
-            };
-
-            var type = dictionary[typeof(T)];
+            var concreteDatumType = GetConcreteDatumType<T>();
 
             return Session
-                .CreateCriteria(type)
+                .CreateCriteria(concreteDatumType)
                 .Add(Restrictions.Eq("Signal", signal))
                 .Add(Restrictions.Between("Timestamp", fromIncluded, toExcluded))
                 .List()
                 .Cast<Datum<T>>();
         }
 
-        private Dictionary<Type, Type> genericTypeMappinges = new Dictionary<Type, Type>(); 
+        private Type GetConcreteDatumType<T>()
+        {
+            var concreteDatumType = genericConcreteDatumTypePairs
+                .Single(pair => pair.Item1.GenericTypeArguments.Single().Equals(typeof(T)))
+                .Item2;
+
+            return concreteDatumType;
+        }
+
+        private List<Tuple<Type, Type>> genericConcreteDatumTypePairs = new List<Tuple<Type, Type>>();
     }
 }
