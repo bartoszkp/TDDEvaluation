@@ -129,7 +129,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal, data.ToDto());
+            client.SetData(signal, data.ToDto<Dto.Datum[]>());
             var retrievedData = client.GetData(signal, timestamp, timestamp.AddDays(1));
 
             Assert.AreEqual(data.Length, retrievedData.Length);
@@ -171,7 +171,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -236,7 +236,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -253,7 +253,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -270,7 +270,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -287,7 +287,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -304,7 +304,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -321,7 +321,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -338,7 +338,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -355,7 +355,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -372,7 +372,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -389,7 +389,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -406,7 +406,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -423,7 +423,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -440,7 +440,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -457,7 +457,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -474,7 +474,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -491,7 +491,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -508,7 +508,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -525,7 +525,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -542,7 +542,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -559,7 +559,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
 
@@ -577,7 +577,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -594,7 +594,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -613,7 +613,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -630,7 +630,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -647,7 +647,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
@@ -664,7 +664,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto());
+            client.SetData(signal.ToDto<Dto.Signal>(), data.ToDto<Dto.Datum[]>());
         }
 
         [TestMethod]
