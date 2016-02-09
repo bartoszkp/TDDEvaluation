@@ -76,8 +76,8 @@ namespace DataAccess.Repositories
 
             return Session
                 .CreateCriteria(type)
-                .Add(Expression.Eq("Signal", signal))
-                .Add(Expression.Between("Timestamp", fromIncluded, toExcluded))
+                .Add(Restrictions.Eq("Signal", signal))
+                .Add(Restrictions.Between("Timestamp", fromIncluded, toExcluded))
                 .List()
                 .Cast<Datum<T>>();
         }
