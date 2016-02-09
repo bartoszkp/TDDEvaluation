@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Domain;
+using Domain.Infrastructure;
 using Mapster;
 using NHibernate.Criterion;
 
@@ -65,10 +67,13 @@ namespace DataAccess.Repositories
         {
             var concreteDatumType = GetConcreteDatumType<T>();
 
+            var signalPropertyName = GetDatumPropertyName<T>(d => d.Signal);
+            var timestampPropertyName = GetDatumPropertyName<T>(d => d.Timestamp);
+
             return Session
                 .CreateCriteria(concreteDatumType)
-                .Add(Restrictions.Eq("Signal", signal))
-                .Add(Restrictions.Between("Timestamp", fromIncluded, toExcluded))
+                .Add(Restrictions.Eq(signalPropertyName, signal))
+                .Add(Restrictions.Between(timestampPropertyName, fromIncluded, toExcluded))
                 .List()
                 .Cast<Datum<T>>();
         }
@@ -80,6 +85,11 @@ namespace DataAccess.Repositories
                 .Item2;
 
             return concreteDatumType;
+        }
+
+        private string GetDatumPropertyName<T>(Expression<Func<Datum<T>, object>> expression)
+        {
+            return ReflectionUtils.GetMemberInfo(expression).Name;
         }
 
         private List<Tuple<Type, Type>> genericConcreteDatumTypePairs = new List<Tuple<Type, Type>>();

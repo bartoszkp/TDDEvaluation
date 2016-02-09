@@ -20,14 +20,33 @@ namespace Domain.Infrastructure
 
         public static MemberInfo GetMemberInfo<TSource, TProperty>(Expression<Func<TSource, TProperty>> expression)
         {
-            MemberExpression outermostExpression = expression.Body as MemberExpression;
+            var outermostExpression = expression.Body as MemberExpression;
 
             if (outermostExpression == null)
             {
+                outermostExpression = TryAsUnaryExpression(expression);
+            }
+
+            if (outermostExpression == null)
+            { 
                 throw new ArgumentException("Invalid Expression. Expression should consist of a Property access only.");
             }
 
             return outermostExpression.Member;
+        }
+
+        private static MemberExpression TryAsUnaryExpression<TSource, TProperty>(Expression<Func<TSource, TProperty>> expression)
+        {
+            var unaryExpression = expression.Body as UnaryExpression;
+
+            MemberExpression result = null;
+
+            if (unaryExpression != null)
+            {
+                result = unaryExpression.Operand as MemberExpression;
+            }
+
+            return result;
         }
     }
 }
