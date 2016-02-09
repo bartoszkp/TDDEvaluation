@@ -4,7 +4,7 @@ namespace Domain
 {
     public class Datum<T>
     {
-        public static Datum<T> None(Signal signal, DateTime timestamp)
+        public static Datum<T> CreateNone(Signal signal, DateTime timestamp)
         {
             return new Datum<T>()
             {
