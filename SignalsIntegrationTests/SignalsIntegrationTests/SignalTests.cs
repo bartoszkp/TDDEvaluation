@@ -208,7 +208,6 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void SignalWithoutDataReturnsNoneQualityDatumsForEachTimerangeStep()
         {
-            // TODO this test can be removed after extensive MissingDataPolicyConfig tests
             var signal = AddNewIntegerSignal(Granularity.Day);
 
             const int numberOfDays = 5;
