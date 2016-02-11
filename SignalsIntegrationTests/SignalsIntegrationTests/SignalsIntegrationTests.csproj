@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Infrastructure\Assertions.cs" />
     <Compile Include="Infrastructure\ServiceManager.cs" />
+    <Compile Include="Infrastructure\ServiceManagerGuard.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
