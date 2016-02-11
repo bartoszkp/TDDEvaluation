@@ -12,21 +12,18 @@ using System.Collections;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class SignalTests
+    public class SignalTests : TestsBase
     {
-        private static IDisposable serviceGuard;
-        private WS.SignalsWebServiceClient client;
-
         [ClassInitialize]
-        public static void ClassInitialize(TestContext testContext)
+        public static new void ClassInitialize(TestContext testContext)
         {
-            serviceGuard = ServiceManagerGuard.Attach();
+            TestsBase.ClassInitialize(testContext);
         }
 
-        [TestInitialize]
-        public void TestInitialize()
+        [ClassCleanup]
+        public static new void ClassCleanup()
         {
-            client = new WS.SignalsWebServiceClient();
+            TestsBase.ClassCleanup();
         }
 
         [TestMethod]
@@ -924,16 +921,5 @@ namespace SignalsIntegrationTests
         // TODO changing path?
 
         // TODO persistency tests - problem - sequential run of unit tests...
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-        }
-
-        [ClassCleanup]
-        public static void ClassCleanup()
-        {
-            serviceGuard.Dispose();
-        }
     }
 }
