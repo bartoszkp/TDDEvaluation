@@ -15,14 +15,7 @@ namespace SignalsIntegrationTests
     public class SignalTests
     {
         private static IDisposable serviceGuard;
-        private static int signalCounter = 0;
         private WS.SignalsWebServiceClient client;
-
-        private static Path GenerateUniqueSignalPath()
-        {
-            Interlocked.Increment(ref signalCounter);
-            return Path.FromString("/new/signal" + signalCounter.ToString());
-        }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -49,7 +42,7 @@ namespace SignalsIntegrationTests
         {
             var signal = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -64,7 +57,7 @@ namespace SignalsIntegrationTests
         {
             var newSignal = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -82,13 +75,13 @@ namespace SignalsIntegrationTests
         {
             var newSignal1 = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
             var newSignal2 = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Hour,
                 DataType = DataType.Double
             };
@@ -106,7 +99,7 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void CanWriteAndRetrieveData()
         {
-            var path = GenerateUniqueSignalPath();
+            var path = SignalPathGenerator.Generate();
             var timestamp = new DateTime(2019, 4, 14);
 
             var newSignal1 = new Signal()
@@ -142,7 +135,7 @@ namespace SignalsIntegrationTests
         {
             var newSignal = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -157,7 +150,7 @@ namespace SignalsIntegrationTests
             var timestamp = new DateTime(2019, 4, 14);
             var signal = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -178,7 +171,7 @@ namespace SignalsIntegrationTests
         {
             var signal = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer
             };
@@ -193,7 +186,7 @@ namespace SignalsIntegrationTests
         {
             var signal = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer,
                 Id = 42
@@ -679,7 +672,7 @@ namespace SignalsIntegrationTests
         {
             var signal = new Signal()
             {
-                Path = GenerateUniqueSignalPath(),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = granularity,
                 DataType = DataType.Integer,
             };
