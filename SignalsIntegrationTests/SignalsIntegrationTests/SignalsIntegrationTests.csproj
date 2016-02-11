@@ -77,7 +77,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="SetDataArgumentsTests.cs" />
-    <Compile Include="Tests Base.cs" />
+    <Compile Include="TestsBase.cs" />
     <Compile Include="BasicSignalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
