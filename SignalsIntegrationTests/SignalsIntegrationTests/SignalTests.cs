@@ -14,8 +14,8 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SignalTests
     {
+        private static IDisposable serviceGuard;
         private static int signalCounter = 0;
-        private static ServiceManager serviceManager;
         private WS.SignalsWebServiceClient client;
 
         private static Path GenerateUniqueSignalPath()
@@ -27,10 +27,7 @@ namespace SignalsIntegrationTests
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            ServiceManager.RebuildDatabase();
-
-            serviceManager = new ServiceManager();
-            serviceManager.StartService();
+            serviceGuard = ServiceManagerGuard.Attach();
         }
 
         [TestInitialize]
@@ -943,7 +940,7 @@ namespace SignalsIntegrationTests
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            serviceManager.StopService();
+            serviceGuard.Dispose();
         }
     }
 }
