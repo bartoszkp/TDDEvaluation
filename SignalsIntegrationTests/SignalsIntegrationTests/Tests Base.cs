@@ -24,7 +24,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestInitialize]
-        public void TestInitialize()
+        public void InitializeClient()
         {
             client = new WS.SignalsWebServiceClient();
         }
@@ -38,6 +38,18 @@ namespace SignalsIntegrationTests
         public static void ClassCleanup()
         {
             serviceGuard.Dispose();
+        }
+
+        protected Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second)
+        {
+            var signal = new Signal()
+            {
+                Path = SignalPathGenerator.Generate(),
+                Granularity = granularity,
+                DataType = DataType.Integer,
+            };
+
+            return client.Add(signal.ToDto<Dto.Signal>());
         }
     }
 }

@@ -60,6 +60,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="NoneQualityPolicyTests.cs" />
+    <Compile Include="MissingValuePolocyTestsBase.cs" />
     <Compile Include="Infrastructure\Assertions.cs" />
     <Compile Include="Infrastructure\ServiceManager.cs" />
     <Compile Include="Infrastructure\ServiceManagerGuard.cs" />
@@ -74,8 +76,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="SetDataArgumentsTests.cs" />
     <Compile Include="Tests Base.cs" />
-    <Compile Include="SignalTests.cs" />
+    <Compile Include="BasicSignalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

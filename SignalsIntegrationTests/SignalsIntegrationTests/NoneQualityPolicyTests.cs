@@ -1,0 +1,118 @@
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Domain;
+using Dto.Conversions;
+using SignalsIntegrationTests.Infrastructure;
+using System;
+using System.Threading;
+using System.ServiceModel;
+using System.Collections.Generic;
+using System.Collections;
+
+namespace SignalsIntegrationTests
+{
+    [TestClass]
+    public class NoneQualityPolicyTests : MissingValuePolocyTestsBase
+    {
+        private MissingValuePolicyValidator validator;
+
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            MissingValuePolocyTestsBase.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            MissingValuePolocyTestsBase.ClassCleanup();
+        }
+
+        [TestInitialize]
+        public void InitializeValidator()
+        {
+            validator = new MissingValuePolicyValidator(this)
+            {
+                PolicyConfig = new MissingValuePolicyConfig() { Policy = MissingValuePolicy.NoneQuality },
+            };
+        }
+
+        [TestMethod]
+        public void NoneQualityPolicyFillsMissingDataWhenNoDataPresent()
+        {
+            validator.WithoutSignalDataExpect(new[]
+            {
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
+            });
+        }
+
+        [TestMethod]
+        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAtBeginOfRangePresent()
+        {
+            validator.WithSingleDatumAtBeginOfRangeExpect(new[]
+            {
+                new Datum<int> { Quality = Quality.Good, Timestamp = validator.BeginTimestamp, Value = validator.GeneratedSingleValue },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
+            });
+        }
+
+        [TestMethod]
+        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumBeforeBeginOfRangePresent()
+        {
+            validator.WithSingleDatumBeforeBeginOfRangeExpect(new[]
+            {
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp,},
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
+            });
+        }
+
+        [TestMethod]
+        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAtEndOfRangePresent()
+        {
+            validator.WithSingleDatumAtEndOfRangeExpect(new[]
+            {
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
+                new Datum<int> { Quality = Quality.Good, Timestamp = validator.BeginTimestamp.AddDays(4), Value = validator.GeneratedSingleValue }
+            });
+        }
+
+        [TestMethod]
+        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAfterEndOfRangePresent()
+        {
+            validator.WithSingleDatumAfterEndOfRangeExpect(new[]
+            {
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
+            });
+        }
+
+        [TestMethod]
+        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumInMiddleRangePresent()
+        {
+            validator.WithSingleDatumInMiddleOfRangeExpect(new[]
+            {
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
+                new Datum<int> { Quality = Quality.Good, Timestamp = validator.BeginTimestamp.AddDays(2), Value = validator.GeneratedSingleValue },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
+                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
+            });
+        }
+    }
+}
