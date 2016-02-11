@@ -19,11 +19,18 @@ namespace Bootstrapper
 
             UnityContainer.RegisterInstance<IUnityContainer>(UnityContainer, new ExternallyControlledLifetimeManager());
 
+            SetupDtoAutoMapping();
+
             SetupDataAccess();
 
             SetupDomain();
 
             SetupWebService();
+        }
+
+        public void SetupDtoAutoMapping()
+        {
+            Dto.Conversions.AutoMappingConfiguration.Run();
         }
 
         public void SetupDataAccess()
