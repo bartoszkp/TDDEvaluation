@@ -2,10 +2,10 @@
 {
     public enum DataType
     {
+        Boolean,
         Integer,
         Double,
         Decimal,
-        String,
-        Boolean
+        String
     }
 }
