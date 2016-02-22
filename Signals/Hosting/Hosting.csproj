@@ -87,6 +87,14 @@
       <Project>{8d448351-2474-4223-93a0-9b2ea0ad8f70}</Project>
       <Name>Bootstrapper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{7643117c-25cb-4b38-8d3d-efa38e2dc719}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dto\Dto.csproj">
+      <Project>{e54dd54b-5f62-4276-90fe-f9e98be74931}</Project>
+      <Name>Dto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebService\WebService.csproj">
       <Project>{84086867-4954-4565-82c6-344061b45fcd}</Project>
       <Name>WebService</Name>

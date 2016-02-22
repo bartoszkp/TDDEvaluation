@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel.Description;
 using Microsoft.Practices.Unity;
 using Unity.Wcf;
