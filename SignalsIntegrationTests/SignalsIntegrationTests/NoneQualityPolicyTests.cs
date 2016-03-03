@@ -12,20 +12,20 @@ using System.Collections;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class NoneQualityPolicyTests : MissingValuePolocyTestsBase
+    public class NoneQualityPolicyTests : MissingValuePolicyTestsBase
     {
         private MissingValuePolicyValidator validator;
 
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolocyTestsBase.ClassInitialize(testContext);
+            MissingValuePolicyTestsBase.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolocyTestsBase.ClassCleanup();
+            MissingValuePolicyTestsBase.ClassCleanup();
         }
 
         [TestInitialize]
