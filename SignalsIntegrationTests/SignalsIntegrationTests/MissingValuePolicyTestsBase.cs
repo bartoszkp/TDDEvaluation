@@ -12,7 +12,7 @@ using System.Collections;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public abstract class MissingValuePolocyTestsBase : TestsBase
+    public abstract class MissingValuePolicyTestsBase : TestsBase
     {
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
@@ -57,9 +57,9 @@ namespace SignalsIntegrationTests
             public DateTime MiddleTimestamp { get { return BeginTimestamp.AddDays(2); } }
             public int GeneratedSingleValue { get { return 42; } }
 
-            private MissingValuePolocyTestsBase parent;
+            private MissingValuePolicyTestsBase parent;
 
-            public MissingValuePolicyValidator(MissingValuePolocyTestsBase parent)
+            public MissingValuePolicyValidator(MissingValuePolicyTestsBase parent)
             {
                 this.parent = parent;
             }
