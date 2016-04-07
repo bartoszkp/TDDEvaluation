@@ -33,7 +33,7 @@ namespace SignalsIntegrationTests
         {
             validator = new MissingValuePolicyValidator(this)
             {
-                PolicyConfig = new MissingValuePolicyConfig() { Policy = MissingValuePolicy.NoneQuality },
+                Policy = new NoneQualityMissingValuePolicy()
             };
         }
 

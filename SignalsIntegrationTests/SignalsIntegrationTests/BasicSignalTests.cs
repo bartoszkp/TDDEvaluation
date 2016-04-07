@@ -187,9 +187,9 @@ namespace SignalsIntegrationTests
         {
             var signal = AddNewIntegerSignal();
 
-            var result = client.GetMissingValuePolicyConfig(signal);
+            var result = client.GetMissingValuePolicy(signal);
 
-            Assert.AreEqual(Dto.MissingValuePolicy.NoneQuality, result.Policy);
+            Assert.IsInstanceOfType(result, typeof(Dto.NoneQualityMissingValuePolicy));
         }
 
         [TestMethod]
@@ -197,12 +197,12 @@ namespace SignalsIntegrationTests
         {
             var signal = AddNewIntegerSignal();
 
-            var newConfig = new MissingValuePolicyConfig() { Policy = MissingValuePolicy.SpecificValue };
+            var policy = new NoneQualityMissingValuePolicy(); // TODO another class
 
-            client.SetMissingValuePolicyConfig(signal, newConfig.ToDto<Dto.MissingValuePolicyConfig>());
-            var result = client.GetMissingValuePolicyConfig(signal);
+            client.SetMissingValuePolicy(signal, policy.ToDto<Dto.MissingValuePolicy>());
+            var result = client.GetMissingValuePolicy(signal);
 
-            Assert.AreEqual(newConfig.Policy, result.ToDomain<Domain.MissingValuePolicyConfig>().Policy);
+            // TODO Assert.IsIns
         }
 
         /* TODO bad timestamps in GetData

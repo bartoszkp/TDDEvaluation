@@ -30,7 +30,7 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal signal)
         {
-            signal.MissingValuePolicyConfig = new MissingValuePolicyConfig();
+            signal.MissingValuePolicy= new NoneQualityMissingValuePolicy();
             return this.signalRepository.Add(signal);
         }
 
@@ -61,15 +61,15 @@ namespace Domain.Services.Implementation
                 .ToArray();
         }
 
-        public MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal)
+        public MissingValuePolicy GetMissingValuePolicy(Signal signal)
         {
-           return this.signalRepository.Get(signal.Path).MissingValuePolicyConfig;
+            return this.signalRepository.Get(signal.Path).MissingValuePolicy;
         }
 
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config)
+        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy policy)
         {
             signal = this.signalRepository.Get(signal.Path);
-            signal.MissingValuePolicyConfig = config;
+            signal.MissingValuePolicy = policy;
         }
     }
 }

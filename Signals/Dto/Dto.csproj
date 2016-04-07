@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,8 +50,8 @@
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />
     <Compile Include="Granularity.cs" />
+    <Compile Include="NoneQualityMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy.cs" />
-    <Compile Include="MissingValuePolicyConfig.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quality.cs" />

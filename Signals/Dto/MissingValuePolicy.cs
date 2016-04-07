@@ -1,9 +1,10 @@
-﻿namespace Dto
+﻿using System.Runtime.Serialization;
+
+namespace Dto
 {
-    public enum MissingValuePolicy
+    [DataContract]
+    [KnownType(typeof(NoneQualityMissingValuePolicy))]
+    public abstract class MissingValuePolicy
     {
-        NoneQuality,
-        SpecificValue,
-        Interpolation
     }
 }
