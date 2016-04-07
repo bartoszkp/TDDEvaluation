@@ -58,29 +58,29 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetMissingValuePolicyConfig">
+  <xs:element name="GetMissingValuePolicy">
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="signal" nillable="true" type="q9:Signal" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetMissingValuePolicyConfigResponse">
+  <xs:element name="GetMissingValuePolicyResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="GetMissingValuePolicyConfigResult" nillable="true" type="q10:MissingValuePolicyConfig" />
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="GetMissingValuePolicyResult" nillable="true" type="q10:MissingValuePolicy" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SetMissingValuePolicyConfig">
+  <xs:element name="SetMissingValuePolicy">
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="signal" nillable="true" type="q11:Signal" />
-        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="config" nillable="true" type="q12:MissingValuePolicyConfig" />
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="policy" nillable="true" type="q12:MissingValuePolicy" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SetMissingValuePolicyConfigResponse">
+  <xs:element name="SetMissingValuePolicyResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>

@@ -18,11 +18,11 @@
   <xs:element name="Signal" nillable="true" type="tns:Signal" />
   <xs:simpleType name="DataType">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="Boolean" />
       <xs:enumeration value="Integer" />
       <xs:enumeration value="Double" />
       <xs:enumeration value="Decimal" />
       <xs:enumeration value="String" />
-      <xs:enumeration value="Boolean" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="DataType" nillable="true" type="tns:DataType" />
@@ -62,18 +62,16 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="Quality" nillable="true" type="tns:Quality" />
-  <xs:complexType name="MissingValuePolicyConfig">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Policy" type="tns:MissingValuePolicy" />
-    </xs:sequence>
+  <xs:complexType name="MissingValuePolicy">
+    <xs:sequence />
   </xs:complexType>
-  <xs:element name="MissingValuePolicyConfig" nillable="true" type="tns:MissingValuePolicyConfig" />
-  <xs:simpleType name="MissingValuePolicy">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="NoneQuality" />
-      <xs:enumeration value="SpecificValue" />
-      <xs:enumeration value="Interpolation" />
-    </xs:restriction>
-  </xs:simpleType>
   <xs:element name="MissingValuePolicy" nillable="true" type="tns:MissingValuePolicy" />
+  <xs:complexType name="NoneQualityMissingValuePolicy">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:MissingValuePolicy">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="NoneQualityMissingValuePolicy" nillable="true" type="tns:NoneQualityMissingValuePolicy" />
 </xs:schema>

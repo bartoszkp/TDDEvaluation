@@ -92,14 +92,14 @@ namespace WebService
             return genericMethodInfo.MakeGenericMethod(dataType.GetNativeType());
         }
 
-        public MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal)
+        public MissingValuePolicy GetMissingValuePolicy(Signal signal)
         {
-            return this.signalsDomainService.GetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>()).ToDto<MissingValuePolicyConfig>();
+            return this.signalsDomainService.GetMissingValuePolicy(signal.ToDomain<Domain.Signal>()).ToDto<MissingValuePolicy>();
         }
 
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config)
+        public void SetMissingValuePolicy(Signal signal, MissingValuePolicy policy)
         {
-            this.signalsDomainService.SetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>(), config.ToDomain<Domain.MissingValuePolicyConfig>());
+            this.signalsDomainService.SetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>(), policy.ToDomain<Domain.MissingValuePolicy>());
         }
     }
 }

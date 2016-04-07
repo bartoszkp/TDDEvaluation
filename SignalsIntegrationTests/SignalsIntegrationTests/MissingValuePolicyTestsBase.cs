@@ -51,7 +51,7 @@ namespace SignalsIntegrationTests
 
         protected class MissingValuePolicyValidator
         {
-            public MissingValuePolicyConfig PolicyConfig { get; set; }
+            public MissingValuePolicy Policy { get; set; }
             public DateTime BeginTimestamp { get { return new DateTime(2020, 10, 12); } }
             public DateTime EndTimestamp { get { return BeginTimestamp.AddDays(5); } }
             public DateTime MiddleTimestamp { get { return BeginTimestamp.AddDays(2); } }
@@ -116,7 +116,7 @@ namespace SignalsIntegrationTests
                                                         IEnumerable<Datum<int>> expected)
             {
                 var signal = parent.AddNewIntegerSignal(Granularity.Day);
-                parent.client.SetMissingValuePolicyConfig(signal, PolicyConfig.ToDto<Dto.MissingValuePolicyConfig>());
+                parent.client.SetMissingValuePolicy(signal, Policy.ToDto<Dto.MissingValuePolicy>());
 
                 parent.client.SetData(signal, input.ToDto<Dto.Datum[]>());
                 var result = parent.client.GetData(signal, BeginTimestamp, EndTimestamp);

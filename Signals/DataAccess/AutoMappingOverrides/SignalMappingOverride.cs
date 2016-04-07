@@ -9,7 +9,7 @@ namespace DataAccess.AutoMappingOverrides
         public void Override(AutoMapping<Signal> mapping)
         {
             mapping
-                .References(s => s.MissingValuePolicyConfig)
+                .References(s => s.MissingValuePolicy)
                 .Unique()
                 .Cascade
                 .All();

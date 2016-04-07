@@ -108,6 +108,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\Dto.Datum.datasource" />
+    <None Include="Properties\DataSources\Dto.MissingValuePolicy.datasource" />
     <None Include="Properties\DataSources\Dto.MissingValuePolicyConfig.datasource" />
     <None Include="Properties\DataSources\Dto.Signal.datasource" />
     <None Include="Properties\DataSources\Signals.Dto.Datum.datasource" />
