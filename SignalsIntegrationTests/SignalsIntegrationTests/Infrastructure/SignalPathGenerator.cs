@@ -1,10 +1,5 @@
-﻿using Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using Domain;
 
 namespace SignalsIntegrationTests.Infrastructure
 {
@@ -20,7 +15,6 @@ namespace SignalsIntegrationTests.Infrastructure
 
         private SignalPathGenerator()
         {
-
         }
     }
 }
