@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Configuration;
 
 namespace DatabaseMaintenanceTool
 {
@@ -43,7 +44,7 @@ namespace DatabaseMaintenanceTool
             string databaseName = "Signals";
             string fileName = Path.Combine(AppDomain.CurrentDomain.GetData(DataDirectoryDataKey).ToString(), databaseName + ".mdf");
 
-            string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB; Initial Catalog=master; Integrated Security=True;";
+            string connectionString = ConfigurationManager.ConnectionStrings["signals"].ConnectionString;
 
             if (!File.Exists(fileName))
             {
