@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Domain
 {
@@ -40,7 +40,7 @@ namespace Domain
 
         public override int GetHashCode()
         {
-            return this.Components.GetHashCode();
+            return this.ToString().GetHashCode();
         }
     }
 }
