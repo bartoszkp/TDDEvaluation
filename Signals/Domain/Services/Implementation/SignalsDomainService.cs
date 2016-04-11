@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Domain.Repositories;
 using Domain.Infrastructure;
@@ -12,7 +12,6 @@ namespace Domain.Services.Implementation
 
         public SignalsDomainService(ISignalsRepository signalRepository)
         {
-           
             this.signalRepository = signalRepository;
         }
 
