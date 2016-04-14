@@ -9,6 +9,11 @@ namespace DataAccess.AutoMappingOverrides
         public void Override(AutoMapping<Signal> mapping)
         {
             mapping
+                .Id(s => s.Id)
+                .GeneratedBy
+                .Increment();
+
+            mapping
                 .References(s => s.MissingValuePolicyConfig)
                 .Unique()
                 .Cascade
