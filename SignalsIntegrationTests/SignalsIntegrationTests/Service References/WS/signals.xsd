@@ -18,11 +18,11 @@
   <xs:element name="Signal" nillable="true" type="tns:Signal" />
   <xs:simpleType name="DataType">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="Boolean" />
       <xs:enumeration value="Integer" />
       <xs:enumeration value="Double" />
       <xs:enumeration value="Decimal" />
       <xs:enumeration value="String" />
-      <xs:enumeration value="Boolean" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="DataType" nillable="true" type="tns:DataType" />
@@ -38,6 +38,18 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="Granularity" nillable="true" type="tns:Granularity" />
+  <xs:complexType name="PathEntry">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Signals" nillable="true" type="tns:ArrayOfSignal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PathEntry" nillable="true" type="tns:PathEntry" />
+  <xs:complexType name="ArrayOfSignal">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Signal" nillable="true" type="tns:Signal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfSignal" nillable="true" type="tns:ArrayOfSignal" />
   <xs:complexType name="ArrayOfDatum">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Datum" nillable="true" type="tns:Datum" />
@@ -64,6 +76,7 @@
   <xs:element name="Quality" nillable="true" type="tns:Quality" />
   <xs:complexType name="MissingValuePolicyConfig">
     <xs:sequence>
+      <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Params" nillable="true" type="q2:ArrayOfKeyValueOfstringanyType" />
       <xs:element minOccurs="0" name="Policy" type="tns:MissingValuePolicy" />
     </xs:sequence>
   </xs:complexType>

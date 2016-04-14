@@ -1,15 +1,12 @@
-﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Domain;
 using Dto.Conversions;
-using SignalsIntegrationTests.Infrastructure;
-using System;
-using System.Threading;
-using System.ServiceModel;
-using System.Collections.Generic;
-using System.Collections;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SignalsIntegrationTests
+namespace SignalsIntegrationTests.Infrastructure
 {
     [TestClass]
     public abstract class MissingValuePolicyTestsBase : TestsBase

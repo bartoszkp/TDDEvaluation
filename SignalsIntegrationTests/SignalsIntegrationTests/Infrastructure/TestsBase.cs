@@ -4,7 +4,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 
-namespace SignalsIntegrationTests
+namespace SignalsIntegrationTests.Infrastructure
 {
     [TestClass]
     public abstract class TestsBase
@@ -37,11 +37,16 @@ namespace SignalsIntegrationTests
             serviceGuard.Dispose();
         }
 
-        protected Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second)
+        protected Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second, Domain.Path path = null)
         {
+            if (path == null)
+            {
+                path = SignalPathGenerator.Generate();
+            }
+
             var signal = new Signal()
             {
-                Path = SignalPathGenerator.Generate(),
+                Path = path,
                 Granularity = granularity,
                 DataType = DataType.Integer,
             };

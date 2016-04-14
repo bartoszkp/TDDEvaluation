@@ -33,6 +33,19 @@ namespace Domain.Services.Implementation
             return this.signalRepository.Add(signal);
         }
 
+        public PathEntry GetPathEntry(Path path)
+        {
+            var allSignals = this.signalRepository.GetAllWithPathPrefix(path);
+
+            var directDescendants = allSignals.Where(s => s.Path.Length == path.Length + 1).ToArray();
+            var subPaths = allSignals
+                .Where(s => s.Path.Length > path.Length + 1)
+                .Select(s => s.Path.GetPrefix(path.Length + 1))
+                .ToArray();
+
+            return new PathEntry(directDescendants, subPaths);
+        }
+
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
             var readData = this.signalRepository.GetData<T>(signal, fromIncluded, toExcluded);

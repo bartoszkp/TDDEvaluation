@@ -81,11 +81,12 @@
   </Choose>
   <ItemGroup>
     <Compile Include="NoneQualityPolicyTests.cs" />
-    <Compile Include="MissingValuePolicyTestsBase.cs" />
+    <Compile Include="Infrastructure\MissingValuePolicyTestsBase.cs" />
     <Compile Include="Infrastructure\Assertions.cs" />
     <Compile Include="Infrastructure\ServiceManager.cs" />
     <Compile Include="Infrastructure\ServiceManagerGuard.cs" />
     <Compile Include="Infrastructure\SignalPathGenerator.cs" />
+    <Compile Include="PathStructureTests.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -97,7 +98,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="SetDataArgumentsTests.cs" />
-    <Compile Include="TestsBase.cs" />
+    <Compile Include="Infrastructure\TestsBase.cs" />
     <Compile Include="BasicSignalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -109,6 +110,7 @@
     <None Include="packages.config" />
     <None Include="Properties\DataSources\Dto.Datum.datasource" />
     <None Include="Properties\DataSources\Dto.MissingValuePolicyConfig.datasource" />
+    <None Include="Properties\DataSources\Dto.PathEntry.datasource" />
     <None Include="Properties\DataSources\Dto.Signal.datasource" />
     <None Include="Properties\DataSources\Signals.Dto.Datum.datasource" />
     <None Include="Properties\DataSources\Signals.Dto.Signal.datasource" />
