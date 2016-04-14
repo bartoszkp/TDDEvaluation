@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Domain.Repositories;
 using Domain.Infrastructure;
 using System.Linq;
+using Domain.Exceptions;
 
 namespace Domain.Services.Implementation
 {
@@ -29,6 +30,11 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal signal)
         {
+            if (signal.Id.HasValue)
+            {
+                throw new IdNotNullException();
+            }
+
             signal.MissingValuePolicyConfig = new MissingValuePolicyConfig();
             return this.signalRepository.Add(signal);
         }
