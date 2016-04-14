@@ -35,6 +35,13 @@ namespace WebService
             return this.signalsDomainService.Add(signal).ToDto<Signal>();
         }
 
+        public PathEntry GetPathEntry(Path pathDto)
+        {
+            var path = pathDto.ToDomain<Domain.Path>();
+
+            return this.signalsDomainService.GetPathEntry(path).ToDto<PathEntry>();
+        }
+
         public IEnumerable<Datum> GetData(Signal signalDto, DateTime fromIncluded, DateTime toExcluded)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
