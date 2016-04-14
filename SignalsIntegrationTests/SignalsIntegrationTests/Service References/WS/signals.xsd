@@ -38,6 +38,25 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="Granularity" nillable="true" type="tns:Granularity" />
+  <xs:complexType name="PathEntry">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Signals" nillable="true" type="tns:ArrayOfSignal" />
+      <xs:element minOccurs="0" name="SubPaths" nillable="true" type="tns:ArrayOfPath" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PathEntry" nillable="true" type="tns:PathEntry" />
+  <xs:complexType name="ArrayOfSignal">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Signal" nillable="true" type="tns:Signal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfSignal" nillable="true" type="tns:ArrayOfSignal" />
+  <xs:complexType name="ArrayOfPath">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Path" nillable="true" type="tns:Path" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPath" nillable="true" type="tns:ArrayOfPath" />
   <xs:complexType name="ArrayOfDatum">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Datum" nillable="true" type="tns:Datum" />

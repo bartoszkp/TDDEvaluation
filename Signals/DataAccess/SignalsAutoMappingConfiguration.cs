@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentNHibernate;
 
 namespace DataAccess
 {
@@ -7,8 +8,15 @@ namespace DataAccess
         public override bool ShouldMap(Type type)
         {
             return base.ShouldMap(type)
+                && !type.IsDefined(typeof(Domain.Infrastructure.NHibernateIgnoreAttribute), false)
                 && !type.ContainsGenericParameters
                 && (type.Namespace == "Domain" || type.Namespace == "DataAccess.GenericInstantiations");
+        }
+
+        public override bool ShouldMap(Member member)
+        {
+            return base.ShouldMap(member)
+                && !member.MemberInfo.IsDefined(typeof(Domain.Infrastructure.NHibernateIgnoreAttribute), false);
         }
 
         public override bool IsComponent(Type type)

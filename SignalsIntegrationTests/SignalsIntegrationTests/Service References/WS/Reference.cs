@@ -27,6 +27,12 @@ namespace SignalsIntegrationTests.WS {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Add", ReplyAction="http://tempuri.org/ISignalsWebService/AddResponse")]
         System.Threading.Tasks.Task<Dto.Signal> AddAsync(Dto.Signal signal);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetPathEntry", ReplyAction="http://tempuri.org/ISignalsWebService/GetPathEntryResponse")]
+        Dto.PathEntry GetPathEntry(Dto.Path path);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetPathEntry", ReplyAction="http://tempuri.org/ISignalsWebService/GetPathEntryResponse")]
+        System.Threading.Tasks.Task<Dto.PathEntry> GetPathEntryAsync(Dto.Path path);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetData", ReplyAction="http://tempuri.org/ISignalsWebService/GetDataResponse")]
         Dto.Datum[] GetData(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded);
         
@@ -95,6 +101,14 @@ namespace SignalsIntegrationTests.WS {
         
         public System.Threading.Tasks.Task<Dto.Signal> AddAsync(Dto.Signal signal) {
             return base.Channel.AddAsync(signal);
+        }
+        
+        public Dto.PathEntry GetPathEntry(Dto.Path path) {
+            return base.Channel.GetPathEntry(path);
+        }
+        
+        public System.Threading.Tasks.Task<Dto.PathEntry> GetPathEntryAsync(Dto.Path path) {
+            return base.Channel.GetPathEntryAsync(path);
         }
         
         public Dto.Datum[] GetData(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded) {

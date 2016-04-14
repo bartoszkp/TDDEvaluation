@@ -44,6 +44,15 @@ namespace DataAccess.Repositories
                 .SingleOrDefault();
         }
 
+        public IEnumerable<Signal> GetAllWithPathPrefix(Path path)
+        {
+            return Session
+                .QueryOver<Signal>()
+                .List<Signal>()
+                .Where(s => s.Path.ToString().StartsWith(path.ToString()))
+                .ToArray();
+        }
+
         public void Remove(Path path)
         {
             var signal = Get(path);

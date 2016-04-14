@@ -9,6 +9,8 @@ namespace Domain.Repositories
 
         Signal Add(Signal signal);
 
+        IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);
+
         void Remove(Path path);
 
         void SetData<T>(IEnumerable<Datum<T>> data);

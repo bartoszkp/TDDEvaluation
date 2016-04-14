@@ -1,13 +1,9 @@
-﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.ServiceModel;
 using Domain;
 using Dto.Conversions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
-using System;
-using System.Threading;
-using System.ServiceModel;
-using System.Collections.Generic;
-using System.Collections;
 
 namespace SignalsIntegrationTests
 {

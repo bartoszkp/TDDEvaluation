@@ -9,6 +9,8 @@ namespace Domain.Services
 
         Signal Add(Signal signal);
 
+        PathEntry GetPathEntry(Path path);
+
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
 
         void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
