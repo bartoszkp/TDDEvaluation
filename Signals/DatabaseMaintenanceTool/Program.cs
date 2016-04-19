@@ -46,22 +46,18 @@ namespace DatabaseMaintenanceTool
 
             string connectionString = ConfigurationManager.ConnectionStrings["signals"].ConnectionString;
 
-            if (!File.Exists(fileName))
+            using (var connection = new System.Data.SqlClient.SqlConnection(connectionString))
             {
-                using (var connection = new System.Data.SqlClient.SqlConnection(connectionString))
+                connection.Open();
+                using (var command = connection.CreateCommand())
                 {
-                    connection.Open();
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.CommandText
-                            = string.Format("CREATE DATABASE {0} ON PRIMARY (NAME={0}, FILENAME='{1}')", databaseName, fileName);
-                        command.ExecuteNonQuery();
+                    command.CommandText
+                        = string.Format("IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = '{0}') DROP DATABASE {0}", databaseName);
+                    command.ExecuteNonQuery();
 
-                        command.CommandText
-                            = string.Format("EXEC sp_detach_db '{0}', 'true'", databaseName);
-
-                        command.ExecuteNonQuery();
-                    }
+                    command.CommandText
+                        = string.Format("CREATE DATABASE {0} ON PRIMARY (NAME={0}, FILENAME='{1}')", databaseName, fileName);
+                    command.ExecuteNonQuery();
                 }
             }
         }
