@@ -99,9 +99,9 @@ namespace WebService
             return genericMethodInfo.MakeGenericMethod(dataType.GetNativeType());
         }
 
-        public MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal)
+        public MissingValuePolicyConfig GetMissingValuePolicyConfig(int signalId)
         {
-            return this.signalsDomainService.GetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>()).ToDto<MissingValuePolicyConfig>();
+            return this.signalsDomainService.Get(signalId).MissingValuePolicyConfig.ToDto<MissingValuePolicyConfig>();
         }
 
         public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config)

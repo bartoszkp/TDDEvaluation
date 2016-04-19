@@ -182,7 +182,7 @@ namespace SignalsIntegrationTests
         {
             var signal = AddNewIntegerSignal();
 
-            var result = client.GetMissingValuePolicyConfig(signal);
+            var result = client.GetMissingValuePolicyConfig(signal.Id.Value);
 
             Assert.AreEqual(Dto.MissingValuePolicy.NoneQuality, result.Policy);
         }
@@ -195,7 +195,7 @@ namespace SignalsIntegrationTests
             var newConfig = new MissingValuePolicyConfig() { Policy = MissingValuePolicy.SpecificValue };
 
             client.SetMissingValuePolicyConfig(signal, newConfig.ToDto<Dto.MissingValuePolicyConfig>());
-            var result = client.GetMissingValuePolicyConfig(signal);
+            var result = client.GetMissingValuePolicyConfig(signal.Id.Value);
 
             Assert.AreEqual(newConfig.Policy, result.ToDomain<Domain.MissingValuePolicyConfig>().Policy);
         }

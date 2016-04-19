@@ -92,11 +92,6 @@ namespace Domain.Services.Implementation
                 .ToArray();
         }
 
-        public MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal)
-        {
-           return this.signalRepository.Get(signal.Path).MissingValuePolicyConfig;
-        }
-
         public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config)
         {
             signal = this.signalRepository.Get(signal.Path);
