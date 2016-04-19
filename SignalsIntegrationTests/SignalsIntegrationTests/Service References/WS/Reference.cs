@@ -52,10 +52,10 @@ namespace SignalsIntegrationTests.WS {
         System.Threading.Tasks.Task<Dto.MissingValuePolicyConfig> GetMissingValuePolicyConfigAsync(int signalId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfigResponse")]
-        void SetMissingValuePolicyConfig(Dto.Signal signal, Dto.MissingValuePolicyConfig config);
+        void SetMissingValuePolicyConfig(int signalId, Dto.MissingValuePolicyConfig config);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfigResponse")]
-        System.Threading.Tasks.Task SetMissingValuePolicyConfigAsync(Dto.Signal signal, Dto.MissingValuePolicyConfig config);
+        System.Threading.Tasks.Task SetMissingValuePolicyConfigAsync(int signalId, Dto.MissingValuePolicyConfig config);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -133,12 +133,12 @@ namespace SignalsIntegrationTests.WS {
             return base.Channel.GetMissingValuePolicyConfigAsync(signalId);
         }
         
-        public void SetMissingValuePolicyConfig(Dto.Signal signal, Dto.MissingValuePolicyConfig config) {
-            base.Channel.SetMissingValuePolicyConfig(signal, config);
+        public void SetMissingValuePolicyConfig(int signalId, Dto.MissingValuePolicyConfig config) {
+            base.Channel.SetMissingValuePolicyConfig(signalId, config);
         }
         
-        public System.Threading.Tasks.Task SetMissingValuePolicyConfigAsync(Dto.Signal signal, Dto.MissingValuePolicyConfig config) {
-            return base.Channel.SetMissingValuePolicyConfigAsync(signal, config);
+        public System.Threading.Tasks.Task SetMissingValuePolicyConfigAsync(int signalId, Dto.MissingValuePolicyConfig config) {
+            return base.Channel.SetMissingValuePolicyConfigAsync(signalId, config);
         }
     }
 }

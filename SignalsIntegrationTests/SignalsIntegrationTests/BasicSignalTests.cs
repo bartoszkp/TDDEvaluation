@@ -190,12 +190,12 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void MissingValuePolicyCanBeSetForSignal()
         {
-            var signal = AddNewIntegerSignal();
+            var signalId = AddNewIntegerSignal().Id.Value;
 
             var newConfig = new MissingValuePolicyConfig() { Policy = MissingValuePolicy.SpecificValue };
 
-            client.SetMissingValuePolicyConfig(signal, newConfig.ToDto<Dto.MissingValuePolicyConfig>());
-            var result = client.GetMissingValuePolicyConfig(signal.Id.Value);
+            client.SetMissingValuePolicyConfig(signalId, newConfig.ToDto<Dto.MissingValuePolicyConfig>());
+            var result = client.GetMissingValuePolicyConfig(signalId);
 
             Assert.AreEqual(newConfig.Policy, result.ToDomain<Domain.MissingValuePolicyConfig>().Policy);
         }
