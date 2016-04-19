@@ -58,9 +58,9 @@ namespace WebService
                 .ToArray();
         }
 
-        public void SetData(Signal signalDto, IEnumerable<Datum> data)
+        public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var signal = signalDto.ToDomain<Domain.Signal>();
+            var signal = this.signalsDomainService.Get(signalId);
 
             var genericDatum = typeof(Domain.Datum<object>).GetGenericTypeDefinition();
             var concreteDatum = genericDatum.MakeGenericType(signal.DataType.GetNativeType());

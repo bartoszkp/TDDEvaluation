@@ -115,7 +115,7 @@ namespace SignalsIntegrationTests.Infrastructure
                 var signal = parent.AddNewIntegerSignal(Granularity.Day);
                 parent.client.SetMissingValuePolicyConfig(signal, PolicyConfig.ToDto<Dto.MissingValuePolicyConfig>());
 
-                parent.client.SetData(signal, input.ToDto<Dto.Datum[]>());
+                parent.client.SetData(signal.Id.Value, input.ToDto<Dto.Datum[]>());
                 var result = parent.client.GetData(signal.Id.Value, BeginTimestamp, EndTimestamp);
 
                 parent.AssertDatumsEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
