@@ -36,6 +36,8 @@ namespace Domain.Services.Implementation
             }
 
             signal.MissingValuePolicy = new NoneQualityMissingValuePolicy();
+            signal.MissingValuePolicy.Signal = signal;
+
             return this.signalRepository.Add(signal);
         }
 

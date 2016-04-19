@@ -96,6 +96,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoMappingOverrides\MissingValuePolicyMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathComponentsList.cs" />
     <Compile Include="AutoMappingOverrides\SignalMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathMappingOverride.cs" />

@@ -14,10 +14,11 @@ namespace DataAccess.AutoMappingOverrides
                 .Increment();
 
             mapping
-                .References(s => s.MissingValuePolicy)
-                .Unique()
-                .Cascade
-                .All();
+               .HasOne(s => s.MissingValuePolicy)
+               .Constrained()
+               .Cascade
+               .All()
+               .PropertyRef(mvp => mvp.Signal);
         }
     }
 }
