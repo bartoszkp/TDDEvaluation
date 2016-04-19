@@ -44,7 +44,7 @@ namespace DatabaseMaintenanceTool
             string databaseName = "Signals";
             string fileName = Path.Combine(AppDomain.CurrentDomain.GetData(DataDirectoryDataKey).ToString(), databaseName + ".mdf");
 
-            string connectionString = ConfigurationManager.ConnectionStrings["signals"].ConnectionString;
+            string connectionString = ConfigurationManager.ConnectionStrings["master"].ConnectionString;
 
             using (var connection = new System.Data.SqlClient.SqlConnection(connectionString))
             {
