@@ -47,6 +47,7 @@ namespace Domain.Services.Implementation
             var subPaths = allSignals
                 .Where(s => s.Path.Length > path.Length + 1)
                 .Select(s => s.Path.GetPrefix(path.Length + 1))
+                .Distinct()
                 .ToArray();
 
             return new PathEntry(directDescendants, subPaths);
