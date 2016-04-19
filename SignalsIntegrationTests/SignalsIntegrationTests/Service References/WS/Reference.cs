@@ -46,10 +46,10 @@ namespace SignalsIntegrationTests.WS {
         System.Threading.Tasks.Task SetDataAsync(int signalId, Dto.Datum[] data);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfigResponse")]
-        Dto.MissingValuePolicyConfig GetMissingValuePolicyConfig(Dto.Signal signal);
+        Dto.MissingValuePolicyConfig GetMissingValuePolicyConfig(int signalId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyConfigResponse")]
-        System.Threading.Tasks.Task<Dto.MissingValuePolicyConfig> GetMissingValuePolicyConfigAsync(Dto.Signal signal);
+        System.Threading.Tasks.Task<Dto.MissingValuePolicyConfig> GetMissingValuePolicyConfigAsync(int signalId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfig", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyConfigResponse")]
         void SetMissingValuePolicyConfig(Dto.Signal signal, Dto.MissingValuePolicyConfig config);
@@ -125,12 +125,12 @@ namespace SignalsIntegrationTests.WS {
             return base.Channel.SetDataAsync(signalId, data);
         }
         
-        public Dto.MissingValuePolicyConfig GetMissingValuePolicyConfig(Dto.Signal signal) {
-            return base.Channel.GetMissingValuePolicyConfig(signal);
+        public Dto.MissingValuePolicyConfig GetMissingValuePolicyConfig(int signalId) {
+            return base.Channel.GetMissingValuePolicyConfig(signalId);
         }
         
-        public System.Threading.Tasks.Task<Dto.MissingValuePolicyConfig> GetMissingValuePolicyConfigAsync(Dto.Signal signal) {
-            return base.Channel.GetMissingValuePolicyConfigAsync(signal);
+        public System.Threading.Tasks.Task<Dto.MissingValuePolicyConfig> GetMissingValuePolicyConfigAsync(int signalId) {
+            return base.Channel.GetMissingValuePolicyConfigAsync(signalId);
         }
         
         public void SetMissingValuePolicyConfig(Dto.Signal signal, Dto.MissingValuePolicyConfig config) {
