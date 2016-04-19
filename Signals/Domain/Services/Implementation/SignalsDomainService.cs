@@ -91,11 +91,5 @@ namespace Domain.Services.Implementation
                 .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.CreateNone(signal, ts))
                 .ToArray();
         }
-
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config)
-        {
-            signal = this.signalRepository.Get(signal.Path);
-            signal.MissingValuePolicyConfig = config;
-        }
     }
 }

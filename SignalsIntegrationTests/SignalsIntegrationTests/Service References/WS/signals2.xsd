@@ -89,8 +89,8 @@
   <xs:element name="SetMissingValuePolicyConfig">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="signal" nillable="true" type="q10:Signal" />
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="config" nillable="true" type="q11:MissingValuePolicyConfig" />
+        <xs:element minOccurs="0" name="signalId" type="xs:int" />
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="config" nillable="true" type="q10:MissingValuePolicyConfig" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

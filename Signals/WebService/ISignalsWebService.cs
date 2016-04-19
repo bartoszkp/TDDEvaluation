@@ -27,6 +27,6 @@ namespace WebService
         MissingValuePolicyConfig GetMissingValuePolicyConfig(int signalId);
 
         [OperationContract]
-        void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config);
+        void SetMissingValuePolicyConfig(int signalId, MissingValuePolicyConfig config);
     }
 }
