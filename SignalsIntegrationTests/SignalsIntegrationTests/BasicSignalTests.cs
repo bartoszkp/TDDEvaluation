@@ -114,7 +114,7 @@ namespace SignalsIntegrationTests
             };
 
             client.SetData(signal, data.ToDto<Dto.Datum[]>());
-            var retrievedData = client.GetData(signal, timestamp, timestamp.AddDays(1));
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
 
             Assert.AreEqual(data.Length, retrievedData.Length);
             Assert.AreEqual(data[0].Value, retrievedData[0].Value);
@@ -125,14 +125,9 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void GetDataUsingIncompleteSignalsThrowsOrReturnsNull()
         {
-            var newSignal = new Signal()
-            {
-                Path = SignalPathGenerator.Generate(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer
-            };
+            int dummySignalId = 0;
 
-            Assertions.AssertReturnsNullOrThrows(() => client.GetData(newSignal.ToDto<Dto.Signal>(), new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
+            Assertions.AssertReturnsNullOrThrows(() => client.GetData(dummySignalId, new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
         }
 
         [TestMethod]
@@ -171,7 +166,7 @@ namespace SignalsIntegrationTests
 
             const int numberOfDays = 5;
             var timestamp = new DateTime(2019, 1, 1);
-            var receivedData = client.GetData(signal, timestamp, timestamp.AddDays(numberOfDays));
+            var receivedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(numberOfDays));
 
             Assert.AreEqual(numberOfDays, receivedData.Length);
             foreach (var datum in receivedData)

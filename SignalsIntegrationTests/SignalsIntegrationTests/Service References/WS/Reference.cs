@@ -34,10 +34,10 @@ namespace SignalsIntegrationTests.WS {
         System.Threading.Tasks.Task<Dto.PathEntry> GetPathEntryAsync(Dto.Path path);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetData", ReplyAction="http://tempuri.org/ISignalsWebService/GetDataResponse")]
-        Dto.Datum[] GetData(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded);
+        Dto.Datum[] GetData(int signalId, System.DateTime fromIncluded, System.DateTime toExcluded);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetData", ReplyAction="http://tempuri.org/ISignalsWebService/GetDataResponse")]
-        System.Threading.Tasks.Task<Dto.Datum[]> GetDataAsync(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded);
+        System.Threading.Tasks.Task<Dto.Datum[]> GetDataAsync(int signalId, System.DateTime fromIncluded, System.DateTime toExcluded);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetData", ReplyAction="http://tempuri.org/ISignalsWebService/SetDataResponse")]
         void SetData(Dto.Signal signal, Dto.Datum[] data);
@@ -109,12 +109,12 @@ namespace SignalsIntegrationTests.WS {
             return base.Channel.GetPathEntryAsync(path);
         }
         
-        public Dto.Datum[] GetData(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded) {
-            return base.Channel.GetData(signal, fromIncluded, toExcluded);
+        public Dto.Datum[] GetData(int signalId, System.DateTime fromIncluded, System.DateTime toExcluded) {
+            return base.Channel.GetData(signalId, fromIncluded, toExcluded);
         }
         
-        public System.Threading.Tasks.Task<Dto.Datum[]> GetDataAsync(Dto.Signal signal, System.DateTime fromIncluded, System.DateTime toExcluded) {
-            return base.Channel.GetDataAsync(signal, fromIncluded, toExcluded);
+        public System.Threading.Tasks.Task<Dto.Datum[]> GetDataAsync(int signalId, System.DateTime fromIncluded, System.DateTime toExcluded) {
+            return base.Channel.GetDataAsync(signalId, fromIncluded, toExcluded);
         }
         
         public void SetData(Dto.Signal signal, Dto.Datum[] data) {
