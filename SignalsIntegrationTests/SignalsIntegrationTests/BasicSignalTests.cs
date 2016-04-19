@@ -113,7 +113,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal, data.ToDto<Dto.Datum[]>());
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
 
             Assert.AreEqual(data.Length, retrievedData.Length);

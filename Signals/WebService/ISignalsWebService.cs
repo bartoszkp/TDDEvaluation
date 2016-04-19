@@ -21,7 +21,7 @@ namespace WebService
         IEnumerable<Datum> GetData(int signalId, DateTime fromIncluded, DateTime toExcluded);
 
         [OperationContract]
-        void SetData(Signal signal, IEnumerable<Datum> data);
+        void SetData(int signalId, IEnumerable<Datum> data);
 
         [OperationContract]
         MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal);
