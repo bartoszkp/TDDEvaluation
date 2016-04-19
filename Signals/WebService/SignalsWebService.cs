@@ -42,9 +42,9 @@ namespace WebService
             return this.signalsDomainService.GetPathEntry(path).ToDto<PathEntry>();
         }
 
-        public IEnumerable<Datum> GetData(Signal signalDto, DateTime fromIncluded, DateTime toExcluded)
+        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncluded, DateTime toExcluded)
         {
-            var signal = signalDto.ToDomain<Domain.Signal>();
+            var signal = this.signalsDomainService.Get(signalId);
 
             var getData = GetAppropriateGetDataMethod(signal.DataType);
 
@@ -58,9 +58,9 @@ namespace WebService
                 .ToArray();
         }
 
-        public void SetData(Signal signalDto, IEnumerable<Datum> data)
+        public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var signal = this.signalsDomainService.Get(signalDto.Path.ToDomain<Domain.Path>());
+            var signal = this.signalsDomainService.Get(signalId);
 
             var genericDatum = typeof(Domain.Datum<object>).GetGenericTypeDefinition();
             var concreteDatum = genericDatum.MakeGenericType(signal.DataType.GetNativeType());
@@ -99,14 +99,14 @@ namespace WebService
             return genericMethodInfo.MakeGenericMethod(dataType.GetNativeType());
         }
 
-        public MissingValuePolicy GetMissingValuePolicy(Signal signal)
+        public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            return this.signalsDomainService.GetMissingValuePolicy(signal.ToDomain<Domain.Signal>()).ToDto<MissingValuePolicy>();
+            return this.signalsDomainService.Get(signalId).MissingValuePolicy.ToDto<MissingValuePolicy>();
         }
 
-        public void SetMissingValuePolicy(Signal signal, MissingValuePolicy policy)
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicy config)
         {
-            this.signalsDomainService.SetMissingValuePolicyConfig(signal.ToDomain<Domain.Signal>(), policy.ToDomain<Domain.MissingValuePolicy>());
+            this.signalsDomainService.Get(signalId).MissingValuePolicy = config.ToDomain<Domain.MissingValuePolicy>();
         }
     }
 }

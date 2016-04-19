@@ -18,15 +18,15 @@ namespace WebService
         PathEntry GetPathEntry(Path path);
 
         [OperationContract]
-        IEnumerable<Datum> GetData(Signal signal, DateTime fromIncluded, DateTime toExcluded);
+        IEnumerable<Datum> GetData(int signalId, DateTime fromIncluded, DateTime toExcluded);
 
         [OperationContract]
-        void SetData(Signal signal, IEnumerable<Datum> data);
+        void SetData(int signalId, IEnumerable<Datum> data);
 
         [OperationContract]
-        MissingValuePolicy GetMissingValuePolicy(Signal signal);
+        MissingValuePolicy GetMissingValuePolicy(int signalId);
 
         [OperationContract]
-        void SetMissingValuePolicy(Signal signal, MissingValuePolicy policy);
+        void SetMissingValuePolicy(int signalId, MissingValuePolicy config);
     }
 }

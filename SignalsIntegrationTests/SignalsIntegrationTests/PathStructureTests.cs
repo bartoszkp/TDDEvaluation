@@ -78,5 +78,21 @@ namespace SignalsIntegrationTests
 
             CollectionAssert.AreEquivalent(new[] { subDirectory }, result.SubPaths.ToArray());
         }
+
+        [TestMethod]
+        public void GivenRootPath_WhenOnePathLevelPresentAndTwoSignalsOnThatLevel_ReturnsOneCommonSubpath()
+        {
+            var topLevelDirectory = Path.Root + "topLevel";
+            var directory = topLevelDirectory + "twoSignals";
+            var firstTopLevelSignalPath = directory + "topLevelSignal1";
+            var secondTopLevelSignalPath = directory + "topLevelSignal2";
+
+            AddNewIntegerSignal(path: firstTopLevelSignalPath);
+            AddNewIntegerSignal(path: secondTopLevelSignalPath);
+
+            var result = GetPathEntry(topLevelDirectory);
+
+            CollectionAssert.AreEquivalent(new[] { directory }, result.SubPaths.ToArray());
+        }
     }
 }

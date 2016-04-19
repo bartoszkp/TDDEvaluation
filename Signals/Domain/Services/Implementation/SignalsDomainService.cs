@@ -28,6 +28,18 @@ namespace Domain.Services.Implementation
             return result;
         }
 
+        public Signal Get(int signalId)
+        {
+            var result = this.signalRepository.Get(signalId);
+
+            if (result == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            return result;
+        }
+  
         public Signal Add(Signal signal)
         {
             if (signal.Id.HasValue)
@@ -49,6 +61,7 @@ namespace Domain.Services.Implementation
             var subPaths = allSignals
                 .Where(s => s.Path.Length > path.Length + 1)
                 .Select(s => s.Path.GetPrefix(path.Length + 1))
+                .Distinct()
                 .ToArray();
 
             return new PathEntry(directDescendants, subPaths);
@@ -79,17 +92,6 @@ namespace Domain.Services.Implementation
             return timeEnumerator
                 .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.CreateNone(signal, ts))
                 .ToArray();
-        }
-
-        public MissingValuePolicy GetMissingValuePolicy(Signal signal)
-        {
-            return this.signalRepository.Get(signal.Path).MissingValuePolicy;
-        }
-
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy policy)
-        {
-            signal = this.signalRepository.Get(signal.Path);
-            signal.MissingValuePolicy = policy;
         }
     }
 }
