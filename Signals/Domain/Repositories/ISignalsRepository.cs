@@ -7,6 +7,8 @@ namespace Domain.Repositories
     {
         Signal Get(Path path);
 
+        Signal Get(int signalId);
+
         Signal Add(Signal signal);
 
         IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);

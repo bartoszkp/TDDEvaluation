@@ -28,6 +28,18 @@ namespace Domain.Services.Implementation
             return result;
         }
 
+        public Signal Get(int signalId)
+        {
+            var result = this.signalRepository.Get(signalId);
+
+            if (result == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            return result;
+        }
+  
         public Signal Add(Signal signal)
         {
             if (signal.Id.HasValue)

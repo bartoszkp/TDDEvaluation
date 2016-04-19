@@ -116,7 +116,7 @@ namespace SignalsIntegrationTests.Infrastructure
                 parent.client.SetMissingValuePolicyConfig(signal, PolicyConfig.ToDto<Dto.MissingValuePolicyConfig>());
 
                 parent.client.SetData(signal, input.ToDto<Dto.Datum[]>());
-                var result = parent.client.GetData(signal, BeginTimestamp, EndTimestamp);
+                var result = parent.client.GetData(signal.Id.Value, BeginTimestamp, EndTimestamp);
 
                 parent.AssertDatumsEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
             }

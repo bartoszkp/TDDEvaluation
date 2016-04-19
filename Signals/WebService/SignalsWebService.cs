@@ -42,9 +42,9 @@ namespace WebService
             return this.signalsDomainService.GetPathEntry(path).ToDto<PathEntry>();
         }
 
-        public IEnumerable<Datum> GetData(Signal signalDto, DateTime fromIncluded, DateTime toExcluded)
+        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncluded, DateTime toExcluded)
         {
-            var signal = signalDto.ToDomain<Domain.Signal>();
+            var signal = this.signalsDomainService.Get(signalId);
 
             var getData = GetAppropriateGetDataMethod(signal.DataType);
 
