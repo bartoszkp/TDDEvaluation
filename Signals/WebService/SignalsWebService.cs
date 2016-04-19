@@ -60,7 +60,7 @@ namespace WebService
 
         public void SetData(Signal signalDto, IEnumerable<Datum> data)
         {
-            var signal = signalDto.ToDomain<Domain.Signal>();
+            var signal = this.signalsDomainService.Get(signalDto.Path.ToDomain<Domain.Path>());
 
             var genericDatum = typeof(Domain.Datum<object>).GetGenericTypeDefinition();
             var concreteDatum = genericDatum.MakeGenericType(signal.DataType.GetNativeType());

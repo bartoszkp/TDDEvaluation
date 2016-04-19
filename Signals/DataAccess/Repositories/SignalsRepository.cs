@@ -32,7 +32,6 @@ namespace DataAccess.Repositories
         public Signal Add(Signal signal)
         {
             Session.SaveOrUpdate(signal);
-
             return signal;
         }
 
