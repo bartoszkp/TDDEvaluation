@@ -112,11 +112,11 @@ namespace SignalsIntegrationTests.Infrastructure
             public void CheckMissingValuePolicyBehavior(IEnumerable<Datum<int>> input,
                                                         IEnumerable<Datum<int>> expected)
             {
-                var signal = parent.AddNewIntegerSignal(Granularity.Day);
-                parent.client.SetMissingValuePolicyConfig(signal, PolicyConfig.ToDto<Dto.MissingValuePolicyConfig>());
+                var signalId = parent.AddNewIntegerSignal(Granularity.Day).Id.Value;
+                parent.client.SetMissingValuePolicyConfig(signalId, PolicyConfig.ToDto<Dto.MissingValuePolicyConfig>());
 
-                parent.client.SetData(signal, input.ToDto<Dto.Datum[]>());
-                var result = parent.client.GetData(signal, BeginTimestamp, EndTimestamp);
+                parent.client.SetData(signalId, input.ToDto<Dto.Datum[]>());
+                var result = parent.client.GetData(signalId, BeginTimestamp, EndTimestamp);
 
                 parent.AssertDatumsEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
             }

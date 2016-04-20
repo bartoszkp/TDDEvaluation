@@ -44,6 +44,14 @@ namespace DataAccess.Repositories
                 .SingleOrDefault();
         }
 
+        public Signal Get(int signalId)
+        {
+            return Session
+                .QueryOver<Signal>()
+                .Where(s => s.Id == signalId)
+                .SingleOrDefault();
+        }
+
         public IEnumerable<Signal> GetAllWithPathPrefix(Path path)
         {
             return Session

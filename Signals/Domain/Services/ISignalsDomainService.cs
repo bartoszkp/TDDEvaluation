@@ -7,6 +7,8 @@ namespace Domain.Services
     {
         Signal Get(Path path);
 
+        Signal Get(int signalId);
+
         Signal Add(Signal signal);
 
         PathEntry GetPathEntry(Path path);
@@ -14,9 +16,5 @@ namespace Domain.Services
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
 
         void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
-
-        MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal);
-
-        void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config);
     }
 }
