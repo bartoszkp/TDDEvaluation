@@ -22,17 +22,5 @@ namespace DatabaseMaintenanceTool.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Hosting\\bin\\Debug")]
-        public string RelativeDataDirectory {
-            get {
-                return ((string)(this["RelativeDataDirectory"]));
-            }
-            set {
-                this["RelativeDataDirectory"] = value;
-            }
-        }
     }
 }
