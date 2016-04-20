@@ -57,7 +57,7 @@ namespace DataAccess.Repositories
             return Session
                 .QueryOver<Signal>()
                 .List<Signal>()
-                .Where(s => s.Path.ToString().StartsWith(path.ToString()))
+                .Where(s => s.Path.Components.Take(path.Length).SequenceEqual(path.Components))
                 .ToArray();
         }
 
