@@ -56,7 +56,7 @@ namespace SignalsIntegrationTests
 
             client.Add(newSignal.ToDto<Dto.Signal>());
             var received = client.Get(newSignal.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
-            var receivedById = client.GetById(received.Id.Value);
+            var receivedById = client.GetById(received.Id.Value).ToDomain<Domain.Signal>();
 
             Assert.AreEqual(newSignal.DataType, received.DataType);
             Assert.AreEqual(newSignal.DataType, receivedById.DataType);
