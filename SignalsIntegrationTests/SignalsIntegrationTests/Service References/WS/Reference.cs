@@ -21,6 +21,12 @@ namespace SignalsIntegrationTests.WS {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Get", ReplyAction="http://tempuri.org/ISignalsWebService/GetResponse")]
         System.Threading.Tasks.Task<Dto.Signal> GetAsync(Dto.Path path);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetById", ReplyAction="http://tempuri.org/ISignalsWebService/GetByIdResponse")]
+        Dto.Signal GetById(int signalId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetById", ReplyAction="http://tempuri.org/ISignalsWebService/GetByIdResponse")]
+        System.Threading.Tasks.Task<Dto.Signal> GetByIdAsync(int signalId);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Add", ReplyAction="http://tempuri.org/ISignalsWebService/AddResponse")]
         Dto.Signal Add(Dto.Signal signal);
         
@@ -91,6 +97,14 @@ namespace SignalsIntegrationTests.WS {
         
         public System.Threading.Tasks.Task<Dto.Signal> GetAsync(Dto.Path path) {
             return base.Channel.GetAsync(path);
+        }
+        
+        public Dto.Signal GetById(int signalId) {
+            return base.Channel.GetById(signalId);
+        }
+        
+        public System.Threading.Tasks.Task<Dto.Signal> GetByIdAsync(int signalId) {
+            return base.Channel.GetByIdAsync(signalId);
         }
         
         public Dto.Signal Add(Dto.Signal signal) {

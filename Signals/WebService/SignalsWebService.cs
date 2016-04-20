@@ -28,6 +28,11 @@ namespace WebService
             return this.signalsDomainService.Get(path).ToDto<Signal>();
         }
 
+        public Signal GetById(int signalId)
+        {
+            return this.signalsDomainService.Get(signalId).ToDto<Signal>();
+        }
+
         public Signal Add(Signal signalDto)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
