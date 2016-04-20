@@ -56,10 +56,14 @@ namespace SignalsIntegrationTests
 
             client.Add(newSignal.ToDto<Dto.Signal>());
             var received = client.Get(newSignal.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
+            var receivedById = client.GetById(received.Id.Value);
 
             Assert.AreEqual(newSignal.DataType, received.DataType);
+            Assert.AreEqual(newSignal.DataType, receivedById.DataType);
             Assert.AreEqual(newSignal.Path, received.Path);
+            Assert.AreEqual(newSignal.Path, receivedById.Path);
             Assert.AreEqual(received.Granularity, received.Granularity);
+            Assert.AreEqual(received.Granularity, receivedById.Granularity);
         }
 
         [TestMethod]
@@ -113,8 +117,8 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal, data.ToDto<Dto.Datum[]>());
-            var retrievedData = client.GetData(signal, timestamp, timestamp.AddDays(1));
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
 
             Assert.AreEqual(data.Length, retrievedData.Length);
             Assert.AreEqual(data[0].Value, retrievedData[0].Value);
@@ -125,14 +129,9 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void GetDataUsingIncompleteSignalsThrowsOrReturnsNull()
         {
-            var newSignal = new Signal()
-            {
-                Path = SignalPathGenerator.Generate(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer
-            };
+            int dummySignalId = 0;
 
-            Assertions.AssertReturnsNullOrThrows(() => client.GetData(newSignal.ToDto<Dto.Signal>(), new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
+            Assertions.AssertReturnsNullOrThrows(() => client.GetData(dummySignalId, new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
         }
 
         [TestMethod]
@@ -171,7 +170,7 @@ namespace SignalsIntegrationTests
 
             const int numberOfDays = 5;
             var timestamp = new DateTime(2019, 1, 1);
-            var receivedData = client.GetData(signal, timestamp, timestamp.AddDays(numberOfDays));
+            var receivedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(numberOfDays));
 
             Assert.AreEqual(numberOfDays, receivedData.Length);
             foreach (var datum in receivedData)
@@ -187,7 +186,7 @@ namespace SignalsIntegrationTests
         {
             var signal = AddNewIntegerSignal();
 
-            var result = client.GetMissingValuePolicyConfig(signal);
+            var result = client.GetMissingValuePolicyConfig(signal.Id.Value);
 
             Assert.AreEqual(Dto.MissingValuePolicy.NoneQuality, result.Policy);
         }
@@ -195,12 +194,12 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void MissingValuePolicyCanBeSetForSignal()
         {
-            var signal = AddNewIntegerSignal();
+            var signalId = AddNewIntegerSignal().Id.Value;
 
             var newConfig = new MissingValuePolicyConfig() { Policy = MissingValuePolicy.SpecificValue };
 
-            client.SetMissingValuePolicyConfig(signal, newConfig.ToDto<Dto.MissingValuePolicyConfig>());
-            var result = client.GetMissingValuePolicyConfig(signal);
+            client.SetMissingValuePolicyConfig(signalId, newConfig.ToDto<Dto.MissingValuePolicyConfig>());
+            var result = client.GetMissingValuePolicyConfig(signalId);
 
             Assert.AreEqual(newConfig.Policy, result.ToDomain<Domain.MissingValuePolicyConfig>().Policy);
         }

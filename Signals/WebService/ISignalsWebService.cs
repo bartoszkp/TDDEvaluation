@@ -12,21 +12,24 @@ namespace WebService
         Signal Get(Path path);
 
         [OperationContract]
+        Signal GetById(int signalId);
+
+        [OperationContract]
         Signal Add(Signal signal);
 
         [OperationContract]
         PathEntry GetPathEntry(Path path);
 
         [OperationContract]
-        IEnumerable<Datum> GetData(Signal signal, DateTime fromIncluded, DateTime toExcluded);
+        IEnumerable<Datum> GetData(int signalId, DateTime fromIncluded, DateTime toExcluded);
 
         [OperationContract]
-        void SetData(Signal signal, IEnumerable<Datum> data);
+        void SetData(int signalId, IEnumerable<Datum> data);
 
         [OperationContract]
-        MissingValuePolicyConfig GetMissingValuePolicyConfig(Signal signal);
+        MissingValuePolicyConfig GetMissingValuePolicyConfig(int signalId);
 
         [OperationContract]
-        void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicyConfig config);
+        void SetMissingValuePolicyConfig(int signalId, MissingValuePolicyConfig config);
     }
 }
