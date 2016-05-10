@@ -10,7 +10,8 @@ namespace DataAccess
             return base.ShouldMap(type)
                 && !type.IsDefined(typeof(Domain.Infrastructure.NHibernateIgnoreAttribute), false)
                 && !type.ContainsGenericParameters
-                && (type.Namespace == "Domain" || type.Namespace == "DataAccess.GenericInstantiations");
+                && (type.Namespace.StartsWith("Domain") || type.Namespace == "DataAccess.GenericInstantiations")
+                && !(type.Namespace == "Domain.Infrastructure" || type.Namespace == "Domain.Exceptions" || type.Namespace == "Repositories" || type.Namespace.StartsWith("Domain.Services"));
         }
 
         public override bool ShouldMap(Member member)

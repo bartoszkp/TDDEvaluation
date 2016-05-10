@@ -43,10 +43,10 @@
   <ItemGroup>
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
-    <Compile Include="MissingValuePolicy.cs" />
+    <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="Infrastructure\GranularityUtils.cs" />
     <Compile Include="PathEntry.cs" />
-    <Compile Include="NoneQualityMissingValuePolicy.cs" />
+    <Compile Include="MissingValuePolicy\NoneQualityMissingValuePolicy.cs" />
     <Compile Include="Quality.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />

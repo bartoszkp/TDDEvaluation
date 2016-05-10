@@ -1,4 +1,4 @@
-﻿using Domain;
+using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 
@@ -26,7 +26,7 @@ namespace SignalsIntegrationTests
         {
             validator = new MissingValuePolicyValidator(this)
             {
-                Policy = new NoneQualityMissingValuePolicy()
+                Policy = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy()
             };
         }
 

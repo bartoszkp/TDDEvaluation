@@ -94,6 +94,11 @@ namespace DataAccess.Repositories
                 .Cast<Datum<T>>();
         }
 
+        public void Add(Domain.MissingValuePolicy.MissingValuePolicy missingValuePolicy)
+        {
+            Session.SaveOrUpdate(missingValuePolicy);
+        }
+
         private Type GetConcreteDatumType<T>()
         {
             var concreteDatumType = genericConcreteDatumTypePairs

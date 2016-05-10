@@ -47,8 +47,10 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            signal.MissingValuePolicy = new NoneQualityMissingValuePolicy();
+            signal.MissingValuePolicy = new MissingValuePolicy.NoneQualityMissingValuePolicy();
             signal.MissingValuePolicy.Signal = signal;
+
+            this.signalRepository.Add(signal.MissingValuePolicy);
 
             return this.signalRepository.Add(signal);
         }
@@ -92,6 +94,12 @@ namespace Domain.Services.Implementation
             return timeEnumerator
                 .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.CreateNone(signal, ts))
                 .ToArray();
+        }
+
+        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicy missingValuePolicy)
+        {
+            missingValuePolicy.Signal = signal;
+            signal.MissingValuePolicy = missingValuePolicy;
         }
     }
 }
