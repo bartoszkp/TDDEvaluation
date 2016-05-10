@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel.Description;
 using Microsoft.Practices.Unity;
 using Unity.Wcf;
@@ -21,6 +22,7 @@ namespace Hosting
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
                 smb.HttpGetEnabled = true;
                 smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
+
                 host.Description.Behaviors.Add(smb);
 
                 host.Open();

@@ -106,7 +106,7 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            this.signalsDomainService.Get(signalId).MissingValuePolicy = policy.ToDomain<Domain.MissingValuePolicy>();
+            this.signalsDomainService.Get(signalId).MissingValuePolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicy>();
         }
     }
 }

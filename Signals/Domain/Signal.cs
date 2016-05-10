@@ -10,6 +10,6 @@
 
         public virtual Path Path { get; set; }
 
-        public virtual MissingValuePolicy MissingValuePolicy { get; set; }
+        public virtual MissingValuePolicy.MissingValuePolicy MissingValuePolicy { get; set; }
     }
 }

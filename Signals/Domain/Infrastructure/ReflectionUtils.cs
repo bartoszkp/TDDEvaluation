@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -6,6 +7,16 @@ namespace Domain.Infrastructure
 {
     public static class ReflectionUtils
     {
+        public static Type GetSingleConcreteTypeWithGivenNameOrNull(Type baseClass, string name)
+        {
+            return baseClass
+                .Assembly
+                .GetTypes()
+                .Where(t => t.IsSubclassOf(baseClass))
+                .Where(t => t.Name == name)
+                .SingleOrDefault();
+        }
+
         public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)
         {
             MethodCallExpression outermostExpression = expression.Body as MethodCallExpression;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +48,7 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected class MissingValuePolicyValidator
         {
-            public MissingValuePolicy Policy { get; set; }
+            public Domain.MissingValuePolicy.MissingValuePolicy Policy { get; set; }
             public DateTime BeginTimestamp { get { return new DateTime(2020, 10, 12); } }
             public DateTime EndTimestamp { get { return BeginTimestamp.AddDays(5); } }
             public DateTime MiddleTimestamp { get { return BeginTimestamp.AddDays(2); } }

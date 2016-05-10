@@ -47,8 +47,10 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            signal.MissingValuePolicy = new NoneQualityMissingValuePolicy();
+            signal.MissingValuePolicy = new MissingValuePolicy.NoneQualityMissingValuePolicy();
             signal.MissingValuePolicy.Signal = signal;
+
+            this.signalRepository.Add(signal.MissingValuePolicy);
 
             return this.signalRepository.Add(signal);
         }
@@ -94,12 +96,12 @@ namespace Domain.Services.Implementation
                 .ToArray();
         }
 
-        public MissingValuePolicy GetMissingValuePolicy(Signal signal)
+        public MissingValuePolicy.MissingValuePolicy GetMissingValuePolicy(Signal signal)
         {
             return this.signalRepository.Get(signal.Path).MissingValuePolicy;
         }
 
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy policy)
+        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicy policy)
         {
             signal = this.signalRepository.Get(signal.Path);
             signal.MissingValuePolicy = policy;

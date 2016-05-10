@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -55,6 +55,7 @@ namespace SignalsIntegrationTests
             };
 
             client.Add(newSignal.ToDto<Dto.Signal>());
+
             var received = client.Get(newSignal.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
 
             Assert.AreEqual(newSignal.DataType, received.DataType);
@@ -192,12 +193,13 @@ namespace SignalsIntegrationTests
         {
             var signalId = AddNewIntegerSignal().Id.Value;
 
-            var policy = new NoneQualityMissingValuePolicy(); // TODO another class
+            var policy = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy(); // TODO another class
 
             client.SetMissingValuePolicy(signalId, policy.ToDto<Dto.MissingValuePolicy>());
-            var result = client.GetMissingValuePolicy(signalId);
+            var result = client.GetMissingValuePolicy(signalId)
+                .ToDomain<Domain.MissingValuePolicy.MissingValuePolicy>();
 
-            // TODO Assert.IsIns
+            Assert.IsInstanceOfType(result, typeof(Domain.MissingValuePolicy.NoneQualityMissingValuePolicy));
         }
 
         /* TODO bad timestamps in GetData

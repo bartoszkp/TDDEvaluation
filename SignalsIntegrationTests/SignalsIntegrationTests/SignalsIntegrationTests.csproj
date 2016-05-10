@@ -63,6 +63,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
@@ -106,15 +108,14 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\DataSources\Dto.Datum.datasource" />
     <None Include="Properties\DataSources\Dto.MissingValuePolicy.datasource" />
-    <None Include="Properties\DataSources\Dto.MissingValuePolicyConfig.datasource" />
     <None Include="Properties\DataSources\Dto.PathEntry.datasource" />
     <None Include="Properties\DataSources\Dto.Signal.datasource" />
-    <None Include="Properties\DataSources\Signals.Dto.Datum.datasource" />
-    <None Include="Properties\DataSources\Signals.Dto.Signal.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -151,6 +152,7 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
