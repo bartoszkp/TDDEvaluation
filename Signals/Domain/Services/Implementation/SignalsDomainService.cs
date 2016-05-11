@@ -10,10 +10,12 @@ namespace Domain.Services.Implementation
     public class SignalsDomainService : ISignalsDomainService
     {
         private readonly ISignalsRepository signalRepository;
+        private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
-        public SignalsDomainService(ISignalsRepository signalRepository)
+        public SignalsDomainService(ISignalsRepository signalRepository, IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalRepository = signalRepository;
+            this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
         public Signal Get(Path path)
@@ -103,7 +105,7 @@ namespace Domain.Services.Implementation
         {
             if (signal.MissingValuePolicy != null)
             {
-                this.signalRepository.Delete(signal.MissingValuePolicy);
+                this.missingValuePolicyRepository.Delete(signal.MissingValuePolicy);
             }
 
             signal = this.signalRepository.Get(signal.Path);
