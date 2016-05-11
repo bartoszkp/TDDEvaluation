@@ -196,10 +196,10 @@ namespace SignalsIntegrationTests
             var policy = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy(); // TODO another class
 
             client.SetMissingValuePolicy(signalId, policy.ToDto<Dto.MissingValuePolicy>());
-            var result = client.GetMissingValuePolicy(signalId)
-                .ToDomain<Domain.MissingValuePolicy.MissingValuePolicy>();
 
-            Assert.IsInstanceOfType(result, typeof(Domain.MissingValuePolicy.NoneQualityMissingValuePolicy));
+            var result = client.GetMissingValuePolicy(signalId);
+
+            Assert.IsInstanceOfType(result, typeof(Dto.NoneQualityMissingValuePolicy));
         }
 
         /* TODO bad timestamps in GetData

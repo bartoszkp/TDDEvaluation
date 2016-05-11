@@ -14,9 +14,8 @@ namespace DataAccess.AutoMappingOverrides
 
             mapping
                 .References(mvp => mvp.Signal)
-                .Unique()
-                .Cascade
-                .All();
+                .Not
+                .Nullable();
         }
     }
 }

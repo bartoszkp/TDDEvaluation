@@ -11,6 +11,8 @@ namespace Domain.Repositories
 
         Signal Add(Signal signal);
 
+        void Delete(Domain.MissingValuePolicy.MissingValuePolicy missingValuePolicy);
+
         IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);
 
         void Remove(Path path);

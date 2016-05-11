@@ -32,7 +32,9 @@ namespace WebService
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
-            return this.signalsDomainService.Add(signal).ToDto<Signal>();
+            var result = this.signalsDomainService.Add(signal).ToDto<Signal>();
+
+            return result;
         }
 
         public PathEntry GetPathEntry(Path pathDto)

@@ -15,10 +15,9 @@ namespace DataAccess.AutoMappingOverrides
 
             mapping
                .HasOne(s => s.MissingValuePolicy)
-               .Constrained()
+               .PropertyRef(m => m.Signal)
                .Cascade
-               .All()
-               .PropertyRef(mvp => mvp.Signal);
+               .All();
         }
     }
 }

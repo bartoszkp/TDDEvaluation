@@ -99,6 +99,11 @@ namespace DataAccess.Repositories
             Session.SaveOrUpdate(missingValuePolicy);
         }
 
+        public void Delete(Domain.MissingValuePolicy.MissingValuePolicy missingValuePolicy)
+        {
+            Session.Delete(missingValuePolicy);
+        }
+
         private Type GetConcreteDatumType<T>()
         {
             var concreteDatumType = genericConcreteDatumTypePairs
