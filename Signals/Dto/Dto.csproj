@@ -50,8 +50,8 @@
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />
     <Compile Include="Granularity.cs" />
-    <Compile Include="NoneQualityMissingValuePolicy.cs" />
-    <Compile Include="MissingValuePolicy.cs" />
+    <Compile Include="MissingValuePolicy\NoneQualityMissingValuePolicy.cs" />
+    <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="PathEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

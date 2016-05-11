@@ -6,6 +6,7 @@
       <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Dto" />
       <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="ISignalsWebService_Get_InputMessage">

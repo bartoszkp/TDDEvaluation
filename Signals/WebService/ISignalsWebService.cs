@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Dto;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
-using Dto;
 
 namespace WebService
 {
@@ -24,9 +24,9 @@ namespace WebService
         void SetData(int signalId, IEnumerable<Datum> data);
 
         [OperationContract]
-        MissingValuePolicy GetMissingValuePolicy(int signalId);
+        Dto.MissingValuePolicy.MissingValuePolicy GetMissingValuePolicy(int signalId);
 
         [OperationContract]
-        void SetMissingValuePolicy(int signalId, MissingValuePolicy policy);
+        void SetMissingValuePolicy(int signalId, Dto.MissingValuePolicy.MissingValuePolicy policy);
     }
 }
