@@ -50,8 +50,6 @@ namespace Domain.Services.Implementation
             signal.MissingValuePolicy = new MissingValuePolicy.NoneQualityMissingValuePolicy();
             signal.MissingValuePolicy.Signal = signal;
 
-            this.signalRepository.Add(signal.MissingValuePolicy);
-
             return this.signalRepository.Add(signal);
         }
 
@@ -98,6 +96,11 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicy missingValuePolicy)
         {
+            if (signal.MissingValuePolicy != null)
+            {
+                this.signalRepository.Delete(signal.MissingValuePolicy);
+            }
+
             missingValuePolicy.Signal = signal;
             signal.MissingValuePolicy = missingValuePolicy;
         }
