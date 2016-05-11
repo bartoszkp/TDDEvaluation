@@ -81,19 +81,4 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="Quality" nillable="true" type="tns:Quality" />
-  <xs:complexType name="MissingValuePolicy">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Id" nillable="true" type="xs:int" />
-      <xs:element minOccurs="0" name="Signal" nillable="true" type="tns:Signal" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="MissingValuePolicy" nillable="true" type="tns:MissingValuePolicy" />
-  <xs:complexType name="NoneQualityMissingValuePolicy">
-    <xs:complexContent mixed="false">
-      <xs:extension base="tns:MissingValuePolicy">
-        <xs:sequence />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="NoneQualityMissingValuePolicy" nillable="true" type="tns:NoneQualityMissingValuePolicy" />
 </xs:schema>

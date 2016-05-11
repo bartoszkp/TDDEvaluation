@@ -25,6 +25,7 @@
     <MetadataFile FileName="signals.xsd" MetadataType="Schema" ID="c9d162fd-ccf0-4a78-ad20-ca629ae384b9" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd2" />
     <MetadataFile FileName="signals1.xsd" MetadataType="Schema" ID="4fbc981f-feb4-4af0-b9dc-0355893100e3" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd1" />
     <MetadataFile FileName="signals2.xsd" MetadataType="Schema" ID="52c10ecc-fba5-436e-8a6f-46ea3276335e" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd0" />
+    <MetadataFile FileName="signals4.xsd" MetadataType="Schema" ID="70a9ca85-a72c-454d-870f-6f10d98df115" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd4" />
     <MetadataFile FileName="signals.disco" MetadataType="Disco" ID="843b1b88-9ca9-46c8-8c4a-4f34c795236e" SourceId="1" SourceUrl="http://localhost:8080/signals?disco" />
     <MetadataFile FileName="Signals.wsdl" MetadataType="Wsdl" ID="5b7ff36f-6522-48b0-aaf4-02ba89bcf687" SourceId="1" SourceUrl="http://localhost:8080/signals?wsdl" />
     <MetadataFile FileName="signals3.xsd" MetadataType="Schema" ID="7c40eda8-3038-4117-ab80-62e9893d6d4f" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd3" />

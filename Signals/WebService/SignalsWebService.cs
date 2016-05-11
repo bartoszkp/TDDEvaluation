@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Domain.Infrastructure;
+using Domain.Services;
+using Dto;
+using Dto.Conversions;
+using Dto.MissingValuePolicy;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
-using Domain.Infrastructure;
-using Domain.Services;
-using Dto;
-using Dto.Conversions;
 
 namespace WebService
 {
@@ -106,11 +107,11 @@ namespace WebService
             return this.signalsDomainService.Get(signalId).MissingValuePolicy.ToDto<MissingValuePolicy>();
         }
 
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicy config)
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicy missingValuePolicy)
         {
             this.signalsDomainService.SetMissingValuePolicyConfig(
                 this.signalsDomainService.Get(signalId),
-                config.ToDomain<Domain.MissingValuePolicy.MissingValuePolicy>());
+                missingValuePolicy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicy>());
         }
     }
 }

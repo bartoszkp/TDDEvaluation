@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Dto
+namespace Dto.MissingValuePolicy
 {
     [DataContract]
     [KnownType(typeof(NoneQualityMissingValuePolicy))]

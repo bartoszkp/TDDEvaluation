@@ -114,6 +114,7 @@
     <None Include="packages.config" />
     <None Include="Properties\DataSources\Dto.Datum.datasource" />
     <None Include="Properties\DataSources\Dto.MissingValuePolicy.datasource" />
+    <None Include="Properties\DataSources\Dto.MissingValuePolicy.MissingValuePolicy.datasource" />
     <None Include="Properties\DataSources\Dto.PathEntry.datasource" />
     <None Include="Properties\DataSources\Dto.Signal.datasource" />
     <None Include="Properties\Settings.settings">
@@ -131,6 +132,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\WS\signals3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\WS\signals4.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

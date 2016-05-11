@@ -113,7 +113,7 @@ namespace SignalsIntegrationTests.Infrastructure
                                                         IEnumerable<Datum<int>> expected)
             {
                 var signalId = parent.AddNewIntegerSignal(Granularity.Day).Id.Value;
-                parent.client.SetMissingValuePolicy(signalId, Policy.ToDto<Dto.MissingValuePolicy>());
+                parent.client.SetMissingValuePolicy(signalId, Policy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
 
                 parent.client.SetData(signalId, input.ToDto<Dto.Datum[]>());
                 var result = parent.client.GetData(signalId, BeginTimestamp, EndTimestamp);
