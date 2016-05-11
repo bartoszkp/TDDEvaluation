@@ -11,8 +11,6 @@ namespace Domain.Repositories
 
         Signal Add(Signal signal);
 
-        void Delete(Domain.MissingValuePolicy.MissingValuePolicy missingValuePolicy);
-
         IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);
 
         void Remove(Path path);
@@ -20,7 +18,5 @@ namespace Domain.Repositories
         void SetData<T>(IEnumerable<Datum<T>> data);
 
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
-
-        void Add(MissingValuePolicy.MissingValuePolicy missingValuePolicy);
     }
 }
