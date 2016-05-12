@@ -128,6 +128,74 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        public void CanWriteAndRetrieveMonthlyData()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 1);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Month,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
+
+            Assert.AreEqual(data.Length, retrievedData.Length);
+            Assert.AreEqual(data[0].Value, retrievedData[0].Value);
+            Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
+            Assert.AreEqual(data[0].Quality, retrievedData[0].ToDomain<Domain.Datum<int>>().Quality);
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveYearlyData()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 1, 1);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
+
+            Assert.AreEqual(data.Length, retrievedData.Length);
+            Assert.AreEqual(data[0].Value, retrievedData[0].Value);
+            Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
+            Assert.AreEqual(data[0].Quality, retrievedData[0].ToDomain<Domain.Datum<int>>().Quality);
+        }
+
+        [TestMethod]
         public void GetDataUsingIncompleteSignalsThrowsOrReturnsNull()
         {
             int dummySignalId = 0;
