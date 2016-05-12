@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.Infrastructure
 {
@@ -10,14 +11,6 @@ namespace Domain.Infrastructure
 
         public DateTime ToExcluded { get; private set; }
 
-        public long Steps
-        {
-            get
-            {
-                return (ToExcluded - FromIncluded).Ticks / granularityTimeSpan[Granularity].Ticks;
-            }
-        }
-
         public Granularity Granularity { get; private set; }
 
         private DateTime? current;
@@ -26,14 +19,6 @@ namespace Domain.Infrastructure
             get
             {
                 return current.Value;
-            }
-        }
-
-        public long CurrentStep
-        {
-            get
-            {
-                return (Current - FromIncluded).Ticks / granularityTimeSpan[Granularity].Ticks;
             }
         }
 
@@ -56,7 +41,7 @@ namespace Domain.Infrastructure
         public TimeEnumerator(DateTime fromIncluded, int steps, Granularity granularity)
         {
             this.FromIncluded = fromIncluded;
-            this.ToExcluded = fromIncluded + TimeSpan.FromTicks(granularityTimeSpan[granularity].Ticks * steps);
+            this.ToExcluded = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncluded, steps), (result, step) => granularityTimeSteps[granularity](result));
             this.Granularity = granularity;
             this.Reset();
         }
@@ -73,7 +58,7 @@ namespace Domain.Infrastructure
                 return true;
             }
 
-            this.current = this.current.Value + granularityTimeSpan[this.Granularity];
+            this.current = granularityTimeSteps[this.Granularity](this.current.Value);
 
             return this.current.Value < this.ToExcluded;
         }
@@ -83,14 +68,16 @@ namespace Domain.Infrastructure
             this.current = null;
         }
 
-        private static Dictionary<Granularity, TimeSpan> InitializeGranularityTimeSpan()
+        private static Dictionary<Granularity, Func<DateTime, DateTime>> InitializeGranularityTimeSteps()
         {
-            return new Dictionary<Granularity, TimeSpan> {
-                { Granularity.Second, TimeSpan.FromSeconds(1) },
-                { Granularity.Minute, TimeSpan.FromMinutes(1) },
-                { Granularity.Hour, TimeSpan.FromHours(1) },
-                { Granularity.Day, TimeSpan.FromDays(1) },
-                { Granularity.Week, TimeSpan.FromDays(7) } };
+            return new Dictionary<Granularity, Func<DateTime, DateTime>> {
+                { Granularity.Second, timestamp => timestamp + TimeSpan.FromSeconds(1) },
+                { Granularity.Minute, timestamp => timestamp + TimeSpan.FromMinutes(1) },
+                { Granularity.Hour, timestamp => timestamp  + TimeSpan.FromHours(1) },
+                { Granularity.Day, timestamp => timestamp + TimeSpan.FromDays(1) },
+                { Granularity.Week, timestamp => timestamp + TimeSpan.FromDays(7) },
+                { Granularity.Month, timestamp => timestamp.AddMonths(1) },
+                { Granularity.Year, timestamp => timestamp.AddYears(1) } };
         }
 
         public IEnumerator<DateTime> GetEnumerator()
@@ -103,6 +90,6 @@ namespace Domain.Infrastructure
             return this;
         }
 
-        private static Dictionary<Granularity, TimeSpan> granularityTimeSpan = InitializeGranularityTimeSpan();
+        private static Dictionary<Granularity, Func<DateTime, DateTime>> granularityTimeSteps = InitializeGranularityTimeSteps();
     }
 }
