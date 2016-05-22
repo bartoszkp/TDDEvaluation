@@ -79,7 +79,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var concreteDatumType = GetConcreteDatumType<T>();
 
@@ -89,7 +89,7 @@ namespace DataAccess.Repositories
             return Session
                 .CreateCriteria(concreteDatumType)
                 .Add(Restrictions.Eq(signalPropertyName, signal))
-                .Add(Restrictions.Between(timestampPropertyName, fromIncluded, toExcluded))
+                .Add(Restrictions.Between(timestampPropertyName, fromIncludedUtc, toExcludedUtc))
                 .List()
                 .Cast<Datum<T>>();
         }

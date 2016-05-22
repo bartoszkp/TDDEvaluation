@@ -17,6 +17,6 @@ namespace Domain.Repositories
 
         void SetData<T>(IEnumerable<Datum<T>> data);
 
-        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
+        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }
