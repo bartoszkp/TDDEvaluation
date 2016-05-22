@@ -50,14 +50,14 @@ namespace WebService
             return this.signalsDomainService.GetPathEntry(path).ToDto<PathEntry>();
         }
 
-        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncluded, DateTime toExcluded)
+        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = this.signalsDomainService.Get(signalId);
 
             var getData = GetAppropriateGetDataMethod(signal.DataType);
 
             var result = getData
-                .Invoke(this.signalsDomainService, new object[] { signal, fromIncluded, toExcluded })
+                .Invoke(this.signalsDomainService, new object[] { signal, fromIncludedUtc, toExcludedUtc })
                 as IEnumerable;
 
             return result
