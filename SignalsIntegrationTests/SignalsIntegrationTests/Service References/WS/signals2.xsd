@@ -62,8 +62,8 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="signalId" type="xs:int" />
-        <xs:element minOccurs="0" name="fromIncluded" type="xs:dateTime" />
-        <xs:element minOccurs="0" name="toExcluded" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="fromIncludedUtc" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="toExcludedUtc" type="xs:dateTime" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

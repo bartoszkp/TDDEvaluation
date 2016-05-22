@@ -69,11 +69,11 @@ namespace Domain.Services.Implementation
             return new PathEntry(directDescendants, subPaths);
         }
 
-        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var readData = this.signalRepository.GetData<T>(signal, fromIncluded, toExcluded);
+            var readData = this.signalRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            return this.FillMissingData(signal, new TimeEnumerator(fromIncluded, toExcluded, signal.Granularity), readData);
+            return this.FillMissingData(signal, new TimeEnumerator(fromIncludedUtc, toExcludedUtc, signal.Granularity), readData);
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)

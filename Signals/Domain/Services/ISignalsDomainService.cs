@@ -13,7 +13,7 @@ namespace Domain.Services
 
         PathEntry GetPathEntry(Path path);
 
-        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
+        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
         void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
 

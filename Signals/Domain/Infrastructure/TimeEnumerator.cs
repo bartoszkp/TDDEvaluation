@@ -7,9 +7,9 @@ namespace Domain.Infrastructure
 {
     public class TimeEnumerator : IEnumerator<DateTime>, IEnumerable<DateTime>
     {
-        public DateTime FromIncluded { get; private set; }
+        public DateTime FromIncludedUtc { get; private set; }
 
-        public DateTime ToExcluded { get; private set; }
+        public DateTime toExcludedUtcUtc { get; private set; }
 
         public Granularity Granularity { get; private set; }
 
@@ -30,18 +30,18 @@ namespace Domain.Infrastructure
             }
         }
 
-        public TimeEnumerator(DateTime fromIncluded, DateTime toExcluded, Granularity granularity)
+        public TimeEnumerator(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
-            this.FromIncluded = fromIncluded;
-            this.ToExcluded = toExcluded;
+            this.FromIncludedUtc = fromIncludedUtc;
+            this.toExcludedUtcUtc = toExcludedUtc;
             this.Granularity = granularity;
             this.Reset();
         }
 
-        public TimeEnumerator(DateTime fromIncluded, int steps, Granularity granularity)
+        public TimeEnumerator(DateTime fromIncludedUtc, int steps, Granularity granularity)
         {
-            this.FromIncluded = fromIncluded;
-            this.ToExcluded = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncluded, steps), (result, step) => granularityTimeSteps[granularity](result));
+            this.FromIncludedUtc = fromIncludedUtc;
+            this.toExcludedUtcUtc = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncludedUtc, steps), (result, step) => granularityTimeSteps[granularity](result));
             this.Granularity = granularity;
             this.Reset();
         }
@@ -54,13 +54,13 @@ namespace Domain.Infrastructure
         {
             if (this.current == null)
             {
-                this.current = FromIncluded;
+                this.current = FromIncludedUtc;
                 return true;
             }
 
             this.current = granularityTimeSteps[this.Granularity](this.current.Value);
 
-            return this.current.Value < this.ToExcluded;
+            return this.current.Value < this.toExcludedUtcUtc;
         }
 
         public void Reset()
