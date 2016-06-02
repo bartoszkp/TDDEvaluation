@@ -19,6 +19,10 @@ namespace SignalsIntegrationTests.Infrastructure
             {
             }
         }
+    }
+
+    public static class Then
+    {
         public static void AssertEqual<T>(IEnumerable<Datum<T>> expected, IEnumerable<Datum<T>> actual)
         {
             CollectionAssert.AreEqual(
