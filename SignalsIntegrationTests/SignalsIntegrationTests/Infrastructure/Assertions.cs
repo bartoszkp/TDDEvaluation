@@ -1,5 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Domain;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 
 namespace SignalsIntegrationTests.Infrastructure
@@ -15,6 +18,13 @@ namespace SignalsIntegrationTests.Infrastructure
             catch (FaultException)
             {
             }
+        }
+        public static void AssertEqual<T>(IEnumerable<Datum<T>> expected, IEnumerable<Datum<T>> actual)
+        {
+            CollectionAssert.AreEqual(
+                expected.ToList(),
+                actual.ToList(),
+                Comparer<Datum<T>>.Create((x, y) => x.Value.Equals(y.Value) && x.Timestamp.Equals(y.Timestamp) ? 0 : 1));
         }
     }
 }
