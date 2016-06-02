@@ -39,7 +39,8 @@ namespace SignalsIntegrationTests
 
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
-            ThenResultEquals(DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day));
+            ThenResultEquals(DatumArray<int>
+                .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
@@ -49,7 +50,9 @@ namespace SignalsIntegrationTests
 
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
-            ThenResultEquals(DatumWithSingleValueFollowedByNoneQualityFor(42, BeginTimestamp, EndTimestamp, Granularity.Day));
+            ThenResultEquals(DatumArray<int>
+                .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day)
+                .StartingWithGoodQualityValue(42));
         }
 
         [TestMethod]
@@ -57,10 +60,10 @@ namespace SignalsIntegrationTests
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp.AddDays(-1) });
 
-
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
-            ThenResultEquals(DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day));
+            ThenResultEquals(DatumArray<int>
+                .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
@@ -70,7 +73,9 @@ namespace SignalsIntegrationTests
 
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
-            ThenResultEquals(DatumWithSingleValuePrecededByNoneQualityFor(42, BeginTimestamp, EndTimestamp, Granularity.Day));
+            ThenResultEquals(DatumArray<int>
+                .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day)
+                .EndingWithGoodQualityValue(42));
         }
 
         [TestMethod]
@@ -80,7 +85,8 @@ namespace SignalsIntegrationTests
 
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
-            ThenResultEquals(DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day));
+            ThenResultEquals(DatumArray<int>
+                .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
@@ -90,14 +96,11 @@ namespace SignalsIntegrationTests
 
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = middleTimestamp });
 
-            var expected = DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day);
-
-            expected.SingleOrDefault(e => e.Timestamp == middleTimestamp).Quality = Quality.Good;
-            expected.SingleOrDefault(e => e.Timestamp == middleTimestamp).Value = 42;
-
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
-            ThenResultEquals(expected);
+            ThenResultEquals(DatumArray<int>
+                .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day)
+                .WithSingleGoodQualityValueAt(42, middleTimestamp));
         }
     }
 }
