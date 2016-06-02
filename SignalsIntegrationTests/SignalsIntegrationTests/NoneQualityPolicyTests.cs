@@ -32,7 +32,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void NoneQualityPolicyFillsMissingDataWhenNoDataPresent()
+        public void GivenNoData_ReturnsNoneQualityForTheWholeRange()
         {
             GivenNoData();
 
@@ -43,7 +43,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAtBeginOfRangePresent()
+        public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithNoneQuality()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp });
 
@@ -55,7 +55,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumBeforeBeginOfRangePresent()
+        public void GivenSingleDatumBeforeTheBeginning_ReturnsNoneQualityForTheWholeRange()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp.AddDays(-1) });
 
@@ -66,7 +66,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAtEndOfRangePresent()
+        public void GivenSingleDatumAtTheEnd_FillsRemainingRangeWithNoneQuality()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp.AddDays(-1) });
 
@@ -78,7 +78,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAfterEndOfRangePresent()
+        public void GivenSingleDatumAfterTheEnd_ReturnsNoneQualityForTheWholeRange()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp });
 
@@ -89,7 +89,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void NoneQualityPolicyFillsMissingDataWhenSingleDatumInMiddleRangePresent()
+        public void GivenSingleDatumInTheMiddle_FillsRemainingRangesWithNoneQuality()
         {
             var middleTimestamp = BeginTimestamp.AddDays(2);
 
