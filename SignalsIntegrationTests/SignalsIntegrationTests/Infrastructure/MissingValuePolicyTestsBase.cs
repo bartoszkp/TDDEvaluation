@@ -22,14 +22,6 @@ namespace SignalsIntegrationTests.Infrastructure
             TestsBase.ClassCleanup();
         }
 
-        private void AssertDatumsEqual<T>(IEnumerable<Datum<T>> expected, IEnumerable<Datum<T>> actual)
-        {
-            CollectionAssert.AreEqual(
-                expected.ToList(), 
-                actual.ToList(), 
-                Comparer<Datum<T>>.Create((x, y) => x.Value.Equals(y.Value) && x.Timestamp.Equals(y.Timestamp) ? 0 : 1));
-        }
-
         protected class MissingValuePolicyValidator
         {
             public Domain.MissingValuePolicy.MissingValuePolicy Policy { get; set; }
@@ -102,7 +94,7 @@ namespace SignalsIntegrationTests.Infrastructure
                 parent.client.SetData(signalId, input.ToDto<Dto.Datum[]>());
                 var result = parent.client.GetData(signalId, BeginTimestamp, EndTimestamp);
 
-                parent.AssertDatumsEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
+                Assertions.AssertEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
             }
         }
 
