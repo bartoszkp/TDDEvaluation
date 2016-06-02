@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.ServiceModel;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalsIntegrationTests.Infrastructure
 {
