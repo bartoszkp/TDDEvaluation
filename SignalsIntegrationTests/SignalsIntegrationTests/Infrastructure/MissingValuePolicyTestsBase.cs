@@ -43,32 +43,6 @@ namespace SignalsIntegrationTests.Infrastructure
             client.SetMissingValuePolicy(signalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
         }
 
-        protected Datum<int>[] DatumWithNoneQualityFor(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
-        {
-            return new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
-                .Select(ts => new Datum<int>() { Quality = Quality.None, Timestamp = ts })
-                .ToArray();
-        }
-
-        protected Datum<int>[] DatumWithSingleValueFollowedByNoneQualityFor(int value, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
-        {
-            return Enumerable.Concat(
-                new[] { new Datum<int>() { Quality = Quality.Good, Value = value, Timestamp = fromIncludedUtc } },
-                new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
-                    .Skip(1)
-                    .Select(ts => new Datum<int>() { Quality = Quality.None, Timestamp = ts }))
-                .ToArray();
-        }
-
-        protected Datum<int>[] DatumWithSingleValuePrecededByNoneQualityFor(int value, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
-        {
-            return Enumerable.Concat(
-                new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc.AddDays(-1), granularity)
-                    .Select(ts => new Datum<int>() { Quality = Quality.None, Timestamp = ts }),
-                new[] { new Datum<int>() { Quality = Quality.Good, Value = value, Timestamp = toExcludedUtc.AddDays(-1) } })
-                .ToArray();
-        }
-
         public void WhenReadingData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             whenReadingDataResult = client.GetData(signalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<int>[]>();
