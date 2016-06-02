@@ -23,110 +23,74 @@ namespace SignalsIntegrationTests.Infrastructure
             TestsBase.ClassCleanup();
         }
 
-        public int SignalId { get; set; }
-
         protected void GivenASignal(Granularity granularity)
         {
-            SignalId = AddNewIntegerSignal(granularity).Id.Value;
+            signalId = AddNewIntegerSignal(granularity).Id.Value;
         }
 
-        protected void WithNoData()
+        protected void GivenNoData()
         {
-            client.SetData(SignalId, new Datum<int>[0].ToDto<Dto.Datum[]>());
+            client.SetData(signalId, new Datum<int>[0].ToDto<Dto.Datum[]>());
+        }
+
+        protected void GivenSingleDatum(Datum<int> datum)
+        {
+            client.SetData(signalId, new[] { datum }.ToDto<Dto.Datum[]>());
         }
 
         protected void WithMissingValuePolicy(MissingValuePolicy missingValuePolicy)
         {
-            client.SetMissingValuePolicy(SignalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
+            client.SetMissingValuePolicy(signalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
         }
 
         protected Datum<int>[] DatumWithNoneQualityFor(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
             return new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
-                .Select(ts => new Datum<int> { Quality = Quality.None, Timestamp = ts })
+                .Select(ts => new Datum<int>() { Quality = Quality.None, Timestamp = ts })
                 .ToArray();
         }
 
-        public IEnumerable<Datum<int>> WhenReadingData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        protected Datum<int>[] DatumWithSingleValueFollowedByNoneQualityFor(int value, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
-            return client.GetData(SignalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<int>[]>();
+            return Enumerable.Concat(
+                new[] { new Datum<int>() { Quality = Quality.Good, Value = value, Timestamp = fromIncludedUtc } },
+                new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
+                    .Skip(1)
+                    .Select(ts => new Datum<int>() { Quality = Quality.None, Timestamp = ts }))
+                .ToArray();
         }
 
-        protected class MissingValuePolicyValidator
+        protected Datum<int>[] DatumWithSingleValuePrecededByNoneQualityFor(int value, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
-            public Domain.MissingValuePolicy.MissingValuePolicy Policy { get; set; }
-            public DateTime BeginTimestamp { get { return new DateTime(2020, 10, 12); } }
-            public DateTime EndTimestamp { get { return BeginTimestamp.AddDays(5); } }
-            public DateTime MiddleTimestamp { get { return BeginTimestamp.AddDays(2); } }
-            public int GeneratedSingleValue { get { return 42; } }
-
-            private MissingValuePolicyTestsBase parent;
-
-            public MissingValuePolicyValidator(MissingValuePolicyTestsBase parent)
-            {
-                this.parent = parent;
-            }
-
-            public void WithSingleDatumAtBeginOfRangeExpect(Datum<int>[] expected)
-            {
-                CheckMissingValuePolicyBehavior(BuildSingleValueInput(BeginTimestamp), expected);
-            }
-
-            public void WithSingleDatumBeforeBeginOfRangeExpect(Datum<int>[] expected)
-            {
-                CheckMissingValuePolicyBehavior(BuildSingleValueInput(BeginTimestamp.AddDays(-1)), expected);
-            }
-
-            public void WithSingleDatumAtEndOfRangeExpect(Datum<int>[] expected)
-            {
-                CheckMissingValuePolicyBehavior(BuildSingleValueInput(EndTimestamp.AddDays(-1)), expected);
-            }
-
-            public void WithSingleDatumAfterEndOfRangeExpect(Datum<int>[] expected)
-            {
-                CheckMissingValuePolicyBehavior(BuildSingleValueInput(EndTimestamp), expected);
-            }
-
-            public void WithSingleDatumInMiddleOfRangeExpect(Datum<int>[] expected)
-            {
-                CheckMissingValuePolicyBehavior(BuildSingleValueInput(MiddleTimestamp), expected);
-            }
-
-            public Datum<int>[] BuildSingleValueInput(DateTime when)
-            {
-                return new[]
-                {
-                    new Datum<int>
-                    {
-                        Timestamp = when,
-                        Value = GeneratedSingleValue,
-                        Quality = Quality.Good
-                    }
-                };
-            }
-
-            public void CheckMissingValuePolicyBehavior(IEnumerable<Datum<int>> input,
-                                                        IEnumerable<Datum<int>> expected)
-            {
-                var signalId = parent.AddNewIntegerSignal(Granularity.Day).Id.Value;
-                parent.client.SetMissingValuePolicy(signalId, Policy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
-                
-                parent.client.SetData(signalId, input.ToDto<Dto.Datum[]>());
-                var result = parent.client.GetData(signalId, BeginTimestamp, EndTimestamp);
-
-                Then.AssertEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
-            }
+            return Enumerable.Concat(
+                new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc.AddDays(-1), granularity)
+                    .Select(ts => new Datum<int>() { Quality = Quality.None, Timestamp = ts }),
+                new[] { new Datum<int>() { Quality = Quality.Good, Value = value, Timestamp = toExcludedUtc.AddDays(-1) } })
+                .ToArray();
         }
 
-                /* TODO bad timestamps in GetData
-                Second,
-                Minute,
-                Hour,
-                Day,
-                Week,
-                Month,
-                Year
-        */
+        public void WhenReadingData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            whenReadingDataResult = client.GetData(signalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<int>[]>();
+        }
+
+        public void ThenResultEquals(IEnumerable<Datum<int>> expected)
+        {
+            Assertions.AssertEqual(expected, whenReadingDataResult);
+        }
+
+        protected int signalId;
+        protected IEnumerable<Datum<int>> whenReadingDataResult;
+
+        /* TODO bad timestamps in GetData
+        Second,
+        Minute,
+        Hour,
+        Day,
+        Week,
+        Month,
+        Year
+*/
 
         /* TODO correct timestamps in GetData (?)
                 Second,
