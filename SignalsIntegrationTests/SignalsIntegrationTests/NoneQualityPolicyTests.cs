@@ -2,16 +2,16 @@ using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 using System;
+using System.Linq;
 
 namespace SignalsIntegrationTests
 {
     [TestClass]
     public class NoneQualityPolicyTests : MissingValuePolicyTestsBase
     {
-        private MissingValuePolicyValidator validator;
         private DateTime BeginTimestamp { get { return new DateTime(2020, 10, 12); } }
+
         private DateTime EndTimestamp { get { return BeginTimestamp.AddDays(5); } }
-        private DateTime MiddleTimestamp { get { return BeginTimestamp.AddDays(2); } }
 
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
@@ -26,91 +26,78 @@ namespace SignalsIntegrationTests
         }
 
         [TestInitialize]
-        public void InitializeValidator()
+        public void TestInitialize()
         {
-            validator = new MissingValuePolicyValidator(this)
-            {
-                Policy = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy()
-            };
+            GivenASignal(Granularity.Day);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy());
         }
 
         [TestMethod]
         public void NoneQualityPolicyFillsMissingDataWhenNoDataPresent()
         {
-            GivenASignal(Granularity.Day);
-            WithNoData();
-            WithMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy());
+            GivenNoData();
 
-            var result = WhenReadingData(BeginTimestamp, EndTimestamp);
+            WhenReadingData(BeginTimestamp, EndTimestamp);
 
-            Then.AssertEqual(
-                DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day),
-                result);
+            ThenResultEquals(DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
         public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAtBeginOfRangePresent()
         {
-            validator.WithSingleDatumAtBeginOfRangeExpect(new[]
-            {
-                new Datum<int> { Quality = Quality.Good, Timestamp = validator.BeginTimestamp, Value = validator.GeneratedSingleValue },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
-            });
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp });
+
+            WhenReadingData(BeginTimestamp, EndTimestamp);
+
+            ThenResultEquals(DatumWithSingleValueFollowedByNoneQualityFor(42, BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
         public void NoneQualityPolicyFillsMissingDataWhenSingleDatumBeforeBeginOfRangePresent()
         {
-            validator.WithSingleDatumBeforeBeginOfRangeExpect(new[]
-            {
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp,},
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
-            });
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp.AddDays(-1) });
+
+
+            WhenReadingData(BeginTimestamp, EndTimestamp);
+
+            ThenResultEquals(DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
         public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAtEndOfRangePresent()
         {
-            validator.WithSingleDatumAtEndOfRangeExpect(new[]
-            {
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
-                new Datum<int> { Quality = Quality.Good, Timestamp = validator.BeginTimestamp.AddDays(4), Value = validator.GeneratedSingleValue }
-            });
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp.AddDays(-1) });
+
+            WhenReadingData(BeginTimestamp, EndTimestamp);
+
+            ThenResultEquals(DatumWithSingleValuePrecededByNoneQualityFor(42, BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
         public void NoneQualityPolicyFillsMissingDataWhenSingleDatumAfterEndOfRangePresent()
         {
-            validator.WithSingleDatumAfterEndOfRangeExpect(new[]
-            {
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
-            });
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp });
+
+            WhenReadingData(BeginTimestamp, EndTimestamp);
+
+            ThenResultEquals(DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
         [TestMethod]
         public void NoneQualityPolicyFillsMissingDataWhenSingleDatumInMiddleRangePresent()
         {
-            validator.WithSingleDatumInMiddleOfRangeExpect(new[]
-            {
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
-                new Datum<int> { Quality = Quality.Good, Timestamp = validator.BeginTimestamp.AddDays(2), Value = validator.GeneratedSingleValue },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
-            });
+            var middleTimestamp = BeginTimestamp.AddDays(2);
+
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = middleTimestamp });
+
+            var expected = DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day);
+
+            expected.SingleOrDefault(e => e.Timestamp == middleTimestamp).Quality = Quality.Good;
+            expected.SingleOrDefault(e => e.Timestamp == middleTimestamp).Value = 42;
+
+            WhenReadingData(BeginTimestamp, EndTimestamp);
+
+            ThenResultEquals(expected);
         }
     }
 }
