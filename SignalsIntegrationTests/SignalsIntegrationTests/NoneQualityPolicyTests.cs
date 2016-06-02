@@ -1,6 +1,7 @@
 using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
+using System;
 
 namespace SignalsIntegrationTests
 {
@@ -8,6 +9,9 @@ namespace SignalsIntegrationTests
     public class NoneQualityPolicyTests : MissingValuePolicyTestsBase
     {
         private MissingValuePolicyValidator validator;
+        private DateTime BeginTimestamp { get { return new DateTime(2020, 10, 12); } }
+        private DateTime EndTimestamp { get { return BeginTimestamp.AddDays(5); } }
+        private DateTime MiddleTimestamp { get { return BeginTimestamp.AddDays(2); } }
 
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
@@ -33,14 +37,15 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void NoneQualityPolicyFillsMissingDataWhenNoDataPresent()
         {
-            validator.WithoutSignalDataExpect(new[]
-            {
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(1) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(2) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(3) },
-                new Datum<int> { Quality = Quality.None, Timestamp = validator.BeginTimestamp.AddDays(4) },
-            });
+            GivenASignal(Granularity.Day);
+            WithNoData();
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy());
+
+            var result = WhenReadingData(BeginTimestamp, EndTimestamp);
+
+            Then.AssertEqual(
+                DatumWithNoneQualityFor(BeginTimestamp, EndTimestamp, Granularity.Day),
+                result);
         }
 
         [TestMethod]

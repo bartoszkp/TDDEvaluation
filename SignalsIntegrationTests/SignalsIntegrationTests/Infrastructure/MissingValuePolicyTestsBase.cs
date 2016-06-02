@@ -1,4 +1,5 @@
 using Domain;
+using Domain.MissingValuePolicy;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -22,6 +23,35 @@ namespace SignalsIntegrationTests.Infrastructure
             TestsBase.ClassCleanup();
         }
 
+        public int SignalId { get; set; }
+
+        protected void GivenASignal(Granularity granularity)
+        {
+            SignalId = AddNewIntegerSignal(granularity).Id.Value;
+        }
+
+        protected void WithNoData()
+        {
+            client.SetData(SignalId, new Datum<int>[0].ToDto<Dto.Datum[]>());
+        }
+
+        protected void WithMissingValuePolicy(MissingValuePolicy missingValuePolicy)
+        {
+            client.SetMissingValuePolicy(SignalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
+        }
+
+        protected Datum<int>[] DatumWithNoneQualityFor(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
+        {
+            return new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
+                .Select(ts => new Datum<int> { Quality = Quality.None, Timestamp = ts })
+                .ToArray();
+        }
+
+        public IEnumerable<Datum<int>> WhenReadingData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            return client.GetData(SignalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<int>[]>();
+        }
+
         protected class MissingValuePolicyValidator
         {
             public Domain.MissingValuePolicy.MissingValuePolicy Policy { get; set; }
@@ -35,11 +65,6 @@ namespace SignalsIntegrationTests.Infrastructure
             public MissingValuePolicyValidator(MissingValuePolicyTestsBase parent)
             {
                 this.parent = parent;
-            }
-
-            public void WithoutSignalDataExpect(Datum<int>[] expected)
-            {
-                CheckMissingValuePolicyBehavior(BuildEmptyInput(), expected);
             }
 
             public void WithSingleDatumAtBeginOfRangeExpect(Datum<int>[] expected)
@@ -67,11 +92,6 @@ namespace SignalsIntegrationTests.Infrastructure
                 CheckMissingValuePolicyBehavior(BuildSingleValueInput(MiddleTimestamp), expected);
             }
 
-            public Datum<int>[] BuildEmptyInput()
-            {
-                return new Datum<int>[0];
-            }
-
             public Datum<int>[] BuildSingleValueInput(DateTime when)
             {
                 return new[]
@@ -90,11 +110,11 @@ namespace SignalsIntegrationTests.Infrastructure
             {
                 var signalId = parent.AddNewIntegerSignal(Granularity.Day).Id.Value;
                 parent.client.SetMissingValuePolicy(signalId, Policy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
-
+                
                 parent.client.SetData(signalId, input.ToDto<Dto.Datum[]>());
                 var result = parent.client.GetData(signalId, BeginTimestamp, EndTimestamp);
 
-                Assertions.AssertEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
+                Then.AssertEqual(expected, result.ToDomain<Domain.Datum<int>[]>());
             }
         }
 
