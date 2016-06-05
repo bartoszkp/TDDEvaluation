@@ -22,5 +22,31 @@ namespace Domain.Infrastructure
                     throw new ArgumentException("Unknown data type", "@this");
             }
         }
+
+        public static DataType FromNativeType(Type nativeType)
+        {
+            if (nativeType.Equals(typeof(bool)))
+            {
+                return DataType.Boolean;
+            }
+            else if (nativeType.Equals(typeof(decimal)))
+            {
+                return DataType.Decimal;
+            }
+            else if (nativeType.Equals(typeof(double)))
+            {
+                return DataType.Double;
+            }
+            else if (nativeType.Equals(typeof(int)))
+            {
+                return DataType.Integer;
+            }
+            else if (nativeType.Equals(typeof(string)))
+            {
+                return DataType.String;
+            }
+
+            throw new ArgumentException("Unknown native type", "nativeType");
+        }
     }
 }

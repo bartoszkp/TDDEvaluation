@@ -4,6 +4,7 @@ namespace Dto.MissingValuePolicy
 {
     [DataContract]
     [KnownType(typeof(NoneQualityMissingValuePolicy))]
+    [KnownType(typeof(SpecificValueMissingValuePolicy))]
     public abstract class MissingValuePolicy
     {
         [DataMember]

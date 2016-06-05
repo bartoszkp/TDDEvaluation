@@ -4,7 +4,7 @@
     {
     }
 
-    public class DatumInteger : Domain.Datum<int>
+    public class DatumDecimal : Domain.Datum<decimal>
     {
     }
 
@@ -12,7 +12,7 @@
     {
     }
 
-    public class DatumDecimal : Domain.Datum<decimal>
+    public class DatumInteger : Domain.Datum<int>
     {
     }
 
