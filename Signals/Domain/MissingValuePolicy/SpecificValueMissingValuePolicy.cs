@@ -6,9 +6,9 @@ namespace Domain.MissingValuePolicy
 {
     public class SpecificValueMissingValuePolicy<T> : MissingValuePolicy
     {
-        public virtual T Value { get; private set; }
+        public virtual T Value { get; set; }
 
-        public virtual Quality Quality { get; private set; }
+        public virtual Quality Quality { get; set; }
 
         public SpecificValueMissingValuePolicy()
         {

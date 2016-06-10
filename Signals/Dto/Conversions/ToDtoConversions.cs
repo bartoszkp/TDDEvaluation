@@ -1,5 +1,6 @@
 ﻿using Domain.Infrastructure;
 using Mapster;
+using System;
 using System.Linq;
 
 namespace Dto.Conversions
@@ -24,7 +25,7 @@ namespace Dto.Conversions
             return TypeAdapter.Adapt<T>(@this);
         }
 
-        public static T SetDataTypeIfNeeded<T>(object source, T result)
+        private static T SetDataTypeIfNeeded<T>(object source, T result)
         {
             if (!source.GetType().IsGenericType
                 || source.GetType().GetGenericArguments().Length != 1)

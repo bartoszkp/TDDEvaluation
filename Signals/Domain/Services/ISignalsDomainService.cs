@@ -17,6 +17,8 @@ namespace Domain.Services
 
         void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
 
+        Domain.MissingValuePolicy.MissingValuePolicy GetMissingValuePolicy(int signalId);
+
         void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicy missingValuePolicy);
     }
 }

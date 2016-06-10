@@ -12,12 +12,6 @@ namespace DataAccess.AutoMappingOverrides
                 .Id(s => s.Id)
                 .GeneratedBy
                 .Increment();
-
-            mapping
-               .HasOne(s => s.MissingValuePolicy)
-               .PropertyRef(m => m.Signal)
-               .Cascade
-               .All();
         }
     }
 }
