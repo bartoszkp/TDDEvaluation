@@ -14,7 +14,7 @@ namespace Dto.Conversions
 
                 if (derivedWithMatchingName != null)
                 {
-                    var dataTypeProperty = @this.GetType().GetProperty("DataType", typeof(Dto.DataType));
+                    var dataTypeProperty = MapFromGenericDataTypeAttribute.GetSinglePropertyMappedFromGenericDataTypeOrNull(@this.GetType());
 
                     if (derivedWithMatchingName.IsGenericTypeDefinition
                         && derivedWithMatchingName.GetGenericArguments().Length == 1
