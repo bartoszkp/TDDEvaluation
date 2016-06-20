@@ -1,9 +1,45 @@
-﻿namespace Dto.Conversions
+﻿using Domain.Infrastructure;
+using Mapster;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+
+namespace Dto.Conversions
 {
     public static class AutoMappingConfiguration
     {
         public static void Run()
         {
+            TypeAdapterConfig.GlobalSettings.When((s, t, m) => t.Namespace.Equals(typeof(MissingValuePolicy.MissingValuePolicy).Namespace))
+                .Settings
+                .AfterMappingFactories
+                .Add(SetDataTypeIfNeededFactory);
+        }
+
+        private static LambdaExpression SetDataTypeIfNeededFactory(CompileArgument ca)
+        {
+            Expression<Action<object, object>> factory = ((object source, object result) => SetDataTypeIfNeeded(source, result));
+            return factory;
+        }
+
+        private static void SetDataTypeIfNeeded(object source, object result)
+        {
+            if (!source.GetType().IsGenericType
+                || source.GetType().GetGenericArguments().Length != 1)
+            {
+                return;
+            }
+
+            var dataTypeProperty = result.GetType().GetProperty("DataType", typeof(Dto.DataType));
+
+            if (dataTypeProperty == null)
+            {
+                return;
+            }
+
+            var dataTypeValue = DataTypeUtils.FromNativeType(source.GetType().GetGenericArguments().Single()).ToDto<Dto.DataType>();
+
+            dataTypeProperty.SetValue(result, dataTypeValue);
         }
     }
 }

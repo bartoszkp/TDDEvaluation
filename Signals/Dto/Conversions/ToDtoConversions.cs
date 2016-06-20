@@ -16,35 +16,11 @@ namespace Dto.Conversions
 
                 if (derivedWithMatchingName != null)
                 {
-                    var result = (T)TypeAdapter.Adapt(@this, @this.GetType(), derivedWithMatchingName);
-
-                    return SetDataTypeIfNeeded(@this, result);
+                    return (T)TypeAdapter.Adapt(@this, @this.GetType(), derivedWithMatchingName);
                 }
             }
 
             return TypeAdapter.Adapt<T>(@this);
-        }
-
-        private static T SetDataTypeIfNeeded<T>(object source, T result)
-        {
-            if (!source.GetType().IsGenericType
-                || source.GetType().GetGenericArguments().Length != 1)
-            {
-                return result;
-            }
-
-            var dataTypeProperty = result.GetType().GetProperty("DataType", typeof(Dto.DataType));
-
-            if (dataTypeProperty == null)
-            {
-                return result;
-            }
-
-            var dataTypeValue = DataTypeUtils.FromNativeType(source.GetType().GetGenericArguments().Single()).ToDto<Dto.DataType>();
-
-            dataTypeProperty.SetValue(result, dataTypeValue);
-
-            return result;
         }
     }
 }
