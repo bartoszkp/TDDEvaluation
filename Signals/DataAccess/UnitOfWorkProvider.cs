@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading;
-using FluentNHibernate.Automapping;
+﻿using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using NHibernate;
 using NHibernate.Cfg;
+using System;
+using System.Threading;
 
 namespace DataAccess
 {
@@ -41,12 +41,13 @@ namespace DataAccess
         {
             var mappings = AutoMap
                 .Assemblies(new SignalsAutoMappingConfiguration(), typeof(Domain.Signal).Assembly, typeof(UnitOfWorkProvider).Assembly)
+                .IncludeBase(typeof(Domain.DatumBase))
                 .IgnoreBase(typeof(Domain.Datum<>))
                 .IgnoreBase(typeof(Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<>))
                 .IncludeBase(typeof(Domain.MissingValuePolicy.MissingValuePolicy))
                 .UseOverridesFromAssemblyOf<UnitOfWorkProvider>()
                 .Conventions.AddFromAssemblyOf<UnitOfWorkProvider>();
-                
+
             this.NHibernateConfiguration = Fluently
                 .Configure()
                 .Database(FluentNHibernate.Cfg.Db.MsSqlConfiguration.MsSql2012.ConnectionString(
