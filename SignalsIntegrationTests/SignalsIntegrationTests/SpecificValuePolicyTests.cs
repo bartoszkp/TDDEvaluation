@@ -12,6 +12,10 @@ namespace SignalsIntegrationTests
 
         private DateTime EndTimestamp { get { return BeginTimestamp.AddDays(5); } }
 
+        private int SpecificValue { get { return 14; } }
+
+        private Quality SpecificQuality { get { return Quality.Fair; } }
+
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -28,23 +32,24 @@ namespace SignalsIntegrationTests
         public void TestInitialize()
         {
             GivenASignal(Granularity.Day);
+
             WithMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
             {
-                Value = 14,
-                Quality = Quality.Fair
+                Value = SpecificValue,
+                Quality = SpecificQuality
             });
         }
 
-        //[TestMethod]
-        //public void GivenNoData_ReturnsNoneQualityForTheWholeRange()
-        //{
-        //    GivenNoData();
+        [TestMethod]
+        public void GivenNoData_ReturnsSpecificValueTheWholeRange()
+        {
+            GivenNoData();
 
-        //    WhenReadingData(BeginTimestamp, EndTimestamp);
+            WhenReadingData(BeginTimestamp, EndTimestamp);
 
-        //    ThenResultEquals(DatumArray<int>
-        //        .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day));
-        //}
+            ThenResultEquals(DatumArray<int>
+                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day));
+        }
 
         //[TestMethod]
         //public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithNoneQuality()
