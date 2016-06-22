@@ -23,18 +23,12 @@ namespace Domain.MissingValuePolicy
             this.Quality = quality;
         }
 
-        public override IEnumerable<Datum<S>> FillMissingData<S>(TimeEnumerator timeEnumerator, IEnumerable<Datum<S>> readData)
+        protected override IEnumerable<DatumBase> FillMissingData(TimeEnumerator timeEnumerator, IEnumerable<DatumBase> readData)
         {
-            if (typeof(S) != typeof(T)) // TODO ugly (necessary?)
-                throw new InvalidOperationException("SpecificValueMissingValuePolicy used for wrong DataType");
-
             var readDataDict = readData.ToDictionary(d => d.Timestamp, d => d);
 
-            // TODO ugly convert...
-            var valueInS = (S)Convert.ChangeType(Value, typeof(S));
-
             return timeEnumerator
-                .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : new Datum<S>() { Value = valueInS, Quality = Quality, Signal = Signal, Timestamp = ts })
+                .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : new Datum<T>() { Value = Value, Quality = Quality, Signal = Signal, Timestamp = ts })
                 .ToArray();
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Domain
 {
-    public class Datum<T>
+    public class Datum<T> : DatumBase
     {
         public static Datum<T> CreateNone(Signal signal, DateTime timestamp)
         {
@@ -16,14 +16,12 @@ namespace Domain
             };
         }
 
-        public virtual int Id { get; set; }
-
-        public virtual Signal Signal { get; set; }
-
-        public virtual DateTime Timestamp { get; set; }
-
         public virtual T Value { get; set; }
 
-        public virtual Quality Quality { get; set; }
+        [Infrastructure.NHibernateIgnore]
+        public override object AbstractValue {  get { return this.Value; } }
+
+        [Infrastructure.NHibernateIgnore]
+        public override Type NativeDataType {  get { return typeof(T); } }
     }
 }
