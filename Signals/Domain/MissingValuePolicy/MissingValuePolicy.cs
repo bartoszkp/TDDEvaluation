@@ -10,8 +10,7 @@ namespace Domain.MissingValuePolicy
         public virtual Signal Signal { get; set; }
 
         public abstract IEnumerable<Datum<T>> FillMissingData<T>(TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData);
-        /*NoneQuality,
-        SpecificValue,
+        /*
         Interpolation*/
     }
 }

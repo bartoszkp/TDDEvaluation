@@ -91,11 +91,7 @@ namespace Domain.Services.Implementation
 
         private IEnumerable<Datum<T>> FillMissingData<T>(Signal signal, TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData)
         {
-            var readDataDict = readData.ToDictionary(d => d.Timestamp, d => d);
-
-            return timeEnumerator
-                .Select(ts => readDataDict.ContainsKey(ts) ? readDataDict[ts] : Datum<T>.CreateNone(signal, ts))
-                .ToArray();
+            return GetMissingValuePolicy(signal.Id.Value).FillMissingData(timeEnumerator, readData);
         }
 
         public Domain.MissingValuePolicy.MissingValuePolicy GetMissingValuePolicy(int signalId)
