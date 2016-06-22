@@ -8,19 +8,13 @@ namespace SignalsIntegrationTests.Infrastructure
     {
         public static Datum<T>[] WithNoneQualityForRange(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
-            return new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
-                .Select(ts => new Datum<T>() { Quality = Quality.None, Timestamp = ts })
-                .ToArray();
+            return ForRange(fromIncludedUtc, toExcludedUtc, granularity).WithQuality(Quality.None);
         }
 
-        public static Datum<T>[] WithSpecificValueAndQualityForRange(T specificValue,
-                                                                     Quality specificQuality,
-                                                                     DateTime fromIncludedUtc,
-                                                                     DateTime toExcludedUtc,
-                                                                     Granularity granularity)
+        public static Datum<T>[] ForRange(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
             return new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
-                .Select(ts => new Datum<T>() { Quality = specificQuality, Value = specificValue, Timestamp = ts })
+                .Select(ts => new Datum<T> { Timestamp = ts })
                 .ToArray();
         }
     }
