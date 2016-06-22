@@ -12,5 +12,16 @@ namespace SignalsIntegrationTests.Infrastructure
                 .Select(ts => new Datum<T>() { Quality = Quality.None, Timestamp = ts })
                 .ToArray();
         }
+
+        public static Datum<T>[] WithSpecificValueAndQualityForRange(T specificValue,
+                                                                     Quality specificQuality,
+                                                                     DateTime fromIncludedUtc,
+                                                                     DateTime toExcludedUtc,
+                                                                     Granularity granularity)
+        {
+            return new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
+                .Select(ts => new Datum<T>() { Quality = specificQuality, Value = specificValue, Timestamp = ts })
+                .ToArray();
+        }
     }
 }
