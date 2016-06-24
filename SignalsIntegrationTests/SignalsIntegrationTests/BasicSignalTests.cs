@@ -263,15 +263,25 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void MissingValuePolicyCanBeSetForSignal()
         {
-            var signalId = AddNewIntegerSignal().Id.Value;
+            var signal1Id = AddNewIntegerSignal().Id.Value;
+            var signal2Id = AddNewIntegerSignal().Id.Value;
 
-            var policy = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy(); // TODO another class
+            var policy1 = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy(); // TODO another class
+            var policy2 = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>(42, Quality.Fair);
 
-            client.SetMissingValuePolicy(signalId, policy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
+            client.SetMissingValuePolicy(signal1Id, policy1.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
+            client.SetMissingValuePolicy(signal2Id, policy2.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
 
-            var result = client.GetMissingValuePolicy(signalId);
+            var result1 = client.GetMissingValuePolicy(signal1Id);
+            var result2 = client.GetMissingValuePolicy(signal2Id);
 
-            Assert.IsInstanceOfType(result, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
+            Assert.IsInstanceOfType(result1, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
+            Assert.IsInstanceOfType(result2, typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy));
+
+            var specificMissingValuePolicy = result2.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>>();
+
+            Assert.AreEqual(42, specificMissingValuePolicy.Value);
+            Assert.AreEqual(Quality.Fair, specificMissingValuePolicy.Quality);
         }
 
         /* TODO bad timestamps in GetData

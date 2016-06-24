@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mapster, Version=2.1.0.0, Culture=neutral, PublicKeyToken=2f39883af23c29a8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mapster.2.3.0\lib\net45\Mapster.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,6 +49,7 @@
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="Infrastructure\GranularityUtils.cs" />
+    <Compile Include="MissingValuePolicy\SpecificValueMissingValuePolicy.cs" />
     <Compile Include="PathEntry.cs" />
     <Compile Include="MissingValuePolicy\NoneQualityMissingValuePolicy.cs" />
     <Compile Include="Quality.cs" />
@@ -62,6 +67,9 @@
     <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />
     <Compile Include="Infrastructure\TimeEnumerator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

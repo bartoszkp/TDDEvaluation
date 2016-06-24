@@ -13,8 +13,14 @@ namespace Domain.Infrastructure
                 .Assembly
                 .GetTypes()
                 .Where(t => t.IsSubclassOf(baseClass))
-                .Where(t => t.Name == name)
+                .Where(t => t.GetNameWithoutArity() == name)
                 .SingleOrDefault();
+        }
+
+        public static string GetNameWithoutArity(this Type @this)
+        {
+            int arityIndex = @this.Name.IndexOf('`');
+            return arityIndex == -1 ? @this.Name : @this.Name.Substring(0, arityIndex);
         }
 
         public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)

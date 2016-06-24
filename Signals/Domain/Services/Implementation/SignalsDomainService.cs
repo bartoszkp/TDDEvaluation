@@ -4,6 +4,7 @@ using Domain.Repositories;
 using Domain.Infrastructure;
 using System.Linq;
 using Domain.Exceptions;
+using Mapster;
 
 namespace Domain.Services.Implementation
 {
@@ -49,10 +50,11 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            signal.MissingValuePolicy = new MissingValuePolicy.NoneQualityMissingValuePolicy();
-            signal.MissingValuePolicy.Signal = signal;
+            var result = this.signalRepository.Add(signal);
 
-            return this.signalRepository.Add(signal);
+            SetMissingValuePolicyConfig(signal, new MissingValuePolicy.NoneQualityMissingValuePolicy() { Signal = signal });
+
+            return result;
         }
 
         public PathEntry GetPathEntry(Path path)
@@ -96,15 +98,31 @@ namespace Domain.Services.Implementation
                 .ToArray();
         }
 
+        public Domain.MissingValuePolicy.MissingValuePolicy GetMissingValuePolicy(int signalId)
+        {
+            var result = this.missingValuePolicyRepository.Get(signalId);
+
+            if (result != null && result.GetType().BaseType.IsGenericType)
+            {
+                result = TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType)
+                  as Domain.MissingValuePolicy.MissingValuePolicy;
+            }
+
+            return result;
+        }
+
         public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicy missingValuePolicy)
         {
-            if (signal.MissingValuePolicy != null)
+            var current = GetMissingValuePolicy(signal.Id.Value);
+
+            if (current != null)
             {
-                this.missingValuePolicyRepository.Delete(signal.MissingValuePolicy);
+                this.missingValuePolicyRepository.Delete(current);
             }
 
             missingValuePolicy.Signal = signal;
-            signal.MissingValuePolicy = missingValuePolicy;
+
+            this.missingValuePolicyRepository.Add(missingValuePolicy);
         }
     }
 }

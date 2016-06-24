@@ -1,5 +1,7 @@
 ﻿using Domain.Infrastructure;
 using Mapster;
+using System;
+using System.Linq;
 
 namespace Dto.Conversions
 {
@@ -9,7 +11,8 @@ namespace Dto.Conversions
         {
             if (typeof(T).IsAbstract)
             {
-                var derivedWithMatchingName = ReflectionUtils.GetSingleConcreteTypeWithGivenNameOrNull(typeof(T), @this.GetType().Name);
+                var derivedWithMatchingName = ReflectionUtils
+                    .GetSingleConcreteTypeWithGivenNameOrNull(typeof(T), @this.GetType().GetNameWithoutArity());
 
                 if (derivedWithMatchingName != null)
                 {

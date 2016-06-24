@@ -14,6 +14,18 @@ namespace Dto.Conversions
 
                 if (derivedWithMatchingName != null)
                 {
+                    var dataTypeProperty = MapFromGenericDataTypeAttribute.GetSinglePropertyMappedFromGenericDataTypeOrNull(@this.GetType());
+
+                    if (derivedWithMatchingName.IsGenericTypeDefinition
+                        && derivedWithMatchingName.GetGenericArguments().Length == 1
+                        && dataTypeProperty != null)
+                    {
+                        var dataType = TypeAdapter.Adapt<Domain.DataType>(dataTypeProperty.GetValue(@this));
+                        var nativeDataType = dataType.GetNativeType();
+
+                        derivedWithMatchingName = derivedWithMatchingName.MakeGenericType(nativeDataType);
+                    }
+
                     return (T)TypeAdapter.Adapt(@this, @this.GetType(), derivedWithMatchingName);
                 }
             }
