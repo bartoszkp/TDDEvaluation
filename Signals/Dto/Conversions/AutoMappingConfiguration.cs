@@ -30,7 +30,7 @@ namespace Dto.Conversions
                 return;
             }
 
-            var dataTypeProperty = result.GetType().GetProperty("DataType", typeof(Dto.DataType));
+            var dataTypeProperty = MapFromGenericDataTypeAttribute.GetSinglePropertyMappedFromGenericDataTypeOrNull(result.GetType());
 
             if (dataTypeProperty == null)
             {
