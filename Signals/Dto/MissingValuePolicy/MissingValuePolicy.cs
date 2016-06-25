@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using Dto.Conversions;
+using System.Runtime.Serialization;
 
 namespace Dto.MissingValuePolicy
 {
@@ -11,5 +12,9 @@ namespace Dto.MissingValuePolicy
 
         [DataMember]
         public Signal Signal { get; set; }
+
+        [DataMember]
+        [MapFromGenericDataType]
+        public DataType DataType { get; set; }
     }
 }
