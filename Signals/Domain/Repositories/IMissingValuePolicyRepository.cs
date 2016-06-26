@@ -2,6 +2,8 @@
 {
     public interface IMissingValuePolicyRepository
     {
-        void Delete(MissingValuePolicy.MissingValuePolicy missingValuePolicy);
+        void Set(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy);
+
+        MissingValuePolicy.MissingValuePolicyBase Get(Signal signal);
     }
 }

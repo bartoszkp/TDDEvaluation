@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Domain.Infrastructure;
 using Mapster;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Dto.Conversions
 {
@@ -8,17 +10,36 @@ namespace Dto.Conversions
     {
         public static void Run()
         {
-            TypeAdapterConfig<IDictionary<string, object>, IDictionary<string, object>>
-                .NewConfig()
-                .MapWith(dictionary => dictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+            TypeAdapterConfig.GlobalSettings.When((s, t, m) => t.Namespace.Equals(typeof(MissingValuePolicy.MissingValuePolicy).Namespace))
+                .Settings
+                .AfterMappingFactories
+                .Add(SetDataTypeIfNeededFactory);
+        }
 
-            TypeAdapterConfig<Dto.Signal, Domain.Signal>
-                .NewConfig()
-                .Ignore(s => s.MissingValuePolicy);
+        private static LambdaExpression SetDataTypeIfNeededFactory(CompileArgument ca)
+        {
+            Expression<Action<object, object>> factory = ((object source, object result) => SetDataTypeIfNeeded(source, result));
+            return factory;
+        }
 
-            TypeAdapterConfig<Domain.Signal, Domain.Signal>
-                .NewConfig()
-                .Ignore(s => s.MissingValuePolicy);
+        private static void SetDataTypeIfNeeded(object source, object result)
+        {
+            if (!source.GetType().IsGenericType
+                || source.GetType().GetGenericArguments().Length != 1)
+            {
+                return;
+            }
+
+            var dataTypeProperty = MapFromGenericDataTypeAttribute.GetSinglePropertyMappedFromGenericDataTypeOrNull(result.GetType());
+
+            if (dataTypeProperty == null)
+            {
+                return;
+            }
+
+            var dataTypeValue = DataTypeUtils.FromNativeType(source.GetType().GetGenericArguments().Single()).ToDto<Dto.DataType>();
+
+            dataTypeProperty.SetValue(result, dataTypeValue);
         }
     }
 }

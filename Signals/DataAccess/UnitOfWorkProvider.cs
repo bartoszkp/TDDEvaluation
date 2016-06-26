@@ -42,7 +42,8 @@ namespace DataAccess
             var mappings = AutoMap
                 .Assemblies(new SignalsAutoMappingConfiguration(), typeof(Domain.Signal).Assembly, typeof(UnitOfWorkProvider).Assembly)
                 .IgnoreBase(typeof(Domain.Datum<>))
-                .IncludeBase(typeof(Domain.MissingValuePolicy.MissingValuePolicy))
+                .IncludeBase(typeof(Domain.MissingValuePolicy.MissingValuePolicyBase))
+                .IgnoreBase(typeof(Domain.MissingValuePolicy.MissingValuePolicy<>))
                 .UseOverridesFromAssemblyOf<UnitOfWorkProvider>()
                 .Conventions.AddFromAssemblyOf<UnitOfWorkProvider>();
                 

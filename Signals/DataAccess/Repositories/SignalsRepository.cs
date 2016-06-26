@@ -89,7 +89,8 @@ namespace DataAccess.Repositories
             return Session
                 .CreateCriteria(concreteDatumType)
                 .Add(Restrictions.Eq(signalPropertyName, signal))
-                .Add(Restrictions.Between(timestampPropertyName, fromIncludedUtc, toExcludedUtc))
+                .Add(Restrictions.Ge(timestampPropertyName, fromIncludedUtc))
+                .Add(Restrictions.Lt(timestampPropertyName, toExcludedUtc))
                 .List()
                 .Cast<Datum<T>>();
         }

@@ -109,14 +109,19 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            return this.signalsDomainService.Get(signalId).MissingValuePolicy.ToDto<MissingValuePolicy>();
+            var signal = this.signalsDomainService.Get(signalId);
+
+            return this.signalsDomainService.GetMissingValuePolicy(signal)
+                .ToDto<MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy missingValuePolicy)
         {
+            var mvp = missingValuePolicy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+
             this.signalsDomainService.SetMissingValuePolicyConfig(
                 this.signalsDomainService.Get(signalId),
-                missingValuePolicy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicy>());
+                mvp);
         }
     }
 }

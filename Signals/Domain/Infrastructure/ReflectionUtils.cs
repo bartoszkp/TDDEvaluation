@@ -7,14 +7,25 @@ namespace Domain.Infrastructure
 {
     public static class ReflectionUtils
     {
-        public static Type GetSingleConcreteTypeWithGivenNameOrNull(Type baseClass, string name)
+        public static Type GetSingleConcreteTypeWithMatchingNameOrNull(Type baseClass, string name)
         {
             return baseClass
                 .Assembly
                 .GetTypes()
                 .Where(t => t.IsSubclassOf(baseClass))
-                .Where(t => t.Name == name)
+                .Where(t => t.GetNameWithoutArity() == GetTypeNameWithoutArity(name))
                 .SingleOrDefault();
+        }
+
+        public static string GetNameWithoutArity(this Type @this)
+        {
+            return GetTypeNameWithoutArity(@this.Name);
+        }
+
+        private static string GetTypeNameWithoutArity(string typeName)
+        {
+            int arityIndex = typeName.IndexOf('`');
+            return arityIndex == -1 ? typeName : typeName.Substring(0, arityIndex);
         }
 
         public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)
