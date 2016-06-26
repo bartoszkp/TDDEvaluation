@@ -1,22 +1,22 @@
 ﻿namespace DataAccess.GenericInstantiations
 {
-    public abstract class MissingValuePolicyBoolean : Domain.MissingValuePolicy.MissingValuePolicy<bool>
+    public class NoneQualityMissingValuePolicyBoolean : Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>
     {
     }
 
-    public abstract class MissingValuePolicyInteger : Domain.MissingValuePolicy.MissingValuePolicy<int>
+    public class NoneQualityMissingValuePolicyInteger : Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>
     {
     }
 
-    public abstract class MissingValuePolicyDouble : Domain.MissingValuePolicy.MissingValuePolicy<double>
+    public class NoneQualityMissingValuePolicyDouble : Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>
     {
     }
 
-    public abstract class MissingValuePolicyDecimal : Domain.MissingValuePolicy.MissingValuePolicy<decimal>
+    public class NoneQualityMissingValuePolicyDecimal : Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<decimal>
     {
     }
 
-    public abstract class MissingValuePolicyString : Domain.MissingValuePolicy.MissingValuePolicy<string>
+    public class NoneQualityMissingValuePolicyString : Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<string>
     {
     }
 }

@@ -9,7 +9,5 @@
         public virtual Granularity Granularity { get; set; }
 
         public virtual Path Path { get; set; }
-
-        public virtual MissingValuePolicy.MissingValuePolicy MissingValuePolicy { get; set; }
     }
 }
