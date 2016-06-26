@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Domain.MissingValuePolicy
 {
-    public class NoneQualityMissingValuePolicy : MissingValuePolicy
+    public class NoneQualityMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override IEnumerable<Datum<T>> FillMissingData<T>(TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData)
+        public override IEnumerable<Datum<T>> FillMissingData(TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData)
         {
             var readDataDict = readData.ToDictionary(d => d.Timestamp, d => d);
 

@@ -37,7 +37,7 @@ namespace SignalsIntegrationTests.Infrastructure
             client.SetData(signalId, new[] { datum }.ToDto<Dto.Datum[]>());
         }
 
-        protected void WithMissingValuePolicy(MissingValuePolicy missingValuePolicy)
+        protected void WithMissingValuePolicy(MissingValuePolicyBase missingValuePolicy)
         {
             client.SetMissingValuePolicy(signalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
         }

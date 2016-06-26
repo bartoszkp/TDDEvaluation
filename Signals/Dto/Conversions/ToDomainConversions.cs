@@ -10,7 +10,7 @@ namespace Dto.Conversions
         {
             if (typeof(T).IsAbstract)
             {
-                var derivedWithMatchingName = ReflectionUtils.GetSingleConcreteTypeWithGivenNameOrNull(typeof(T), @this.GetType().Name);
+                var derivedWithMatchingName = ReflectionUtils.GetSingleConcreteTypeWithMatchingNameOrNull(typeof(T), @this.GetType().Name);
 
                 if (derivedWithMatchingName != null)
                 {

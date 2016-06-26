@@ -4,6 +4,7 @@ using Domain.Repositories;
 using Domain.Infrastructure;
 using System.Linq;
 using Domain.Exceptions;
+using Mapster;
 
 namespace Domain.Services.Implementation
 {
@@ -41,7 +42,7 @@ namespace Domain.Services.Implementation
 
             return result;
         }
-  
+ 
         public Signal Add(Signal signal)
         {
             if (signal.Id.HasValue)
@@ -49,10 +50,15 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            signal.MissingValuePolicy = new MissingValuePolicy.NoneQualityMissingValuePolicy();
-            signal.MissingValuePolicy.Signal = signal;
+            var defaultPolicy = MissingValuePolicy.MissingValuePolicyBase.CreateForNativeType(
+                typeof(MissingValuePolicy.NoneQualityMissingValuePolicy<>),
+                DataTypeUtils.GetNativeType(signal.DataType));
 
-            return this.signalRepository.Add(signal);
+            var result = this.signalRepository.Add(signal);
+
+            this.missingValuePolicyRepository.Set(result, defaultPolicy);
+
+            return result;
         }
 
         public PathEntry GetPathEntry(Path path)
@@ -96,15 +102,19 @@ namespace Domain.Services.Implementation
                 .ToArray();
         }
 
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicy missingValuePolicy)
+        public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
-            if (signal.MissingValuePolicy != null)
-            {
-                this.missingValuePolicyRepository.Delete(signal.MissingValuePolicy);
-            }
+            var concretePolicy = this.missingValuePolicyRepository.Get(signal);
 
-            missingValuePolicy.Signal = signal;
-            signal.MissingValuePolicy = missingValuePolicy;
+            return TypeAdapter.Adapt(concretePolicy, concretePolicy.GetType(), concretePolicy.GetType().BaseType)
+                as MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
+        {
+            var existing = GetMissingValuePolicy(signal);
+
+            this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
     }
 }

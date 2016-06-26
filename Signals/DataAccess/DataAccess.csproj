@@ -96,11 +96,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoMappingOverrides\MissingValuePolicyMappingOverride.cs" />
+    <Compile Include="AutoMappingOverrides\MissingValuePolicyBaseMappingOverride.cs" />
+    <Compile Include="AutoMappingOverrides\NoneQualityMissingValuePolicyMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathComponentsList.cs" />
     <Compile Include="AutoMappingOverrides\SignalMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathMappingOverride.cs" />
     <Compile Include="GenericInstantiations\Datum.cs" />
+    <Compile Include="GenericInstantiations\MissingValuePolicy.cs" />
     <Compile Include="Infrastructure\DatabaseTransactionInterception.cs" />
     <Compile Include="ISessionProvider.cs" />
     <Compile Include="IUnitOfWorkProvider.cs" />

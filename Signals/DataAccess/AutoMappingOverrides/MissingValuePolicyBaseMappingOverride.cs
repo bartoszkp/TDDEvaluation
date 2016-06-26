@@ -3,12 +3,13 @@ using FluentNHibernate.Automapping.Alterations;
 
 namespace DataAccess.AutoMappingOverrides
 {
-    public class MissingValuePolicyMappingOverride : IAutoMappingOverride<Domain.MissingValuePolicy.MissingValuePolicy>
+    public class MissingValuePolicyBaseMappingOverride
+        : IAutoMappingOverride<Domain.MissingValuePolicy.MissingValuePolicyBase>
     {
-        public void Override(AutoMapping<Domain.MissingValuePolicy.MissingValuePolicy> mapping)
+        public void Override(AutoMapping<Domain.MissingValuePolicy.MissingValuePolicyBase> mapping)
         {
             mapping
-                .Id(m => m.Id)
+                .Id(mvp => mvp.Id)
                 .GeneratedBy
                 .Increment();
 

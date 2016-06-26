@@ -7,14 +7,31 @@ namespace Domain.Infrastructure
 {
     public static class ReflectionUtils
     {
-        public static Type GetSingleConcreteTypeWithGivenNameOrNull(Type baseClass, string name)
+        public static Type GetSingleConcreteTypeWithMatchingNameOrNull(Type baseClass, string name)
         {
             return baseClass
                 .Assembly
                 .GetTypes()
                 .Where(t => t.IsSubclassOf(baseClass))
-                .Where(t => t.Name == name)
+                .Where(t => NamesMatchIgnoringGenericPart(t.Name, name))
                 .SingleOrDefault();
+        }
+
+        private static bool NamesMatchIgnoringGenericPart(string name1, string name2)
+        {
+            var i1 = name1.IndexOf('`');
+            var i2 = name2.IndexOf('`');
+            if (i1 >= 0)
+            {
+                name1 = name1.Substring(0, i1);
+            }
+
+            if (i2 >= 0)
+            {
+                name2 = name2.Substring(0, i2);
+            }
+
+            return name1 == name2;
         }
 
         public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)
