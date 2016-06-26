@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using Mapster;
+using Domain.Infrastructure;
 
 namespace DataAccess.Repositories
 {
@@ -49,7 +50,7 @@ namespace DataAccess.Repositories
         private Type GetConcretePolicyType(MissingValuePolicyBase missingValuePolicy)
         {
             var concretePolicyType = genericConcretePolicyTypePairs
-                .Single(pair => pair.Item1.GenericTypeArguments.Single().Equals(missingValuePolicy.NativeDataType))
+                .Single(pair => pair.Item1.Equals(missingValuePolicy.GetType()))
                 .Item2;
 
             return concretePolicyType;

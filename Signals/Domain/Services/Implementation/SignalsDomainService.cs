@@ -112,8 +112,6 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
         {
-            var existing = GetMissingValuePolicy(signal);
-
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
     }

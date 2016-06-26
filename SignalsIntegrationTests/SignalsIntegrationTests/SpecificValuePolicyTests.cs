@@ -28,7 +28,11 @@ namespace SignalsIntegrationTests
         public void TestInitialize()
         {
             GivenASignal(Granularity.Day);
-            WithMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>(14, Quality.Fair));
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
+            {
+                Value = 14,
+                Quality = Quality.Fair
+            });
         }
 
         //[TestMethod]
