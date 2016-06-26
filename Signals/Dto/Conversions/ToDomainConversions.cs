@@ -10,10 +10,22 @@ namespace Dto.Conversions
         {
             if (typeof(T).IsAbstract)
             {
-                var derivedWithMatchingName = ReflectionUtils.GetSingleConcreteTypeWithGivenNameOrNull(typeof(T), @this.GetType().Name);
+                var derivedWithMatchingName = ReflectionUtils.GetSingleConcreteTypeWithMatchingNameOrNull(typeof(T), @this.GetType().Name);
 
                 if (derivedWithMatchingName != null)
                 {
+                    var dataTypeProperty = MapFromGenericDataTypeAttribute.GetSinglePropertyMappedFromGenericDataTypeOrNull(@this.GetType());
+
+                    if (derivedWithMatchingName.IsGenericTypeDefinition
+                        && derivedWithMatchingName.GetGenericArguments().Length == 1
+                        && dataTypeProperty != null)
+                    {
+                        var dataType = TypeAdapter.Adapt<Domain.DataType>(dataTypeProperty.GetValue(@this));
+                        var nativeDataType = dataType.GetNativeType();
+
+                        derivedWithMatchingName = derivedWithMatchingName.MakeGenericType(nativeDataType);
+                    }
+
                     return (T)TypeAdapter.Adapt(@this, @this.GetType(), derivedWithMatchingName);
                 }
             }
