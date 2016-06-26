@@ -41,7 +41,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void GivenNoData_ReturnsSpecificValueTheWholeRange()
+        public void GivenNoData_ReturnsSpecificValueForTheWholeRange()
         {
             GivenNoData();
 
@@ -51,64 +51,64 @@ namespace SignalsIntegrationTests
                 .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
-        //[TestMethod]
-        //public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithNoneQuality()
-        //{
-        //    GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp });
+        [TestMethod]
+        public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithSpecificValue()
+        {
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp });
 
-        //    WhenReadingData(BeginTimestamp, EndTimestamp);
+            WhenReadingData(BeginTimestamp, EndTimestamp);
 
-        //    ThenResultEquals(DatumArray<int>
-        //        .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day)
-        //        .StartingWithGoodQualityValue(42));
-        //}
+            ThenResultEquals(DatumArray<int>
+                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day)
+                .StartingWithGoodQualityValue(42));
+        }
 
-        //[TestMethod]
-        //public void GivenSingleDatumBeforeTheBeginning_ReturnsNoneQualityForTheWholeRange()
-        //{
-        //    GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp.AddDays(-1) });
+        [TestMethod]
+        public void GivenSingleDatumBeforeTheBeginning_ReturnsSpecificValueForTheWholeRange()
+        {
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp.AddDays(-1) });
 
-        //    WhenReadingData(BeginTimestamp, EndTimestamp);
+            WhenReadingData(BeginTimestamp, EndTimestamp);
 
-        //    ThenResultEquals(DatumArray<int>
-        //        .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day));
-        //}
+            ThenResultEquals(DatumArray<int>
+                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day));
+        }
 
-        //[TestMethod]
-        //public void GivenSingleDatumAtTheEnd_FillsRemainingRangeWithNoneQuality()
-        //{
-        //    GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp.AddDays(-1) });
+        [TestMethod]
+        public void GivenSingleDatumAtTheEnd_FillsRemainingRangeWithSpecificValue()
+        {
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp.AddDays(-1) });
 
-        //    WhenReadingData(BeginTimestamp, EndTimestamp);
+            WhenReadingData(BeginTimestamp, EndTimestamp);
 
-        //    ThenResultEquals(DatumArray<int>
-        //        .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day)
-        //        .EndingWithGoodQualityValue(42));
-        //}
+            ThenResultEquals(DatumArray<int>
+                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day)
+                .EndingWithGoodQualityValue(42));
+        }
 
-        //[TestMethod]
-        //public void GivenSingleDatumAfterTheEnd_ReturnsNoneQualityForTheWholeRange()
-        //{
-        //    GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp });
+        [TestMethod]
+        public void GivenSingleDatumAfterTheEnd_ReturnsSpecificValueForTheWholeRange()
+        {
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp });
 
-        //    WhenReadingData(BeginTimestamp, EndTimestamp);
+            WhenReadingData(BeginTimestamp, EndTimestamp);
 
-        //    ThenResultEquals(DatumArray<int>
-        //        .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day));
-        //}
+            ThenResultEquals(DatumArray<int>
+                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day));
+        }
 
-        //[TestMethod]
-        //public void GivenSingleDatumInTheMiddle_FillsRemainingRangesWithNoneQuality()
-        //{
-        //    var middleTimestamp = BeginTimestamp.AddDays(2);
+        [TestMethod]
+        public void GivenSingleDatumInTheMiddle_FillsRemainingRangesWithNoneQuality()
+        {
+            var middleTimestamp = BeginTimestamp.AddDays(2);
 
-        //    GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = middleTimestamp });
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = middleTimestamp });
 
-        //    WhenReadingData(BeginTimestamp, EndTimestamp);
+            WhenReadingData(BeginTimestamp, EndTimestamp);
 
-        //    ThenResultEquals(DatumArray<int>
-        //        .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day)
-        //        .WithSingleGoodQualityValueAt(42, middleTimestamp));
-        //}
+            ThenResultEquals(DatumArray<int>
+                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day)
+                .WithSingleGoodQualityValueAt(42, middleTimestamp));
+        }
     }
 }
