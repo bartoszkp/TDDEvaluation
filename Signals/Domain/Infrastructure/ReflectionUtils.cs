@@ -13,25 +13,19 @@ namespace Domain.Infrastructure
                 .Assembly
                 .GetTypes()
                 .Where(t => t.IsSubclassOf(baseClass))
-                .Where(t => NamesMatchIgnoringGenericPart(t.Name, name))
+                .Where(t => t.GetNameWithoutArity() == GetTypeNameWithoutArity(name))
                 .SingleOrDefault();
         }
 
-        private static bool NamesMatchIgnoringGenericPart(string name1, string name2)
+        public static string GetNameWithoutArity(this Type @this)
         {
-            var i1 = name1.IndexOf('`');
-            var i2 = name2.IndexOf('`');
-            if (i1 >= 0)
-            {
-                name1 = name1.Substring(0, i1);
-            }
+            return GetTypeNameWithoutArity(@this.Name);
+        }
 
-            if (i2 >= 0)
-            {
-                name2 = name2.Substring(0, i2);
-            }
-
-            return name1 == name2;
+        private static string GetTypeNameWithoutArity(string typeName)
+        {
+            int arityIndex = typeName.IndexOf('`');
+            return arityIndex == -1 ? typeName : typeName.Substring(0, arityIndex);
         }
 
         public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)

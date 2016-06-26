@@ -267,7 +267,11 @@ namespace SignalsIntegrationTests
             var signal2Id = AddNewIntegerSignal().Id.Value;
 
             var policy1 = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>(); // TODO another class
-            var policy2 = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>(42, Quality.Fair);
+            var policy2 = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
+                {
+                    Value = 42,
+                    Quality = Quality.Fair
+                };
 
             client.SetMissingValuePolicy(signal1Id, policy1.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
             client.SetMissingValuePolicy(signal2Id, policy2.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
