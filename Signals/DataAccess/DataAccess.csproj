@@ -97,7 +97,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMappingOverrides\MissingValuePolicyBaseMappingOverride.cs" />
-    <Compile Include="AutoMappingOverrides\NoneQualityMissingValuePolicyMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathComponentsList.cs" />
     <Compile Include="AutoMappingOverrides\SignalMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathMappingOverride.cs" />
