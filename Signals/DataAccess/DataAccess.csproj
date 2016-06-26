@@ -101,7 +101,7 @@
     <Compile Include="AutoMappingOverrides\SignalMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\PathMappingOverride.cs" />
     <Compile Include="GenericInstantiations\Datum.cs" />
-    <Compile Include="GenericInstantiations\MissingValuePolicy.cs" />
+    <Compile Include="GenericInstantiations\NoneQualityMissingValuePolicy.cs" />
     <Compile Include="Infrastructure\DatabaseTransactionInterception.cs" />
     <Compile Include="ISessionProvider.cs" />
     <Compile Include="IUnitOfWorkProvider.cs" />
