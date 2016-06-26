@@ -53,6 +53,7 @@
     <Compile Include="Granularity.cs" />
     <Compile Include="MissingValuePolicy\NoneQualityMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
+    <Compile Include="MissingValuePolicy\SpecificValueMissingValuePolicy.cs" />
     <Compile Include="Path.cs" />
     <Compile Include="PathEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
