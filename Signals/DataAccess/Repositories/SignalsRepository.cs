@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Domain;
+using Domain.Infrastructure;
 
 namespace DataAccess.Repositories
 {
+    [UnityRegister]
     public class SignalsRepository : RepositoryBase, Domain.Repositories.ISignalsRepository
     {
         public SignalsRepository(ISessionProvider sessionProvider)
