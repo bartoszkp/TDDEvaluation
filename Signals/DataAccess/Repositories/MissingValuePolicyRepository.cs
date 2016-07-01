@@ -1,13 +1,14 @@
-﻿using Domain.MissingValuePolicy;
-using System.Reflection;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using Mapster;
+using System.Linq;
+using System.Reflection;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
+using Mapster;
 
 namespace DataAccess.Repositories
 {
+    [UnityRegister]
     public class MissingValuePolicyRepository : RepositoryBase, Domain.Repositories.IMissingValuePolicyRepository
     {
         public MissingValuePolicyRepository(ISessionProvider sessionProvider)

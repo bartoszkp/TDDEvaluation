@@ -10,6 +10,7 @@ using NHibernate.Criterion;
 
 namespace DataAccess.Repositories
 {
+    [UnityRegister]
     public class SignalsDataRepository : RepositoryBase, Domain.Repositories.ISignalsDataRepository
     {
         public SignalsDataRepository(ISessionProvider sessionProvider)
