@@ -1,27 +1,32 @@
 using System;
 using System.Collections.Generic;
-using Domain.Repositories;
-using Domain.Infrastructure;
 using System.Linq;
 using Domain.Exceptions;
+using Domain.Infrastructure;
+using Domain.Repositories;
 using Mapster;
 
 namespace Domain.Services.Implementation
 {
     public class SignalsDomainService : ISignalsDomainService
     {
-        private readonly ISignalsRepository signalRepository;
+        private readonly ISignalsRepository signalsRepository;
+        private readonly ISignalsDataRepository signalsDataRepository;
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
-        public SignalsDomainService(ISignalsRepository signalRepository, IMissingValuePolicyRepository missingValuePolicyRepository)
+        public SignalsDomainService(
+            ISignalsRepository signalsRepository, 
+            ISignalsDataRepository signalsDataRepository, 
+            IMissingValuePolicyRepository missingValuePolicyRepository)
         {
-            this.signalRepository = signalRepository;
+            this.signalsRepository = signalsRepository;
+            this.signalsDataRepository = signalsDataRepository;
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
         public Signal Get(Path path)
         {
-            var result = this.signalRepository.Get(path);
+            var result = this.signalsRepository.Get(path);
 
             if (result == null)
             {
@@ -33,7 +38,7 @@ namespace Domain.Services.Implementation
 
         public Signal Get(int signalId)
         {
-            var result = this.signalRepository.Get(signalId);
+            var result = this.signalsRepository.Get(signalId);
 
             if (result == null)
             {
@@ -54,7 +59,7 @@ namespace Domain.Services.Implementation
                 typeof(MissingValuePolicy.NoneQualityMissingValuePolicy<>),
                 DataTypeUtils.GetNativeType(signal.DataType));
 
-            var result = this.signalRepository.Add(signal);
+            var result = this.signalsRepository.Add(signal);
 
             this.missingValuePolicyRepository.Set(result, defaultPolicy);
 
@@ -63,7 +68,7 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path path)
         {
-            var allSignals = this.signalRepository.GetAllWithPathPrefix(path);
+            var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
 
             var directDescendants = allSignals.Where(s => s.Path.Length == path.Length + 1).ToArray();
             var subPaths = allSignals
@@ -77,7 +82,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var readData = this.signalRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var readData = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             return this.FillMissingData(signal, new TimeEnumerator(fromIncludedUtc, toExcludedUtc, signal.Granularity), readData);
         }
@@ -90,7 +95,7 @@ namespace Domain.Services.Implementation
                 signal.Granularity.ValidateTimestamp(d.Timestamp);
             }
 
-            this.signalRepository.SetData<T>(data);
+            this.signalsDataRepository.SetData<T>(data);
         }
 
         private IEnumerable<Datum<T>> FillMissingData<T>(Signal signal, TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData)

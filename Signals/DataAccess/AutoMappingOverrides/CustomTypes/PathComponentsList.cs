@@ -5,7 +5,7 @@ using System.Linq;
 using NHibernate.SqlTypes;
 using NHibernate.UserTypes;
 
-namespace DataAccess.AutoMappingOverrides
+namespace DataAccess.AutoMappingOverrides.CustomTypes
 {
     public class PathComponentsList : IUserType
     {

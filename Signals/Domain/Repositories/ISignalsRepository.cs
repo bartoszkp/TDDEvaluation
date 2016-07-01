@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Domain.Repositories
 {
@@ -14,9 +13,5 @@ namespace Domain.Repositories
         IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);
 
         void Remove(Path path);
-
-        void SetData<T>(IEnumerable<Datum<T>> data);
-
-        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }
