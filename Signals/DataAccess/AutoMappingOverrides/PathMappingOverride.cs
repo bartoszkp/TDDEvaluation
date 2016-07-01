@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using DataAccess.AutoMappingOverrides.CustomTypes;
+using Domain;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Automapping.Alterations;
 
