@@ -1,17 +1,20 @@
-﻿using Domain.Infrastructure;
-using Domain.Services;
-using Dto;
-using Dto.Conversions;
-using Dto.MissingValuePolicy;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
+using DataAccess.Infrastructure;
+using Domain.Infrastructure;
+using Domain.Services;
+using Dto;
+using Dto.Conversions;
+using Dto.MissingValuePolicy;
+using Microsoft.Practices.Unity;
 
 namespace WebService
 {
+    [UnityRegister(typeof(ContainerControlledLifetimeManager), typeof(DatabaseTransactionInterceptionInjectionMembersFactory))]
     [ServiceBehavior(IncludeExceptionDetailInFaults = true)]
     public class SignalsWebService : ISignalsWebService
     {

@@ -8,6 +8,7 @@ using Mapster;
 
 namespace Domain.Services.Implementation
 {
+    [UnityRegister]
     public class SignalsDomainService : ISignalsDomainService
     {
         private readonly ISignalsRepository signalsRepository;

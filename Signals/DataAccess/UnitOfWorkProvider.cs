@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Threading;
+using Domain.Infrastructure;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
+using Microsoft.Practices.Unity;
 using NHibernate;
 using NHibernate.Cfg;
 
 namespace DataAccess
 {
+    [UnityRegister(typeof(ContainerControlledLifetimeManager))]
     public class UnitOfWorkProvider : IUnitOfWorkProvider, ISessionProvider, IDisposable
     {
         public Configuration NHibernateConfiguration { get; private set; }
