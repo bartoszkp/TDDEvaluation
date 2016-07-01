@@ -1,10 +1,9 @@
-﻿using DataAccess;
-using DataAccess.Infrastructure;
-using Domain.Repositories;
-using Domain.Services;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Domain.Infrastructure;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.InterceptionExtension;
-using WebService;
 
 namespace Bootstrapper
 {
@@ -21,11 +20,7 @@ namespace Bootstrapper
 
             SetupDtoAutoMapping();
 
-            SetupDataAccess();
-
-            SetupDomain();
-
-            SetupWebService();
+            SetupUnityContainer();
         }
 
         public void SetupDtoAutoMapping()
@@ -33,26 +28,34 @@ namespace Bootstrapper
             Dto.Conversions.AutoMappingConfiguration.Run();
         }
 
-        public void SetupDataAccess()
+        public void SetupUnityContainer()
         {
-            UnityContainer.RegisterType<IUnitOfWorkProvider, UnitOfWorkProvider>(new ContainerControlledLifetimeManager());
-            UnityContainer.RegisterType<ISessionProvider, UnitOfWorkProvider>(new ContainerControlledLifetimeManager());
+            UnityContainer.RegisterTypes(
+                AllClasses.FromAssembliesInBasePath().Where(HasUnityRegisterAttribute),
+                getFromTypes: WithMappings.FromAllInterfaces,
+                getLifetimeManager: GetLifetimeManager,
+                getInjectionMembers: GetInjectionMembers);
         }
 
-        public void SetupDomain()
+        private static bool HasUnityRegisterAttribute(Type type)
         {
-            UnityContainer.RegisterType<ISignalsRepository, DataAccess.Repositories.SignalsRepository>();
-            UnityContainer.RegisterType<ISignalsDataRepository, DataAccess.Repositories.SignalsDataRepository>();
-            UnityContainer.RegisterType<IMissingValuePolicyRepository, DataAccess.Repositories.MissingValuePolicyRepository>();
-
-            UnityContainer.RegisterType<ISignalsDomainService, Domain.Services.Implementation.SignalsDomainService>();
+            return type.GetCustomAttributes(typeof(UnityRegisterAttribute), false).Any();
         }
 
-        public void SetupWebService()
+        private static LifetimeManager GetLifetimeManager(Type type)
         {
-            UnityContainer.RegisterType<ISignalsWebService, SignalsWebService>(
-                new Interceptor<TransparentProxyInterceptor>(),
-                new InterceptionBehavior<DatabaseTransactionInterception>());
+            var registrationAttribute = type.GetCustomAttributes(typeof(UnityRegisterAttribute), false).Single()
+                as UnityRegisterAttribute;
+
+            return registrationAttribute.LifetimeManager;
+        }
+
+        private static IEnumerable<InjectionMember> GetInjectionMembers(Type type)
+        {
+            var registrationAttribute = type.GetCustomAttributes(typeof(UnityRegisterAttribute), false).Single()
+                as UnityRegisterAttribute;
+
+            return registrationAttribute.InjectionMembers;
         }
     }
 }
