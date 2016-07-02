@@ -106,9 +106,9 @@ namespace Domain.Services.Implementation
             var missingValuePolicy = GetMissingValuePolicy(signal)
                 as MissingValuePolicy.MissingValuePolicy<T>;
 
-            var olderData = missingValuePolicy.OlderDataSamplesCountNeeded > 0 
-                ? this.signalsDataRepository.GetDataOlderThan<T>(signal, timeEnumerator.FromIncludedUtc, 1)
-                : Enumerable.Empty<Datum<T>>();
+            var olderData = this.signalsDataRepository.GetDataOlderThan<T>(signal,
+                                                                           timeEnumerator.FromIncludedUtc,
+                                                                           missingValuePolicy.OlderDataSampleCountNeeded);
 
             return missingValuePolicy.FillMissingData(timeEnumerator,
                                                       readData,
