@@ -56,5 +56,10 @@ namespace SignalsIntegrationTests.Infrastructure
 
             return @this;
         }
+
+        public static Datum<T>[] FollowedBy<T>(this Datum<T>[] @this, Datum<T>[] tail)
+        {
+            return @this.Concat(tail).ToArray();
+        }
     }
 }

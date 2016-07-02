@@ -29,12 +29,17 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected void GivenNoData()
         {
-            client.SetData(signalId, new Datum<int>[0].ToDto<Dto.Datum[]>());
+            GivenDatums();
         }
 
         protected void GivenSingleDatum(Datum<int> datum)
         {
-            client.SetData(signalId, new[] { datum }.ToDto<Dto.Datum[]>());
+            GivenDatums(datum);
+        }
+
+        protected void GivenDatums(params Datum<int>[] datums)
+        {
+            client.SetData(signalId, datums.ToDto<Dto.Datum[]>());
         }
 
         protected void WithMissingValuePolicy(MissingValuePolicyBase missingValuePolicy)
