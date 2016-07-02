@@ -13,6 +13,13 @@ namespace SignalsIntegrationTests.Infrastructure
             return @this;
         }
 
+        public static Datum<T>[] WithValue<T>(this Datum<T>[] @this, T value)
+        {
+            Array.ForEach(@this, datum => datum.Value = value);
+
+            return @this;
+        }
+
         public static Datum<T>[] WithSingleGoodQualityValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)
         {
             @this.Single(datum => datum.Timestamp == timestamp).Quality = Quality.Good;
