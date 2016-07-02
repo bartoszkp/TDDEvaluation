@@ -9,7 +9,7 @@ namespace Domain.Infrastructure
     {
         public DateTime FromIncludedUtc { get; private set; }
 
-        public DateTime toExcludedUtcUtc { get; private set; }
+        public DateTime ToExcludedUtcUtc { get; private set; }
 
         public Granularity Granularity { get; private set; }
 
@@ -33,7 +33,7 @@ namespace Domain.Infrastructure
         public TimeEnumerator(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
             this.FromIncludedUtc = fromIncludedUtc;
-            this.toExcludedUtcUtc = toExcludedUtc;
+            this.ToExcludedUtcUtc = toExcludedUtc;
             this.Granularity = granularity;
             this.Reset();
         }
@@ -41,7 +41,7 @@ namespace Domain.Infrastructure
         public TimeEnumerator(DateTime fromIncludedUtc, int steps, Granularity granularity)
         {
             this.FromIncludedUtc = fromIncludedUtc;
-            this.toExcludedUtcUtc = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncludedUtc, steps), (result, step) => granularityTimeSteps[granularity](result));
+            this.ToExcludedUtcUtc = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncludedUtc, steps), (result, step) => granularityTimeSteps[granularity](result));
             this.Granularity = granularity;
             this.Reset();
         }
@@ -60,7 +60,7 @@ namespace Domain.Infrastructure
 
             this.current = granularityTimeSteps[this.Granularity](this.current.Value);
 
-            return this.current.Value < this.toExcludedUtcUtc;
+            return this.current.Value < this.ToExcludedUtcUtc;
         }
 
         public void Reset()

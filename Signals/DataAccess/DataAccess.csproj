@@ -102,6 +102,7 @@
     <Compile Include="AutoMappingOverrides\PathMappingOverride.cs" />
     <Compile Include="GenericInstantiations\Datum.cs" />
     <Compile Include="GenericInstantiations\NoneQualityMissingValuePolicy.cs" />
+    <Compile Include="GenericInstantiations\ZeroOrderMissingValuePolicy.cs" />
     <Compile Include="GenericInstantiations\SpecificValueMissingValuePolicy.cs" />
     <Compile Include="Infrastructure\DatabaseTransactionInterception.cs" />
     <Compile Include="Infrastructure\DatabaseTransactionInterceptionInjectionMembersFactory.cs" />

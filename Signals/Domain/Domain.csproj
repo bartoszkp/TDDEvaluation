@@ -68,6 +68,7 @@
     <Compile Include="Infrastructure\UnityRegisterAttribute.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="Infrastructure\GranularityUtils.cs" />
+    <Compile Include="MissingValuePolicy\ZeroOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\SpecificValueMissingValuePolicy.cs" />
     <Compile Include="PathEntry.cs" />
     <Compile Include="MissingValuePolicy\NoneQualityMissingValuePolicy.cs" />
