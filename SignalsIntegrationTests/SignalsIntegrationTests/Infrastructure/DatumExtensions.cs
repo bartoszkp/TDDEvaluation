@@ -29,9 +29,22 @@ namespace SignalsIntegrationTests.Infrastructure
             return @this;
         }
 
+        public static Datum<T>[] StartingWithNoneQuality<T>(this Datum<T>[] @this)
+        {
+            @this.First().Quality = Quality.None;
+            @this.First().Value = default(T);
+
+            return @this;
+        }
+
         public static Datum<T>[] EndingWithGoodQualityValue<T>(this Datum<T>[] @this, T value)
         {
-            @this.Last().Quality = Quality.Good;
+            return @this.EndingWith(value, Quality.Good);
+        }
+
+        public static Datum<T>[] EndingWith<T>(this Datum<T>[] @this, T value, Quality quality)
+        {
+            @this.Last().Quality = quality;
             @this.Last().Value = value;
 
             return @this;
