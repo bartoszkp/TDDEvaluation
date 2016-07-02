@@ -6,7 +6,8 @@ namespace Domain.MissingValuePolicy
 {
     public class ZeroOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override int OlderDataSamplesCountNeeded { get { return 1; } }
+        [NHibernateIgnore]
+        public override int OlderDataSampleCountNeeded { get { return 1; } }
 
         public override IEnumerable<Datum<T>> FillMissingData(TimeEnumerator timeEnumerator,
                                                               IEnumerable<Datum<T>> readData,
@@ -26,6 +27,7 @@ namespace Domain.MissingValuePolicy
                     lastValue = readEnumerator.Current.Value;
                     nextValueTs = readEnumerator.MoveNext() ? readEnumerator.Current.Timestamp : timeEnumerator.ToExcludedUtcUtc;
                 }
+
                 yield return new Datum<T>() { Value = lastValue, Quality = lastQuality, Signal = Signal, Timestamp = ts };
             }
         }

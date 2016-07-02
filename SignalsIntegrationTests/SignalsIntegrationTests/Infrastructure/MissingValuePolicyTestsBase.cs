@@ -29,15 +29,15 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected void GivenNoData()
         {
-            GivenDatums();
+            GivenData();
         }
 
         protected void GivenSingleDatum(Datum<int> datum)
         {
-            GivenDatums(datum);
+            GivenData(datum);
         }
 
-        protected void GivenDatums(params Datum<int>[] datums)
+        protected void GivenData(params Datum<int>[] datums)
         {
             client.SetData(signalId, datums.ToDto<Dto.Datum[]>());
         }

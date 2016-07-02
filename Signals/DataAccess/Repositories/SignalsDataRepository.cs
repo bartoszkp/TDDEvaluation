@@ -74,6 +74,9 @@ namespace DataAccess.Repositories
 
         public IEnumerable<Datum<T>> GetDataOlderThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount)
         {
+            if (maxSampleCount < 1)
+                return Enumerable.Empty<Datum<T>>();
+
             var concreteDatumType = GetConcreteDatumType<T>();
 
             var signalPropertyName = GetDatumPropertyName<T>(d => d.Signal);

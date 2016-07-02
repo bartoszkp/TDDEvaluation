@@ -28,7 +28,7 @@ namespace Domain.MissingValuePolicy
         public override Type NativeDataType { get { return typeof(T); } }
 
         [NHibernateIgnore]
-        public virtual int OlderDataSamplesCountNeeded { get { return 0; } }
+        public virtual int OlderDataSampleCountNeeded { get { return 0; } }
 
         public abstract IEnumerable<Datum<T>> FillMissingData(TimeEnumerator timeEnumerator,
                                                                       IEnumerable<Datum<T>> readData,

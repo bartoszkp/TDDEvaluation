@@ -1,7 +1,7 @@
-﻿using Domain;
+﻿using System;
+using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
-using System;
 
 namespace SignalsIntegrationTests
 {
@@ -107,8 +107,8 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void GivenDatumAtTheBeginingAndInTheMiddle_ReturnsFirstValueBeforeMiddleAndSecondValueAfter()
         {
-            GivenDatums(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
-                        new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = MiddleTimestamp });
+            GivenData(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
+                      new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = MiddleTimestamp });
 
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
@@ -121,8 +121,8 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void GivenDatumAtTheBeginingAndNoneTheMiddle_ReturnsFirstValueBeforeMiddleAndNoneForRestOfRange()
         {
-            GivenDatums(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
-                        new Datum<int>() { Quality = Quality.None, Timestamp = MiddleTimestamp });
+            GivenData(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
+                      new Datum<int>() { Quality = Quality.None, Timestamp = MiddleTimestamp });
 
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
