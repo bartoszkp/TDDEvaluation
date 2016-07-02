@@ -72,6 +72,22 @@ namespace DataAccess.Repositories
             return ReflectionUtils.GetMemberInfo(expression).Name;
         }
 
+        public IEnumerable<Datum<T>> GetDataOlderThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount)
+        {
+            var concreteDatumType = GetConcreteDatumType<T>();
+
+            var signalPropertyName = GetDatumPropertyName<T>(d => d.Signal);
+            var timestampPropertyName = GetDatumPropertyName<T>(d => d.Timestamp);
+
+            return Session
+                .CreateCriteria(concreteDatumType)
+                .Add(Restrictions.Eq(signalPropertyName, signal))
+                .Add(Restrictions.Lt(timestampPropertyName, excludedUtc))
+                .SetMaxResults(maxSampleCount)
+                .List()
+                .Cast<Datum<T>>();
+        }
+
         private List<Tuple<Type, Type>> genericConcreteDatumTypePairs = new List<Tuple<Type, Type>>();
     }
 }

@@ -68,6 +68,7 @@ namespace SignalsIntegrationTests
                 .StartingWithNoneQuality());
         }
 
+        [TestMethod]
         public void GivenSingleDatumAtTheEnd_ReturnsThatSingleValue()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = EndTimestamp.AddDays(-1) });
@@ -79,6 +80,7 @@ namespace SignalsIntegrationTests
                 .EndingWith(1410, Quality.Fair));
         }
 
+        [TestMethod]
         public void GivenSingleDatumAfterTheEnd_ReturnsNoneQualitytForRange()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = EndTimestamp });
@@ -89,9 +91,10 @@ namespace SignalsIntegrationTests
                 .WithNoneQualityForRange(BeginTimestamp, EndTimestamp, Granularity.Day));
         }
 
+        [TestMethod]
         public void GivenSingleDatumInTheMiddle_ReturnsNoneQualityBeforeMiddleAndGivenValueAfter()
         {
-            GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = MiddleTimestamp});
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = MiddleTimestamp });
 
             WhenReadingData(BeginTimestamp, EndTimestamp);
 
@@ -101,6 +104,7 @@ namespace SignalsIntegrationTests
                     .WithSpecificValueAndQualityForRange(1410, Quality.Fair, MiddleTimestamp, EndTimestamp, Granularity.Day)));
         }
 
+        [TestMethod]
         public void GivenDatumAtTheBeginingAndInTheMiddle_ReturnsFirstValueBeforeMiddleAndSecondValueAfter()
         {
             GivenDatums(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
@@ -114,6 +118,7 @@ namespace SignalsIntegrationTests
                     .WithSpecificValueAndQualityForRange(1410, Quality.Fair, MiddleTimestamp, EndTimestamp, Granularity.Day)));
         }
 
+        [TestMethod]
         public void GivenDatumAtTheBeginingAndNoneTheMiddle_ReturnsFirstValueBeforeMiddleAndNoneForRestOfRange()
         {
             GivenDatums(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
@@ -127,6 +132,15 @@ namespace SignalsIntegrationTests
                     .WithNoneQualityForRange(MiddleTimestamp, EndTimestamp, Granularity.Day)));
         }
 
-        // TODO value before range
+        [TestMethod]
+        public void GivenSingleDatumBeforeTheBegining_ReturnsItValueForTheWholeRange()
+        {
+            GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = BeginTimestamp.AddDays(-10) });
+
+            WhenReadingData(BeginTimestamp, EndTimestamp);
+
+            ThenResultEquals(DatumArray<int>
+                .WithSpecificValueAndQualityForRange(1410, Quality.Fair, BeginTimestamp, EndTimestamp, Granularity.Day));
+        }
     }
 }
