@@ -19,18 +19,6 @@ namespace SignalsIntegrationTests.Infrastructure
             }
         }
 
-        public static void AssertThrows(Action f)
-        {
-            try
-            {
-                f();
-                throw new AssertFailedException();
-            }
-            catch (FaultException)
-            {
-            }
-        }
-
         public static void AssertEqual<T>(IEnumerable<Domain.Datum<T>> expected, IEnumerable<Domain.Datum<T>> actual)
         {
             CollectionAssert.AreEqual(
