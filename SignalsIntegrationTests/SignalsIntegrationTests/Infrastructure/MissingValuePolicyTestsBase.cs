@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using Domain;
 using Domain.MissingValuePolicy;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 
 namespace SignalsIntegrationTests.Infrastructure
 {

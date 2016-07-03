@@ -1,5 +1,4 @@
-﻿using System.IO;
-using DataAccess;
+﻿using DataAccess;
 using NHibernate.Tool.hbm2ddl;
 
 namespace DatabaseMaintenance

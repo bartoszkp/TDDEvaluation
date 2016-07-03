@@ -8,9 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SignalsIntegrationTests.WS {
-    
-    
+namespace SignalsIntegrationTests.WS
+{
+
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WS.ISignalsWebService")]
     public interface ISignalsWebService {

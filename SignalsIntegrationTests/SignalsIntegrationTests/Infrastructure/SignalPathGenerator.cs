@@ -1,5 +1,5 @@
-using Domain;
 using System.Threading;
+using Domain;
 
 namespace SignalsIntegrationTests.Infrastructure
 {
