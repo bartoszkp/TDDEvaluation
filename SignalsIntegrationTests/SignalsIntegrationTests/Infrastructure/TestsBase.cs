@@ -57,7 +57,7 @@ namespace SignalsIntegrationTests.Infrastructure
         {
             var signal = new Signal()
             {
-                Path = Path.FromString("/new/string_signal"),
+                Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.String
             };
