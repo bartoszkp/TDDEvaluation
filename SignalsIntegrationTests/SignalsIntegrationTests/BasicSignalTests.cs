@@ -1,4 +1,5 @@
 using System;
+using System.ServiceModel;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -30,13 +31,16 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void RequestForSettingFirstOrderMissingValuePolicyForStringThrows()
         {
             var signalId = AddNewStringSignal().Id.Value;
 
-            Assertions.AssertThrows(() => client.SetMissingValuePolicy(
-                signalId,
-                (new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<string>()).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>()));
+            var firstOrderMissingValuePolicy
+                 = (new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<string>())
+                 .ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+
+            client.SetMissingValuePolicy(signalId, firstOrderMissingValuePolicy);
         }
 
         [TestMethod]
