@@ -30,6 +30,16 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        public void RequestForSettingFirstOrderMissingValuePolicyForStringThrows()
+        {
+            var signalId = AddNewStringSignal().Id.Value;
+
+            Assertions.AssertThrows(() => client.SetMissingValuePolicy(
+                signalId,
+                (new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<string>()).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>()));
+        }
+
+        [TestMethod]
         public void AddingSignalSetsItsId()
         {
             var signal = new Signal()

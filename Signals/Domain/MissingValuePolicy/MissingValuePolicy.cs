@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Domain.Infrastructure; // TODO ugly dependency, change iface to DateTime
 
@@ -20,18 +21,30 @@ namespace Domain.MissingValuePolicy
 
         [NHibernateIgnore]
         public abstract Type NativeDataType { get; }
-    }
-
-    public abstract class MissingValuePolicy<T> : MissingValuePolicyBase
-    {
-        [NHibernateIgnore]
-        public override Type NativeDataType { get { return typeof(T); } }
 
         [NHibernateIgnore]
         public virtual int OlderDataSampleCountNeeded { get { return 0; } }
 
         [NHibernateIgnore]
         public virtual int NewerDataSampleCountNeeded { get { return 0; } }
+
+        [NHibernateIgnore]
+        public virtual IEnumerable<Type> CompatibleNativeTypes
+        {
+            get
+            {
+                return Enum
+                    .GetValues(typeof(DataType))
+                    .Cast<DataType>()
+                    .Select(dt => dt.GetNativeType());
+            }
+        }
+    }
+
+    public abstract class MissingValuePolicy<T> : MissingValuePolicyBase
+    {
+        [NHibernateIgnore]
+        public override Type NativeDataType { get { return typeof(T); } }
 
         public abstract IEnumerable<Datum<T>> FillMissingData(
             TimeEnumerator timeEnumerator,

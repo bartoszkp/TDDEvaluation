@@ -52,5 +52,17 @@ namespace SignalsIntegrationTests.Infrastructure
 
             return client.Add(signal.ToDto<Dto.Signal>());
         }
+
+        protected Dto.Signal AddNewStringSignal()
+        {
+            var signal = new Signal()
+            {
+                Path = Path.FromString("/new/string_signal"),
+                Granularity = Granularity.Day,
+                DataType = DataType.String
+            };
+
+            return client.Add(signal.ToDto<Dto.Signal>());
+        }
     }
 }
