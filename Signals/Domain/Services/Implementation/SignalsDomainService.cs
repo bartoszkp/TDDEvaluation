@@ -85,7 +85,9 @@ namespace Domain.Services.Implementation
         {
             var readData = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            return this.FillMissingData(signal, new TimeEnumerator(fromIncludedUtc, toExcludedUtc, signal.Granularity), readData);
+            return this.FillMissingData(signal,
+                                        new TimeEnumerator(fromIncludedUtc, toExcludedUtc, signal.Granularity),
+                                        readData);
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
@@ -104,7 +106,13 @@ namespace Domain.Services.Implementation
             var missingValuePolicy = GetMissingValuePolicy(signal)
                 as MissingValuePolicy.MissingValuePolicy<T>;
 
-            return missingValuePolicy.FillMissingData(timeEnumerator, readData);
+            var olderData = this.signalsDataRepository.GetDataOlderThan<T>(signal,
+                                                                           timeEnumerator.FromIncludedUtc,
+                                                                           missingValuePolicy.OlderDataSampleCountNeeded);
+
+            return missingValuePolicy.FillMissingData(timeEnumerator,
+                                                      readData,
+                                                      olderData);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)

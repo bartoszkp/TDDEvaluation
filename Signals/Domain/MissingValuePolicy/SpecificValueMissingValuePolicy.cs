@@ -1,7 +1,6 @@
-﻿using Domain.Infrastructure;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Domain.Infrastructure;
 
 namespace Domain.MissingValuePolicy
 {
@@ -11,7 +10,9 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public override IEnumerable<Datum<T>> FillMissingData(TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData)
+        public override IEnumerable<Datum<T>> FillMissingData(TimeEnumerator timeEnumerator,
+                                                              IEnumerable<Datum<T>> readData,
+                                                              IEnumerable<Datum<T>> additionalOlderData)
         {
             var readDataDict = readData.ToDictionary(d => d.Timestamp, d => d);
 
