@@ -19,6 +19,6 @@ namespace Domain.Services
 
         MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal);
 
-        void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy);
+        void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy);
     }
 }
