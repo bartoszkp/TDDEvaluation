@@ -20,33 +20,46 @@ namespace SignalsIntegrationTests.Infrastructure
             return @this;
         }
 
-        public static Datum<T>[] WithSingleGoodQualityValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)
+        public static Datum<T>[] WithValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)
         {
-            @this.Single(datum => datum.Timestamp == timestamp).Quality = Quality.Good;
             @this.Single(datum => datum.Timestamp == timestamp).Value = value;
 
             return @this;
         }
 
+        public static Datum<T>[] WithGoodQualityValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)
+        {
+            @this.Single(datum => datum.Timestamp == timestamp).Quality = Quality.Good;
+
+            return @this.WithValueAt(value, timestamp);
+        }
+
+        public static Datum<T>[] WithSingleGoodQualityValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)
+        {
+            return @this.WithGoodQualityValueAt(value, timestamp);
+        }
+
         public static Datum<T>[] StartingWithGoodQualityValue<T>(this Datum<T>[] @this, T value)
         {
-            @this.First().Quality = Quality.Good;
-            @this.First().Value = value;
-
-            return @this;
+            return @this.StartingWith(value, Quality.Good);
         }
 
         public static Datum<T>[] StartingWithNoneQuality<T>(this Datum<T>[] @this)
         {
-            @this.First().Quality = Quality.None;
-            @this.First().Value = default(T);
-
-            return @this;
+            return @this.StartingWith(default(T), Quality.None);
         }
 
         public static Datum<T>[] EndingWithGoodQualityValue<T>(this Datum<T>[] @this, T value)
         {
             return @this.EndingWith(value, Quality.Good);
+        }
+
+        public static Datum<T>[] StartingWith<T>(this Datum<T>[] @this, T value, Quality quality)
+        {
+            @this.First().Quality = quality;
+            @this.First().Value = value;
+
+            return @this;
         }
 
         public static Datum<T>[] EndingWith<T>(this Datum<T>[] @this, T value, Quality quality)

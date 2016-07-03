@@ -36,4 +36,12 @@
     </xs:complexContent>
   </xs:complexType>
   <xs:element name="ZeroOrderMissingValuePolicy" nillable="true" type="tns:ZeroOrderMissingValuePolicy" />
+  <xs:complexType name="FirstOrderMissingValuePolicy">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:MissingValuePolicy">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="FirstOrderMissingValuePolicy" nillable="true" type="tns:FirstOrderMissingValuePolicy" />
 </xs:schema>

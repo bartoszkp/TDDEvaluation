@@ -109,10 +109,14 @@ namespace Domain.Services.Implementation
             var olderData = this.signalsDataRepository.GetDataOlderThan<T>(signal,
                                                                            timeEnumerator.FromIncludedUtc,
                                                                            missingValuePolicy.OlderDataSampleCountNeeded);
+            var newerData = this.signalsDataRepository.GetDataNewerThan<T>(signal,
+                                                                           timeEnumerator.ToExcludedUtcUtc,
+                                                                           missingValuePolicy.NewerDataSampleCountNeeded);
 
             return missingValuePolicy.FillMissingData(timeEnumerator,
                                                       readData,
-                                                      olderData);
+                                                      olderData,
+                                                      newerData);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
