@@ -9,9 +9,11 @@ namespace Domain.MissingValuePolicy
         [NHibernateIgnore]
         public override int OlderDataSampleCountNeeded { get { return 1; } }
 
-        public override IEnumerable<Datum<T>> FillMissingData(TimeEnumerator timeEnumerator,
-                                                              IEnumerable<Datum<T>> readData,
-                                                              IEnumerable<Datum<T>> additionalOlderData)
+        public override IEnumerable<Datum<T>> FillMissingData(
+           TimeEnumerator timeEnumerator,
+           IEnumerable<Datum<T>> readData,
+           IEnumerable<Datum<T>> additionalOlderData,
+           IEnumerable<Datum<T>> additionalNewerData)
         {
             var readEnumerator = readData.GetEnumerator();
             var datumBeforeRange = additionalOlderData.DefaultIfEmpty(new Datum<T> { Quality = Quality.None }).Single();
