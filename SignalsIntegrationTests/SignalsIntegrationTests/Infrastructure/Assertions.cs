@@ -24,7 +24,9 @@ namespace SignalsIntegrationTests.Infrastructure
             CollectionAssert.AreEqual(
                 expected.ToList(),
                 actual.ToList(),
-                Comparer<Domain.Datum<T>>.Create((x, y) => x.Value.Equals(y.Value) && x.Timestamp.Equals(y.Timestamp) ? 0 : 1));
+                Comparer<Domain.Datum<T>>.Create((x, y) => x.Value.Equals(y.Value) 
+                                                            && x.Quality == y.Quality
+                                                            && x.Timestamp.Equals(y.Timestamp) ? 0 : 1));
         }
     }
 }

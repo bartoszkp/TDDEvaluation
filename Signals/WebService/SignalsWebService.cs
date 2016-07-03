@@ -122,7 +122,7 @@ namespace WebService
         {
             var mvp = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
-            this.signalsDomainService.SetMissingValuePolicyConfig(
+            this.signalsDomainService.SetMissingValuePolicy(
                 this.signalsDomainService.Get(signalId),
                 mvp);
         }

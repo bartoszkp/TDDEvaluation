@@ -8,10 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SignalsIntegrationTests.WS
-{
-
-
+namespace SignalsIntegrationTests.WS {
+    
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WS.ISignalsWebService")]
     public interface ISignalsWebService {
@@ -56,6 +55,7 @@ namespace SignalsIntegrationTests.WS
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.ZeroOrderMissingValuePolicy))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.FirstOrderMissingValuePolicy))]
         Dto.MissingValuePolicy.MissingValuePolicy GetMissingValuePolicy(int signalId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicy", ReplyAction="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyResponse")]
@@ -65,6 +65,7 @@ namespace SignalsIntegrationTests.WS
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.ZeroOrderMissingValuePolicy))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Dto.MissingValuePolicy.FirstOrderMissingValuePolicy))]
         void SetMissingValuePolicy(int signalId, Dto.MissingValuePolicy.MissingValuePolicy policy);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicy", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyResponse")]
