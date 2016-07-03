@@ -1,6 +1,6 @@
-﻿using Domain.Infrastructure;
+﻿using System;
+using Domain.Infrastructure;
 using Mapster;
-using System;
 
 namespace Dto.Conversions
 {

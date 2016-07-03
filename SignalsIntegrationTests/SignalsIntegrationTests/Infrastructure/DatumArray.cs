@@ -1,6 +1,6 @@
-﻿using Domain;
-using System;
+﻿using System;
 using System.Linq;
+using Domain;
 
 namespace SignalsIntegrationTests.Infrastructure
 {

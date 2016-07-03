@@ -1,5 +1,5 @@
-﻿using Dto.Conversions;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
+using Dto.Conversions;
 
 namespace Dto.MissingValuePolicy
 {

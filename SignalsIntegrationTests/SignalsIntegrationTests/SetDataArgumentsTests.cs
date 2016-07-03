@@ -1,9 +1,9 @@
-﻿using Domain;
+﻿using System;
+using System.ServiceModel;
+using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
-using System;
-using System.ServiceModel;
 
 namespace SignalsIntegrationTests
 {

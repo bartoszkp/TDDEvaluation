@@ -1,7 +1,7 @@
-﻿using Dto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using Dto;
 
 namespace WebService
 {

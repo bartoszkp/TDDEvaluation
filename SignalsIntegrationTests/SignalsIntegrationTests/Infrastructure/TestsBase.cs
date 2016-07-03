@@ -1,7 +1,7 @@
-﻿using Domain;
+﻿using System;
+using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace SignalsIntegrationTests.Infrastructure
 {

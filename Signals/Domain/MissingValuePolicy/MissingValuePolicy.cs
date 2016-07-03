@@ -1,6 +1,6 @@
-﻿using Domain.Infrastructure; // TODO ugly dependency, change iface to DateTime
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Domain.Infrastructure; // TODO ugly dependency, change iface to DateTime
 
 namespace Domain.MissingValuePolicy
 {
