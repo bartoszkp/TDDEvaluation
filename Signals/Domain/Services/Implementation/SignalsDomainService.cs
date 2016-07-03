@@ -127,8 +127,13 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
+        public void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
         {
+            if (!missingValuePolicy.CompatibleNativeTypes.Contains(signal.DataType.GetNativeType()))
+            {
+                throw new IncompatibleSignalDataType();
+            }
+
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
     }
