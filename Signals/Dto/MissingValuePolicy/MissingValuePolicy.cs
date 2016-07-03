@@ -7,6 +7,7 @@ namespace Dto.MissingValuePolicy
     [KnownType(typeof(NoneQualityMissingValuePolicy))]
     [KnownType(typeof(SpecificValueMissingValuePolicy))]
     [KnownType(typeof(ZeroOrderMissingValuePolicy))]
+    [KnownType(typeof(FirstOrderMissingValuePolicy))]
     public abstract class MissingValuePolicy
     {
         [DataMember]

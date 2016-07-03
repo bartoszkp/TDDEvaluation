@@ -109,10 +109,14 @@ namespace Domain.Services.Implementation
             var olderData = this.signalsDataRepository.GetDataOlderThan<T>(signal,
                                                                            timeEnumerator.FromIncludedUtc,
                                                                            missingValuePolicy.OlderDataSampleCountNeeded);
+            var newerData = this.signalsDataRepository.GetDataNewerThan<T>(signal,
+                                                                           timeEnumerator.ToExcludedUtcUtc,
+                                                                           missingValuePolicy.NewerDataSampleCountNeeded);
 
             return missingValuePolicy.FillMissingData(timeEnumerator,
                                                       readData,
-                                                      olderData);
+                                                      olderData,
+                                                      newerData);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
@@ -123,8 +127,13 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void SetMissingValuePolicyConfig(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
+        public void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
         {
+            if (!missingValuePolicy.CompatibleNativeTypes.Contains(signal.DataType.GetNativeType()))
+            {
+                throw new IncompatibleSignalDataType();
+            }
+
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
     }

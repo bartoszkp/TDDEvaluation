@@ -91,6 +91,25 @@ namespace DataAccess.Repositories
                 .Cast<Datum<T>>();
         }
 
+        public IEnumerable<Datum<T>> GetDataNewerThan<T>(Signal signal, DateTime includedUtc, int maxSampleCount)
+        {
+            if (maxSampleCount < 1)
+                return Enumerable.Empty<Datum<T>>();
+
+            var concreteDatumType = GetConcreteDatumType<T>();
+
+            var signalPropertyName = GetDatumPropertyName<T>(d => d.Signal);
+            var timestampPropertyName = GetDatumPropertyName<T>(d => d.Timestamp);
+
+            return Session
+                .CreateCriteria(concreteDatumType)
+                .Add(Restrictions.Eq(signalPropertyName, signal))
+                .Add(Restrictions.Ge(timestampPropertyName, includedUtc))
+                .SetMaxResults(maxSampleCount)
+                .List()
+                .Cast<Datum<T>>();
+        }
+
         private List<Tuple<Type, Type>> genericConcreteDatumTypePairs = new List<Tuple<Type, Type>>();
     }
 }
