@@ -30,8 +30,9 @@ namespace Domain.MissingValuePolicy
         [NHibernateIgnore]
         public virtual int OlderDataSampleCountNeeded { get { return 0; } }
 
-        public abstract IEnumerable<Datum<T>> FillMissingData(TimeEnumerator timeEnumerator,
-                                                                      IEnumerable<Datum<T>> readData,
-                                                                      IEnumerable<Datum<T>> additionalOlderData);
+        public abstract IEnumerable<Datum<T>> FillMissingData(
+            TimeEnumerator timeEnumerator,
+            IEnumerable<Datum<T>> readData,
+            IEnumerable<Datum<T>> additionalOlderData);
     }
 }
