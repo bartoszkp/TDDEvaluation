@@ -397,8 +397,6 @@ namespace SignalsIntegrationTests
         {
             var signal = AddNewIntegerSignal(Granularity.Year);
 
-            signal = client.Add(signal);
-
             var data = new[]
             {
                 new Datum<int>()
