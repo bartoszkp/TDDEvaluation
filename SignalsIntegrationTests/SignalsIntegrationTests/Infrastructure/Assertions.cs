@@ -14,9 +14,28 @@ namespace SignalsIntegrationTests.Infrastructure
             {
                 Assert.IsNull(f());
             }
-            catch (FaultException)
+            catch (FaultException e)
             {
+                AssertNotDefaultException(e);
             }
+        }
+
+        public static void AssertThrows(Action f)
+        {
+            try
+            {
+                f();
+            }
+            catch (FaultException e)
+            {
+                AssertNotDefaultException(e);
+            }
+        }
+
+        private static void AssertNotDefaultException(FaultException e)
+        {
+            var ex = e as FaultException<ExceptionDetail>;
+            Assert.AreNotEqual(typeof(NotImplementedException).ToString(), ex?.Detail.Type);
         }
 
         public static void AssertEqual<T>(IEnumerable<Domain.Datum<T>> expected, IEnumerable<Domain.Datum<T>> actual)

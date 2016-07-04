@@ -27,7 +27,7 @@ namespace SignalsIntegrationTests.Infrastructure
                                           DateTime toExcludedUtc,
                                           Granularity granularity)
         {
-            return new Domain.Infrastructure.TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
+            return new TimeEnumerator(fromIncludedUtc, toExcludedUtc, granularity)
                 .Select(ts => new Datum<T>() { Timestamp = ts })
                 .ToArray();
         }
