@@ -49,12 +49,23 @@ namespace DataAccess.Repositories
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
             var concreteDatumType = GetConcreteDatumType<T>();
+            var oldData = data.Count() > 0
+                       ? GetData<T>(data.First().Signal, data.First().Timestamp, data.Last().Timestamp.AddSeconds(1)).ToDictionary(d => d.Timestamp)
+                       : new Dictionary<DateTime, Datum<T>>();
 
             foreach (var datum in data)
             {
-                var mappedDatum = TypeAdapter.Adapt(datum, datum.GetType(), concreteDatumType);
-
-                Session.SaveOrUpdate(mappedDatum);
+                Datum<T> oldDatum = null;
+                if (oldData.TryGetValue(datum.Timestamp, out oldDatum))
+                {
+                    oldDatum.Value = datum.Value;
+                    oldDatum.Quality = datum.Quality;
+                }
+                else
+                {
+                    var mappedDatum = TypeAdapter.Adapt(datum, datum.GetType(), concreteDatumType);
+                    Session.SaveOrUpdate(mappedDatum);
+                }
             }
         }
 

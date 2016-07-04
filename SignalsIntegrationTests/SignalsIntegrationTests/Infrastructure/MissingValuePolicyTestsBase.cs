@@ -59,46 +59,5 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected int signalId;
         protected IEnumerable<Datum<int>> whenReadingDataResult;
-
-        /* TODO bad timestamps in GetData
-        Second,
-        Minute,
-        Hour,
-        Day,
-        Week,
-        Month,
-        Year
-*/
-
-        /* TODO correct timestamps in GetData (?)
-                Second,
-                Minute, 
-                Hour,
-                Day,    
-                Week,
-                Month,
-                Year
-        */
-
-        /* TODO correct timestamps in SetData (?)
-                    Second,
-                    Minute,
-                    Hour,
-                    Day,
-                    Week,
-                    Month,
-                    Year
-        */
-
-        // TODO SetMissing.... validates Params (?)
-        // TODO GetData range validation
-
-        // TODO GetData with different MissingValuePolicy
-
-        // TODO removing?
-        // TODO editing?
-        // TODO changing path?
-
-        // TODO persistency tests - problem - sequential run of unit tests...
     }
 }
