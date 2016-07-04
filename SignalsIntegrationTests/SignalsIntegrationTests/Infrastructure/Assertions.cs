@@ -25,6 +25,7 @@ namespace SignalsIntegrationTests.Infrastructure
             try
             {
                 f();
+                Assert.Fail();
             }
             catch (FaultException e)
             {
