@@ -121,6 +121,21 @@ namespace DataAccess.Repositories
                 .Cast<Datum<T>>();
         }
 
+        public void DeleteData<T>(Signal signal)
+        {
+            var concreteDatumType = GetConcreteDatumType<T>();
+
+            var signalPropertyName = GetDatumPropertyName<T>(d => d.Signal);
+
+            foreach (var toDelete in Session
+                .CreateCriteria(concreteDatumType)
+                .Add(Restrictions.Eq(signalPropertyName, signal))
+                .List())
+            {
+                Session.Delete(toDelete);
+            }
+        }
+
         private List<Tuple<Type, Type>> genericConcreteDatumTypePairs = new List<Tuple<Type, Type>>();
     }
 }

@@ -38,6 +38,11 @@ namespace DataAccess.Repositories
                 Session.Delete(existing);
             }
 
+            if (missingValuePolicy == null)
+            {
+                return;
+            }
+
             var concretePolicyType = GetConcretePolicyType(missingValuePolicy);
 
             var concretePolicy = TypeAdapter.Adapt(missingValuePolicy, missingValuePolicy.GetType(), concretePolicyType)
