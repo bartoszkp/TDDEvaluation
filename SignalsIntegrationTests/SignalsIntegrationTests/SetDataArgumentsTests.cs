@@ -23,7 +23,6 @@ namespace SignalsIntegrationTests
         }
                 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataUsingIncompleteSignalsThrows()
         {
             var timestamp = new DateTime(2019, 4, 14);
@@ -37,11 +36,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(dummySignalId, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(dummySignalId, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForSecondGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Second);
@@ -54,11 +52,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMinuteGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Minute);
@@ -71,11 +68,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMinuteGranularityRequiresZerosSecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Minute);
@@ -88,11 +84,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForHourGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Hour);
@@ -105,11 +100,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForHourGranularityRequiresZerosSecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Hour);
@@ -122,11 +116,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForHourGranularityRequiresZerosMinutesInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Hour);
@@ -139,11 +132,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForDayGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Day);
@@ -156,11 +148,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForDayGranularityRequiresZerosSecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Day);
@@ -173,11 +164,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForDayGranularityRequiresZerosMinutesInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Day);
@@ -190,11 +180,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForDayGranularityRequiresZerosHoursInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Day);
@@ -207,11 +196,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Week);
@@ -224,11 +212,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+           Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosSecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Week);
@@ -241,11 +228,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosMinutesInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Week);
@@ -258,11 +244,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresZerosHoursInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Week);
@@ -275,11 +260,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForWeekGranularityRequiresMondayInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Week);
@@ -292,11 +276,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Month);
@@ -309,11 +292,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosSecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Month);
@@ -326,11 +308,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosMinutesInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Month);
@@ -343,11 +324,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresZerosHoursInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Month);
@@ -360,11 +340,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForMonthGranularityRequiresFirstDayOfMonthInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Month);
@@ -377,12 +356,11 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosMillisecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Year);
@@ -395,11 +373,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosSecondsInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Year);
@@ -412,11 +389,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosMinutesInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Year);
@@ -431,11 +407,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresZerosHoursInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Year);
@@ -448,11 +423,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresFirstDayOfMonthInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Year);
@@ -465,11 +439,10 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FaultException), AllowDerivedTypes = true)]
         public void SetDataForYearGranularityRequiresFirstMonthInTimestamps()
         {
             var signal = AddNewIntegerSignal(Granularity.Year);
@@ -482,7 +455,7 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
     }
 }
