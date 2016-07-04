@@ -456,4 +456,34 @@ namespace SignalsIntegrationTests
             Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
         }
     }
+
+    /* TODO bad timestamps in GetData
+             Second,
+             Minute,
+             Hour,
+             Day,
+             Week,
+             Month,
+             Year
+     */
+
+    /* TODO correct timestamps in GetData (?)
+            Second,
+            Minute, 
+            Hour,
+            Day,    
+            Week,
+            Month,
+            Year
+    */
+
+    /* TODO correct timestamps in SetData (?)
+                Second,
+                Minute,
+                Hour,
+                Day,
+                Week,
+                Month,
+                Year
+    */
 }
