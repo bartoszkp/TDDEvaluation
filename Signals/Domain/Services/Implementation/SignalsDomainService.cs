@@ -123,6 +123,11 @@ namespace Domain.Services.Implementation
         {
             var concretePolicy = this.missingValuePolicyRepository.Get(signal);
 
+            if (concretePolicy == null)
+            {
+                return null;
+            }
+
             return TypeAdapter.Adapt(concretePolicy, concretePolicy.GetType(), concretePolicy.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
