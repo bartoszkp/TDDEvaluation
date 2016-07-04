@@ -114,7 +114,7 @@ namespace WebService
         {
             var signal = this.signalsDomainService.Get(signalId);
 
-            return this.signalsDomainService.GetMissingValuePolicy(signal)
+            return this.signalsDomainService.GetMissingValuePolicy(signal)?
                 .ToDto<MissingValuePolicy>();
         }
 
