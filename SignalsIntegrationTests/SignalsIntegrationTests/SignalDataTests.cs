@@ -149,6 +149,35 @@ namespace SignalsIntegrationTests
             }
         }
 
+        [TestMethod]
+        public void SetDataOverridesExistingData()
+        {
+            var timestamp = new DateTime(2019, 1, 1);
+            var signal = AddNewIntegerSignal(Granularity.Day);
+
+            var originalData = new[] { new Datum<int>() { Timestamp = timestamp.AddDays(0), Value = 1, Quality = Quality.Fair },
+                                       new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 2, Quality = Quality.Fair },
+                                       new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 3, Quality = Quality.Fair },
+                                       new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
+                                     };
+
+            var newData      = new[] { new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
+                                       new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 9, Quality = Quality.Good},
+                                     };
+
+            var expectedData = new[] { new Datum<int>() { Timestamp = timestamp.AddDays(0), Value = 1, Quality = Quality.Fair },
+                                       new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
+                                       new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 9, Quality = Quality.Good},
+                                       new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
+                                     };
+
+            client.SetData(signal.Id.Value, originalData.ToDto<Dto.Datum[]>());
+            client.SetData(signal.Id.Value, newData.ToDto<Dto.Datum[]>());
+
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(4)).ToDomain<Domain.Datum<int>[]>();
+            Assertions.AssertEqual(expectedData, retrievedData);
+        }
+
         // TODO GetData range validation
     }
 }
