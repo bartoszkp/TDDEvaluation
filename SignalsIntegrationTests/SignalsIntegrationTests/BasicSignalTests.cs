@@ -172,7 +172,24 @@ namespace SignalsIntegrationTests
             Assert.AreEqual(Quality.Fair, specificMissingValuePolicy.Quality);
         }
 
-        // TODO removing?
+        [TestMethod]
+        public void WhenDeletingNonExistentSignal_Throws()
+        {
+            Assertions.AssertThrows(() => client.Delete(0));
+        }
+
+        [TestMethod]
+        public void WhenDeletingExistingSignalWithData_SignalDisappears()
+        {
+            var signal = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
+
+            client.SetData(signal, new[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 0 } });
+
+            client.Delete(signal);
+
+            Assertions.AssertThrows(() => client.GetById(signal));
+        }
+
         // TODO editing?
         // TODO changing path?
 

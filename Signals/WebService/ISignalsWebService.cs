@@ -18,6 +18,9 @@ namespace WebService
         Signal Add(Signal signal);
 
         [OperationContract]
+        void Delete(int signalId);
+
+        [OperationContract]
         PathEntry GetPathEntry(Path path);
 
         [OperationContract]

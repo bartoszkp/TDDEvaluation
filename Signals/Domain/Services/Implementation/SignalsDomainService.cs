@@ -67,6 +67,28 @@ namespace Domain.Services.Implementation
             return result;
         }
 
+        public void Delete(int signalId)
+        {
+            var signal = this.signalsRepository.Get(signalId);
+
+            if (signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            this.missingValuePolicyRepository.Set(signal, null);
+
+            var deleteDataMethod = ReflectionUtils.GetMethodInfo<ISignalsDataRepository>(sdr => sdr.DeleteData<object>(null));
+
+            var concreteDataMethod = deleteDataMethod
+                .GetGenericMethodDefinition()
+                .MakeGenericMethod(signal.DataType.GetNativeType());
+
+            concreteDataMethod.Invoke(this.signalsDataRepository, new object[] { signal });
+
+            this.signalsRepository.Delete(signal);
+        }
+
         public PathEntry GetPathEntry(Path path)
         {
             var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
