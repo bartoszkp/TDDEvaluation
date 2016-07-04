@@ -12,5 +12,7 @@ namespace Domain.Repositories
         IEnumerable<Datum<T>> GetDataNewerThan<T>(Signal signal, DateTime includedUtc, int maxSampleCount);
 
         void SetData<T>(IEnumerable<Datum<T>> data);
+
+        void DeleteData<T>(Signal signal);
     }
 }

@@ -301,42 +301,24 @@ namespace SignalsIntegrationTests
             Assert.AreEqual(Quality.Fair, specificMissingValuePolicy.Quality);
         }
 
-        /* TODO bad timestamps in GetData
-                Second,
-                Minute,
-                Hour,
-                Day,
-                Week,
-                Month,
-                Year
-        */
+        [TestMethod]
+        public void WhenDeletingNonExistentSignal_Throws()
+        {
+            Assertions.AssertThrows(() => client.Delete(0));
+        }
 
-        /* TODO correct timestamps in GetData (?)
-                Second,
-                Minute, 
-                Hour,
-                Day,    
-                Week,
-                Month,
-                Year
-        */
+        [TestMethod]
+        public void WhenDeletingExistingSignalWithData_SignalDisappears()
+        {
+            var signal = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
 
-        /* TODO correct timestamps in SetData (?)
-                    Second,
-                    Minute,
-                    Hour,
-                    Day,
-                    Week,
-                    Month,
-                    Year
-        */
+            client.SetData(signal, new[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 0 } });
 
-        // TODO SetMissing.... validates Params (?)
-        // TODO GetData range validation
+            client.Delete(signal);
 
-        // TODO GetData with different MissingValuePolicy
+            Assertions.AssertThrows(() => client.GetById(signal));
+        }
 
-        // TODO removing?
         // TODO editing?
         // TODO changing path?
 

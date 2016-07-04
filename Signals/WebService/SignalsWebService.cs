@@ -28,6 +28,11 @@ namespace WebService
             throw new NotImplementedException();
         }
 
+        public void Delete(int signalId)
+        {
+            this.signalsDomainService.Delete(signalId);
+        }
+
         public PathEntry GetPathEntry(Path pathDto)
         {
             throw new NotImplementedException();
