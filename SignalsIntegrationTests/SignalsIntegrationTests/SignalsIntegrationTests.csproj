@@ -82,6 +82,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="SignalDataTests.cs" />
     <Compile Include="Infrastructure\DatumArray.cs" />
     <Compile Include="Infrastructure\DatumExtensions.cs" />
     <Compile Include="Infrastructure\TimeEnumerator.cs" />
