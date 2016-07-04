@@ -14,8 +14,10 @@ namespace SignalsIntegrationTests.Infrastructure
             {
                 Assert.IsNull(f());
             }
-            catch (FaultException)
+            catch (FaultException e)
             {
+                var ex = e as FaultException<System.ServiceModel.ExceptionDetail>;
+                Assert.AreNotEqual(typeof(NotImplementedException).ToString(), ex?.Detail.Type);
             }
         }
 

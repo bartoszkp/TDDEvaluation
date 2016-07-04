@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Domain;
 
-namespace Domain.Infrastructure
+namespace SignalsIntegrationTests.Infrastructure
 {
     public class TimeEnumerator : IEnumerator<DateTime>, IEnumerable<DateTime>
     {
