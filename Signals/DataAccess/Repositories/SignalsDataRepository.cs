@@ -49,7 +49,7 @@ namespace DataAccess.Repositories
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
             var concreteDatumType = GetConcreteDatumType<T>();
-            var existingData = data.Count() > 0
+            var existingData = data.Any()
                        ? GetData<T>(data.First().Signal, data.First().Timestamp, data.Last().Timestamp.AddSeconds(1)).ToDictionary(d => d.Timestamp)
                        : new Dictionary<DateTime, Datum<T>>();
 
