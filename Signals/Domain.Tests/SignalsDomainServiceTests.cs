@@ -33,10 +33,8 @@ namespace Domain.Tests
         private void GivenNoSignals()
         {
             signalsRepository = MockRepository.GenerateStub<ISignalsRepository>();
-            signalsDataRepository = MockRepository.GenerateStub<ISignalsDataRepository>();
-            missingValuePolicyRepository = MockRepository.GenerateStub<IMissingValuePolicyRepository>();
 
-            signalsDomainService = new Domain.Services.Implementation.SignalsDomainService(signalsRepository, signalsDataRepository, missingValuePolicyRepository);
+            signalsDomainService = new Domain.Services.Implementation.SignalsDomainService(signalsRepository);
         }
 
         private void GivenASignal(Signal s)
@@ -52,7 +50,5 @@ namespace Domain.Tests
         }
 
         private ISignalsRepository signalsRepository;
-        private ISignalsDataRepository signalsDataRepository;
-        private IMissingValuePolicyRepository missingValuePolicyRepository;
     }
 }
