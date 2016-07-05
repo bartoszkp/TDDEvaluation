@@ -83,11 +83,14 @@
     <Compile Include="Repositories\IMissingValuePolicyRepository.cs" />
     <Compile Include="Repositories\ISignalsDataRepository.cs" />
     <Compile Include="Repositories\ISignalsRepository.cs" />
+    <Compile Include="Services\Implementation\SignalsDomainService.cs" />
+    <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

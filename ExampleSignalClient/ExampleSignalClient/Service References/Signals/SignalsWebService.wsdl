@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SignalsWebService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Dto" />
+      <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://localhost:8080/signals?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ISignalsWebService_Get_InputMessage">
+    <wsdl:part name="parameters" element="tns:Get" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_Get_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetById" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_Add_InputMessage">
+    <wsdl:part name="parameters" element="tns:Add" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_Add_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetPathEntry_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetPathEntry" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetPathEntry_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetPathEntryResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetData_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetData" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_SetData_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetData" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_SetData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetMissingValuePolicy_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetMissingValuePolicy" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetMissingValuePolicy_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetMissingValuePolicyResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_SetMissingValuePolicy_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetMissingValuePolicy" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_SetMissingValuePolicy_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetMissingValuePolicyResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ISignalsWebService">
+    <wsdl:operation name="Get">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Get" message="tns:ISignalsWebService_Get_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetResponse" message="tns:ISignalsWebService_Get_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetById">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetById" message="tns:ISignalsWebService_GetById_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetByIdResponse" message="tns:ISignalsWebService_GetById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Add">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Add" message="tns:ISignalsWebService_Add_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/AddResponse" message="tns:ISignalsWebService_Add_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPathEntry">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetPathEntry" message="tns:ISignalsWebService_GetPathEntry_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetPathEntryResponse" message="tns:ISignalsWebService_GetPathEntry_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetData">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetData" message="tns:ISignalsWebService_GetData_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetDataResponse" message="tns:ISignalsWebService_GetData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetData">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/SetData" message="tns:ISignalsWebService_SetData_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/SetDataResponse" message="tns:ISignalsWebService_SetData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMissingValuePolicy">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicy" message="tns:ISignalsWebService_GetMissingValuePolicy_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetMissingValuePolicyResponse" message="tns:ISignalsWebService_GetMissingValuePolicy_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetMissingValuePolicy">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicy" message="tns:ISignalsWebService_SetMissingValuePolicy_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyResponse" message="tns:ISignalsWebService_SetMissingValuePolicy_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_ISignalsWebService" type="tns:ISignalsWebService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Get">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/Get" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetById">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/GetById" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Add">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/Add" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPathEntry">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/GetPathEntry" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetData">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/GetData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetData">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/SetData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMissingValuePolicy">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/GetMissingValuePolicy" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetMissingValuePolicy">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicy" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SignalsWebService">
+    <wsdl:port name="BasicHttpBinding_ISignalsWebService" binding="tns:BasicHttpBinding_ISignalsWebService">
+      <soap:address location="http://localhost:8080/signals" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
