@@ -29,12 +29,12 @@ namespace WebService
         {
             var path = pathDto.ToDomain<Domain.Path>();
 
-            return this.signalsDomainService.Get(path).ToDto<Signal>();
+            return this.signalsDomainService.Get(path)?.ToDto<Signal>();
         }
 
         public Signal GetById(int signalId)
         {
-            return this.signalsDomainService.Get(signalId).ToDto<Signal>();
+            return this.signalsDomainService.Get(signalId)?.ToDto<Signal>();
         }
 
         public Signal Add(Signal signalDto)
@@ -68,6 +68,8 @@ namespace WebService
                 .Invoke(this.signalsDomainService, new object[] { signal, fromIncludedUtc, toExcludedUtc })
                 as IEnumerable;
 
+            if (result == null)
+                return null;
             return result
                 .Cast<object>()
                 .Select(d => d.ToDto<Datum>())

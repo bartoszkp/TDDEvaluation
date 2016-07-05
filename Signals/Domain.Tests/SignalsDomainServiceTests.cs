@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Domain.Repositories;
+﻿using Domain.Repositories;
 using Domain.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
@@ -12,12 +11,13 @@ namespace Domain.Tests
         private ISignalsDomainService signalsDomainService;
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
         public void GivenNoSignals_WhenGettingSignal_ThrowsKeyNotFoundException()
         {
             GivenNoSignals();
 
-            WhenGettingSignalByPath(Path.FromString(string.Empty));
+            var result = WhenGettingSignalByPath(Path.FromString(string.Empty));
+
+            Assert.IsNull(result);
         }
 
         [TestMethod]
