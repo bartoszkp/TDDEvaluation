@@ -22,11 +22,11 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void RequestForNonExistingSignalThrowsOrReturnsNull()
+        public void RequestForNonExistingSignalReturnsNull()
         {
             var path = Path.FromString("/non/existent/path");
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Get(path.ToDto<Dto.Path>()));
+            Assert.IsNull(client.Get(path.ToDto<Dto.Path>()));
         }
 
         [TestMethod]
@@ -106,7 +106,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void TryingToAddSignalWithExistingPathThrowsOrReturnsNull()
+        public void TryingToAddSignalWithExistingPathThrows()
         {
             var signal = new Signal()
             {
@@ -117,11 +117,11 @@ namespace SignalsIntegrationTests
 
             client.Add(signal.ToDto<Dto.Signal>());
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
         [TestMethod]
-        public void TryingToAddSignalWithNotNullIdThrowsOrReturnsNull()
+        public void TryingToAddSignalWithNotNullIdThrows()
         {
             var signal = new Signal()
             {
@@ -131,7 +131,7 @@ namespace SignalsIntegrationTests
                 Id = 42
             };
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
         [TestMethod]
@@ -185,7 +185,7 @@ namespace SignalsIntegrationTests
 
             client.Delete(signalId);
 
-            Assertions.AssertThrows(() => client.GetById(signalId));
+            Assert.IsNull(client.GetById(signalId));
         }
 
         [TestMethod]
