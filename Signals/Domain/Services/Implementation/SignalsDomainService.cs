@@ -14,14 +14,7 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path path)
         {
-            var result = this.signalsRepository.Get(path);
-
-            if (result == null)
-            {
-                throw new KeyNotFoundException();
-            }
-
-            return result;
+            return this.signalsRepository.Get(path);
         }
     }
 }

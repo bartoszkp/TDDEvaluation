@@ -8,18 +8,6 @@ namespace SignalsIntegrationTests.Infrastructure
 {
     public static class Assertions
     {
-        public static void AssertReturnsNullOrThrows<T>(Func<T> f) where T : class
-        {
-            try
-            {
-                Assert.IsNull(f());
-            }
-            catch (FaultException e)
-            {
-                AssertNotDefaultException(e);
-            }
-        }
-
         public static void AssertThrows(Action f)
         {
             try

@@ -22,11 +22,11 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void RequestForNonExistingSignalThrowsOrReturnsNull()
+        public void RequestForNonExistingSignalReturnsNull()
         {
             var path = Path.FromString("/non/existent/path");
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Get(path.ToDto<Dto.Path>()));
+            Assert.IsNull(client.Get(path.ToDto<Dto.Path>()));
         }
 
         [TestMethod]
@@ -106,7 +106,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void TryingToAddSignalWithExistingPathThrowsOrReturnsNull()
+        public void TryingToAddSignalWithExistingPathThrows()
         {
             var signal = new Signal()
             {
@@ -117,11 +117,11 @@ namespace SignalsIntegrationTests
 
             client.Add(signal.ToDto<Dto.Signal>());
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
         [TestMethod]
-        public void TryingToAddSignalWithNotNullIdThrowsOrReturnsNull()
+        public void TryingToAddSignalWithNotNullIdThrows()
         {
             var signal = new Signal()
             {
@@ -131,7 +131,7 @@ namespace SignalsIntegrationTests
                 Id = 42
             };
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
         [TestMethod]
@@ -172,7 +172,36 @@ namespace SignalsIntegrationTests
             Assert.AreEqual(Quality.Fair, specificMissingValuePolicy.Quality);
         }
 
-        // TODO removing?
+        [TestMethod]
+        public void WhenDeletingNonExistentSignal_Throws()
+        {
+            Assertions.AssertThrows(() => client.Delete(0));
+        }
+
+        [TestMethod]
+        public void WhenDeletingExistingSignal_SignalDisappears()
+        {
+            var signalId = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
+
+            client.Delete(signalId);
+
+            Assert.IsNull(client.GetById(signalId));
+        }
+
+        [TestMethod]
+        public void WhenDeletingExistingSignalWithData_BothSignalAndDataDisappear()
+        {
+            var signalId = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
+
+            var ts = new DateTime(2000, 1, 1);
+
+            client.SetData(signalId, new[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = ts, Value = 0 } });
+
+            client.Delete(signalId);
+
+            Assertions.AssertThrows(() => client.GetData(signalId, ts, ts.AddYears(1)));
+        }
+
         // TODO editing?
         // TODO changing path?
 
