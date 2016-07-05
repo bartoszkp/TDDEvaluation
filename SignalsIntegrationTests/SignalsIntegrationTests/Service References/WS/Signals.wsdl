@@ -27,6 +27,12 @@
   <wsdl:message name="ISignalsWebService_Add_OutputMessage">
     <wsdl:part name="parameters" element="tns:AddResponse" />
   </wsdl:message>
+  <wsdl:message name="ISignalsWebService_Delete_InputMessage">
+    <wsdl:part name="parameters" element="tns:Delete" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_Delete_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteResponse" />
+  </wsdl:message>
   <wsdl:message name="ISignalsWebService_GetPathEntry_InputMessage">
     <wsdl:part name="parameters" element="tns:GetPathEntry" />
   </wsdl:message>
@@ -69,6 +75,10 @@
     <wsdl:operation name="Add">
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Add" message="tns:ISignalsWebService_Add_InputMessage" />
       <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/AddResponse" message="tns:ISignalsWebService_Add_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Delete">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Delete" message="tns:ISignalsWebService_Delete_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/DeleteResponse" message="tns:ISignalsWebService_Delete_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetPathEntry">
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetPathEntry" message="tns:ISignalsWebService_GetPathEntry_InputMessage" />
@@ -113,6 +123,15 @@
     </wsdl:operation>
     <wsdl:operation name="Add">
       <soap:operation soapAction="http://tempuri.org/ISignalsWebService/Add" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Delete">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/Delete" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
