@@ -46,6 +46,11 @@ namespace WebService
             return result;
         }
 
+        public void Delete(int signalId)
+        {
+            this.signalsDomainService.Delete(signalId);
+        }
+
         public PathEntry GetPathEntry(Path pathDto)
         {
             var path = pathDto.ToDomain<Domain.Path>();

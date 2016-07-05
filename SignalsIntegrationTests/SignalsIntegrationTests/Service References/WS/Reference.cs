@@ -33,6 +33,12 @@ namespace SignalsIntegrationTests.WS {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Add", ReplyAction="http://tempuri.org/ISignalsWebService/AddResponse")]
         System.Threading.Tasks.Task<Dto.Signal> AddAsync(Dto.Signal signal);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Delete", ReplyAction="http://tempuri.org/ISignalsWebService/DeleteResponse")]
+        void Delete(int signalId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Delete", ReplyAction="http://tempuri.org/ISignalsWebService/DeleteResponse")]
+        System.Threading.Tasks.Task DeleteAsync(int signalId);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetPathEntry", ReplyAction="http://tempuri.org/ISignalsWebService/GetPathEntryResponse")]
         Dto.PathEntry GetPathEntry(Dto.Path path);
         
@@ -121,6 +127,14 @@ namespace SignalsIntegrationTests.WS {
         
         public System.Threading.Tasks.Task<Dto.Signal> AddAsync(Dto.Signal signal) {
             return base.Channel.AddAsync(signal);
+        }
+        
+        public void Delete(int signalId) {
+            base.Channel.Delete(signalId);
+        }
+        
+        public System.Threading.Tasks.Task DeleteAsync(int signalId) {
+            return base.Channel.DeleteAsync(signalId);
         }
         
         public Dto.PathEntry GetPathEntry(Dto.Path path) {

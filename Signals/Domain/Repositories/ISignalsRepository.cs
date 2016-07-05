@@ -10,6 +10,8 @@ namespace Domain.Repositories
 
         Signal Add(Signal signal);
 
+        void Delete(Signal signal);
+
         IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);
 
         void Remove(Path path);

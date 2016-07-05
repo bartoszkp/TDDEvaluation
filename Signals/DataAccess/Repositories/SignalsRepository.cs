@@ -19,6 +19,11 @@ namespace DataAccess.Repositories
             return signal;
         }
 
+        public void Delete(Signal signal)
+        {
+            Session.Delete(signal);
+        }
+
         public Signal Get(Path path)
         {
             return Session
