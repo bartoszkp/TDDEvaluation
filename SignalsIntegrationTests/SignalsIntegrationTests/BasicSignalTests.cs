@@ -308,15 +308,27 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void WhenDeletingExistingSignalWithData_SignalDisappears()
+        public void WhenDeletingExistingSignal_SignalDisappears()
         {
-            var signal = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
+            var signalId = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
 
-            client.SetData(signal, new[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 0 } });
+            client.Delete(signalId);
 
-            client.Delete(signal);
+            Assertions.AssertThrows(() => client.GetById(signalId));
+        }
 
-            Assertions.AssertThrows(() => client.GetById(signal));
+        [TestMethod]
+        public void WhenDeletingExistingSignalWithData_BothSignalAndDataDisappear()
+        {
+            var signalId = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
+
+            var ts = new DateTime(2000, 1, 1);
+
+            client.SetData(signalId, new[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = ts, Value = 0 } });
+
+            client.Delete(signalId);
+
+            Assertions.AssertThrows(() => client.GetData(signalId, ts, ts.AddYears(1)));
         }
 
         // TODO editing?
