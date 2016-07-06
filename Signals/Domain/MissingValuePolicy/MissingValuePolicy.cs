@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Domain.Infrastructure; // TODO ugly dependency, change iface to DateTime
+using Domain.Infrastructure;
 
 namespace Domain.MissingValuePolicy
 {
