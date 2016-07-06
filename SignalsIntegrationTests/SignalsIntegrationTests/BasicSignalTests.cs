@@ -145,6 +145,21 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        public void WhenGettingMissingValuePolicyForNonExistentSignal_Throws()
+        {
+            Assertions.AssertThrows(() => client.GetMissingValuePolicy(0));
+        }
+
+        [TestMethod]
+        public void WhenSettingsMissingValuePolicyForNonExistentSignal_Throws()
+        {
+            var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>()
+                .ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+
+            Assertions.AssertThrows(() => client.SetMissingValuePolicy(0, mvp));
+        }
+
+        [TestMethod]
         public void MissingValuePolicyCanBeSetForSignal()
         {
             var signal1Id = AddNewIntegerSignal().Id.Value;
