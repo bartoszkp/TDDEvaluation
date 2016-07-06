@@ -29,12 +29,12 @@ namespace WebService
         {
             var path = pathDto.ToDomain<Domain.Path>();
 
-            return this.signalsDomainService.Get(path).ToDto<Signal>();
+            return this.signalsDomainService.Get(path)?.ToDto<Signal>();
         }
 
         public Signal GetById(int signalId)
         {
-            return this.signalsDomainService.Get(signalId).ToDto<Signal>();
+            return this.signalsDomainService.Get(signalId)?.ToDto<Signal>();
         }
 
         public Signal Add(Signal signalDto)
@@ -67,6 +67,9 @@ namespace WebService
             var result = getData
                 .Invoke(this.signalsDomainService, new object[] { signal, fromIncludedUtc, toExcludedUtc })
                 as IEnumerable;
+
+            if (result == null)
+                return null;
 
             return result
                 .Cast<object>()
@@ -119,6 +122,11 @@ namespace WebService
         {
             var signal = this.signalsDomainService.Get(signalId);
 
+            if (signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             return this.signalsDomainService.GetMissingValuePolicy(signal)?
                 .ToDto<MissingValuePolicy>();
         }
@@ -127,8 +135,15 @@ namespace WebService
         {
             var mvp = missingValuePolicy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
+            var signal = this.signalsDomainService.Get(signalId);
+
+            if (signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             this.signalsDomainService.SetMissingValuePolicy(
-                this.signalsDomainService.Get(signalId),
+                signal,
                 mvp);
         }
     }
