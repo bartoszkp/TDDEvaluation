@@ -70,6 +70,7 @@ namespace WebService
 
             if (result == null)
                 return null;
+
             return result
                 .Cast<object>()
                 .Select(d => d.ToDto<Datum>())
@@ -121,6 +122,11 @@ namespace WebService
         {
             var signal = this.signalsDomainService.Get(signalId);
 
+            if (signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             return this.signalsDomainService.GetMissingValuePolicy(signal)?
                 .ToDto<MissingValuePolicy>();
         }
@@ -129,8 +135,15 @@ namespace WebService
         {
             var mvp = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
+            var signal = this.signalsDomainService.Get(signalId);
+
+            if (signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             this.signalsDomainService.SetMissingValuePolicy(
-                this.signalsDomainService.Get(signalId),
+                signal,
                 mvp);
         }
     }
