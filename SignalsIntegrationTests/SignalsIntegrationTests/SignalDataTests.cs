@@ -177,7 +177,5 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(4)).ToDomain<Domain.Datum<int>[]>();
             Assertions.AssertEqual(expectedData, retrievedData);
         }
-
-        // TODO GetData range validation
     }
 }
