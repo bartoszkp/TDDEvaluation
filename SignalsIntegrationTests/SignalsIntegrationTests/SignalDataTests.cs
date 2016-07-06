@@ -124,7 +124,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void GetDataUsingIncompleteSignalsThrows()
+        public void GetDataUsingNonExistentSignalsThrows()
         {
             int dummySignalId = 0;
 
