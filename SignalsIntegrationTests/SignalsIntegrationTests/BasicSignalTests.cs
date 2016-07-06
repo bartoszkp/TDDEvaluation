@@ -22,11 +22,11 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void RequestForNonExistingSignalThrowsOrReturnsNull()
+        public void RequestForNonExistingSignalReturnsNull()
         {
             var path = Path.FromString("/non/existent/path");
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Get(path.ToDto<Dto.Path>()));
+            Assert.IsNull(client.Get(path.ToDto<Dto.Path>()));
         }
 
         [TestMethod]
@@ -106,7 +106,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void TryingToAddSignalWithExistingPathThrowsOrReturnsNull()
+        public void TryingToAddSignalWithExistingPathThrows()
         {
             var signal = new Signal()
             {
@@ -117,11 +117,11 @@ namespace SignalsIntegrationTests
 
             client.Add(signal.ToDto<Dto.Signal>());
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
         [TestMethod]
-        public void TryingToAddSignalWithNotNullIdThrowsOrReturnsNull()
+        public void TryingToAddSignalWithNotNullIdThrows()
         {
             var signal = new Signal()
             {
@@ -131,7 +131,7 @@ namespace SignalsIntegrationTests
                 Id = 42
             };
 
-            Assertions.AssertReturnsNullOrThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
         }
 
         [TestMethod]
@@ -142,6 +142,21 @@ namespace SignalsIntegrationTests
             var result = client.GetMissingValuePolicy(signal.Id.Value);
 
             Assert.IsInstanceOfType(result, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
+        }
+
+        [TestMethod]
+        public void WhenGettingMissingValuePolicyForNonExistentSignal_Throws()
+        {
+            Assertions.AssertThrows(() => client.GetMissingValuePolicy(0));
+        }
+
+        [TestMethod]
+        public void WhenSettingsMissingValuePolicyForNonExistentSignal_Throws()
+        {
+            var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>()
+                .ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+
+            Assertions.AssertThrows(() => client.SetMissingValuePolicy(0, mvp));
         }
 
         [TestMethod]
@@ -185,7 +200,7 @@ namespace SignalsIntegrationTests
 
             client.Delete(signalId);
 
-            Assertions.AssertThrows(() => client.GetById(signalId));
+            Assert.IsNull(client.GetById(signalId));
         }
 
         [TestMethod]
