@@ -26,7 +26,7 @@ namespace SignalsIntegrationTests.Infrastructure
         /// netsh http add urlacl url=http://+:8080/signals user=[DOMAIN]\[USER]
         /// 
         /// where [DOMAIN] and [USER] should be replaced with values appropriate for the credentials
-        /// you want to use when working with this solution.
+        /// you want to use when working with this solution (%USERDOMAIN% and %USERNAME% works fine).
         /// </summary>
         public void StartService()
         {
