@@ -65,14 +65,20 @@ namespace Domain.MissingValuePolicy
             if (resultQuality == Quality.None)
                 return Datum<T>.CreateNone(Signal, currentTs);
 
-            var timeSpan = (newer.Timestamp - older.Timestamp).TotalSeconds;
-            var valueSpan = (dynamic)newer.Value - (dynamic)older.Value;
-            var step = valueSpan / timeSpan;
-            var currentValue = Convert.ChangeType(
-                (currentTs - older.Timestamp).TotalSeconds * step + older.Value,
+            var totalSpanTimeEnumerator = new TimeEnumerator(older.Timestamp, newer.Timestamp, Signal.Granularity);
+            var fromOlderToCurrentSpanTimeEnumerator = new TimeEnumerator(older.Timestamp, currentTs, Signal.Granularity);
+
+            var totalStepCount = (decimal)totalSpanTimeEnumerator.Count();
+            var fromOlderToCurrentStepCount = (decimal)fromOlderToCurrentSpanTimeEnumerator.Count();
+
+            var valueSpan = Convert.ChangeType((dynamic)newer.Value - (dynamic)older.Value, typeof(decimal));
+            var step = valueSpan / totalStepCount;
+
+            var increase = Convert.ChangeType(
+                fromOlderToCurrentStepCount * step,
                 typeof(T));
 
-            return new Datum<T> { Value = currentValue, Timestamp = currentTs, Quality = resultQuality, Signal = Signal };
+            return new Datum<T> { Value = older.Value + increase, Timestamp = currentTs, Quality = resultQuality, Signal = Signal };
         }
     }
 }

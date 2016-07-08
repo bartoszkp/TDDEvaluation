@@ -548,6 +548,12 @@ namespace ExampleSignalClient.Signals {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Add", ReplyAction="http://tempuri.org/ISignalsWebService/AddResponse")]
         System.Threading.Tasks.Task<ExampleSignalClient.Signals.Signal> AddAsync(ExampleSignalClient.Signals.Signal signal);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Delete", ReplyAction="http://tempuri.org/ISignalsWebService/DeleteResponse")]
+        void Delete(int signalId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/Delete", ReplyAction="http://tempuri.org/ISignalsWebService/DeleteResponse")]
+        System.Threading.Tasks.Task DeleteAsync(int signalId);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetPathEntry", ReplyAction="http://tempuri.org/ISignalsWebService/GetPathEntryResponse")]
         ExampleSignalClient.Signals.PathEntry GetPathEntry(ExampleSignalClient.Signals.Path path);
         
@@ -628,6 +634,14 @@ namespace ExampleSignalClient.Signals {
         
         public System.Threading.Tasks.Task<ExampleSignalClient.Signals.Signal> AddAsync(ExampleSignalClient.Signals.Signal signal) {
             return base.Channel.AddAsync(signal);
+        }
+        
+        public void Delete(int signalId) {
+            base.Channel.Delete(signalId);
+        }
+        
+        public System.Threading.Tasks.Task DeleteAsync(int signalId) {
+            return base.Channel.DeleteAsync(signalId);
         }
         
         public ExampleSignalClient.Signals.PathEntry GetPathEntry(ExampleSignalClient.Signals.Path path) {
