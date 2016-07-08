@@ -217,9 +217,6 @@ namespace SignalsIntegrationTests
             Assertions.AssertThrows(() => client.GetData(signalId, ts, ts.AddYears(1)));
         }
 
-        // TODO editing?
-        // TODO changing path?
-
         // TODO persistency tests - problem - sequential run of unit tests...
     }
 }

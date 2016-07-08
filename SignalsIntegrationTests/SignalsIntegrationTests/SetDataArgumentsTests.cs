@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ServiceModel;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -433,7 +432,7 @@ namespace SignalsIntegrationTests
             {
                 new Datum<int>()
                 {
-                    Timestamp = new DateTime(2016, 10, 2),
+                    Timestamp = new DateTime(2016, 1, 2),
                 }
             };
 
