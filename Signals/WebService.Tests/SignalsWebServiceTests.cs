@@ -32,7 +32,7 @@ namespace WebService.Tests
 
         private void GivenNoSignals()
         {
-            var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+            var signalsDomainService = new SignalsDomainService(signalsRepositoryStub.Object, signalsDataRepositoryStub.Object, missingValuePolicyRepositoryStub.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
         }
 
@@ -40,7 +40,7 @@ namespace WebService.Tests
         {
             GivenNoSignals();
 
-            signalsRepositoryMock.Setup(r => r.Get(signal.Path)).Returns(signal);
+            signalsRepositoryStub.Setup(r => r.Get(signal.Path)).Returns(signal);
         }
 
         private Signal WhenGettingSignalByPath(Path path)
@@ -49,8 +49,8 @@ namespace WebService.Tests
         }
 
         private ISignalsWebService signalsWebService;
-        private Mock<ISignalsRepository> signalsRepositoryMock = new Mock<ISignalsRepository>();
-        private Mock<ISignalsDataRepository> signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-        private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+        private Mock<ISignalsRepository> signalsRepositoryStub = new Mock<ISignalsRepository>();
+        private Mock<ISignalsDataRepository> signalsDataRepositoryStub = new Mock<ISignalsDataRepository>();
+        private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryStub = new Mock<IMissingValuePolicyRepository>();
     }
 }
