@@ -91,6 +91,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            signal.Granularity.ValidateTimestamp(fromIncludedUtc);
             var readData = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             return this.FillMissingData(signal,
