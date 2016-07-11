@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -45,6 +46,16 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        public void GetDataForSecondGranularityReturnsEmptyForReversedTimestamps()
+        {
+            GivenASignalWith(Granularity.Second);
+
+            WhenGettigData(FromTimestamp, FromTimestamp.AddSeconds(-1));
+
+            ResultEmpty();
+        }
+
+        [TestMethod]
         public void GetDataForMinuteGranularityRequiresZerosMillisecondsInFromTimestamp()
         {
             GivenASignalWith(Granularity.Minute);
@@ -62,6 +73,16 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
             ResultThrows();
+        }
+
+        [TestMethod]
+        public void GetDataForMinuteGranularityReturnsEmptyForReversedTimestamps()
+        {
+            GivenASignalWith(Granularity.Minute);
+
+            WhenGettigData(FromTimestamp, FromTimestamp.AddMinutes(-1));
+
+            ResultEmpty();
         }
 
         [TestMethod]
@@ -92,6 +113,16 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddMinutes(1), ToTimestamp);
 
             ResultThrows();
+        }
+
+        [TestMethod]
+        public void GetDataForHourGranularityReturnsEmptyForReversedTimestamps()
+        {
+            GivenASignalWith(Granularity.Hour);
+
+            WhenGettigData(FromTimestamp, FromTimestamp.AddHours(-1));
+
+            ResultEmpty();
         }
 
         [TestMethod]
@@ -132,6 +163,16 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddHours(1), ToTimestamp);
 
             ResultThrows();
+        }
+
+        [TestMethod]
+        public void GetDataForDayGranularityReturnsEmptyForReversedTimestamps()
+        {
+            GivenASignalWith(Granularity.Day);
+
+            WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-1));
+
+            ResultEmpty();
         }
 
         [TestMethod]
@@ -185,6 +226,16 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        public void GetDataForWeekGranularityReturnsEmptyForReversedTimestamps()
+        {
+            GivenASignalWith(Granularity.Week);
+
+            WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-7));
+
+            ResultEmpty();
+        }
+
+        [TestMethod]
         public void GetDataForMonthGranularityRequiresZerosMillisecondsInFromTimestamps()
         {
             GivenASignalWith(Granularity.Month);
@@ -233,7 +284,17 @@ namespace SignalsIntegrationTests
 
             ResultThrows();
         }
-        
+
+        [TestMethod]
+        public void GetDataForMonthGranularityReturnsEmptyForReversedTimestamps()
+        {
+            GivenASignalWith(Granularity.Month);
+
+            WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-31));
+
+            ResultEmpty();
+        }
+
         [TestMethod]
         public void GetDataForYearGranularityRequiresZerosMillisecondsInFromTimestamps()
         {
@@ -294,8 +355,15 @@ namespace SignalsIntegrationTests
             ResultThrows();
         }
 
-        private int signalId;
-        private Action getDataAction;
+        [TestMethod]
+        public void GetDataForYearGranularityReturnsEmptyForReversedTimestamps()
+        {
+            GivenASignalWith(Granularity.Year);
+
+            WhenGettigData(FromTimestamp, FromTimestamp.AddYears(-1));
+
+            ResultEmpty();
+        }
 
         private void GivenASignalWith(Granularity granularity)
         {
@@ -309,12 +377,22 @@ namespace SignalsIntegrationTests
 
         private void WhenGettigData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            getDataAction = () => client.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+            getData = () => client.GetData(signalId, fromIncludedUtc, toExcludedUtc);
         }
 
         private void ResultThrows()
         {
-            Assertions.AssertThrows(getDataAction);
+            Assertions.AssertThrows(() => getData());
         }
+
+        private void ResultEmpty()
+        {
+            var result = getData();
+
+            Assert.IsFalse(result.Any());
+        }
+
+        private int signalId;
+        private Func<Dto.Datum[]> getData;
     }
 }
