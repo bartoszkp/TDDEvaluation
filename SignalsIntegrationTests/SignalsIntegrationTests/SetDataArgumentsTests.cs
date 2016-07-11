@@ -9,6 +9,8 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SetDataArgumentsTests : TestsBase
     {
+        private DateTime Timestamp { get; } = new DateTime(2029, 1, 1, 0, 0, 0, 0);
+
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -24,435 +26,305 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void SetDataUsingIncompleteSignalsThrows()
         {
-            var timestamp = new DateTime(2019, 4, 14);
-            int dummySignalId = 0;
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = timestamp,
-                    Value = 4
-                }
-            };
+            GivenNoSignal();
 
-            Assertions.AssertThrows(() => client.SetData(dummySignalId, data.ToDto<Dto.Datum[]>()));
+            WhenSettigDataFor(Timestamp);
+
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForSecondGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Second);
+            GivenASignalWith(Granularity.Second);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 44, 123),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForMinuteGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Minute);
+            GivenASignalWith(Granularity.Minute);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 123),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForMinuteGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Minute);
+            GivenASignalWith(Granularity.Minute);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForHourGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Hour);
+            GivenASignalWith(Granularity.Hour);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForHourGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Hour);
+            GivenASignalWith(Granularity.Hour);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForHourGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Hour);
+            GivenASignalWith(Granularity.Hour);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForDayGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Day);
+            GivenASignalWith(Granularity.Day);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForDayGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Day);
+            GivenASignalWith(Granularity.Day);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForDayGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Day);
+            GivenASignalWith(Granularity.Day);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForDayGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Day);
+            GivenASignalWith(Granularity.Day);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddHours(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForWeekGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Week);
+            GivenASignalWith(Granularity.Week);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-           Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForWeekGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Week);
+            GivenASignalWith(Granularity.Week);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForWeekGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Week);
+            GivenASignalWith(Granularity.Week);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForWeekGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Week);
+            GivenASignalWith(Granularity.Week);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddHours(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForWeekGranularityRequiresMondayInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Week);
+            GivenASignalWith(Granularity.Week);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddDays(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForMonthGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Month);
+            GivenASignalWith(Granularity.Month);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForMonthGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Month);
+            GivenASignalWith(Granularity.Month);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForMonthGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Month);
+            GivenASignalWith(Granularity.Month);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForMonthGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Month);
+            GivenASignalWith(Granularity.Month);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddHours(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForMonthGranularityRequiresFirstDayOfMonthInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Month);
+            GivenASignalWith(Granularity.Month);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddDays(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
 
         [TestMethod]
         public void SetDataForYearGranularityRequiresZerosMillisecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Year);
+            GivenASignalWith(Granularity.Year);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 10),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForYearGranularityRequiresZerosSecondsInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Year);
+            GivenASignalWith(Granularity.Year);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 10, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForYearGranularityRequiresZerosMinutesInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Year);
+            GivenASignalWith(Granularity.Year);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 13, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForYearGranularityRequiresZerosHoursInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Year);
+            GivenASignalWith(Granularity.Year);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 10, 2, 12, 0, 0, 0),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddHours(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForYearGranularityRequiresFirstDayOfMonthInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Year);
+            GivenASignalWith(Granularity.Year);
 
-            var data = new[]
-            {
-                new Datum<int>()
-                {
-                    Timestamp = new DateTime(2016, 1, 2),
-                }
-            };
+            WhenSettigDataFor(Timestamp.AddDays(1));
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            ResultThrows();
         }
 
         [TestMethod]
         public void SetDataForYearGranularityRequiresFirstMonthInTimestamps()
         {
-            var signal = AddNewIntegerSignal(Granularity.Year);
+            GivenASignalWith(Granularity.Year);
 
+            WhenSettigDataFor(Timestamp.AddMonths(1));
+
+            ResultThrows();
+        }
+
+        private int signalId;
+        private Action setDataAction;
+
+        private void GivenASignalWith(Granularity granularity)
+        {
+            signalId = AddNewIntegerSignal(granularity).Id.Value;
+        }
+
+        private void GivenNoSignal()
+        {
+            signalId = 0;
+        }
+
+        private void WhenSettigDataFor(DateTime dataTimestampUtc)
+        {
             var data = new[]
             {
                 new Datum<int>()
                 {
-                    Timestamp = new DateTime(2016, 2, 1),
+                    Timestamp = dataTimestampUtc,
+                    Value = 42,
+                    Quality = Quality.Good
                 }
             };
 
-            Assertions.AssertThrows(() => client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>()));
+            setDataAction = () => client.SetData(signalId, data.ToDto<Dto.Datum[]>());
+        }
+
+        private void ResultThrows()
+        {
+            Assertions.AssertThrows(setDataAction);
         }
     }
 
