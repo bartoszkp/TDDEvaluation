@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +23,217 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void CanWriteAndRetrieveData()
+        public void CanWriteAndRetrieveSecondData()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 14);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Second,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddSeconds(1))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveSecondDataIgnoringOrder()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 14);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Second,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp.AddSeconds(1),
+                    Value = 5,
+                    Quality = Quality.Fair
+                },
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddSeconds(2))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveMinuteData()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 14);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Minute,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMinutes(1))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveMinuteDataIgnoringOrder()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 14);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Minute,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp.AddMinutes(1),
+                    Value = 5,
+                    Quality = Quality.Fair
+                },
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMinutes(2))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveHourData()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 14);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Hour,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddHours(1))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveHourDataIgnoringOrder()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 14);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Hour,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp.AddHours(1),
+                    Value = 5,
+                    Quality = Quality.Fair
+                },
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddHours(2))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveDayData()
         {
             var path = SignalPathGenerator.Generate();
             var timestamp = new DateTime(2019, 4, 14);
@@ -47,12 +258,118 @@ namespace SignalsIntegrationTests
             };
 
             client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
-            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1))
+                .ToDomain<Domain.Datum<int>[]>();
 
-            Assert.AreEqual(data.Length, retrievedData.Length);
-            Assert.AreEqual(data[0].Value, retrievedData[0].Value);
-            Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
-            Assert.AreEqual(data[0].Quality, retrievedData[0].ToDomain<Domain.Datum<int>>().Quality);
+            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveDayDataIgnoringOrder()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 14);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp.AddDays(1),
+                    Value = 5,
+                    Quality = Quality.Fair
+                },
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(2))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveWeekData()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 1, 7);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Week,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(7))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveWeekDataIgnoringOrder()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 1, 7);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Week,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp.AddDays(7),
+                    Value = 5,
+                    Quality = Quality.Fair
+                },
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(14))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
         }
 
         [TestMethod]
@@ -81,12 +398,48 @@ namespace SignalsIntegrationTests
             };
 
             client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
-            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMonths(1))
+                .ToDomain<Domain.Datum<int>[]>();
 
-            Assert.AreEqual(data.Length, retrievedData.Length);
-            Assert.AreEqual(data[0].Value, retrievedData[0].Value);
-            Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
-            Assert.AreEqual(data[0].Quality, retrievedData[0].ToDomain<Domain.Datum<int>>().Quality);
+            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveMonthlyDataIgnoringOrder()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 4, 1);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Month,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp.AddMonths(1),
+                    Value = 5,
+                    Quality = Quality.Fair
+                },
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMonths(2))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
         }
 
         [TestMethod]
@@ -115,12 +468,48 @@ namespace SignalsIntegrationTests
             };
 
             client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
-            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1))
+                .ToDomain<Domain.Datum<int>[]>();
 
-            Assert.AreEqual(data.Length, retrievedData.Length);
-            Assert.AreEqual(data[0].Value, retrievedData[0].Value);
-            Assert.AreEqual(data[0].Timestamp, retrievedData[0].Timestamp);
-            Assert.AreEqual(data[0].Quality, retrievedData[0].ToDomain<Domain.Datum<int>>().Quality);
+            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+        }
+
+        [TestMethod]
+        public void CanWriteAndRetrieveYearlyDataIgnoringOrder()
+        {
+            var path = SignalPathGenerator.Generate();
+            var timestamp = new DateTime(2019, 1, 1);
+
+            var newSignal1 = new Signal()
+            {
+                Path = path,
+                Granularity = Granularity.Year,
+                DataType = DataType.Integer
+            };
+
+            var signal = client.Add(newSignal1.ToDto<Dto.Signal>());
+
+            var data = new[]
+            {
+                new Datum<int>()
+                {
+                    Timestamp = timestamp.AddYears(1),
+                    Value = 5,
+                    Quality = Quality.Fair
+                },
+                new Datum<int>()
+                {
+                    Timestamp = timestamp,
+                    Value = 4,
+                    Quality = Quality.Fair
+                }
+            };
+
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddYears(2))
+                .ToDomain<Domain.Datum<int>[]>();
+
+            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
         }
 
         [TestMethod]
