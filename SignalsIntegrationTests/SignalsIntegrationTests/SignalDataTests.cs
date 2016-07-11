@@ -51,7 +51,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddSeconds(1))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data, retrievedData);
         }
 
         [TestMethod]
@@ -89,7 +89,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddSeconds(2))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data.OrderBy(d => d.Timestamp), retrievedData);
         }
 
         [TestMethod]
@@ -121,7 +121,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMinutes(1))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data, retrievedData);
         }
 
         [TestMethod]
@@ -159,7 +159,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMinutes(2))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data.OrderBy(d => d.Timestamp), retrievedData);
         }
 
         [TestMethod]
@@ -191,7 +191,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddHours(1))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data, retrievedData);
         }
 
         [TestMethod]
@@ -229,7 +229,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddHours(2))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data.OrderBy(d => d.Timestamp), retrievedData);
         }
 
         [TestMethod]
@@ -261,7 +261,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data, retrievedData);
         }
 
         [TestMethod]
@@ -299,7 +299,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(2))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data.OrderBy(d => d.Timestamp), retrievedData);
         }
 
         [TestMethod]
@@ -331,7 +331,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(7))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data, retrievedData);
         }
 
         [TestMethod]
@@ -369,7 +369,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(14))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data.OrderBy(d => d.Timestamp), retrievedData);
         }
 
         [TestMethod]
@@ -401,7 +401,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMonths(1))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data, retrievedData);
         }
 
         [TestMethod]
@@ -439,7 +439,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddMonths(2))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data.OrderBy(d => d.Timestamp), retrievedData);
         }
 
         [TestMethod]
@@ -471,7 +471,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data, retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data, retrievedData);
         }
 
         [TestMethod]
@@ -509,7 +509,7 @@ namespace SignalsIntegrationTests
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddYears(2))
                 .ToDomain<Domain.Datum<int>[]>();
 
-            CollectionAssert.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, new DatumComparer<int>());
+            Assertions.AreEqual(data.OrderBy(d => d.Timestamp), retrievedData);
         }
 
         [TestMethod]
@@ -564,7 +564,7 @@ namespace SignalsIntegrationTests
             client.SetData(signal.Id.Value, newData.ToDto<Dto.Datum[]>());
 
             var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(4)).ToDomain<Domain.Datum<int>[]>();
-            Assertions.AssertEqual(expectedData, retrievedData);
+            Assertions.AreEqual(expectedData, retrievedData);
         }
     }
 }

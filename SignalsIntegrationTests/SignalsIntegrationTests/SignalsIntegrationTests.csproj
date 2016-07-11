@@ -83,7 +83,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="GetDataArgumentsTests.cs" />
-    <Compile Include="Infrastructure\DatumComparer.cs" />
     <Compile Include="SignalDataTests.cs" />
     <Compile Include="Infrastructure\DatumArray.cs" />
     <Compile Include="Infrastructure\DatumExtensions.cs" />

@@ -27,7 +27,7 @@ namespace SignalsIntegrationTests.Infrastructure
             Assert.AreNotEqual(typeof(NotImplementedException).ToString(), ex?.Detail.Type);
         }
 
-        public static void AssertEqual<T>(IEnumerable<Domain.Datum<T>> expected, IEnumerable<Domain.Datum<T>> actual)
+        public static void AreEqual<T>(IEnumerable<Domain.Datum<T>> expected, IEnumerable<Domain.Datum<T>> actual)
         {
             CollectionAssert.AreEqual(
                 expected.ToList(),
