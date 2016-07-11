@@ -52,7 +52,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddSeconds(-1));
 
-            ResultEmpty();
+            ResultIsEmpty();
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddMinutes(-1));
 
-            ResultEmpty();
+            ResultIsEmpty();
         }
 
         [TestMethod]
@@ -122,7 +122,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddHours(-1));
 
-            ResultEmpty();
+            ResultIsEmpty();
         }
 
         [TestMethod]
@@ -172,7 +172,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-1));
 
-            ResultEmpty();
+            ResultIsEmpty();
         }
 
         [TestMethod]
@@ -232,7 +232,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-7));
 
-            ResultEmpty();
+            ResultIsEmpty();
         }
 
         [TestMethod]
@@ -292,7 +292,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-31));
 
-            ResultEmpty();
+            ResultIsEmpty();
         }
 
         [TestMethod]
@@ -362,7 +362,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddYears(-1));
 
-            ResultEmpty();
+            ResultIsEmpty();
         }
 
         private void GivenASignalWith(Granularity granularity)
@@ -385,7 +385,7 @@ namespace SignalsIntegrationTests
             Assertions.AssertThrows(() => getData());
         }
 
-        private void ResultEmpty()
+        private void ResultIsEmpty()
         {
             var result = getData();
 
