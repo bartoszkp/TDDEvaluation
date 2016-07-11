@@ -54,7 +54,7 @@ namespace SignalsIntegrationTests.Infrastructure
 
         public void ThenResultEquals(IEnumerable<Datum<int>> expected)
         {
-            Assertions.AssertEqual(expected, whenReadingDataResult);
+            Assertions.AreEqual(expected, whenReadingDataResult);
         }
 
         protected int signalId;
