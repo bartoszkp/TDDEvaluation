@@ -55,10 +55,11 @@ namespace Domain.Infrastructure
             if (this.current == null)
             {
                 this.current = FromIncludedUtc;
-                return true;
             }
-
-            this.current = granularityTimeSteps[this.Granularity](this.current.Value);
+            else
+            {
+                this.current = granularityTimeSteps[this.Granularity](this.current.Value);
+            }
 
             return this.current.Value < this.ToExcludedUtcUtc;
         }
