@@ -327,24 +327,4 @@ namespace SignalsIntegrationTests
             Assertions.AssertThrows(setDataAction);
         }
     }
-
-    /* TODO correct timestamps in GetData (?)
-            Second,
-            Minute, 
-            Hour,
-            Day,    
-            Week,
-            Month,
-            Year
-    */
-
-    /* TODO correct timestamps in SetData (?)
-                Second,
-                Minute,
-                Hour,
-                Day,
-                Week,
-                Month,
-                Year
-    */
 }
