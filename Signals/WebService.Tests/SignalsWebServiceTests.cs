@@ -10,6 +10,12 @@ namespace WebService.Tests
     [TestClass]
     public class SignalsWebServiceTests
     {
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            SetupWebService();
+        }
+
         [TestMethod]
         public void GivenNoSignals_WhenGettingSignal_ThrowsKeyNotFoundException()
         {
@@ -32,20 +38,22 @@ namespace WebService.Tests
 
         private void GivenNoSignals()
         {
-            var signalsDomainService = new SignalsDomainService(signalsRepositoryStub.Object, signalsDataRepositoryStub.Object, missingValuePolicyRepositoryStub.Object);
-            signalsWebService = new SignalsWebService(signalsDomainService);
         }
 
         private void GivenASignal(Signal signal)
         {
-            GivenNoSignals();
-
             signalsRepositoryStub.Setup(r => r.Get(signal.Path)).Returns(signal);
         }
 
         private Signal WhenGettingSignalByPath(Path path)
         {
             return signalsWebService.Get(path.ToDto<Dto.Path>())?.ToDomain<Signal>();
+        }
+
+        private void SetupWebService()
+        {
+            var signalsDomainService = new SignalsDomainService(signalsRepositoryStub.Object, signalsDataRepositoryStub.Object, missingValuePolicyRepositoryStub.Object);
+            signalsWebService = new SignalsWebService(signalsDomainService);
         }
 
         private ISignalsWebService signalsWebService;
