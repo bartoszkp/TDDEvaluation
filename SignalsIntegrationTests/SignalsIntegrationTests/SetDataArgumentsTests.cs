@@ -456,16 +456,6 @@ namespace SignalsIntegrationTests
         }
     }
 
-    /* TODO bad timestamps in GetData
-             Second,
-             Minute,
-             Hour,
-             Day,
-             Week,
-             Month,
-             Year
-     */
-
     /* TODO correct timestamps in GetData (?)
             Second,
             Minute, 
