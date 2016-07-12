@@ -32,7 +32,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddSeconds(-1));
 
-            ResultIsEmpty();
+            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddMinutes(-1));
 
-            ResultIsEmpty();
+            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -102,7 +102,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -112,7 +112,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMinutes(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -122,7 +122,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddHours(-1));
 
-            ResultIsEmpty();
+            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -142,7 +142,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -152,7 +152,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMinutes(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -162,7 +162,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddHours(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -172,7 +172,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-1));
 
-            ResultIsEmpty();
+            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -182,7 +182,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -192,7 +192,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -202,7 +202,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMinutes(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -212,7 +212,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddHours(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -222,7 +222,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddDays(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -232,7 +232,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-7));
 
-            ResultIsEmpty();
+            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -242,7 +242,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -252,7 +252,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -262,7 +262,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMinutes(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -272,7 +272,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddHours(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -282,7 +282,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddDays(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -292,7 +292,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-31));
 
-            ResultIsEmpty();
+            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -302,7 +302,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -312,7 +312,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -322,7 +322,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMinutes(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -332,7 +332,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddHours(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -342,7 +342,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddDays(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -352,7 +352,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp.AddMonths(1), ToTimestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -362,7 +362,7 @@ namespace SignalsIntegrationTests
 
             WhenGettigData(FromTimestamp, FromTimestamp.AddYears(-1));
 
-            ResultIsEmpty();
+            ThenResultIsEmpty();
         }
 
         private void GivenASignalWith(Granularity granularity)
@@ -380,12 +380,12 @@ namespace SignalsIntegrationTests
             getData = () => client.GetData(signalId, fromIncludedUtc, toExcludedUtc);
         }
 
-        private void ResultThrows()
+        private void ThenRequestThrows()
         {
             Assertions.AssertThrows(() => getData());
         }
 
-        private void ResultIsEmpty()
+        private void ThenResultIsEmpty()
         {
             var result = getData();
 

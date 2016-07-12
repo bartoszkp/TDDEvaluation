@@ -30,7 +30,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp);
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -40,7 +40,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -50,7 +50,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -60,7 +60,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -80,7 +80,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -90,7 +90,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -100,7 +100,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -110,7 +110,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddHours(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -150,7 +150,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -160,7 +160,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -170,7 +170,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddHours(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -180,7 +180,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddDays(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -190,7 +190,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -200,7 +200,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -210,7 +210,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -220,7 +220,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddHours(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -230,7 +230,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddDays(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
 
@@ -241,7 +241,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMilliseconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -251,7 +251,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddSeconds(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -261,7 +261,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMinutes(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -271,7 +271,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddHours(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -281,7 +281,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddDays(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         [TestMethod]
@@ -291,7 +291,7 @@ namespace SignalsIntegrationTests
 
             WhenSettigDataFor(Timestamp.AddMonths(1));
 
-            ResultThrows();
+            ThenRequestThrows();
         }
 
         private int signalId;
@@ -322,7 +322,7 @@ namespace SignalsIntegrationTests
             setDataAction = () => client.SetData(signalId, data.ToDto<Dto.Datum[]>());
         }
 
-        private void ResultThrows()
+        private void ThenRequestThrows()
         {
             Assertions.AssertThrows(setDataAction);
         }
