@@ -15,6 +15,9 @@ namespace WebService
         Signal Add(Signal signal);
 
         [OperationContract]
+        PathEntry GetPathEntry(Path path);
+
+        [OperationContract]
         IEnumerable<Datum> GetData(Signal signal, DateTime fromIncluded, DateTime toExcluded);
 
         [OperationContract]

@@ -20,6 +20,12 @@
   <wsdl:message name="ISignalsWebService_Add_OutputMessage">
     <wsdl:part name="parameters" element="tns:AddResponse" />
   </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetPathEntry_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetPathEntry" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetPathEntry_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetPathEntryResponse" />
+  </wsdl:message>
   <wsdl:message name="ISignalsWebService_GetData_InputMessage">
     <wsdl:part name="parameters" element="tns:GetData" />
   </wsdl:message>
@@ -53,6 +59,10 @@
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Add" message="tns:ISignalsWebService_Add_InputMessage" />
       <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/AddResponse" message="tns:ISignalsWebService_Add_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetPathEntry">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetPathEntry" message="tns:ISignalsWebService_GetPathEntry_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetPathEntryResponse" message="tns:ISignalsWebService_GetPathEntry_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetData">
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetData" message="tns:ISignalsWebService_GetData_InputMessage" />
       <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetDataResponse" message="tns:ISignalsWebService_GetData_OutputMessage" />
@@ -83,6 +93,15 @@
     </wsdl:operation>
     <wsdl:operation name="Add">
       <soap:operation soapAction="http://tempuri.org/ISignalsWebService/Add" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPathEntry">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/GetPathEntry" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
