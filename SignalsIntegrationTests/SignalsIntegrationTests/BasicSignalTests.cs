@@ -113,8 +113,8 @@ namespace SignalsIntegrationTests
                 }
             };
 
-            client.SetData(signal, data.ToDto<Dto.Datum[]>());
-            var retrievedData = client.GetData(signal, timestamp, timestamp.AddDays(1));
+            client.SetData(signal.Id.Value, data.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(1));
 
             Assert.AreEqual(data.Length, retrievedData.Length);
             Assert.AreEqual(data[0].Value, retrievedData[0].Value);
@@ -125,14 +125,9 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void GetDataUsingIncompleteSignalsThrowsOrReturnsNull()
         {
-            var newSignal = new Signal()
-            {
-                Path = SignalPathGenerator.Generate(),
-                Granularity = Granularity.Day,
-                DataType = DataType.Integer
-            };
+            int dummySignalId = 0;
 
-            Assertions.AssertReturnsNullOrThrows(() => client.GetData(newSignal.ToDto<Dto.Signal>(), new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
+            Assertions.AssertReturnsNullOrThrows(() => client.GetData(dummySignalId, new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
         }
 
         [TestMethod]
@@ -171,7 +166,7 @@ namespace SignalsIntegrationTests
 
             const int numberOfDays = 5;
             var timestamp = new DateTime(2019, 1, 1);
-            var receivedData = client.GetData(signal, timestamp, timestamp.AddDays(numberOfDays));
+            var receivedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(numberOfDays));
 
             Assert.AreEqual(numberOfDays, receivedData.Length);
             foreach (var datum in receivedData)
@@ -187,7 +182,7 @@ namespace SignalsIntegrationTests
         {
             var signal = AddNewIntegerSignal();
 
-            var result = client.GetMissingValuePolicy(signal);
+            var result = client.GetMissingValuePolicy(signal.Id.Value);
 
             Assert.IsInstanceOfType(result, typeof(Dto.NoneQualityMissingValuePolicy));
         }
@@ -195,12 +190,12 @@ namespace SignalsIntegrationTests
         [TestMethod]
         public void MissingValuePolicyCanBeSetForSignal()
         {
-            var signal = AddNewIntegerSignal();
+            var signalId = AddNewIntegerSignal().Id.Value;
 
             var policy = new NoneQualityMissingValuePolicy(); // TODO another class
 
-            client.SetMissingValuePolicy(signal, policy.ToDto<Dto.MissingValuePolicy>());
-            var result = client.GetMissingValuePolicy(signal);
+            client.SetMissingValuePolicy(signalId, policy.ToDto<Dto.MissingValuePolicy>());
+            var result = client.GetMissingValuePolicy(signalId);
 
             // TODO Assert.IsIns
         }

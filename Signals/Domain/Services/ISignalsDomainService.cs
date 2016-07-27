@@ -7,6 +7,8 @@ namespace Domain.Services
     {
         Signal Get(Path path);
 
+        Signal Get(int signalId);
+
         Signal Add(Signal signal);
 
         PathEntry GetPathEntry(Path path);
