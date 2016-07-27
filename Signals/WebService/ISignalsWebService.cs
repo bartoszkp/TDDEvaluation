@@ -12,6 +12,9 @@ namespace WebService
         Signal Get(Path path);
 
         [OperationContract]
+        Signal GetById(int signalId);
+
+        [OperationContract]
         Signal Add(Signal signal);
 
         [OperationContract]

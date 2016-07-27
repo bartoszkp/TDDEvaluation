@@ -15,6 +15,12 @@
   <wsdl:message name="ISignalsWebService_Get_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetResponse" />
   </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetById" />
+  </wsdl:message>
+  <wsdl:message name="ISignalsWebService_GetById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetByIdResponse" />
+  </wsdl:message>
   <wsdl:message name="ISignalsWebService_Add_InputMessage">
     <wsdl:part name="parameters" element="tns:Add" />
   </wsdl:message>
@@ -56,6 +62,10 @@
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Get" message="tns:ISignalsWebService_Get_InputMessage" />
       <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetResponse" message="tns:ISignalsWebService_Get_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetById">
+      <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/GetById" message="tns:ISignalsWebService_GetById_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/GetByIdResponse" message="tns:ISignalsWebService_GetById_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="Add">
       <wsdl:input wsam:Action="http://tempuri.org/ISignalsWebService/Add" message="tns:ISignalsWebService_Add_InputMessage" />
       <wsdl:output wsam:Action="http://tempuri.org/ISignalsWebService/AddResponse" message="tns:ISignalsWebService_Add_OutputMessage" />
@@ -85,6 +95,15 @@
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="Get">
       <soap:operation soapAction="http://tempuri.org/ISignalsWebService/Get" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetById">
+      <soap:operation soapAction="http://tempuri.org/ISignalsWebService/GetById" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

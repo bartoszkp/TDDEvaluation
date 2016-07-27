@@ -37,7 +37,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void GivenRootPath_WhenOneSignalPresentInRoot_ReturnsPathEntryWithThisSignal()
+        public void GivenOneSignal_WhenReadingItsParent_ReturnsPathEntryWithThisSignal()
         {
             var directory = Path.Root + "oneSignal";
             var signalPath = directory + "signal";
@@ -49,7 +49,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void GivenRootPath_WhenTwoPathLevelsPresent_ReturnsOnlyDirectDescendants()
+        public void GivenTwoPathLevels_WhenReadingTopLevel_ReturnsOnlyDirectDescendants()
         {
             var directory = Path.Root + "twoLevels";
             var topLevelSignalPath = directory + "topLevelSignal";
@@ -64,7 +64,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void GivenRootPath_WhenTwoPathLevelsPresent_ReturnsSubpaths()
+        public void GivenTwoPathLevels_WhenReadingTopLevel_ReturnsSubpaths()
         {
             var directory = Path.Root + "twoLevels2";
             var topLevelSignalPath = directory + "topLevelSignal";
@@ -80,9 +80,9 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        public void GivenRootPath_WhenOnePathLevelPresentAndTwoSignalsOnThatLevel_ReturnsOneCommonSubpath()
+        public void GivenTwoSignalsInOnePath_WhenReadingItsParent_ReturnsOneCommonSubpath()
         {
-            var topLevelDirectory = Path.Root + "topLevel";
+            var topLevelDirectory = Path.Root + "topLevelWithTwoSignals";
             var directory = topLevelDirectory + "twoSignals";
             var firstTopLevelSignalPath = directory + "topLevelSignal1";
             var secondTopLevelSignalPath = directory + "topLevelSignal2";
@@ -93,6 +93,22 @@ namespace SignalsIntegrationTests
             var result = GetPathEntry(topLevelDirectory);
 
             CollectionAssert.AreEquivalent(new[] { directory }, result.SubPaths.ToArray());
+        }
+
+        [TestMethod]
+        public void GivenPathsWithCommonPrefixInName_WhenReadingTheFirstOne_DoesntReturnTheOther()
+        {
+            var topLevelDirectory = Path.Root + "topLevelWithCommonPrefix";
+            var directory1 = topLevelDirectory + "commonPrefix";
+            var directory2 = topLevelDirectory + "commonPrefixOther";
+
+            var expectedSignalPath = directory1 + "signal1";
+            AddNewIntegerSignal(path: expectedSignalPath);
+            AddNewIntegerSignal(path: directory2 + "signal2");
+
+            var result = GetPathEntry(directory1);
+
+            CollectionAssert.AreEquivalent(new[] { expectedSignalPath }, result.Signals.Select(s => s.Path).ToArray());
         }
     }
 }
