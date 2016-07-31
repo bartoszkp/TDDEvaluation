@@ -37,7 +37,7 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public void Delete(int signalId)
