@@ -37,6 +37,7 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
+            signalsDomainService.Add();
             return signalDto;
         }
 

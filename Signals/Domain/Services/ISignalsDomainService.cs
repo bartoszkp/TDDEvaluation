@@ -5,5 +5,6 @@ namespace Domain.Services
 {
     public interface ISignalsDomainService
     {
+        void Add();
     }
 }
