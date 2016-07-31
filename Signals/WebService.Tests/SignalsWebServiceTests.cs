@@ -56,6 +56,21 @@ namespace WebService.Tests
                         && passedSignal.Path.ToString() == "root/signal")));
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_ReturnsIdFromRepository()
+            {
+                var signalId = 1;
+                GivenNoSignals();
+                GivenRepositoryThatAssigns(id: signalId);
+
+                var result = signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Decimal,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
+
+                Assert.AreEqual(signalId, result.Id);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -74,6 +89,17 @@ namespace WebService.Tests
                     .Returns<Domain.Signal>(s => s);
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
+            private void GivenRepositoryThatAssigns(int id)
+            {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s =>
+                    {
+                        s.Id = id;
+                        return s;
+                    });
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
