@@ -27,124 +27,47 @@ namespace WebService
 
         public Signal Get(Path pathDto)
         {
-            var path = pathDto.ToDomain<Domain.Path>();
-
-            return this.signalsDomainService.Get(path)?.ToDto<Signal>();
+            throw new NotImplementedException();
         }
 
         public Signal GetById(int signalId)
         {
-            return this.signalsDomainService.Get(signalId)?.ToDto<Signal>();
+            throw new NotImplementedException();
         }
 
         public Signal Add(Signal signalDto)
         {
-            var signal = signalDto.ToDomain<Domain.Signal>();
-
-            var result = this.signalsDomainService.Add(signal).ToDto<Signal>();
-
-            return result;
+            throw new NotImplementedException();
         }
 
         public void Delete(int signalId)
         {
-            this.signalsDomainService.Delete(signalId);
+            throw new NotImplementedException();
         }
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            var path = pathDto.ToDomain<Domain.Path>();
-
-            return this.signalsDomainService.GetPathEntry(path).ToDto<PathEntry>();
+            throw new NotImplementedException();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var signal = this.signalsDomainService.Get(signalId);
-
-            var getData = GetAppropriateGetDataMethod(signal.DataType);
-
-            var result = getData
-                .Invoke(this.signalsDomainService, new object[] { signal, fromIncludedUtc, toExcludedUtc })
-                as IEnumerable;
-
-            if (result == null)
-                return null;
-
-            return result
-                .Cast<object>()
-                .Select(d => d.ToDto<Datum>())
-                .ToArray();
+            throw new NotImplementedException();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var signal = this.signalsDomainService.Get(signalId);
-
-            var genericDatum = typeof(Domain.Datum<object>).GetGenericTypeDefinition();
-            var concreteDatum = genericDatum.MakeGenericType(signal.DataType.GetNativeType());
-
-            var dataArray = data.ToArray();
-            var concreteData = Array.CreateInstance(concreteDatum, dataArray.Length);
-
-            for (int i = 0;i < dataArray.Length;++i)
-            {
-                concreteData.SetValue(dataArray[i].ToDomain(concreteDatum), i);
-            }
-
-            var setData = GetAppropriateSetDataMethod(signal.DataType);
-
-            setData.Invoke(this.signalsDomainService, new object[] { signal, concreteData });
-        }
-
-        private static MethodInfo GetAppropriateGetDataMethod(Domain.DataType dataType)
-        {
-            var methodInfo = ReflectionUtils
-                .GetMethodInfo<ISignalsDomainService>(x => x.GetData<object>(null, default(DateTime), default(DateTime)));
-
-            return GetAppropriateMethod(methodInfo.GetGenericMethodDefinition(), dataType);
-        }
-
-        private static MethodInfo GetAppropriateSetDataMethod(Domain.DataType dataType)
-        {
-            var methodInfo = ReflectionUtils
-                .GetMethodInfo<ISignalsDomainService>(x => x.SetData<object>(null, null));
-
-            return GetAppropriateMethod(methodInfo.GetGenericMethodDefinition(), dataType);
-        }
-
-        private static MethodInfo GetAppropriateMethod(MethodInfo genericMethodInfo, Domain.DataType dataType)
-        {
-            return genericMethodInfo.MakeGenericMethod(dataType.GetNativeType());
+            throw new NotImplementedException();
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            var signal = this.signalsDomainService.Get(signalId);
-
-            if (signal == null)
-            {
-                throw new KeyNotFoundException();
-            }
-
-            return this.signalsDomainService.GetMissingValuePolicy(signal)?
-                .ToDto<MissingValuePolicy>();
+            throw new NotImplementedException();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            var mvp = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
-
-            var signal = this.signalsDomainService.Get(signalId);
-
-            if (signal == null)
-            {
-                throw new KeyNotFoundException();
-            }
-
-            this.signalsDomainService.SetMissingValuePolicy(
-                signal,
-                mvp);
+            throw new NotImplementedException();
         }
     }
 }
