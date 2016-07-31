@@ -37,7 +37,11 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
-            throw new NotImplementedException();
+            var signal = signalDto.ToDomain<Domain.Signal>();
+
+            var result = this.signalsDomainService.Add(signal);
+
+            return result.ToDto<Dto.Signal>();
         }
 
         public void Delete(int signalId)
