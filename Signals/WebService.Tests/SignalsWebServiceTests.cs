@@ -30,12 +30,10 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                var result = signalsWebService.Add(new Dto.Signal()
-                {
-                    DataType = Dto.DataType.Decimal,
-                    Granularity = Dto.Granularity.Week,
-                    Path = new Dto.Path() { Components = new[] { "root", "signal" } }
-                });
+                var result = signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Decimal,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
 
                 Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Week, result.Granularity);
@@ -47,14 +45,22 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                signalsWebService.Add(new Dto.Signal()
-                {
-                    DataType = Dto.DataType.Decimal,
-                    Granularity = Dto.Granularity.Week,
-                    Path = new Dto.Path() { Components = new[] { "root", "signal" } }
-                });
+                signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Decimal,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
 
                 signalsRepositoryMock.Verify(sr => sr.Add(It.IsAny<Domain.Signal>()));
+            }
+
+            private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
+            {
+                return new Dto.Signal()
+                {
+                    DataType = dataType,
+                    Granularity = granularity,
+                    Path = path
+                };
             }
 
             private void GivenNoSignals()
