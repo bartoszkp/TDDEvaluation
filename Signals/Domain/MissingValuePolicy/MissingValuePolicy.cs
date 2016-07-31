@@ -7,14 +7,6 @@ namespace Domain.MissingValuePolicy
 {
     public abstract class MissingValuePolicyBase
     {
-        public static MissingValuePolicyBase CreateForNativeType(Type genericPolicyType, Type nativeType)
-        {
-            return genericPolicyType
-                .MakeGenericType(nativeType)
-                .GetConstructor(Type.EmptyTypes)
-                .Invoke(null) as MissingValuePolicyBase;
-        }
-
         public virtual int? Id { get; set; }
 
         public virtual Signal Signal { get; set; }
