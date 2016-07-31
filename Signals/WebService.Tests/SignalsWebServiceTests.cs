@@ -13,10 +13,12 @@ namespace WebService.Tests
         [TestClass]
         public class SignalsWebServiceTests
         {
+            private ISignalsWebService signalsWebService;
+
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
-                var signalsWebService = new SignalsWebService(null);
+                GivenNoSignals();
 
                 var result = signalsWebService.Add(new Dto.Signal());
 
@@ -26,7 +28,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsTheSameSignalExceptForId()
             {
-                var signalsWebService = new SignalsWebService(null);
+                GivenNoSignals();
 
                 var result = signalsWebService.Add(new Dto.Signal()
                 {
@@ -38,6 +40,11 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Week, result.Granularity);
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
+
+            private void GivenNoSignals()
+            {
+                signalsWebService = new SignalsWebService(null);
             }
         }
     }
