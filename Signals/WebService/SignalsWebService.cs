@@ -39,9 +39,9 @@ namespace WebService
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
-            signalsDomainService.Add(signal);
+            var result = signalsDomainService.Add(signal);
 
-            return signalDto;
+            return result.ToDto<Dto.Signal>();
         }
 
         public void Delete(int signalId)
