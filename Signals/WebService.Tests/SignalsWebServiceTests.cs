@@ -14,13 +14,6 @@ namespace WebService.Tests
         public class SignalsWebServiceTests
         {
             [TestMethod]
-            public void GivenNoSignals_WhenAddingASignal_DoesNotThrow()
-            {
-                var signalsWebService = new SignalsWebService(null);
-                signalsWebService.Add(new Dto.Signal());
-            }
-
-            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
                 var signalsWebService = new SignalsWebService(null);
