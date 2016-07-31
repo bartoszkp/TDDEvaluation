@@ -3,8 +3,7 @@ Repozytorium Signals - No Unit Tests
 
 Metodyka
 --------------
-Pracując w metodyce NUT pisze się jedynie kod produkcyjny, 
-czyli ten, za który zamawiający płaci.
+Pracując w metodyce NUT pisze się jedynie kod produkcyjny, bez testów jednostkowych.
 
 Kodu produkcyjnego pisze się tyle ile programista uważa,
 że jest konieczne, by rozszerzyć funkcjonalność programu o wybraną funckję.
@@ -14,7 +13,7 @@ tej metodyki w tym repozytorium.
 
 Schemat pracy
 --------------
-Na potrzeby eksperymentu prosimy o dość standardowy schemat komitowania:
+Prosimy o standardowy schemat komitowania:
 
  1. Wybierz zadanie do implementacji.
  2. Napisz kod produkcyjny realizujący to zadanie
