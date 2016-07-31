@@ -19,6 +19,16 @@ namespace WebService.Tests
                 var signalsWebService = new SignalsWebService(null);
                 signalsWebService.Add(new Dto.Signal());
             }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
+            {
+                var signalsWebService = new SignalsWebService(null);
+
+                var result = signalsWebService.Add(new Dto.Signal());
+
+                Assert.IsNotNull(result);
+            }
         }
     }
 }
