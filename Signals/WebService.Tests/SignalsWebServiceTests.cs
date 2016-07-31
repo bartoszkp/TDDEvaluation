@@ -41,19 +41,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignals_WhenAddingASignal_CallsRepositoryAdd()
-            {
-                GivenNoSignals();
-
-                signalsWebService.Add(SignalWith(
-                    dataType: Dto.DataType.Decimal,
-                    granularity: Dto.Granularity.Week,
-                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
-
-                signalsRepositoryMock.Verify(sr => sr.Add(It.IsAny<Domain.Signal>()));
-            }
-
-            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
             {
                 GivenNoSignals();
