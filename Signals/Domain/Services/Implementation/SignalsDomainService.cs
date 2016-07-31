@@ -34,5 +34,10 @@ namespace Domain.Services.Implementation
 
             return this.signalsRepository.Add(newSignal);
         }
+
+        public Signal GetById(int signalId)
+        {
+            return this.signalsRepository.Get(signalId);
+        }
     }
 }
