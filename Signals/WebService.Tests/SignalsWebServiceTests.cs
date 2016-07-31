@@ -53,6 +53,22 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(sr => sr.Add(It.IsAny<Domain.Signal>()));
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Decimal,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
+
+                signalsRepositoryMock.Verify(sr => sr.Add(It.Is<Domain.Signal>(passedSignal
+                    => passedSignal.DataType == DataType.Decimal
+                        && passedSignal.Granularity == Granularity.Week
+                        && passedSignal.Path.ToString() == "root/signal")));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
