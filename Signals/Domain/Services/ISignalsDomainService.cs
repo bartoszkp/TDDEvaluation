@@ -5,5 +5,8 @@ namespace Domain.Services
 {
     public interface ISignalsDomainService
     {
+        Signal GetById(int signalId);
+
+        Signal Add(Signal newSignal);
     }
 }

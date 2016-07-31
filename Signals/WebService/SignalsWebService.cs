@@ -32,12 +32,19 @@ namespace WebService
 
         public Signal GetById(int signalId)
         {
-            throw new NotImplementedException();
+            return this.signalsDomainService
+                .GetById(signalId)
+                ?.ToDto<Dto.Signal>();
         }
 
         public Signal Add(Signal signalDto)
         {
-            throw new NotImplementedException();
+            var signal = signalDto.ToDomain<Domain.Signal>();
+
+            var result = this.signalsDomainService
+                .Add(signal);
+
+            return result.ToDto<Dto.Signal>();
         }
 
         public void Delete(int signalId)

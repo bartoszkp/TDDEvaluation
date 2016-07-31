@@ -24,5 +24,20 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository = signalsDataRepository;
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
+
+        public Signal GetById(int signalId)
+        {
+            return this.signalsRepository.Get(signalId);
+        }
+
+        public Signal Add(Signal newSignal)
+        {
+            if (newSignal.Id.HasValue)
+            {
+                throw new IdNotNullException();
+            }
+
+            return this.signalsRepository.Add(newSignal);
+        }
     }
 }

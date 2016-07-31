@@ -9,9 +9,21 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            // use client to call WebService methods of the Signals module
-            // use Console.WriteLine to verify that a desired function works as expected
+            var newSignal = new Signal()
+            {
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "signal1" } }
+            };
 
+            var id = client.Add(newSignal).Id.Value;
+
+            var result = client.GetById(id);
+
+            Console.WriteLine(result.Id);
+            Console.WriteLine(result.DataType);
+            Console.WriteLine(result.Granularity);
+            Console.WriteLine(string.Join("/", result.Path.Components));
             Console.ReadKey();
         }
     }
