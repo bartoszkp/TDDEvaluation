@@ -61,14 +61,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Exceptions\IncompatibleSignalDataType.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />
     <Compile Include="Infrastructure\UnityRegisterAttribute.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
-    <Compile Include="Infrastructure\GranularityUtils.cs" />
     <Compile Include="MissingValuePolicy\FirstOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\ZeroOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\SpecificValueMissingValuePolicy.cs" />
@@ -89,7 +87,6 @@
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />
     <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />
-    <Compile Include="Infrastructure\TimeEnumerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

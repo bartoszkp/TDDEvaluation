@@ -28,18 +28,6 @@ namespace Domain.Infrastructure
             return arityIndex == -1 ? typeName : typeName.Substring(0, arityIndex);
         }
 
-        public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)
-        {
-            MethodCallExpression outermostExpression = expression.Body as MethodCallExpression;
-
-            if (outermostExpression == null)
-            {
-                throw new ArgumentException("Invalid Expression. Expression should consist of a Method call only.");
-            }
-
-            return outermostExpression.Method;
-        }
-
         public static MemberInfo GetMemberInfo<TSource, TProperty>(Expression<Func<TSource, TProperty>> expression)
         {
             var outermostExpression = expression.Body as MemberExpression;
