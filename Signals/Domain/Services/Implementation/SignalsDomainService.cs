@@ -25,9 +25,9 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
-        public void Add()
+        public void Add(Signal newSignal)
         {
-            this.signalsRepository.Add(null);
+            this.signalsRepository.Add(newSignal);
         }
     }
 }
