@@ -37,7 +37,7 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
-            return null;
+            return new Signal();
         }
 
         public void Delete(int signalId)
