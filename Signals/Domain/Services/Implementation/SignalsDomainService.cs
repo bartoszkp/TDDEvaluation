@@ -16,8 +16,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -25,19 +25,5 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
-        public Signal Add(Signal newSignal)
-        {
-            if (newSignal.Id.HasValue)
-            {
-                throw new IdNotNullException();
-            }
-
-            return this.signalsRepository.Add(newSignal);
-        }
-
-        public Signal GetById(int signalId)
-        {
-            return this.signalsRepository.Get(signalId);
-        }
     }
 }
