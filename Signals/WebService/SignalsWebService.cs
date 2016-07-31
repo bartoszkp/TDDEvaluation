@@ -37,7 +37,10 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
-            signalsDomainService.Add(signalDto.ToDomain<Domain.Signal>());
+            var signal = signalDto.ToDomain<Domain.Signal>();
+
+            signalsDomainService.Add(signal);
+
             return signalDto;
         }
 
