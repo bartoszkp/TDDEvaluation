@@ -42,12 +42,29 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_CallsRepositoryAdd()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Add(new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Decimal,
+                    Granularity = Dto.Granularity.Week,
+                    Path = new Dto.Path() { Components = new[] { "root", "signal" } }
+                });
+
+                signalsRepositoryMock.Verify(sr => sr.Add(It.IsAny<Domain.Signal>()));
+            }
+
             private void GivenNoSignals()
             {
-                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
+
+            private Mock<ISignalsRepository> signalsRepositoryMock;
         }
     }
 }
