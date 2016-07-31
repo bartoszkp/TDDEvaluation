@@ -1,11 +1,49 @@
-# TDDEvaluation
+Repozytorium Signals - No Unit Tests
+===========================================
 
-A repository for the purposes of evaluating various programming methods. This is not free software! You are free to use this code for private purposes like studying or testing. Please refer to the LICENSE.
+Metodyka
+--------------
+Pracując w metodyce NUT pisze się jedynie kod produkcyjny, 
+czyli ten, za który zamawiający płaci.
 
-Copyright (c) 2010 Transition Technologies S.A.
-All Rights Reserved.
+Kodu produkcyjnego pisze się tyle ile programista uważa,
+że jest konieczne, by rozszerzyć funkcjonalność programu o wybraną funckję.
 
-This software is the confidential and proprietary information of
-Transition Technologies S.A. You shall not disclose such confidential
-information and shall use it only in accordance with the terms of the
-license agreement.
+Przypominamy, że aby eksperyment się udał, prosimy o trzymanie się skrupulatnie
+tej metodyki w tym repozytorium.
+
+Schemat pracy
+--------------
+Na potrzeby eksperymentu prosimy o dość standardowy schemat komitowania:
+
+ 1. Wybierz zadanie do implementacji.
+ 2. Napisz kod produkcyjny realizujący to zadanie
+        (zawierający ew. poprawki w istniejącym kodzie, wprowadzone 
+         na potrzeby zaimplementowania nowej funkcji).
+ 3. Zakomituj kod produkcyjny (opis wynikający z nazwy zadania).
+ 4. Sugerujemy wypchnięcie do repozytorium w tym miejscu.
+ 5. Powrót do punktu 1.
+ 
+ Wypychać kod do repozytorium możecie w dowolnym momencie, 
+ pod warunkiem, że się **kompiluje**.
+ 
+ Drobne odstępstwa od powyższego schematu są jak najbardziej dopuszczalne
+ (np. komit usuwający nieudaną implementację, czy zawierający pojedynczą 
+ drobną poprawkę). Celem jest weryfikowalność tego, że kod w repozytorium powstał
+ z wykorzystaniem wybranej metodyki.
+ 
+ Osoby obeznane z git'em, w szczególności z operacjami takimi jak _rebase_ czy 
+ _amend_, prosimy o takie z nich korzystanie, by nie zaburzyć wspomnianej wcześniej weryfikowalności
+ (kod i ewentualny refaktoring powinny być widoczne w takiej kolejności w jakiej powstawały).
+ 
+Zadanie
+--------------
+Dokładny opis zadań do wykonania znajduję się w zakładce _Issues_.
+
+Dla przypomnienia - zaimplementowanie tych zadań wymaga modyfikacji 
+w projektach `WebService` i `Domain`.
+
+Instrukcje
+--------------
+Przypomnienie informacji ze szkoleń znajduje się na stronie
+[Manuals](https://gitlab.tt.com.pl/TDDEvaluation/Manuals/wikis/home).
