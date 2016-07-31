@@ -44,7 +44,9 @@ namespace WebService.Tests
 
             private void GivenNoSignals()
             {
-                signalsWebService = new SignalsWebService(null);
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
             }
         }
     }
