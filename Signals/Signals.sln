@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bootstrapper", "Bootstrappe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseMaintenanceTool", "DatabaseMaintenanceTool\DatabaseMaintenanceTool.csproj", "{0594060D-7ABD-47DA-8773-1C4E0E44399C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService.Tests", "..\..\Example\Example\Signals\WebService.Tests\WebService.Tests.csproj", "{1D359E41-E94D-4E70-9204-1CF8250ACE90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService.Tests", "WebService.Tests\WebService.Tests.csproj", "{1D359E41-E94D-4E70-9204-1CF8250ACE90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
