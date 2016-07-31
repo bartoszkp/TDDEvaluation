@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="a2515a33-8147-48d2-a757-406c54edb5a6" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:8080/signals" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="signals.xsd" MetadataType="Schema" ID="c6e0741e-0b2d-4080-b768-28e0f4dfe32b" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd2" />
+    <MetadataFile FileName="signals1.xsd" MetadataType="Schema" ID="f6ad7709-25c8-4aed-a1f1-a2c3987ffaa9" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd1" />
+    <MetadataFile FileName="signals2.xsd" MetadataType="Schema" ID="8cf7eeec-1135-47ba-a684-808532c13d9f" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd0" />
+    <MetadataFile FileName="signals3.xsd" MetadataType="Schema" ID="536628b7-1d24-408e-b5b7-bafae747e56d" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd4" />
+    <MetadataFile FileName="signals.disco" MetadataType="Disco" ID="3215678a-94ad-49ab-b717-9003356f6bbb" SourceId="1" SourceUrl="http://localhost:8080/signals?disco" />
+    <MetadataFile FileName="SignalsWebService.wsdl" MetadataType="Wsdl" ID="67eb4e54-7a64-4298-b891-aeb9dc223da1" SourceId="1" SourceUrl="http://localhost:8080/signals?wsdl" />
+    <MetadataFile FileName="signals4.xsd" MetadataType="Schema" ID="fcf631b5-9ae3-46ce-b241-eb115b0ab1db" SourceId="1" SourceUrl="http://localhost:8080/signals?xsd=xsd3" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
