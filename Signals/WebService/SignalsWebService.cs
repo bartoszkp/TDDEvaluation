@@ -32,7 +32,7 @@ namespace WebService
 
         public Signal GetById(int signalId)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public Signal Add(Signal signalDto)
