@@ -79,9 +79,38 @@ namespace WebService.Tests
                 signalsWebService.GetById(0);
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingByItsId_ReturnsIt()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var result = signalsWebService.GetById(signalId);
+
+                Assert.AreEqual(signalId, result.Id);
+                Assert.AreEqual(Dto.DataType.String, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Year, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
+                {
+                    DataType = dataType,
+                    Granularity = granularity,
+                    Path = path
+                };
+            }
+
+            private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            {
+                return new Domain.Signal()
                 {
                     DataType = dataType,
                     Granularity = granularity,
@@ -97,6 +126,15 @@ namespace WebService.Tests
                     .Returns<Domain.Signal>(s => s);
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
+            private void GivenASignal(Domain.Signal existingSignal)
+            {
+                GivenNoSignals();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
             }
 
             private void GivenRepositoryThatAssigns(int id)
