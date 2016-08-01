@@ -109,6 +109,24 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(sr => sr.Get(signalId));
             }
 
+            [TestMethod]
+            public void GivenAnotherSignal_WhenGettingByItsId_ReturnsIt()
+            {
+                var signalId = 2;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Boolean,
+                    granularity: Domain.Granularity.Year,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var result = signalsWebService.GetById(signalId);
+
+                Assert.AreEqual(signalId, result.Id);
+                Assert.AreEqual(Dto.DataType.String, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Year, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
