@@ -3,6 +3,7 @@ using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
 using Dto.Conversions;
+using DataAccess;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -183,7 +184,7 @@ namespace WebService.Tests
                     granularity: Granularity.Second,
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
-                GivenMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
+                GivenMissingValuePolicy(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger()
                 {
                     Signal = signal,
                     Quality = Domain.Quality.Poor,
@@ -209,9 +210,59 @@ namespace WebService.Tests
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicy_CallsRepositorySet()
+            {
+                var signalId = 1;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: DataType.String,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal"));
+                var signalDto = new Dto.Signal()
+                {
+                    Id = signalId,
+                    DataType = Dto.DataType.String,
+                    Granularity = Dto.Granularity.Second,
+                    Path = new Dto.Path { Components = new string[] { "root", "signal" } }
+                };
+                GivenASignal(signal);
+                var missingValuePolicy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                {
+                    Quality = Dto.Quality.Fair,
+                    Value = "Example",
+                    DataType = Dto.DataType.String,
+                    Signal = signalDto
+                };
+
+                signalsWebService.SetMissingValuePolicy(signalId, missingValuePolicy);
+
+                missingValuePolicyRepositoryMock
+                    .Verify(mvpr => mvpr.Set(It.Is<Domain.Signal>(s => s.Id == signalId),
+                    It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<string>>(mvp =>
+                    mvp.Value == "Example"
+                    && mvp.Quality == Quality.Fair
+                    && mvp.Signal.Id == signalId)));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignal_WhenSettingMissingValuePolicy_ArgumentExceptionIsThrown()
+            {
+                GivenNoSignals();
+                var missingValuePolicy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                {
+                    Quality = Dto.Quality.Fair,
+                    Value = "Example",
+                    DataType = Dto.DataType.String
+                };
+
+                signalsWebService.SetMissingValuePolicy(1, missingValuePolicy);
+            }
+
             private void GivenMissingValuePolicy(Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
             {
-                missingValuePolicyRepository
+                missingValuePolicyRepositoryMock
                     .Setup(mvpr => mvpr.Get(It.Is<Domain.Signal>(s => s.Id == missingValuePolicy.Signal.Id)))
                     .Returns<Domain.Signal>(s => missingValuePolicy);
             }
@@ -263,13 +314,13 @@ namespace WebService.Tests
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                missingValuePolicyRepository = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, 
                     signalsDataRepositoryMock.Object,
-                    missingValuePolicyRepository.Object);
+                    missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -284,7 +335,7 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
-            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepository;
+            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
         }
     }
 }
