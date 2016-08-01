@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
@@ -85,6 +86,44 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(SignalNotFoundException))]
+            public void GivenNoSignals_WhenSettingSignalData_ThrowSignalNotFoundException()
+            {
+                GivenNoSignals();
+
+                var dummyId = 1;
+
+                signalsWebService.SetData(dummyId, Enumerable.Empty<Dto.Datum>());
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingSignalData_CallDataRepositorySetData()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")));
+
+                signalsWebService.SetData(signalId,
+                    new[] {
+                        new Dto.Datum {
+                            Value = 1,
+                            Quality = Dto.Quality.Fair,
+                            Timestamp = new System.DateTime()
+                        }
+                    });
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData(
+                    It.Is<IEnumerable<Domain.Datum<int>>>(
+                        e =>
+                             e.All(datum => datum.Signal.Id == signalId && datum.Value == 1
+                                && datum.Quality == Quality.Fair && datum.Timestamp == new System.DateTime())
+                        )));
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -121,7 +160,13 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -135,6 +180,7 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
         }
     }
 }
