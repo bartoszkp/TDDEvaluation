@@ -223,6 +223,34 @@ namespace WebService.Tests
                 Assert.IsTrue(result is Dto.MissingValuePolicy.FirstOrderMissingValuePolicy);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingByPath_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.Get(new Dto.Path { Components = new string[0] });
+
+                Assert.IsNull(result);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingByItsPath_ReturnsIt()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var result = signalsWebService.Get(new Dto.Path { Components = new[] { "root", "signal" } });
+
+                Assert.AreEqual(signalId, result.Id);
+                Assert.AreEqual(Dto.DataType.Integer, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Second, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
+
 
             private Dto.Signal SignalWith(
                 int? id = null,
@@ -278,6 +306,10 @@ namespace WebService.Tests
 
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Path))
                     .Returns(signal);
             }
 
