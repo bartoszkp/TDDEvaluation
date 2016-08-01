@@ -6,6 +6,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -124,6 +125,34 @@ namespace WebService.Tests
                         )));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(SignalNotFoundException))]
+            public void GivenNoSignals_WhenGettingSignalData_ThrowSignalNotFoundException()
+            {
+                GivenNoSignals();
+
+                var dummyId = 1;
+
+                signalsWebService.GetData(dummyId, new System.DateTime(), new System.DateTime());
+            }
+
+            [TestMethod]
+            public void GivenData_WhenGettingSignalData_ReturnsThisData()
+            {
+                var signalId = 1;
+                var datumValue = 5;
+                GivenData(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")),
+                    new[] { new Domain.Datum<int> { Value = datumValue } });
+
+                var result = signalsWebService.GetData(signalId, new DateTime(), DateTime.Now);
+
+                Assert.AreEqual(datumValue, result.First().Value);
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -177,6 +206,15 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(signal.Id.Value))
                     .Returns(signal);
+            }
+
+            private void GivenData<T>(Signal signal, Datum<T>[] datum)
+            {
+                GivenASignal(signal);
+
+                signalsDataRepositoryMock.Setup(sdr => sdr.GetData<T>(
+                    It.Is<Domain.Signal>(sig => sig.Id == signal.Id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datum);
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
