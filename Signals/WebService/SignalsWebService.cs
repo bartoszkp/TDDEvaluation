@@ -123,11 +123,16 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            Domain.Signal signal = GetById(signalId).ToDomain<Domain.Signal>();
+            Domain.Signal signal = GetById(signalId)?.ToDomain<Domain.Signal>();
+            if(signal == null)
+                throw new ArgumentException("A signal with the given Id does not exist");
 
             var result = signalsDomainService.GetMissingValuePolicy(signal);
 
-            return result.ToDto<MissingValuePolicy>();
+            var returnResult =  result.ToDto<MissingValuePolicy>();
+            returnResult.DataType = result.NativeDataType.FromNativeType().ToDto<Dto.DataType>();
+
+            return returnResult;
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
