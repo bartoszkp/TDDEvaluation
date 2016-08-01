@@ -172,6 +172,20 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(result.Path.Components.ToArray(), new[] { "root", "signal" });
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentException))]
+            public void GivenANonExistingPath_WhenGettingByPath_ThrowsArgumentException()
+            {
+                GivenNoSignals();
+
+                var pathDto = new Dto.Path()
+                {
+                    Components = new[] { "root", "signal" }
+                };
+
+                signalsWebService.Get(pathDto);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
