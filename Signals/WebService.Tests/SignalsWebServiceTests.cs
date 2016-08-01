@@ -18,7 +18,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 var result = signalsWebService.Add(new Dto.Signal());
 
@@ -28,7 +28,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsTheSameSignalExceptForId()
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 var result = signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Decimal,
@@ -43,7 +43,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Decimal,
@@ -60,7 +60,7 @@ namespace WebService.Tests
             public void GivenNoSignals_WhenAddingASignal_ReturnsIdFromRepository()
             {
                 var signalId = 1;
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
                 GivenRepositoryThatAssigns(id: signalId);
 
                 var result = signalsWebService.Add(SignalWith(
@@ -74,7 +74,7 @@ namespace WebService.Tests
             [TestMethod] 
             public void GivenNoSignals_WhenGettingById_DoesNotThrow()
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 signalsWebService.GetById(0);
             }
@@ -83,7 +83,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingByItsId_ReturnsIt()
             {
                 var signalId = 1;
-                GivenASignal(SignalWith(
+                GivenASignal_SetupSignalsRepositoryMock(SignalWith(
                     id: signalId,
                     dataType: Domain.DataType.String,
                     granularity: Domain.Granularity.Year,
@@ -91,17 +91,23 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetById(signalId);
 
-                Assert.AreEqual(signalId, result.Id);
-                Assert.AreEqual(Dto.DataType.String, result.DataType);
-                Assert.AreEqual(Dto.Granularity.Year, result.Granularity);
-                CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+                AssertSignalsAreEqual(result, new Dto.Signal()
+                {
+                    Id = signalId,
+                    DataType = Dto.DataType.String,
+                    Granularity = Dto.Granularity.Year,
+                    Path = new Dto.Path()
+                    {
+                        Components = new[] {"root", "signal"}
+                    }
+                });
             }
 
             [TestMethod]
             public void GivenNoSignals_WhenGettingById_RepositoryGetIsCalledWithGivenId()
             {
                 var signalId = 1;
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 signalsWebService.GetById(signalId);
 
@@ -111,7 +117,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingById_ReturnsNull()
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 var result = signalsWebService.GetById(0);
 
@@ -121,7 +127,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingByPath_DoesNotThrowUnimplementedException()
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal());
 
@@ -141,7 +147,7 @@ namespace WebService.Tests
 
                 var pathDomain = Domain.Path.FromString("root/signal");
 
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal());
 
@@ -160,7 +166,7 @@ namespace WebService.Tests
 
                 var pathDomain = Domain.Path.FromString("root/signal");
 
-                GivenASignal(new Signal()
+                GivenASignal_SetupSignalsRepositoryMock(new Signal()
                 {
                     Id = 1,
                     DataType = DataType.Double,
@@ -170,17 +176,20 @@ namespace WebService.Tests
 
                 var result = signalsWebService.Get(pathDto);
 
-                Assert.AreEqual(result.Id, 1);
-                Assert.AreEqual(result.DataType, Dto.DataType.Double);
-                Assert.AreEqual(result.Granularity, Dto.Granularity.Month);
-                CollectionAssert.AreEqual(result.Path.Components.ToArray(), new[] { "root", "signal" });
+                AssertSignalsAreEqual(result, new Dto.Signal()
+                {
+                    Id = 1,
+                    DataType = Dto.DataType.Double,
+                    Granularity = Dto.Granularity.Month,
+                    Path = pathDto
+                });
             }
 
             [TestMethod]
             [ExpectedException(typeof(System.ArgumentException))]
             public void GivenANonExistingPath_WhenGettingByPath_ThrowsArgumentException()
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 var pathDto = new Dto.Path()
                 {
@@ -211,7 +220,7 @@ namespace WebService.Tests
                 };
             }
 
-            private void GivenNoSignals()
+            private void GivenNoSignals_SetupSignalsRepositoryMock()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
@@ -222,9 +231,9 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void GivenASignal(Domain.Signal existingSignal)
+            private void GivenASignal_SetupSignalsRepositoryMock(Domain.Signal existingSignal)
             {
-                GivenNoSignals();
+                GivenNoSignals_SetupSignalsRepositoryMock();
 
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
@@ -242,6 +251,14 @@ namespace WebService.Tests
                         s.Id = id;
                         return s;
                     });
+            }
+
+            private void AssertSignalsAreEqual(Dto.Signal signal1, Dto.Signal signal2)
+            {
+                Assert.AreEqual(signal1.Id, signal2.Id);
+                Assert.AreEqual(signal1.DataType, signal2.DataType);
+                Assert.AreEqual(signal1.Granularity, signal2.Granularity);
+                CollectionAssert.AreEqual(signal1.Path.Components.ToArray(), signal2.Path.Components.ToArray());
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
