@@ -120,6 +120,14 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentNullException))]
+            public void GettingSignalByPath_GivenNullPath_ThrowsArgumentNullExcetion()
+            {
+                GivenNoSignals();
+                var result = signalsWebService.Get(null);
+            }
+
 
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
