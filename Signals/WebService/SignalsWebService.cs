@@ -57,7 +57,31 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            Domain.Signal domainSignal = GetById(signalId)?.ToDomain<Domain.Signal>();
+
+            if(domainSignal == null)
+                throw new ArgumentException("A signal with the given Id does not exist");
+
+            switch (domainSignal.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    return signalsDomainService.GetData<bool>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>());
+                case Domain.DataType.Decimal:
+                    return signalsDomainService.GetData<decimal>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>());
+                case Domain.DataType.Double:
+                    return signalsDomainService.GetData<double>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>());
+                case Domain.DataType.Integer:
+                    return signalsDomainService.GetData<int>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>());
+                case Domain.DataType.String:
+                    return signalsDomainService.GetData<string>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>());
+            }
+
+            return null;
         }
 
         private IEnumerable<Domain.Datum<T>> ConvertDtoDataToDomain<T>(IEnumerable<Dto.Datum> data, Dto.Signal signal)
