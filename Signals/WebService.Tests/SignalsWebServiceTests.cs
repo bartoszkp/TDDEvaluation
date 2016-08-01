@@ -211,7 +211,7 @@ namespace WebService.Tests
                     Id = signalId
                 });
 
-                signalsWebService.SetMissingValuePolicy(0, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
+                signalsWebService.SetMissingValuePolicy(signalId, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
             }
 
             [TestMethod]
