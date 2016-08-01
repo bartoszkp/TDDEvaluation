@@ -9,17 +9,23 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
+            var newSignal = new Signal()
+            {
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Day,
+                Path = new Path() { Components = new[] { "root", "dayDecimal1" } }
+            };
 
-            client.SetMissingValuePolicy(1, mvp);
+            //client.Add(newSignal);
 
-            var result = client.GetMissingValuePolicy(1) as Signals.SpecificValueMissingValuePolicy;
+            var result = client.Get(new Path() { Components = new[] { "root", "dayDecimal1" } });
 
-            Console.WriteLine(result.Signal.Id.Value);
+            Console.WriteLine(result.Id.Value);
             Console.WriteLine(result.DataType);
-            Console.WriteLine(result.Quality);
-            Console.WriteLine(result.Value);
+            Console.WriteLine(result.Granularity);
+            Console.WriteLine(string.Join("/", result.Path.Components));
             Console.ReadKey();
         }
     }
 }
+
