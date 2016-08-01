@@ -39,5 +39,14 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
+
+        public Signal Get(Path pathDomain)
+        {
+            if (pathDomain.Components.Count() <= 0)
+            {
+                throw new ArgumentException("Path isn't exist");
+            }
+            return signalsRepository.Get(pathDomain);
+        }
     }
 }

@@ -27,7 +27,9 @@ namespace WebService
 
         public Signal Get(Path pathDto)
         {
-            throw new NotImplementedException();
+            var pathDomain = pathDto.ToDomain<Domain.Path>();
+            Domain.Signal result = signalsDomainService.Get(pathDomain);
+            return result.ToDto<Dto.Signal>();
         }
 
         public Signal GetById(int signalId)
