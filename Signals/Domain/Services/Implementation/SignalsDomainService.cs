@@ -39,5 +39,19 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
+
+        public void SetData(int signalId, IEnumerable<Datum<double>> data)
+        {
+            try
+            {
+                GetById(signalId);
+            }
+            catch (NullReferenceException)
+            {
+                throw new SignalNotExistException();
+            }
+                
+            signalsDataRepository.SetData(data);
+        }
     }
 }
