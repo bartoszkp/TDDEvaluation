@@ -172,16 +172,23 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
 
-            [TestMethod]
-            public void GivenNoSignal_WhenGettingByPath_ReturnsNotNull()
+            private Dto.Path GivenASignalByPath()
             {
                 GivenNoSignals();
 
-                Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
-                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal()
+                Domain.Path path = Domain.Path.FromString("root/signal");
+                signalsRepositoryMock.Setup(x => x.Get(path)).Returns(new Domain.Signal()
                 {
-                    Path = path.ToDomain<Domain.Path>()
+                    Path = path
                 });
+
+                return path.ToDto<Dto.Path>();
+            }
+
+            [TestMethod]
+            public void GivenNoSignal_WhenGettingByPath_ReturnsNotNull()
+            {
+                GivenASignalByPath();
 
                 var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
 
@@ -191,13 +198,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingByPath_ReturnsSignalWithPath()
             {
-                GivenNoSignals();
-
-                Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
-                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal()
-                {
-                    Path = path.ToDomain<Domain.Path>()
-                });
+                var path = GivenASignalByPath();
 
                 var result = signalsWebService.Get(path);
 
@@ -207,12 +208,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignal_WhenGettingByPath_RepositoryGetIsCalledWithGivenPath()
             {
-                GivenNoSignals();
-
-                Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
-                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal() {
-                    Path = path.ToDomain<Domain.Path>()
-                });
+                var path = GivenASignalByPath();
 
                 var result = signalsWebService.Get(path);
 
