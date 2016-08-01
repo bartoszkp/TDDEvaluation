@@ -34,5 +34,20 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
+
+        public Signal GetByPath(Path signalPath)
+        {
+            if (signalPath == null)
+                throw new ArgumentNullException("Attempted to get signal with null path");
+
+
+            var result = this.signalsRepository.Get(signalPath);
+
+            if (result == null)
+                throw new NoSuchSignalException();
+
+            return result;
+
+        }
     }
 }

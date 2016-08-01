@@ -8,5 +8,7 @@ namespace Domain.Services
         Signal Add(Signal newSignal);
 
         Signal GetById(int signalId);
+
+        Signal GetByPath(Path signalPath);
     }
 }
