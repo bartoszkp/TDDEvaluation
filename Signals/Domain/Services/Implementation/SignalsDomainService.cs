@@ -39,5 +39,15 @@ namespace Domain.Services.Implementation
 
             return this.signalsRepository.Add(newSignal);
         }
+
+        public Signal GetByPath(Path signalPath)
+        {
+            var result = this.signalsRepository.Get(signalPath);
+
+            if (result == null)
+                throw new PathDoesntExistException();
+
+            return result;
+        }
     }
 }

@@ -84,6 +84,7 @@
     <Compile Include="Repositories\IMissingValuePolicyRepository.cs" />
     <Compile Include="Repositories\ISignalsDataRepository.cs" />
     <Compile Include="Repositories\ISignalsRepository.cs" />
+    <Compile Include="Exceptions\PathDoesntExistException.cs" />
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />
     <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />
