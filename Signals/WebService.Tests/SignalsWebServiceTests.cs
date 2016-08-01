@@ -216,7 +216,7 @@ namespace WebService.Tests
                     dataType: DataType.Integer,
                     granularity: Granularity.Second,
                     path: Domain.Path.FromString("root/signal")),
-                    new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<int>());
+                    new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
 
                 var result = signalsWebService.GetMissingValuePolicy(signalId);
 
@@ -318,7 +318,7 @@ namespace WebService.Tests
                 GivenASignal(signal);
 
                 signalsDataRepositoryMock.Setup(sdr => sdr.GetData<T>(
-                    It.Is<Domain.Signal>(sig => sig.Id == signal.Id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    signal, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(datum);
             }
 
