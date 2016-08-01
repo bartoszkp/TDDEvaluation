@@ -42,5 +42,13 @@ namespace Domain.Services.Implementation
                 throw new NullReferenceException();
             return signal;
         }
+
+        public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
+        {
+            var signal = this.signalsRepository.Get(signalId);
+            if (signal.Id == null)
+                throw new NullReferenceException();
+            this.signalsDataRepository.SetData<T>(data);
+        }
     }
 }
