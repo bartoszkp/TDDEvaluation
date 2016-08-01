@@ -109,6 +109,16 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(sr => sr.Get(signalId));
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingById_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.GetById(0);
+
+                Assert.IsNull(result);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
