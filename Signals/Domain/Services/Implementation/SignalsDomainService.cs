@@ -65,7 +65,6 @@ namespace Domain.Services.Implementation
                 throw new SignalWithThisIdNonExistException();
             }
             missingValuePolicyRepository.Set(signal, policy);
-            throw new NotImplementedException();
         }
     }
 }
