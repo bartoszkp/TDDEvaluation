@@ -49,9 +49,9 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicyBase)
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicy)
         {
-            this.missingValuePolicyRepository.Set(null, null);
+            this.missingValuePolicyRepository.Set(new Domain.Signal(), missingValuePolicy);
         }
     }
 }
