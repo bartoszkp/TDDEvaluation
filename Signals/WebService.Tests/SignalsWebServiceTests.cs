@@ -122,7 +122,7 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(System.ArgumentNullException))]
-            public void GettingSignalByPath_GivenNullPath_ThrowsArgumentNullExcetion()
+            public void GettingSignalByPath_GivenNullPath_ThrowsArgumentNullException()
             {
                 GivenNoSignals();
                 var result = signalsWebService.Get(null);
