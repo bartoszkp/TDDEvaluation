@@ -112,7 +112,6 @@ namespace WebService.Tests
                     )));
             }
 
-
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignal_WhenSettingData_ThrowsArgumentException()
@@ -123,6 +122,42 @@ namespace WebService.Tests
                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } };
 
                 signalsWebService.SetData(1, data);
+            }
+
+
+            [TestMethod]
+            public void GivenData_WhenGettingData_ReturnsIt()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day, Domain.Path.FromString("x/y")));
+                GivenData(signalId,  new Domain.Datum<double>[] {
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                Assert.AreEqual(2, result.Count());
+                Assert.AreEqual(Dto.Quality.Fair, result.First().Quality);
+                Assert.AreEqual(Dto.Quality.Good, result.Skip(1).First().Quality);
+                Assert.AreEqual(new DateTime(2000, 1, 1), result.First().Timestamp);
+                Assert.AreEqual(new DateTime(2000, 2, 1), result.Skip(1).First().Timestamp);
+                Assert.AreEqual(1.0, result.First().Value);
+                Assert.AreEqual(1.5, result.Skip(1).First().Value);
+            }
+
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignal_WhenGettingData_ThrowsArgumentException()
+            {
+                GivenNoSignals();
+                GivenData(1, new Domain.Datum<double>[] {
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
             }
 
             private bool DatumEquals<T>(Domain.Datum<T> datum, Domain.Quality quality, DateTime timeStamp, T value, int signalId)
@@ -144,6 +179,13 @@ namespace WebService.Tests
                     Granularity = granularity,
                     Path = path
                 };
+            }
+
+            private void GivenData<T>(int signalId, IEnumerable<Domain.Datum<T>> data)
+            {
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns<Domain.Signal, DateTime, DateTime>((s, from, to) => data.Where(d => d.Timestamp >= from && d.Timestamp < to));
             }
 
             private Domain.Signal SignalWith(
