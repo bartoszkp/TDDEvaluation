@@ -161,7 +161,7 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(NoSuchSignalException))]
-            public void GivenNoSignals_GettingMissingValuePolicy_ThrowsException()
+            public void GivenNoSuchSignal_GettingMissingValuePolicy_ThrowsException()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
 
