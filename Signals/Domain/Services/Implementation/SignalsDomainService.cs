@@ -50,7 +50,7 @@ namespace Domain.Services.Implementation
         }
         
 
-        public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
+        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
             throw new NotImplementedException();
         }
