@@ -22,8 +22,8 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
@@ -57,7 +57,31 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+
+            if (signal == null)
+                throw new SignalNotFoundException(signalId);
+
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Integer:
+                    return signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Double:
+                    return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Decimal:
+                    return signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.String:
+                    return signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

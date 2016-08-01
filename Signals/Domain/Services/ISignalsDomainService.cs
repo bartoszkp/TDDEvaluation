@@ -8,6 +8,9 @@ namespace Domain.Services
         Signal Add(Signal newSignal);
 
         Signal GetById(int signalId);
+
         void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
+
+        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }
