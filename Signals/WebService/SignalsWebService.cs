@@ -60,9 +60,41 @@ namespace WebService
             throw new NotImplementedException();
         }
 
+        private IEnumerable<Domain.Datum<T>> ConvertDtoDataToDomain<T>(IEnumerable<Dto.Datum> data, Dto.Signal signal)
+        {
+            return data.Select(d =>
+            {
+                var domainSignal = d.ToDomain<Domain.Datum<T>>();
+                domainSignal.Signal = signal.ToDomain<Domain.Signal>();
+                return domainSignal;
+            });
+        }
+
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+
+            if (signal == null)
+                throw new ArgumentException("A signal with the given Id does not exist");
+
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    signalsDomainService.SetData(ConvertDtoDataToDomain<bool>(data,signal));
+                    break;
+                case DataType.Decimal:
+                    signalsDomainService.SetData(ConvertDtoDataToDomain<decimal>(data, signal));
+                    break;
+                case DataType.Double:
+                    signalsDomainService.SetData(ConvertDtoDataToDomain<double>(data, signal));
+                    break;
+                case DataType.Integer:
+                    signalsDomainService.SetData(ConvertDtoDataToDomain<int>(data, signal));
+                    break;
+                case DataType.String:
+                    signalsDomainService.SetData(ConvertDtoDataToDomain<string>(data, signal));
+                    break;
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
