@@ -6,7 +6,7 @@ namespace Domain.Services.Implementation
     [Serializable]
     internal class SignalDoesntExistException : Exception
     {
-        public SignalDoesntExistException() : base("Couldnt Get/Set signal policy on non-existing signal.")
+        public SignalDoesntExistException() : base("Given signalId doesnt exist in database.")
         {
         }
     }

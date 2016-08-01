@@ -79,5 +79,23 @@ namespace Domain.Services.Implementation
 
             return signal;
         }
+
+        public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
+        {
+            var signal = this.signalsRepository.Get(signalId);
+            var dataList = data.ToList();
+
+            foreach (var d in dataList)
+                d.Signal = signal;
+
+            this.signalsDataRepository.SetData<T>(dataList);
+        }
+
+        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = this.signalsRepository.Get(signalId);
+
+            return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+        }
     }
 }
