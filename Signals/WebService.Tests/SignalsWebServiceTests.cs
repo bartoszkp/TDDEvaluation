@@ -130,13 +130,23 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.IsAny<Domain.Signal>(), It.IsAny<MissingValuePolicyBase>()));
             }
 
-            //[TestMethod]
-            //[ExpectedException(typeof(ArgumentException))]
-            //public void GivenNoSignal_WhenSetMVPWithInvalidId_ReturnException()
-            //{
-            //    GivenNoSignals();
-            //    missingValuePolicyRepositoryMock.Object.Set(new Signal(), new SpecificValueMissingValuePolicy<int>());
-            //}
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSetMissingValuePolicyWithInvalidId_ReturnException()
+            {
+                int correctId = 1;
+                int invalidId = 123;
+
+                GivenASignal(SignalWith(
+                    id: correctId,
+                    dataType: DataType.Boolean,
+                    granularity: Granularity.Month,
+                    path: Path.FromString("x/y")
+                    ));
+
+                signalsWebService.SetMissingValuePolicy(invalidId, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
+
+            }
 
 
 
