@@ -44,7 +44,7 @@ namespace Domain.Services.Implementation
             var result = this.signalsRepository.Get(signalPath);
 
             if (result == null)
-                throw new NoSuchSignalException();
+                throw new NoSuchSignalException("Signal with given path does not exist in database");
 
             return result;
 

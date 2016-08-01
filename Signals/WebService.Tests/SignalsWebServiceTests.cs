@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -119,6 +120,45 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentNullException))]
+            public void GettingSignalByPath_GivenNullPath_ArgumentNullExceptionIsThrown()
+            {
+                GivenNoSignals();
+                var result = signalsWebService.Get(null);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(NoSuchSignalException))]
+            public void GettingSignalByPath_NoSuchPath_ExceptionIsThrown()
+            {
+                GivenNoSignals();
+                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                var result = signalsWebService.Get(path);
+            }
+
+            [TestMethod]
+            public void GivenSignals_GettingSignalByPath_SignalIsReturned()
+            {
+                
+                var existingSignal = SignalWith(1,
+                                                dataType: DataType.Decimal,
+                                                granularity: Granularity.Day,
+                                                path: Path.FromString("x/y"));
+
+                GivenASignal(existingSignal);
+
+                var dtoPath = new Dto.Path() { Components = new[] { "x", "y" } };
+                var result = signalsWebService.Get(dtoPath);
+
+                Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "x", "y" }, result.Path.Components.ToArray());
+
+            }
+
+
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -156,6 +196,9 @@ namespace WebService.Tests
 
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Path>()))
                     .Returns(existingSignal);
             }
 

@@ -8,7 +8,7 @@ namespace Domain.Exceptions
 {
     public class NoSuchSignalException : System.Exception
     {
-        public NoSuchSignalException() : base("Signal with given path does not exist in database")
+        public NoSuchSignalException(string message) : base(message)
         {
 
         }
