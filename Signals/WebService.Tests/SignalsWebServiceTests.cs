@@ -194,9 +194,25 @@ namespace WebService.Tests
             [TestMethod]
             public void SetMissingValuePolicy_DoesNotThrow()
             {
-                var signalsWebService = new SignalsWebService(null);
+                signalsWebService = new SignalsWebService(null);
 
                 signalsWebService.SetMissingValuePolicy(0, null);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenSettingMissingValuePolicy_RepositorySetIsCalled()
+            {
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Set(null, null));
+                var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+
+                signalsWebService.SetMissingValuePolicy(0, policy);
+
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(null,null));
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
