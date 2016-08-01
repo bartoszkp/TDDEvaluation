@@ -169,11 +169,8 @@ namespace WebService.Tests
                 var pathDto = new Dto.Path() { Components = new[] { "root", "signal1" } };
 
                 var result = signalsWebService.Get(pathDto);
-                
-                Assert.AreEqual(1, result.Id);
-                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
-                Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
-                CollectionAssert.AreEqual(new[] { "root", "signal1" }, result.Path.Components.ToArray());
+
+                GettingByPathAssertion(result);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
@@ -235,7 +232,15 @@ namespace WebService.Tests
                     .Setup(srm => srm.Get(existingSignal.Path))
                     .Returns(existingSignal);
             }
-            
+
+            private void GettingByPathAssertion(Dto.Signal result)
+            {
+                Assert.AreEqual(1, result.Id);
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "root", "signal1" }, result.Path.Components.ToArray());
+            }
+
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }
     }
