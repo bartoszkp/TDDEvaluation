@@ -193,6 +193,22 @@ namespace WebService.Tests
 
                 CollectionAssert.AreEqual(path.Components.ToArray(),result.Path.Components.ToArray());
             }
+
+            [TestMethod]
+            public void GivenNoSignal_WhenGettingByPath_RepositoryGetIsCalledWithGivenPath()
+            {
+                GivenNoSignals();
+
+                Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal() {
+                    Path = path.ToDomain<Domain.Path>()
+                });
+
+                var result = signalsWebService.Get(path);
+
+                signalsRepositoryMock.Verify(x => x.Get(It.IsAny<Domain.Path>()));
+            }
         }
     }
 }
