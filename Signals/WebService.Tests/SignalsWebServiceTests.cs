@@ -89,7 +89,7 @@ namespace WebService.Tests
             //        dataType: Domain.DataType.String,
             //        granularity: Domain.Granularity.Year,
             //        path: Domain.Path.FromString("root/signal")));
-
+                
             //    var result = signalsWebService.GetById(signalId);
 
             //    Assert.AreEqual(signalId, result.Id);
@@ -142,13 +142,24 @@ namespace WebService.Tests
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 string path = "root/signal1";
+                var existingSignal = new Domain.Signal()
+                {
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString(path)
+                };
+
                 signalsRepositoryMock
-                    .Setup(srm => srm.Get(Domain.Path.FromString(path)))
-                    .Returns<Domain.Signal>(s => s);
+                    .Setup(srm => srm.Get(existingSignal.Path))
+                    .Returns(existingSignal);
+
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal1" } });
+                var pathDto = new Dto.Path() { Components = new[] { "root", "signal1" } };
+
+                signalsWebService.Get(pathDto);
 
                 signalsRepositoryMock.Verify(srm => srm.Get(Domain.Path.FromString(path)));
             }
