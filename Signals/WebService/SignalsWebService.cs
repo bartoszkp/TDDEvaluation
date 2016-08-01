@@ -32,15 +32,7 @@ namespace WebService
 
         public Signal GetById(int signalId)
         {
-            signalsDomainService.GetById(signalId);
-
-            return new Signal()
-            {
-                Id = 1,
-                DataType = DataType.String,
-                Granularity = Granularity.Year,
-                Path = new Path() { Components = new[] { "root", "signal" } }
-            };
+            return signalsDomainService.GetById(signalId).ToDto<Dto.Signal>();
         }
 
         public Signal Add(Signal signalDto)

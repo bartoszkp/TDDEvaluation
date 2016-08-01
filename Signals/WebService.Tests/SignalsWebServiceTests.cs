@@ -122,7 +122,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetById(signalId);
 
                 Assert.AreEqual(signalId, result.Id);
-                Assert.AreEqual(Dto.DataType.String, result.DataType);
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Year, result.Granularity);
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }

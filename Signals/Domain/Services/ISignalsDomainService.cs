@@ -7,6 +7,6 @@ namespace Domain.Services
     {
         Signal Add(Signal newSignal);
 
-        void GetById(int signalId);
+        Signal GetById(int signalId);
     }
 }
