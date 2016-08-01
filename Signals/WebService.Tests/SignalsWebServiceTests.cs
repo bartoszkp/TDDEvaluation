@@ -177,6 +177,12 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
+                Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal()
+                {
+                    Path = path.ToDomain<Domain.Path>()
+                });
+
                 var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
 
                 Assert.IsNotNull(result);
@@ -188,6 +194,10 @@ namespace WebService.Tests
                 GivenNoSignals();
 
                 Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal()
+                {
+                    Path = path.ToDomain<Domain.Path>()
+                });
 
                 var result = signalsWebService.Get(path);
 
@@ -200,7 +210,6 @@ namespace WebService.Tests
                 GivenNoSignals();
 
                 Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
-
                 signalsRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal() {
                     Path = path.ToDomain<Domain.Path>()
                 });
