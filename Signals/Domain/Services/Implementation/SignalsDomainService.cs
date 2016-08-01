@@ -59,6 +59,13 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase policy)
         {
+            if (policy != null)
+            {
+                if (policy.Id.HasValue)
+                    throw new IdNotNullException();
+
+                policy.Signal = signal;
+            }
             this.missingValuePolicyRepository.Set(signal, policy);
         }
 

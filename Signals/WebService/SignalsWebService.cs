@@ -131,7 +131,7 @@ namespace WebService
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
 
-            var domainPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+            var domainPolicy = policy?.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
             signalsDomainService.SetMissingValuePolicy(signal, domainPolicy);
         }
