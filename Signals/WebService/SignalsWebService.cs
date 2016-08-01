@@ -28,7 +28,7 @@ namespace WebService
         public Signal Get(Path pathDto)
         {
             var result = signalsDomainService?.Get(pathDto.ToDomain<Domain.Path>());
-
+            
             return result.ToDto<Dto.Signal>();
         }
 

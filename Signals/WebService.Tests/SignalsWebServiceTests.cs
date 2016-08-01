@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -89,7 +90,7 @@ namespace WebService.Tests
             //        dataType: Domain.DataType.String,
             //        granularity: Domain.Granularity.Year,
             //        path: Domain.Path.FromString("root/signal")));
-                
+
             //    var result = signalsWebService.GetById(signalId);
 
             //    Assert.AreEqual(signalId, result.Id);
@@ -171,6 +172,30 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(pathDto);
 
                 GettingByPathAssertion(result);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingByFalsePath_ThrowsException()
+            {
+                string path = "root/signal1";
+
+                GivenASignalSetupGetByPath(SignalWith(
+                    id: 1,
+                    dataType: DataType.Boolean,
+                    granularity: Granularity.Day,
+                    path: Domain.Path.FromString((path))));
+
+                var pathDto = new Dto.Path() { Components = new[] { "root", "signal3" } };
+                try
+                {
+                    signalsWebService.Get(pathDto);
+                }
+                catch(ArgumentException ae)
+                {
+                    Assert.IsNotNull(ae);
+                    return;
+                }
+                Assert.Fail();
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

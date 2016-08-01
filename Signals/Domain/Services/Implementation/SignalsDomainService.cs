@@ -37,7 +37,15 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path pathDomain)
         {
-            return signalsRepository.Get(pathDomain);
+            var result = signalsRepository.Get(pathDomain);
+            if (result == null)
+            {
+                throw new ArgumentException("Invalid argument - signal with path" + pathDomain + "does not exist.");
+            }
+            else
+            {
+                return result; 
+            }
         }
     }
 }
