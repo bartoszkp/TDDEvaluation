@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -218,8 +219,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(NullReferenceException))]
-            public void GivenNoSignals_WhenGettingByPath_ThrowsNullReferenceException()
+            [ExpectedException(typeof(SignalIsNullException))]
+            public void GivenNoSignals_WhenGettingByPath_ThrowsSignalIsNullException()
             {
                 GivenNoSignals();
 
@@ -228,8 +229,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(NullReferenceException))]
-            public void GivenNoSignals_WhenSettingData_ThrowsNullReferenceException()
+            [ExpectedException(typeof(SignalIsNullException))]
+            public void GivenNoSignals_WhenSettingData_ThrowsSignalIsNullException()
             {
                 GivenNoSignals();
 
