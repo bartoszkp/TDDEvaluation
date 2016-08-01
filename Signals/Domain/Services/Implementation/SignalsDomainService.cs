@@ -40,7 +40,12 @@ namespace Domain.Services.Implementation
             if (signalPath == null)
                 throw new ArgumentNullException("Attempted to get signal with null path");
 
-            return this.signalsRepository.Get(signalPath);
+            var result = this.signalsRepository.Get(signalPath);
+
+            if (result == null)
+                throw new NoSuchSignalException("Signal with given path does not exist in database");
+
+            return result;
         }
     }
 }
