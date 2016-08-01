@@ -5,6 +5,8 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -85,6 +87,50 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingData_CallsRepositorySetData()
+            {
+                var signalId = 1;
+                var data = new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } };
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Double,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")));
+
+                signalsWebService.SetData(signalId, data);
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData(It.Is<IEnumerable<Datum<double>>>(
+                    d => d.Count() == 3
+                    && DatumEquals(d.First(), Domain.Quality.Fair, new DateTime(2000, 1, 1), 1.0, signalId)
+                    && DatumEquals(d.Skip(1).First(), Domain.Quality.Good, new DateTime(2000, 2, 1), 1.5, signalId)
+                    && DatumEquals(d.Skip(2).First(), Domain.Quality.Poor, new DateTime(2000, 3, 1), 2.0, signalId)
+                    )));
+            }
+
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignal_WhenSettingData_ThrowsArgumentException()
+            {
+                GivenNoSignals();
+
+                var data = new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } };
+
+                signalsWebService.SetData(1, data);
+            }
+
+            private bool DatumEquals<T>(Domain.Datum<T> datum, Domain.Quality quality, DateTime timeStamp, T value, int signalId)
+            {
+                return datum.Quality == quality && datum.Timestamp == timeStamp 
+                    && datum.Value.Equals(value) && datum.Signal.Id == signalId;
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -118,10 +164,11 @@ namespace WebService.Tests
             private void GivenNoSignals()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -135,6 +182,7 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
         }
     }
 }
