@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -48,6 +49,11 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+        }
+
+        public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
+        {
+            return this.missingValuePolicyRepository.Get(signal);
         }
     }
 }
