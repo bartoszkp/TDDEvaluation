@@ -71,14 +71,13 @@ namespace WebService.Tests
                 Assert.AreEqual(signalId, result.Id);
             }
 
-            [TestMethod]
+            [TestMethod] 
             public void GivenNoSignals_WhenGettingById_DoesNotThrow()
             {
                 GivenNoSignals();
 
                 signalsWebService.GetById(0);
             }
-
 
             [TestMethod]
             public void GivenASignal_WhenGettingByItsId_ReturnsIt()
@@ -117,6 +116,14 @@ namespace WebService.Tests
                 var result = signalsWebService.GetById(0);
 
                 Assert.IsNull(result);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingByPath_DoesNotThrowUnimplementedException()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Get(new Dto.Path());
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
