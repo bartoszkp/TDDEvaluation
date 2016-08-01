@@ -155,7 +155,27 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.Get(Domain.Path.FromString(path)));
             }
 
-            
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPath_ReturnsIt()
+            {
+                string path = "root/signal1";
+
+                GivenASignalSetupGetByPath(SignalWith(
+                    id: 1,
+                    dataType: DataType.Boolean,
+                    granularity: Granularity.Day,
+                    path: Domain.Path.FromString((path))));
+
+                var pathDto = new Dto.Path() { Components = new[] { "root", "signal1" } };
+
+                var result = signalsWebService.Get(pathDto);
+                
+                Assert.AreEqual(1, result.Id);
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "root", "signal1" }, result.Path.Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -215,7 +235,7 @@ namespace WebService.Tests
                     .Setup(srm => srm.Get(existingSignal.Path))
                     .Returns(existingSignal);
             }
-
+            
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }
     }
