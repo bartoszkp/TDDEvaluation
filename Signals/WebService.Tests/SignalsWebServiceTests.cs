@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -83,6 +84,39 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.DataType.Integer, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Second, result.Granularity);
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void Get_IncorrectPath_ThrowException()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Get(new Dto.Path {
+                    Components = new[] {" ","x"}
+                }); 
+
+            }
+
+            [TestMethod]
+            public void Get_SignalWithThisPathExist_ReturnThisSignal()
+            {
+                var signal = new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Decimal,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "x", "y" } }
+                };
+                GivenNoSignals();
+                signalsRepositoryMock.Setup(x => x.Get(Path.FromString("x/y"))).Returns(signal.ToDomain<Domain.Signal>());
+                signalsWebService.Add(signal);
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "x", "y" } });
+
+                Assert.AreEqual(signal.Id, result.Id);
+                Assert.AreEqual(signal.Granularity, result.Granularity);
+                Assert.AreEqual(signal.DataType, result.DataType);
+                CollectionAssert.AreEqual(signal.Path.Components.ToArray(), result.Path.Components.ToArray());
             }
 
             private Dto.Signal SignalWith(

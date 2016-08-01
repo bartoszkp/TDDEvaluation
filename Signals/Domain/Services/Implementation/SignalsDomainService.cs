@@ -42,12 +42,12 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path path)
         {
-            var result = signalsRepository.Get(path);
-            if (result == null)
+            if (path.Components.ToArray()[0].Trim()== "")
             {
-                throw new ArgumentException("path doesn't exist");
+                throw new ArgumentException("incorrect path");
             }
-            return result;
+           
+            return signalsRepository.Get(path);
         }
     }
 }
