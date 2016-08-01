@@ -242,6 +242,19 @@ namespace WebService.Tests
                     svm.Value == (double)1.5)));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentException))]
+            public void GivenNonExistingSignalId_WhenSettingMissingValuePolicy_ThrowsArgumentException()
+            {
+                SetupWebService();
+
+                int nonExistingSignalId = 1;
+
+                signalsRepositoryMock.Setup(srm => srm.Get(nonExistingSignalId)).Returns((Domain.Signal)null);
+
+                signalsWebService.SetMissingValuePolicy(nonExistingSignalId, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
