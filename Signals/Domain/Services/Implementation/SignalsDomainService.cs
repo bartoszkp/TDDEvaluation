@@ -34,5 +34,10 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
+
+        public void Get(Path pathDomain)
+        {
+            this.signalsRepository.Get(pathDomain);
+        }
     }
 }
