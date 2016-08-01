@@ -15,6 +15,20 @@ namespace Dto.Conversions
                 {
                     return (T)TypeAdapter.Adapt(@this, @this.GetType(), derivedWithMatchingName);
                 }
+                else
+                {
+                    var parent = @this.GetType().BaseType;
+                    var derivedParentWithMatchingName = ReflectionUtils.GetSingleConcreteTypeWithMatchingNameOrNull(typeof(T), parent.Name);
+
+                    if (derivedParentWithMatchingName != null)
+                    {
+                        var result = (T)TypeAdapter.Adapt(@this, @this.GetType(), derivedParentWithMatchingName);
+                        if (@this is Domain.MissingValuePolicy.MissingValuePolicyBase)
+                            (result as MissingValuePolicy.MissingValuePolicy).DataType = 
+                                (@this as Domain.MissingValuePolicy.MissingValuePolicyBase).NativeDataType.FromNativeType().ToDto<DataType>();
+                        return result;
+                    }
+                }
             }
 
             return TypeAdapter.Adapt<T>(@this);
