@@ -123,7 +123,10 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                signalsWebService.Get(new Dto.Path());
+                signalsWebService.Get(new Dto.Path()
+                {
+                    Components = new[] { "root", "signal" }
+                });
             }
 
             [TestMethod]
