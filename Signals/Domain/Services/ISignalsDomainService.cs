@@ -9,5 +9,6 @@ namespace Domain.Services
 
         Signal GetById(int signalId);
         Signal Get(Path pathDomain);
+        void SetMissingValuePolicy(int signalId, MissingValuePolicy.MissingValuePolicyBase policy);
     }
 }
