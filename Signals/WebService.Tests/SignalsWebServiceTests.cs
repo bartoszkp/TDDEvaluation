@@ -126,6 +126,25 @@ namespace WebService.Tests
 
                 signalsWebService.Get(new Dto.Path());
             }
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPath_ReturnsTheSignalWithSamePath()
+            {
+                int id = 1;
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = new Signal()
+                {
+                    Id = id,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = path.ToDomain<Domain.Path>()
+                };
+
+                GivenASignal(signal);
+
+                var result = signalsWebService.Get(path);
+                Assert.IsNotNull(result);
+                CollectionAssert.AreEqual(path.Components.ToArray(), result.Path.Components.ToArray());
+            }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
@@ -164,7 +183,7 @@ namespace WebService.Tests
 
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
-                    .Returns(existingSignal);
+                    .Returns(existingSignal);                
             }
 
             private void GivenRepositoryThatAssigns(int id)
