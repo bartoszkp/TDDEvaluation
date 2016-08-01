@@ -51,6 +51,9 @@
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\..\..\..\..\Documents\Visual Studio 2015\Projects\BlogTest\packages\Moq.4.5.10\lib\net45\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

@@ -119,6 +119,14 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingByPath_DoesNotThrow()
+            {
+                var signalsWebService = new SignalsWebService(null);
+
+                signalsWebService.Get(null);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
