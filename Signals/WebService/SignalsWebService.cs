@@ -129,6 +129,9 @@ namespace WebService
 
             var result = signalsDomainService.GetMissingValuePolicy(signal);
 
+            if (result == null)
+                return null;
+
             var returnResult =  result.ToDto<MissingValuePolicy>();
             returnResult.DataType = result.NativeDataType.FromNativeType().ToDto<Dto.DataType>();
 

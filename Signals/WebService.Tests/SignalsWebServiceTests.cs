@@ -210,6 +210,22 @@ namespace WebService.Tests
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
 
+
+            [TestMethod]
+            public void GivenNoMissingValuePolicy_WhenGettingMissingValuePolicy_ReturnsNull()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: DataType.String,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var result = signalsWebService.GetMissingValuePolicy(signalId);
+
+                Assert.IsNull(result);
+            }
+
             [TestMethod]
             public void GivenASignal_WhenSettingMissingValuePolicy_CallsRepositorySet()
             {
