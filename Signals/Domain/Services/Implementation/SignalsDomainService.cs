@@ -42,15 +42,9 @@ namespace Domain.Services.Implementation
 
         public void SetData(int signalId, IEnumerable<Datum<double>> data)
         {
-            try
-            {
-                GetById(signalId);
-            }
-            catch (NullReferenceException)
-            {
+            if (GetById(signalId) == null)
                 throw new SignalNotExistException();
-            }
-                
+
             signalsDataRepository.SetData(data);
         }
     }

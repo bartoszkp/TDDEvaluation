@@ -90,13 +90,20 @@ namespace WebService.Tests
             [ExpectedException(typeof(Domain.Exceptions.SignalNotExistException))]
             public void GivenNoSignals_WhenSetData_ExpectedException()
             {
-                var signalsDomainService = new SignalsDomainService(null, null, null);
+                int signalId = 0;
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                signalsWebService.SetData(1, new Dto.Datum[] {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signalId)).Returns<Domain.Signal>(null);
+
+                signalsWebService.SetData(signalId, new Dto.Datum[] {
                 new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
                 new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
                 new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+
             }
 
             private Dto.Signal SignalWith(
