@@ -126,6 +126,23 @@ namespace WebService.Tests
                 signalsWebService.Get(new Dto.Path());
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingByPath_RepositoryGetIsCalledWithGivenPath()
+            {
+                var pathDto = new Dto.Path()
+                {
+                    Components = new[] { "root", "signal" }
+                };
+
+                var pathDomain = Domain.Path.FromString("root/signal");
+
+                GivenNoSignals();
+
+                signalsWebService.Get(pathDto);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(pathDomain));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
