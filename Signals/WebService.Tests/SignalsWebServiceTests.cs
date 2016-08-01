@@ -6,6 +6,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -147,7 +148,9 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -172,6 +175,7 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
 
             private Dto.Path GivenASignalByPath()
             {
@@ -221,6 +225,23 @@ namespace WebService.Tests
 
                 Dto.Path notExistingPath = new Dto.Path() { Components = new[] { "root" } };
                 var result = signalsWebService.Get(notExistingPath);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(NullReferenceException))]
+            public void GivenNoSignals_WhenSettingData_ThrowsNullReferenceException()
+            {
+                GivenNoSignals();
+
+                Dto.Datum[] data = new Dto.Datum[] 
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
+
+                int notExistingSignalID = 8;
+                signalsWebService.SetData(notExistingSignalID,data);
             }
         }
     }
