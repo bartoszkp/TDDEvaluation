@@ -181,6 +181,18 @@ namespace WebService.Tests
 
                 Assert.IsNotNull(result);
             }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingByPath_ReturnsSignalWithPath()
+            {
+                GivenNoSignals();
+
+                Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
+
+                var result = signalsWebService.Get(path);
+
+                CollectionAssert.AreEqual(path.Components.ToArray(),result.Path.Components.ToArray());
+            }
         }
     }
 }
