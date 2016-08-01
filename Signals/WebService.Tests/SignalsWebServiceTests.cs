@@ -85,6 +85,9 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void 
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,

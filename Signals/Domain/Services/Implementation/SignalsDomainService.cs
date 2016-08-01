@@ -42,6 +42,11 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path pathDto)
         {
+            if (pathDto.Equals(null))
+            {
+                throw new PathIsNullException();
+            }
+
             return this.signalsRepository.Get(pathDto);
         }
     }
