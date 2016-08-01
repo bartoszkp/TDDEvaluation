@@ -181,6 +181,48 @@ namespace WebService.Tests
                     It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<int>>()));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(SignalNotFoundException))]
+            public void GivenNoSignals_WhenGettingMissingValuePolicy_ThrowSignalNotFoundException()
+            {
+                GivenNoSignals();
+
+                var dummyId = 1;
+
+                var result = signalsWebService.GetMissingValuePolicy(dummyId);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingMissingValuePolicy_ReturnsNull()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var result = signalsWebService.GetMissingValuePolicy(signalId);
+
+                Assert.IsNull(result);
+            }
+
+            [TestMethod]
+            public void GivenMissingValuePolicy_WhenGettingMissingValuePolicy_ReturnsThisPolicy()
+            {
+                var signalId = 1;
+                GivenMissingValuePolicy(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")),
+                    new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<int>());
+
+                var result = signalsWebService.GetMissingValuePolicy(signalId);
+
+                Assert.IsTrue(result is Dto.MissingValuePolicy.FirstOrderMissingValuePolicy);
+            }
+
 
             private Dto.Signal SignalWith(
                 int? id = null,
@@ -246,6 +288,13 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Setup(sdr => sdr.GetData<T>(
                     It.Is<Domain.Signal>(sig => sig.Id == signal.Id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(datum);
+            }
+
+            private void GivenMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
+            {
+                GivenASignal(signal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(signal)).Returns(policy);
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
