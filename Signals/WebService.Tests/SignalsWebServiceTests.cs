@@ -128,6 +128,17 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(null);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(NoSuchSignalException))]
+            public void GettingSignalByPath_SignalDoesNotExist_ThrowsException()
+            {
+                GivenNoSignals();
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Path>())).Returns((Signal)null);
+                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+
+                var result = signalsWebService.Get(path);
+            }
+
 
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
