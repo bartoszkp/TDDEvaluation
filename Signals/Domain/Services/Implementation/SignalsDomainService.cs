@@ -41,6 +41,11 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(signalId);
         }
 
+        public Signal GetByPath(Path path)
+        {
+            return this.signalsRepository.Get(path);
+        }
+
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
             data = data.Select(d =>
