@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8080/signals?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Dto" />
+  <xs:complexType name="MissingValuePolicy">
+    <xs:sequence>
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="DataType" type="q1:DataType" />
+      <xs:element minOccurs="0" name="Id" nillable="true" type="xs:int" />
+      <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="Signal" nillable="true" type="q2:Signal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MissingValuePolicy" nillable="true" type="tns:MissingValuePolicy" />
+  <xs:complexType name="NoneQualityMissingValuePolicy">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:MissingValuePolicy">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="NoneQualityMissingValuePolicy" nillable="true" type="tns:NoneQualityMissingValuePolicy" />
+  <xs:complexType name="SpecificValueMissingValuePolicy">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:MissingValuePolicy">
+        <xs:sequence>
+          <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="Quality" type="q3:Quality" />
+          <xs:element minOccurs="0" name="Value" nillable="true" type="xs:anyType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="SpecificValueMissingValuePolicy" nillable="true" type="tns:SpecificValueMissingValuePolicy" />
+  <xs:complexType name="ZeroOrderMissingValuePolicy">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:MissingValuePolicy">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ZeroOrderMissingValuePolicy" nillable="true" type="tns:ZeroOrderMissingValuePolicy" />
+  <xs:complexType name="FirstOrderMissingValuePolicy">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:MissingValuePolicy">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="FirstOrderMissingValuePolicy" nillable="true" type="tns:FirstOrderMissingValuePolicy" />
+</xs:schema>
