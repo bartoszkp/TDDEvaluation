@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -213,6 +214,15 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(path);
 
                 signalsRepositoryMock.Verify(x => x.Get(It.IsAny<Domain.Path>()));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(NullReferenceException))]
+            public void GivenASignalByPath_WhenGettingByPath_ThrowsNullReferenceException()
+            {
+                GivenASignalByPath();
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "root"} });
             }
         }
     }
