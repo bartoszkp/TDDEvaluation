@@ -27,6 +27,10 @@ namespace WebService
 
         public Signal Get(Path pathDto)
         {
+            if (pathDto.Components == null)
+            {
+                throw new Domain.Exceptions.PathIsEmptyException();
+            }
             var pathDomain = pathDto.ToDomain<Domain.Path>();
             Domain.Signal result = signalsDomainService.Get(pathDomain);
             return result.ToDto<Dto.Signal>();

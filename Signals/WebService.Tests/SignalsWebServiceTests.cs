@@ -85,6 +85,38 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void WhenGettingByPath_ReturnsIt()
+            {
+                GivenNoSignals();
+                var signalDomain = new Domain.Signal()
+                {
+                    Id = 23,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("sfd/klpko"),
+                };
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.Is<Domain.Path>(p => p.ToString() == signalDomain.Path.ToString())))
+                    .Returns(signalDomain);
+
+                var signalDto = signalDomain.ToDto<Dto.Signal>();
+                var result = signalsWebService.Get(signalDto.Path);
+
+                Assert.AreEqual(signalDto.Id, result.Id);
+                Assert.AreEqual(signalDto.DataType, result.DataType);
+                Assert.AreEqual(signalDto.Granularity, result.Granularity);
+                Assert.AreEqual(signalDto.Path.ToString(), result.Path.ToString());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.PathIsEmptyException))]
+            public void WhenGettingByPathWithEmptyPath_ThrowPathIsEmptyException()
+            {
+                GivenNoSignals();
+                signalsWebService.Get(new Dto.Path());
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,

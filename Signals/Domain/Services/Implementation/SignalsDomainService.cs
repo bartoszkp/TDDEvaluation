@@ -42,10 +42,6 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path pathDomain)
         {
-            if (pathDomain.Components.Count() <= 0)
-            {
-                throw new ArgumentException("Path isn't exist");
-            }
             return signalsRepository.Get(pathDomain);
         }
     }
