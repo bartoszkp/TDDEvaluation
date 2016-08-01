@@ -171,6 +171,25 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPath_ReturnsNotNull()
+            {
+                int signalId = 4;
+                GivenNoSignals();
+
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: Domain.Path.FromString("root/signal"));
+
+                signalsRepositoryMock.Setup( x=>x.Get(signal.Path)).Returns(signal);
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
+
+                Assert.IsNotNull(result);
+            }
         }
     }
 }
