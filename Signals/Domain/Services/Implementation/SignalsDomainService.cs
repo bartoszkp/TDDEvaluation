@@ -34,15 +34,5 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
-
-        public Signal Get(Path pathDomain)
-        {
-            var signal = this.signalsRepository.Get(pathDomain);
-
-            if (signal == null)
-                throw new ArgumentException("Path not found.");
-
-            return signal;
-        }
     }
 }

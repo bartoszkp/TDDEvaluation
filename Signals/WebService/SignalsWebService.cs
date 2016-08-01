@@ -27,11 +27,7 @@ namespace WebService
 
         public Signal Get(Path pathDto)
         {
-            var pathDtoComponents = pathDto.Components;
-            var pathDomainString = Domain.Path.JoinComponents(pathDtoComponents);
-            var pathDomain = Domain.Path.FromString(pathDomainString);
-
-            return signalsDomainService.Get(pathDomain).ToDto<Dto.Signal>();
+            throw new NotImplementedException();
         }
 
         public Signal GetById(int signalId)
