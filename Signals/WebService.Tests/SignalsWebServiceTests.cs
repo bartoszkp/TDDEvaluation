@@ -119,6 +119,65 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentException))]
+            public void GivenNoSignals_WhenGettingByPath_ThrowsArgumentException()
+            {
+                GivenNoSignals();
+
+                var pathDto = new Dto.Path()
+                {
+                    Components = new[] { "root", "signal" }
+                };
+
+                signalsWebService.Get(pathDto);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPath_RepositoryGetIsCalledWithGivenPath()
+            {
+                var pathDto = new Dto.Path()
+                {
+                    Components = new[] { "root", "signal" }
+                };
+
+                var pathDomain = Domain.Path.FromString("root/signal");
+
+                GivenASignal(SignalWith(
+                    id: 1,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: pathDomain));
+
+                signalsWebService.Get(pathDto);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(pathDomain));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingByItsPath_ReturnsIt()
+            {
+                var pathDomain = Domain.Path.FromString("root/signal");
+
+                var pathDto = new Dto.Path()
+                {
+                    Components = new[] { "root", "signal" }
+                };
+
+                GivenASignal(SignalWith(
+                    id: 1,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: pathDomain));
+
+                var result = signalsWebService.Get(pathDto);
+
+                Assert.AreEqual(1, result.Id);
+                Assert.AreEqual(Dto.DataType.String, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Year, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -156,6 +215,10 @@ namespace WebService.Tests
 
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Path))
                     .Returns(existingSignal);
             }
 
