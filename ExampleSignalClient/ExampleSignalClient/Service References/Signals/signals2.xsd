@@ -117,7 +117,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="signalId" type="xs:int" />
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy" minOccurs="0" name="missingValuePolicy" nillable="true" type="q11:MissingValuePolicy" />
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy" minOccurs="0" name="policy" nillable="true" type="q11:MissingValuePolicy" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
