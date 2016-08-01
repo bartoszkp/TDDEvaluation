@@ -63,12 +63,116 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+
+            if (signal == null)
+                throw new InvalidCastException("Signal dosen't exist");
+
+            switch(signal.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    {
+                        var item = signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                    }
+                case Domain.DataType.Decimal:
+                    {
+                        var item = signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                    }
+                case Domain.DataType.Double:
+                    {
+                        var item = signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                    }
+                case Domain.DataType.Integer:
+                    {
+                        var item = signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                    }
+                case Domain.DataType.String:
+                    {
+                        var item = signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                    }
+                default:
+                    {
+                        return null;
+                    }
+            }
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+
+            if (signal == null)
+                throw new InvalidCastException("Signal dosen't exist");
+
+
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Decimal:
+                    {
+                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<decimal>>>()
+                            .ToList();
+                        foreach (var item in domianModel)
+                        {
+                            item.Signal = signal;
+                        }
+                        signalsDomainService.SetData<decimal>(domianModel);
+                        break;
+                    }
+                case Domain.DataType.Boolean:
+                    {
+                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<bool>>>()
+                            .ToList();
+                        foreach (var item in domianModel)
+                        {
+                            item.Signal = signal;
+                        }
+                        signalsDomainService.SetData<bool>(domianModel);
+                        break;
+                    }
+                case Domain.DataType.Double:
+                    {
+                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<double>>>()
+                            .ToList();
+                        foreach (var item in domianModel)
+                        {
+                            item.Signal = signal;
+                        }
+                        signalsDomainService.SetData<double>(domianModel);
+                        break;
+                    }
+                case Domain.DataType.Integer:
+                    {
+                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<int>>>()
+                            .ToList();
+                        foreach (var item in domianModel)
+                        {
+                            item.Signal = signal;
+                        }
+                        signalsDomainService.SetData<int>(domianModel);
+                        break;
+                    }
+                case Domain.DataType.String:
+                    {
+                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<string>>>()
+                            .ToList();
+                        foreach (var item in domianModel)
+                        {
+                            item.Signal = signal;
+                        }
+                        signalsDomainService.SetData<string>(domianModel);
+                        break;
+                    }
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)

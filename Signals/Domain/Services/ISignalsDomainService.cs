@@ -9,5 +9,9 @@ namespace Domain.Services
 
         Signal Add(Signal newSignal);
         Signal Get(Path pathDto);
+
+        void SetData<T>(IEnumerable<Datum<T>> data);
+
+        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }
