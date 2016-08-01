@@ -41,6 +41,12 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(signalId);
         }
 
+
+        public Signal Get(Path path)
+        {
+            return this.signalsRepository.Get(path);
+        }
+
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
             this.signalsDataRepository.SetData(data);
@@ -67,5 +73,6 @@ namespace Domain.Services.Implementation
         {
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
+
     }
 }
