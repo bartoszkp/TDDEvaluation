@@ -10,6 +10,7 @@ using Domain.Services;
 using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
+using Domain.MissingValuePolicy;
 using Microsoft.Practices.Unity;
 
 namespace WebService
@@ -74,19 +75,13 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            var mvp = this.signalsDomainService.GetMissingValuePolicy(signalId);
-            
-            return mvp.ToDto<MissingValuePolicy>();
+            return this.signalsDomainService.GetMissingValuePolicy(signalId)
+                ?.ToDto<MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            Domain.MissingValuePolicy.MissingValuePolicyBase domainPolicy;
-
-            if (policy != null)
-                domainPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
-            else
-                domainPolicy = null;
+            var domainPolicy = policy?.ToDomain<MissingValuePolicyBase>();
 
             this.signalsDomainService.SetMissingValuePolicy(signalId, domainPolicy);
         }

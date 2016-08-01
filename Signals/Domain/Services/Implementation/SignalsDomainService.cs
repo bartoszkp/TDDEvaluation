@@ -53,25 +53,31 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase policy)
         {
-            var signal = this.signalsRepository.Get(signalId);
-
-            if (signal == null)
-                throw new SignalDoesntExistException();
+            var signal = MissingValuePolicySignal(signalId);
 
             missingValuePolicyRepository.Set(signal, policy);
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
+            var signal = MissingValuePolicySignal(signalId);
+            var mvp = this.missingValuePolicyRepository.Get(signal);
+
+            if (mvp != null)
+                mvp = TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                    as MissingValuePolicyBase;
+
+            return mvp;
+        }
+
+        private Signal MissingValuePolicySignal(int signalId)
+        {
             var signal = this.signalsRepository.Get(signalId);
 
             if (signal == null)
                 throw new SignalDoesntExistException();
 
-            var mvp = this.missingValuePolicyRepository.Get(signal);
-            
-            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy.MissingValuePolicyBase;
+            return signal;
         }
     }
 }
