@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -85,6 +86,34 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPath_ReturnsIt()
+            {
+                Dto.Path path = new Dto.Path() { Components = new[] { "x", "y" } };
+                GivenASignal(SignalWith(
+                    id: 1,
+                    dataType: DataType.Boolean,
+                    granularity: Granularity.Month,
+                    path: path.ToDomain<Domain.Path>()
+                    ));
+
+                var result = signalsWebService.Get(path.ToDto<Dto.Path>());
+
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Month, result.Granularity);
+                CollectionAssert.AreEqual(path.Components.ToArray(), result.Path.Components.ToArray());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignal_WhenGettingByNonExistentPath_ReturnException()
+            {
+                GivenNoSignals();
+                signalsWebService.Get(null);
+            }
+
+
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -131,6 +160,10 @@ namespace WebService.Tests
 
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Path))
                     .Returns(signal);
             }
 
