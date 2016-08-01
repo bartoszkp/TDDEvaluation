@@ -198,6 +198,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetMissingValuePolicy(0, null);
             }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
