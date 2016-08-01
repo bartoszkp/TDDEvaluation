@@ -189,10 +189,9 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignalByPath_WhenGettingByPath_ReturnsNotNull()
             {
-                GivenASignalByPath();
+                var path = GivenASignalByPath();
 
-                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
-
+                var result = signalsWebService.Get(path);
                 Assert.IsNotNull(result);
             }
 
@@ -202,7 +201,6 @@ namespace WebService.Tests
                 var path = GivenASignalByPath();
 
                 var result = signalsWebService.Get(path);
-
                 CollectionAssert.AreEqual(path.Components.ToArray(),result.Path.Components.ToArray());
             }
 
@@ -212,17 +210,17 @@ namespace WebService.Tests
                 var path = GivenASignalByPath();
 
                 var result = signalsWebService.Get(path);
-
                 signalsRepositoryMock.Verify(x => x.Get(It.IsAny<Domain.Path>()));
             }
 
             [TestMethod]
             [ExpectedException(typeof(NullReferenceException))]
-            public void GivenASignalByPath_WhenGettingByPath_ThrowsNullReferenceException()
+            public void GivenNoSignals_WhenGettingByPath_ThrowsNullReferenceException()
             {
-                GivenASignalByPath();
+                GivenNoSignals();
 
-                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "root"} });
+                Dto.Path notExistingPath = new Dto.Path() { Components = new[] { "root" } };
+                var result = signalsWebService.Get(notExistingPath);
             }
         }
     }
