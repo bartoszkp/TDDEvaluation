@@ -51,6 +51,7 @@ namespace Domain.Services.Implementation
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase policy)
         {
             Signal signal = signalsRepository.Get(signalId);
+            if (signal == null) throw new ArgumentException();
             missingValuePolicyRepository.Set(signal, policy);
         }
     }
