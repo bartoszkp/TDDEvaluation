@@ -48,11 +48,15 @@ namespace Domain.Services.Implementation
 
             return result;
         }
-        
+
 
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
-            throw new NotImplementedException();
+            var signal = this.GetById(signalId);
+            if (signal == null)
+                throw new NoSuchSignalException("Cannot get missing value policy for not exisitng signal");
+
+            return this.missingValuePolicyRepository.Get(signal);
         }
     }
 }

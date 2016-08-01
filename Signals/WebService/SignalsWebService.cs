@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Mapster;
 
 namespace WebService
 {
@@ -70,7 +71,13 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            throw new NotImplementedException();
+            var mvp = this.signalsDomainService.GetMissingValuePolicy(signalId);
+
+            /*return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                as MissingValuePolicy.MissingValuePolicyBase;*/
+
+            return mvp.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)

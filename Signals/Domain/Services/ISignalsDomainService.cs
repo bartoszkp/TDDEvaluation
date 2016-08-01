@@ -11,6 +11,6 @@ namespace Domain.Services
 
         Signal GetByPath(Path signalPath);
 
-        MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal);
+        MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(int signalId);
     }
 }

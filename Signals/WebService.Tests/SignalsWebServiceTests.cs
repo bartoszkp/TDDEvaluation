@@ -164,10 +164,11 @@ namespace WebService.Tests
             public void GivenNoSuchSignal_GettingMissingValuePolicy_ThrowsException()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
-
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,null, missingValueRepoMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
+
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
 
