@@ -210,6 +210,8 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
                     .Returns(existingSignal);
+
+                signalsRepositoryMock.Setup(sr => sr.Get(existingSignal.Path)).Returns(existingSignal);
             }
 
             private void GivenRepositoryThatAssigns(int id)
