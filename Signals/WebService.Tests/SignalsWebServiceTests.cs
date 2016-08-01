@@ -123,6 +123,8 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal());
+
                 signalsWebService.Get(new Dto.Path()
                 {
                     Components = new[] { "root", "signal" }
@@ -140,6 +142,8 @@ namespace WebService.Tests
                 var pathDomain = Domain.Path.FromString("root/signal");
 
                 GivenNoSignals();
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Path>())).Returns(new Domain.Signal());
 
                 signalsWebService.Get(pathDto);
 
@@ -213,6 +217,7 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
+
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
