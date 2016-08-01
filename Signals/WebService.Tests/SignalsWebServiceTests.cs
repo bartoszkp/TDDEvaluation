@@ -139,6 +139,26 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(path);
             }
 
+            [TestMethod]
+            public void GivenSignals_GettingSignalByPath_SignalIsReturned()
+            {
+                var exsistingSignal = SignalWith(1,
+                                                dataType: DataType.Integer,
+                                                granularity: Granularity.Hour,
+                                                path: Path.FromString("x/y"));
+
+                GivenASignal(exsistingSignal);
+                var dtoPath = new Dto.Path() { Components = new[] { "x", "y" } };
+                var result = signalsWebService.Get(dtoPath);
+
+                Assert.AreEqual(Dto.DataType.Integer, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Hour, result.Granularity);
+                Assert.AreEqual(exsistingSignal.Id, result.Id);
+                CollectionAssert.AreEqual(dtoPath.Components.ToArray(), result.Path.Components.ToArray());
+
+
+            }
+
 
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
