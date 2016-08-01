@@ -186,16 +186,8 @@ namespace WebService.Tests
                     path: Domain.Path.FromString((path))));
 
                 var pathDto = new Dto.Path() { Components = new[] { "root", "signal3" } };
-                try
-                {
-                    signalsWebService.Get(pathDto);
-                }
-                catch(ArgumentException ae)
-                {
-                    Assert.IsNotNull(ae);
-                    return;
-                }
-                Assert.Fail();
+                
+                GettingByFalsePathAssertion(pathDto);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
@@ -264,6 +256,20 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
                 CollectionAssert.AreEqual(new[] { "root", "signal1" }, result.Path.Components.ToArray());
+            }
+
+            private void GettingByFalsePathAssertion(Dto.Path pathDto)
+            {
+                try
+                {
+                    signalsWebService.Get(pathDto);
+                }
+                catch (ArgumentException ae)
+                {
+                    Assert.IsNotNull(ae);
+                    return;
+                }
+                Assert.Fail();
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
