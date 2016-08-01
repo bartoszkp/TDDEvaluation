@@ -124,7 +124,7 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                signalsWebService.Get(new Dto.Path());
+                signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
             }
             [TestMethod]
             public void GivenASignal_WhenGettingByPath_ReturnsTheSignalWithSamePath()
@@ -183,7 +183,10 @@ namespace WebService.Tests
 
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
-                    .Returns(existingSignal);                
+                    .Returns(existingSignal);
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Path))
+                    .Returns(existingSignal);
             }
 
             private void GivenRepositoryThatAssigns(int id)
