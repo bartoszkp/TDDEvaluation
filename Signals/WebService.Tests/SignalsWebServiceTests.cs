@@ -202,10 +202,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenSettingMissingValuePolicy_DoesNotThrow()
             {
-                Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
-                var signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupWebService();
 
                 int signalId = 1;
 
@@ -220,10 +217,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenSettingMissingValuePolicy_RepositorySetIsCalledWithGivenPolicy()
             {
-                Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
-                var signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupWebService();
 
                 int signalId = 1;
 
