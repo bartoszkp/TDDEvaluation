@@ -32,7 +32,8 @@ namespace WebService
 
         public Signal GetById(int signalId)
         {
-            signalsDomainService.GetById(0);
+            signalsDomainService.GetById(signalId);
+
             return new Signal()
             {
                 Id = 1,

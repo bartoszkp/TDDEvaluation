@@ -32,7 +32,7 @@ namespace Domain.Services.Implementation
 
         public void GetById(int signalId)
         {
-            this.signalsRepository.Get(0);
+            this.signalsRepository.Get(signalId);
         }
     }
 }
