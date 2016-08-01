@@ -209,6 +209,37 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(0, It.IsAny<Dto.MissingValuePolicy.MissingValuePolicy>());
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenSettingMissingValuePolicy_RepositorySetIsCalledWithGivenPolicy()
+            {
+                Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+
+                int signalId = 1;
+
+                Dto.MissingValuePolicy.MissingValuePolicy mvp = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy() { 
+                    Id = signalId,
+                    DataType = Dto.DataType.Double,
+                    Quality = Dto.Quality.Fair,
+                    Value = (double)1.5
+                };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(signalId)).Returns(new Domain.Signal()
+                {
+                    Id = 1
+                });
+
+                signalsWebService.SetMissingValuePolicy(signalId, mvp);
+
+                missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.Is<Domain.Signal>(s => s.Id == signalId), 
+                    It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>(svm => 
+                    svm.Id == signalId && 
+                    svm.Quality == Quality.Fair && 
+                    svm.Value == (double)1.5)));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
