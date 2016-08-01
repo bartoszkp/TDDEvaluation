@@ -112,6 +112,7 @@ namespace WebService.Tests
             {
                 return new Domain.Signal()
                 {
+                    Id = id,
                     DataType = dataType,
                     Granularity = granularity,
                     Path = path
