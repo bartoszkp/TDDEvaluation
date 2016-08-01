@@ -186,7 +186,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignal_WhenGettingByPath_ReturnsNotNull()
+            public void GivenASignalByPath_WhenGettingByPath_ReturnsNotNull()
             {
                 GivenASignalByPath();
 
@@ -196,7 +196,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignals_WhenGettingByPath_ReturnsSignalWithPath()
+            public void GivenASignalByPath_WhenGettingByPath_ReturnsSignalWithPath()
             {
                 var path = GivenASignalByPath();
 
@@ -206,7 +206,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignal_WhenGettingByPath_RepositoryGetIsCalledWithGivenPath()
+            public void GivenASignalByPath_WhenGettingByPath_RepositoryGetIsCalledWithGivenPath()
             {
                 var path = GivenASignalByPath();
 
