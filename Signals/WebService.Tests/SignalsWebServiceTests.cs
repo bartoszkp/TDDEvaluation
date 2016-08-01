@@ -99,13 +99,14 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignals_WhenGettingById_RepositoryGetIsCalled()
+            public void GivenNoSignals_WhenGettingById_RepositoryGetIsCalledWithGivenId()
             {
+                var signalId = 1;
                 GivenNoSignals();
 
-                signalsWebService.GetById(0);
+                signalsWebService.GetById(signalId);
 
-                signalsRepositoryMock.Verify(sr => sr.Get(It.IsAny<int>()));
+                signalsRepositoryMock.Verify(sr => sr.Get(signalId));
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
