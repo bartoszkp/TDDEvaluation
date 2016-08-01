@@ -49,6 +49,10 @@ namespace Domain.Services.Implementation
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase policy)
         {
             var signal = this.GetById(signalId);
+
+            if (signal == null)
+                throw new ArgumentException("Signal with given Id not found.");
+
             this.missingValuePolicyRepository.Set(signal, policy);
         }
     }
