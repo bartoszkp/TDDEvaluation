@@ -8,5 +8,6 @@ namespace Domain.Services
         Signal Add(Signal newSignal);
 
         Signal GetById(int signalId);
+        void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
     }
 }

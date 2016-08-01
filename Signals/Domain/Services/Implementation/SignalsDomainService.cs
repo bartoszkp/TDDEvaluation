@@ -16,8 +16,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -38,6 +38,17 @@ namespace Domain.Services.Implementation
         public Signal GetById(int signalId)
         {
             return this.signalsRepository.Get(signalId);
+        }
+
+        public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
+        {
+            data = data.Select(d =>
+            {
+                d.Signal = signal;
+                return d;
+            }).ToList();
+
+            this.signalsDataRepository.SetData(data);
         }
     }
 }
