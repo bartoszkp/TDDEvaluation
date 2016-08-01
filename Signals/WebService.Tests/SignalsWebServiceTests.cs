@@ -98,6 +98,16 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingById_RepositoryGetIsCalled()
+            {
+                GivenNoSignals();
+
+                signalsWebService.GetById(0);
+
+                signalsRepositoryMock.Verify(sr => sr.Get(It.IsAny<int>()));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
