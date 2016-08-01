@@ -579,10 +579,10 @@ namespace ExampleSignalClient.Signals {
         System.Threading.Tasks.Task<ExampleSignalClient.Signals.MissingValuePolicy> GetMissingValuePolicyAsync(int signalId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicy", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyResponse")]
-        void SetMissingValuePolicy(int signalId, ExampleSignalClient.Signals.MissingValuePolicy missingValuePolicy);
+        void SetMissingValuePolicy(int signalId, ExampleSignalClient.Signals.MissingValuePolicy policy);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetMissingValuePolicy", ReplyAction="http://tempuri.org/ISignalsWebService/SetMissingValuePolicyResponse")]
-        System.Threading.Tasks.Task SetMissingValuePolicyAsync(int signalId, ExampleSignalClient.Signals.MissingValuePolicy missingValuePolicy);
+        System.Threading.Tasks.Task SetMissingValuePolicyAsync(int signalId, ExampleSignalClient.Signals.MissingValuePolicy policy);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -676,12 +676,12 @@ namespace ExampleSignalClient.Signals {
             return base.Channel.GetMissingValuePolicyAsync(signalId);
         }
         
-        public void SetMissingValuePolicy(int signalId, ExampleSignalClient.Signals.MissingValuePolicy missingValuePolicy) {
-            base.Channel.SetMissingValuePolicy(signalId, missingValuePolicy);
+        public void SetMissingValuePolicy(int signalId, ExampleSignalClient.Signals.MissingValuePolicy policy) {
+            base.Channel.SetMissingValuePolicy(signalId, policy);
         }
         
-        public System.Threading.Tasks.Task SetMissingValuePolicyAsync(int signalId, ExampleSignalClient.Signals.MissingValuePolicy missingValuePolicy) {
-            return base.Channel.SetMissingValuePolicyAsync(signalId, missingValuePolicy);
+        public System.Threading.Tasks.Task SetMissingValuePolicyAsync(int signalId, ExampleSignalClient.Signals.MissingValuePolicy policy) {
+            return base.Channel.SetMissingValuePolicyAsync(signalId, policy);
         }
     }
 }
