@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -83,6 +84,19 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.DataType.Integer, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Second, result.Granularity);
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalNotExistException))]
+            public void GivenNoSignals_WhenSetData_ExpectedException()
+            {
+                var signalsDomainService = new SignalsDomainService(null, null, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, new Dto.Datum[] {
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
             }
 
             private Dto.Signal SignalWith(
