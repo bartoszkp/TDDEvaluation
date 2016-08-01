@@ -47,5 +47,12 @@ namespace Domain.Services.Implementation
 
             return result;
         }
+
+        public Signal GetMissingValuePolicy(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 }
