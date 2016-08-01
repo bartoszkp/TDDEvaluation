@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/Dto" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Dto" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8080/signals?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="Path">
+    <xs:sequence>
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Components" nillable="true" type="q1:ArrayOfstring" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Path" nillable="true" type="tns:Path" />
+  <xs:complexType name="Signal">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="DataType" type="tns:DataType" />
+      <xs:element minOccurs="0" name="Granularity" type="tns:Granularity" />
+      <xs:element minOccurs="0" name="Id" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="Path" nillable="true" type="tns:Path" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Signal" nillable="true" type="tns:Signal" />
+  <xs:simpleType name="DataType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Boolean" />
+      <xs:enumeration value="Integer" />
+      <xs:enumeration value="Double" />
+      <xs:enumeration value="Decimal" />
+      <xs:enumeration value="String" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="DataType" nillable="true" type="tns:DataType" />
+  <xs:simpleType name="Granularity">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Second" />
+      <xs:enumeration value="Minute" />
+      <xs:enumeration value="Hour" />
+      <xs:enumeration value="Day" />
+      <xs:enumeration value="Week" />
+      <xs:enumeration value="Month" />
+      <xs:enumeration value="Year" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Granularity" nillable="true" type="tns:Granularity" />
+  <xs:complexType name="PathEntry">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Signals" nillable="true" type="tns:ArrayOfSignal" />
+      <xs:element minOccurs="0" name="SubPaths" nillable="true" type="tns:ArrayOfPath" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PathEntry" nillable="true" type="tns:PathEntry" />
+  <xs:complexType name="ArrayOfSignal">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Signal" nillable="true" type="tns:Signal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfSignal" nillable="true" type="tns:ArrayOfSignal" />
+  <xs:complexType name="ArrayOfPath">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Path" nillable="true" type="tns:Path" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPath" nillable="true" type="tns:ArrayOfPath" />
+  <xs:complexType name="ArrayOfDatum">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Datum" nillable="true" type="tns:Datum" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDatum" nillable="true" type="tns:ArrayOfDatum" />
+  <xs:complexType name="Datum">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Quality" type="tns:Quality" />
+      <xs:element minOccurs="0" name="Timestamp" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Value" nillable="true" type="xs:anyType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Datum" nillable="true" type="tns:Datum" />
+  <xs:simpleType name="Quality">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="Good" />
+      <xs:enumeration value="Fair" />
+      <xs:enumeration value="Poor" />
+      <xs:enumeration value="Bad" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Quality" nillable="true" type="tns:Quality" />
+</xs:schema>
