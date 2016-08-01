@@ -29,5 +29,10 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Add(newSignal);
         }
+
+        public void GetById(int signalId)
+        {
+            this.signalsRepository.Get(0);
+        }
     }
 }
