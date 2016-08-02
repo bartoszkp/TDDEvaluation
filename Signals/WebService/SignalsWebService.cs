@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -61,18 +62,32 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var first = data.FirstOrDefault();
-            var element = first.Value;
+            Signal signal = GetById(signalId);
+            if (signal == null)
+                throw new SignalIsNullException();
 
-            if (element is double)
+            switch (signal.DataType)
             {
-                this.signalsDomainService.SetData(signalId,
-                    data.ToDomain<IEnumerable<Domain.Datum<double>>>());
-            }
-            else if (element is int)
-            {
-                this.signalsDomainService.SetData(signalId,
-                    data.ToDomain<IEnumerable<Domain.Datum<int>>>());
+                case Dto.DataType.Double:
+                    this.signalsDomainService.SetData(signalId,
+                        data.ToDomain<IEnumerable<Domain.Datum<Double>>>());
+                    break;
+                case Dto.DataType.Integer:
+                    this.signalsDomainService.SetData(signalId,
+                        data.ToDomain<IEnumerable<Domain.Datum<Int32>>>());
+                    break;
+                case Dto.DataType.Boolean:
+                    this.signalsDomainService.SetData(signalId,
+                        data.ToDomain<IEnumerable<Domain.Datum<Boolean>>>());
+                    break;
+                case Dto.DataType.Decimal:
+                    this.signalsDomainService.SetData(signalId,
+                        data.ToDomain<IEnumerable<Domain.Datum<Decimal>>>());
+                    break;
+                case Dto.DataType.String:
+                    this.signalsDomainService.SetData(signalId,
+                        data.ToDomain<IEnumerable<Domain.Datum<String>>>());
+                    break;
             }
         }
 

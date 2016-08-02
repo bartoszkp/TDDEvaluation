@@ -45,9 +45,6 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
         {
-            var signal = this.signalsRepository.Get(signalId);
-            if (signal == null)
-                throw new SignalIsNullException();
             this.signalsDataRepository.SetData<T>(data);
         }
     }

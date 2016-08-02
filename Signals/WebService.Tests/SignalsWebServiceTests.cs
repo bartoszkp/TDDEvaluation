@@ -238,26 +238,6 @@ namespace WebService.Tests
                 };
             }
 
-
-            private Dto.Datum[] GetDatumInt()
-            {
-                return new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
-                };
-            }
-
-            private void GivenASignalForSettingData(int signalId)
-            {
-                GivenASignal(SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal")));
-            }
-
             [TestMethod]
             [ExpectedException(typeof(SignalIsNullException))]
             public void GivenNoSignals_WhenSettingData_ThrowsSignalIsNullException()
@@ -271,10 +251,14 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalForSettingData_WhenSettingData_DontThrows()
+            public void GivenASignal_WhenSettingData_DontThrows()
             {
                 int signalId = 6;
-                GivenASignalForSettingData(signalId);
+                GivenASignal(SignalWith(
+                   id: signalId,
+                   dataType: Domain.DataType.Double,
+                   granularity: Domain.Granularity.Month,
+                   path: Domain.Path.FromString("root/signal")));
 
                 Dto.Datum[] data = GetDatumDouble();
 
@@ -282,10 +266,14 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalForSettingData_WhenSettingData_VerifingRepositoryFunctionsGetAndSetData()
+            public void GivenASignal_WhenSettingData_VerifingRepositoryFunctionsGetAndSetData()
             {
                 int signalId = 3;
-                GivenASignalForSettingData(signalId);
+                GivenASignal(SignalWith(
+                   id: signalId,
+                   dataType: Domain.DataType.Double,
+                   granularity: Domain.Granularity.Month,
+                   path: Domain.Path.FromString("root/signal")));
 
                 Dto.Datum[] data = GetDatumDouble();
 
@@ -298,12 +286,21 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalForSettingData_WhenSettingData_UsingIntsInstedOfDouble()
+            public void GivenASignal_WhenSettingData_UsingIntsInstedOfDouble()
             {
-                int signalId = 3;
-                GivenASignalForSettingData(signalId);
+                int signalId = 7;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Integer,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
 
-                Dto.Datum[] data = GetDatumInt();
+                Dto.Datum[] data = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
+                };
 
                 signalsDataRepositoryMock.Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
 
