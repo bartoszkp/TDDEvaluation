@@ -119,6 +119,18 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+
+            [TestMethod]
+            public void GivenNoData_WhenSettingData_DoesNotThrowException()
+            {
+                //arrange
+                int signalId = 2;
+                signalsWebService = new SignalsWebService(null);
+                //act
+                signalsWebService.SetData(signalId, null);
+                //assert
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
