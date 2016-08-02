@@ -27,7 +27,7 @@ namespace WebService
 
         public Signal Get(Path pathDto)
         {
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
         public Signal GetById(int signalId)
