@@ -230,7 +230,30 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.Get(1));
                 missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
             }
-            
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                SetupMissingValueTest(existingSignal);
+
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(1, policy);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(1));
+                missingValuePolicyRepositoryMock
+                    .Verify(mvp => mvp.Set(
+                        It.Is<Domain.Signal>(s => s == existingSignal),
+                        It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
