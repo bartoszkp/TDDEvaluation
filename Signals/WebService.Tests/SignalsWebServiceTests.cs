@@ -339,7 +339,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetMissingValuePolicy(dummyInt, policy);
                 //assert
-                missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+                missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.Is<Domain.Signal>(s=>s.Id==dummyInt), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
 
 
             }
