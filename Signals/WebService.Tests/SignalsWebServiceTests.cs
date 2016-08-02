@@ -139,12 +139,22 @@ namespace WebService.Tests
             public void GivenData_WhenSettingData_SetDataIsCalled()
             {
                 //arrange
-              
+
                 var dummyData = MakeData();
 
                 var dataRepositoryMock = new Mock<ISignalsDataRepository>();
-                var signalsDomainService = new SignalsDomainService(null, dataRepositoryMock.Object, null);
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                 .Setup(sr => sr.Get(dummyInt))
+                 .Returns(SignalWith(id: dummyInt,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: Domain.Path.FromString("root/signal")));
+
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
+
                 ////act
                 signalsWebService.SetData(dummyInt, dummyData);
 
@@ -159,8 +169,16 @@ namespace WebService.Tests
 
                 var dummyData = MakeData();
 
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                 .Setup(sr => sr.Get(dummyInt))
+                 .Returns(SignalWith(id: dummyInt,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: Domain.Path.FromString("root/signal")));
+
                 var dataRepositoryMock = new Mock<ISignalsDataRepository>();
-                var signalsDomainService = new SignalsDomainService(null, dataRepositoryMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
                 ////act
                 signalsWebService.SetData(dummyInt, dummyData);
@@ -211,6 +229,7 @@ namespace WebService.Tests
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
+
 
             private void GivenASignal(Domain.Signal existingSignal)
             {
