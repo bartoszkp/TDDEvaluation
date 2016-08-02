@@ -6,6 +6,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Domain.Exceptions;
+using Domain.MissingValuePolicy;
 
 namespace WebService.Tests
 {
@@ -167,6 +168,18 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
+
+            [TestMethod]
+            public void SignalHasNoSpecfiedPolicy_GettingMissingValuePolicy_ReturnsNull()
+            {
+                SetupWebServiceForMissingValuePolicy();
+                missingValueRepoMock.Setup(mv => mv.Get(It.IsAny<Signal>())).Returns((MissingValuePolicyBase)null);
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+                Assert.IsNull(result);
+
+            }
+
             
             
             private void SetupWebServiceForMissingValuePolicy()
