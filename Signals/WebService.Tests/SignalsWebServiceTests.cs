@@ -199,22 +199,22 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(0, null);
             }
 
-            [TestMethod]
-            public void GivenDefaultSignalAndDefaultSpecificValueMissingValuePolicy_WhenSettingMissingValuePolicy_RepositorySetIsCalled()
-            {
-                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+            //[TestMethod]
+            //public void GivenDefaultSignalAndDefaultSpecificValueMissingValuePolicy_WhenSettingMissingValuePolicy_RepositorySetIsCalled()
+            //{
+            //    var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
-                missingValuePolicyRepositoryMock
-                    .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
-                var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+            //    missingValuePolicyRepositoryMock
+            //        .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            //    var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
+            //    signalsWebService = new SignalsWebService(signalsDomainService);
 
-                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+            //    var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
 
-                signalsWebService.SetMissingValuePolicy(0, policy);
+            //    signalsWebService.SetMissingValuePolicy(0, policy);
 
-                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
-            }
+            //    missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            //}
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
