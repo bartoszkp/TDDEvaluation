@@ -68,9 +68,13 @@ namespace WebService
                 var result = signalsDomainService.GetById(signalId);
          
                  var list = new List<Domain.Datum<double>>();
-           
+            foreach (var i in data)
+            {
 
-                signalsDomainService.SetData<double>(list);
+                list.Add(i.ToDomain<Domain.Datum<double>>());
+            }
+
+            signalsDomainService.SetData<double>(list);
 
             }
            
