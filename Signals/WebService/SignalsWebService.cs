@@ -70,6 +70,11 @@ namespace WebService
         {
             var signal = signalsDomainService?.GetById(signalId);
 
+            if(signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             return this.signalsDomainService
                 ?.GetMissingValuePolicy(signal)
                 ?.ToDto<MissingValuePolicy>();
