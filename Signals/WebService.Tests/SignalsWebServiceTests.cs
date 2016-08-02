@@ -136,7 +136,7 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            public void GivenData_WhenSettingData_SetDataIsCalled()
+            public void GivenDataDouble_WhenSettingData_SetDataIsCalled()
             {
                 //arrange
 
@@ -147,7 +147,7 @@ namespace WebService.Tests
                 signalsRepositoryMock
                  .Setup(sr => sr.Get(dummyInt))
                  .Returns(SignalWith(id: dummyInt,
-                    dataType: Domain.DataType.String,
+                    dataType: Domain.DataType.Double,
                     granularity: Domain.Granularity.Year,
                     path: Domain.Path.FromString("root/signal")));
 
@@ -160,10 +160,10 @@ namespace WebService.Tests
 
                 ////assert
 
-                dataRepositoryMock.Verify(sr => sr.SetData<Datum>(It.IsAny<System.Collections.Generic.ICollection<Datum<Datum>>>()));
+                dataRepositoryMock.Verify(sr => sr.SetData<double>(It.IsAny<System.Collections.Generic.ICollection<Datum<double>>>()));
             }
             [TestMethod]
-            public void GivenData_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
+            public void GivenDataDouble_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
             {
                 //arrange
 
@@ -173,7 +173,7 @@ namespace WebService.Tests
                 signalsRepositoryMock
                  .Setup(sr => sr.Get(dummyInt))
                  .Returns(SignalWith(id: dummyInt,
-                    dataType: Domain.DataType.String,
+                    dataType: Domain.DataType.Double,
                     granularity: Domain.Granularity.Year,
                     path: Domain.Path.FromString("root/signal")));
 
