@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
@@ -247,6 +248,31 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(1, policy);
 
                 VerifyRepositorySetAndGetIsCalled(existingSignal);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicyForNonExistingSignal_ThrowsException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                SetupMissingValueTest(existingSignal);
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                try
+                {
+                    signalsWebService.SetMissingValuePolicy(2, policy);
+                }
+                catch (KeyNotFoundException kne)
+                {
+                    Assert.IsNotNull(kne);
+                    return;
+                }
+                Assert.Fail();
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
