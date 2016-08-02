@@ -390,6 +390,41 @@ namespace WebService.Tests
                     It.IsAny<DateTime>(),
                     It.IsAny<DateTime>()));
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_CheckingContentOfReturnedList()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
+
+                signalsDataRepositoryMock.Setup(asd => asd.GetData<double>(
+                    It.IsAny<Signal>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<DateTime>())).Returns((Signal s, DateTime f, DateTime t) => {
+                        Domain.Datum<double>[] all = GetDomainDatumDouble();
+                        List<Domain.Datum<double>> chosen = new List<Datum<double>>();
+                        for (int i = 0; i < all.ToArray().Length; ++i)
+                        {
+                            if (f <= all.ElementAt(i).Timestamp &&
+                                t > all.ElementAt(i).Timestamp)
+                            {
+                                chosen.Add(all.ElementAt(i));
+                            }
+                        }
+                        return chosen;
+                    });
+
+                var yo = signalsWebService.GetData(signalId, from, to);
+
+                Assert.AreEqual(2,yo.Count());
+            }
         }
     }
 }
