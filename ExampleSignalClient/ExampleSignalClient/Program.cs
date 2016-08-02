@@ -15,7 +15,7 @@ namespace ExampleSignalClient
                 Granularity = Granularity.Day,
                 Path = new Path() { Components = new[] { "root", "dayDecimal1" } }
             };
-
+            
             client.Add(newSignal);
 
             var result = client.Get(new Path() { Components = new[] { "root", "dayDecimal1" } });
