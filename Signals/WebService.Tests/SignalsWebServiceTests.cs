@@ -290,6 +290,47 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Get(It.Is<Domain.Signal>(s => s.Id == id)), Times.Once);
             }
 
+            [TestMethod]
+            public void GivenASignalId_WhenGettingMissingValuePolicy_ReturnsCorrectPolicy()
+            {
+                SetupWebService();
+                int id = 5;
+
+                var signal = new Domain.Signal()
+                {
+                    Id = id, 
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Week,
+                    Path = Domain.Path.FromString("root/signal")
+                };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
+
+                var expected = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger()
+                {
+                    Id = id,
+                    Quality = Quality.Good,
+                    Signal = signal,
+                    Value = (int)2
+                };
+
+                missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(expected);
+
+                var result = signalsWebService.GetMissingValuePolicy(id);
+
+                Assert.AreEqual(result.Id, id);
+                AssertSignalsAreEqual(result.Signal, new Dto.Signal()
+                {
+                    Id = id,
+                    DataType = Dto.DataType.Integer,
+                    Granularity = Dto.Granularity.Week,
+                    Path = new Dto.Path()
+                    {
+                        Components = new[] { "root", "signal" }
+                    }
+                });
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
