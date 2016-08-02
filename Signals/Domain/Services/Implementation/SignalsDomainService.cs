@@ -39,5 +39,10 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(path);
         }
+
+        public void SetData(IEnumerable<Datum<double>> domain_data)
+        {
+            this.signalsDataRepository.SetData(domain_data);
+        }
     }
 }

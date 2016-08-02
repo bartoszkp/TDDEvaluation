@@ -64,6 +64,22 @@ namespace WebService
             var signal = GetById(signalId);
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
+
+            int i = 0;
+            if (signal.DataType == DataType.Double)
+            {
+                var domain_data = new Domain.Datum<double>[data.Count()];
+                foreach (var datum in data)
+                {
+                    domain_data[i] = datum.ToDomain<Domain.Datum<double>>();
+                    domain_data[i].Signal = signal.ToDomain<Domain.Signal>();
+                    ++i;
+                }
+                signalsDomainService.SetData(domain_data);
+            }
+            else
+                throw new NotImplementedException();
+            
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
