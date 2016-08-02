@@ -11,6 +11,13 @@ namespace ExampleSignalClient
 
             var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
 
+
+            client.Add(new Signals.Signal()
+            {
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Day
+            });
+
             client.SetMissingValuePolicy(1, mvp);
 
             var result = client.GetMissingValuePolicy(1) as Signals.SpecificValueMissingValuePolicy;
