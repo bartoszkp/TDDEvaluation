@@ -282,8 +282,8 @@ namespace WebService.Tests
             {
                 //arrange
                 dataRepositoryMock = new Mock<ISignalsDataRepository>();
-                var signalsDomainService = new SignalsDomainService(null, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                
+                signalsWebService = new SignalsWebService(null);
                 //act
                 var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
                 //assert
@@ -297,9 +297,11 @@ namespace WebService.Tests
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
                 //act
+               
                 var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
                 //assert
-                dataRepositoryMock.Verify(sr => sr.GetData<double>(new Domain.Signal(), new DateTime(), new DateTime()));
+                dataRepositoryMock.Verify(sr => sr.GetData<Dto.Datum>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
             }
             private  Datum[] MakeData(Dto.Quality quality,DateTime date, object value  )

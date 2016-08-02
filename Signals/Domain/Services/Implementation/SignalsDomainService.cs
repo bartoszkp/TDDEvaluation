@@ -39,5 +39,10 @@ namespace Domain.Services.Implementation
         {
             signalsDataRepository.SetData(data);
         }
+
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+        }
     }
 }
