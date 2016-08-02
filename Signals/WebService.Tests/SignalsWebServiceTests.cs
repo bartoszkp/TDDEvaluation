@@ -121,15 +121,15 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
-
+            private int dummyInt;
             [TestMethod]
             public void GivenNoData_WhenSettingData_DoesNotThrowException()
             {
                 //arrange
-                int signalId = 2;
+                var dummyData = MakeData();
                 signalsWebService = new SignalsWebService(null);
                 //act
-                signalsWebService.SetData(signalId, null);
+                signalsWebService.SetData(dummyInt,dummyData);
                 //assert
             }
 
@@ -138,17 +138,24 @@ namespace WebService.Tests
             public void GivenData_WhenSettingData_SetDataIsCalled()
             {
                 //arrange
-                int dummyInt = 2;
-                var dummyData = new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } };
+              
+                var dummyData = MakeData();
+
                 var dataRepositoryMock = new Mock<ISignalsDataRepository>();
                 var signalsDomainService = new SignalsDomainService(null, dataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
                 ////act
-                signalsWebService.SetData( dummyInt,dummyData);
+                signalsWebService.SetData(dummyInt, dummyData);
 
                 ////assert
 
                 dataRepositoryMock.Verify(sr => sr.SetData<Datum>(It.IsAny<System.Collections.Generic.ICollection<Datum<Datum>>>()));
+            }
+
+            private  Datum[] MakeData()
+            {
+                int dummyInt = 2;
+                return new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } };
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

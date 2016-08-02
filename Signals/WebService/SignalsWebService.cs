@@ -63,7 +63,7 @@ namespace WebService
         {
             if (signalsDomainService != null)
             {
-              //  var result = signalsDomainService.GetById(signalId);
+           
                 signalsDomainService.SetData<Datum>(new Domain.Datum<Datum>[] { new Domain.Datum<Datum>() });
             }
         }
