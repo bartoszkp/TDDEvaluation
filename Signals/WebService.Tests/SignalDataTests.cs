@@ -51,7 +51,6 @@ namespace WebService.Tests
             signalsRepoMock = new Mock<ISignalsRepository>();
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, null);
             signalsWebService = new SignalsWebService(domainService);
-
         }
 
 

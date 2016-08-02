@@ -24,8 +24,8 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
@@ -66,7 +66,36 @@ namespace WebService
 
             if (signal == null)
                 throw new NoSuchSignalException("Could not get data for not existing signal");
-            throw new NotImplementedException();
+
+            var domainSignal = signal.ToDomain<Domain.Signal>();
+
+
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    return signalsDomainService.GetData<bool>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Integer:
+                    return signalsDomainService.GetData<int>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Double:
+                    return signalsDomainService.GetData<double>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Decimal:
+                    return signalsDomainService.GetData<decimal>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.String:
+                    return signalsDomainService.GetData<string>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+                default:
+                    return null;
+
+            }
+
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
@@ -80,9 +109,9 @@ namespace WebService
 
             if (mvp == null) return null;
 
-            
+
             return mvp.ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
-            
+
 
         }
 
