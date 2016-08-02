@@ -205,7 +205,7 @@ namespace WebService.Tests
                 var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
                 missingValuePolicyRepositoryMock
-                    .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Domain.Signal>>()));
+                    .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
                 var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
@@ -213,7 +213,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetMissingValuePolicy(0, policy);
 
-                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Domain.Signal>>()));
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
