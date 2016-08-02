@@ -228,23 +228,13 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(notExistingPath);
             }
 
-            private Dto.Datum[] GetDatumDouble()
-            {
-                return new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
-                };
-            }
-
             [TestMethod]
             [ExpectedException(typeof(SignalIsNullException))]
             public void GivenNoSignals_WhenSettingData_ThrowsSignalIsNullException()
             {
                 GivenNoSignals();
 
-                Dto.Datum[] data = GetDatumDouble();
+                Dto.Datum[] data = GetDtoDatumDouble();
 
                 int notExistingSignalID = 8;
                 signalsWebService.SetData(notExistingSignalID, data);
@@ -260,7 +250,7 @@ namespace WebService.Tests
                    granularity: Domain.Granularity.Month,
                    path: Domain.Path.FromString("root/signal")));
 
-                Dto.Datum[] data = GetDatumDouble();
+                Dto.Datum[] data = GetDtoDatumDouble();
 
                 signalsWebService.SetData(signalId, data);
             }
@@ -275,7 +265,7 @@ namespace WebService.Tests
                    granularity: Domain.Granularity.Month,
                    path: Domain.Path.FromString("root/signal")));
 
-                Dto.Datum[] data = GetDatumDouble();
+                Dto.Datum[] data = GetDtoDatumDouble();
 
                 signalsDataRepositoryMock.Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
 
@@ -353,6 +343,26 @@ namespace WebService.Tests
                     Assert.Fail();
             }
 
+            private Domain.Datum<double>[] GetDomainDatumDouble()
+            {
+                return new Domain.Datum<double>[]
+                    {
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
+                    };
+            }
+
+            private Dto.Datum[] GetDtoDatumDouble()
+            {
+                return new Dto.Datum[]
+                    {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                    };
+            }
+
             [TestMethod]
             public void GivenASignal_WhenGettingData_VerifyDataRepositoryFunctions()
             {
@@ -366,17 +376,11 @@ namespace WebService.Tests
 
                 DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
 
-                IEnumerable<Domain.Datum<double>> data = GetDatumDouble().ToDomain<IEnumerable<Domain.Datum<double>>>();
-
                 signalsDataRepositoryMock.Setup(asd => asd.GetData<double>(
                     It.IsAny<Signal>(),
                     It.IsAny<DateTime>(),
                     It.IsAny<DateTime>())).Returns((Signal p,DateTime d,DateTime e) => {
-                        Domain.Datum<double>[] data2 = new Domain.Datum<double>[]
-                        {
-                            new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 5 }
-                        };
-                        return data2;
+                        return GetDomainDatumDouble();
                     });
 
                 signalsWebService.GetData(signalId, from, to);
