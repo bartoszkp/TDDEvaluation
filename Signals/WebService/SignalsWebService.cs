@@ -60,14 +60,8 @@ namespace WebService
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
-        { 
-            List<Domain.Datum<double>> dataList = new List<Domain.Datum<double>>();
-            for (int i = 0; i < data.ToArray().Length; ++i)
-            {
-                dataList.Add(data.ElementAt(i).ToDomain<Domain.Datum<double>>());
-            }
-
-            signalsDomainService.SetData(signalId,dataList);
+        {
+            throw new NotImplementedException();
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
