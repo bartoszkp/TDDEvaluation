@@ -343,6 +343,45 @@ namespace WebService.Tests
                 Assert.AreEqual(existingPolicy.Quality, result.Quality);
                 Assert.AreEqual(existingPolicy.Value, result.Value);
             }
+            
+            [TestMethod]
+            public void GivenASignal_WhenGettingMissingValuePolicyForNonExistingSignal_ThrowsException()
+            {
+                var existingSignal = ExistingSignal();
+
+                var existingPolicy = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
+                {
+                    Id = 1,
+                    Quality = Quality.Bad,
+                    Value = (double)1.5
+                };
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(existingPolicy);
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(3))
+                    .Returns(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                try
+                {
+                    signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
+                }
+                catch (KeyNotFoundException kne)
+                {
+                    Assert.IsNotNull(kne);
+                    return;
+                }
+                Assert.Fail();
+            }
+
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
