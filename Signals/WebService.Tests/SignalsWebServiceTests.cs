@@ -219,8 +219,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(SignalIsNullException))]
-            public void GivenNoSignals_WhenGettingByPath_ThrowsSignalIsNullException()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignals_WhenGettingByPath_ThrowsCouldntGetASignalException()
             {
                 GivenNoSignals();
 
@@ -229,8 +229,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(SignalIsNullException))]
-            public void GivenNoSignals_WhenSettingData_ThrowsSignalIsNullException()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignals_WhenSettingData_ThrowsCouldntGetASignalException()
             {
                 GivenNoSignals();
 
@@ -285,8 +285,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(SignalIsNullException))]
-            public void GivenNoSignals_WhenGettingData_ThrowsSignalIsNullException()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignals_WhenGettingData_ThrowsCouldntGetASignalException()
             {
                 GivenNoSignals();
 

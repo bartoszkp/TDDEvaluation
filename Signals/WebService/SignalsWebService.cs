@@ -59,7 +59,7 @@ namespace WebService
         {
             Signal signal = GetById(signalId);
             if (signal == null)
-                throw new SignalIsNullException();
+                throw new CouldntGetASignalException();
 
             switch (signal.DataType)
             {
@@ -87,7 +87,7 @@ namespace WebService
         {
             Signal signal = GetById(signalId);
             if (signal == null)
-                throw new SignalIsNullException();
+                throw new CouldntGetASignalException();
 
             switch (signal.DataType)
             {

@@ -39,7 +39,7 @@ namespace Domain.Services.Implementation
         {
             Signal signal = this.signalsRepository.Get(signalPath);
             if (signal == null)
-                throw new SignalIsNullException();
+                throw new CouldntGetASignalException();
             return signal;
         }
 
