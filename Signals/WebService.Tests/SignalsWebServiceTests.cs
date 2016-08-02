@@ -231,13 +231,14 @@ namespace WebService.Tests
                 SetupMissingValueTest(existingSignal);
 
                 SetupVerifyOrAssert();
-                verifyOrAssert.AssertIsExceptionThrownWhenInvalidKey(signalsWebService);   
+                verifyOrAssert.AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService);   
             }
 
             [TestMethod]
             public void GivenASignal_WhenSettingSpecificMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
             {
                 var existingSignal = ExistingSignal();
+
                 SetupMissingValueTest(existingSignal);
 
                 var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
@@ -345,16 +346,8 @@ namespace WebService.Tests
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                try
-                {
-                    signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
-                }
-                catch (KeyNotFoundException kne)
-                {
-                    Assert.IsNotNull(kne);
-                    return;
-                }
-                Assert.Fail();
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService);
             }
 
 

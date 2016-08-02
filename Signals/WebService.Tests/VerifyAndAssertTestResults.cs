@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Moq;
 using Domain.Repositories;
+using Dto.Conversions;
 
 namespace WebService.Tests
 {
@@ -31,7 +32,7 @@ namespace WebService.Tests
             Assert.Fail();
         }
 
-        public void AssertIsExceptionThrownWhenInvalidKey(ISignalsWebService signalsWebService)
+        public void AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(ISignalsWebService signalsWebService)
         {
             var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
             try
@@ -85,6 +86,20 @@ namespace WebService.Tests
             && svmvp.Quality == specificPolicy.Quality
             && svmvp.Value == specificPolicy.Value
            ))));
+        }
+
+        public void AssertGetMissingValuePolicyIsExceptionThrownInvalidKey(ISignalsWebService signalsWebService)
+        {
+            try
+            {
+                signalsWebService.GetMissingValuePolicy(3).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
+            }
+            catch (KeyNotFoundException kne)
+            {
+                Assert.IsNotNull(kne);
+                return;
+            }
+            Assert.Fail();
         }
     }
 }
