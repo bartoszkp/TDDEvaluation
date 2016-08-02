@@ -320,6 +320,21 @@ namespace WebService.Tests
                 int notExistingSignalID = 8;
                 signalsWebService.GetData(notExistingSignalID, from, to);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_DontThrows()
+            {
+                int signalId = 7;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Integer,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
+
+                signalsWebService.GetData(signalId, from, to);
+            }
         }
     }
 }
