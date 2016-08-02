@@ -67,7 +67,7 @@ namespace WebService
             {
                 var result = signalsDomainService.GetById(signalId);
 
-
+                if (result == null) throw new ArgumentException();
                 
                 switch (result.DataType)
                 {
