@@ -139,7 +139,7 @@ namespace WebService.Tests
             {
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
                 MakeASignalsRepositoryMockWithCorrectId(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock();
 
                 MakeASignalsWebService();
 
@@ -159,7 +159,7 @@ namespace WebService.Tests
 
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
                 MakeASignalsRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock();
 
                 MakeASignalsWebService();
                
@@ -172,43 +172,13 @@ namespace WebService.Tests
                 dataRepositoryMock.Verify(sr => sr.SetData<double>(It.IsAny<System.Collections.Generic.ICollection<Datum<double>>>()));
             }
             private Mock<ISignalsDataRepository> dataRepositoryMock;
-            private void MakeADataRepositoryMock(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            private void MakeADataRepositoryMock()
             {
                 dataRepositoryMock = new Mock<ISignalsDataRepository>();
             
 
             }
-            private void MakeASignalsWebService()
-            {
-                 
-               
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-              
-            }
-            private void MakeASignalsRepositoryMock(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
-            {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                 .Setup(sr => sr.Get(It.IsAny<int>()))
-                 .Returns(SignalWith(id: dummyInt,
-                    dataType: dataType,
-                    granularity: granularity,
-                    path: path));
-
-            }
-            private void MakeASignalsRepositoryMockWithCorrectId(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
-            {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                 .Setup(sr => sr.Get(It.Is<int>(s=>s==dummyInt)))
-                 .Returns(SignalWith(id: dummyInt,
-                    dataType: dataType,
-                    granularity: granularity,
-                    path: path));
-
-            }
+         
 
 
             [TestMethod]
@@ -224,7 +194,7 @@ namespace WebService.Tests
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
 
                 MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock();
                 MakeASignalsWebService();
 
           
@@ -257,7 +227,7 @@ namespace WebService.Tests
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
 
                 MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock();
                 MakeASignalsWebService();
 
 
@@ -296,10 +266,9 @@ namespace WebService.Tests
 
                 //arrange
               var anotherId = 5;
-                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock();
                 MakeASignalsRepositoryMockWithCorrectId(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                MakeASignalsWebService();
                 //act
 
                 var result = signalsWebService.GetData(anotherId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
@@ -312,10 +281,9 @@ namespace WebService.Tests
             public void GivenNoData_WhenGettingAData_GetDataIsCalledWithCorrectDatum()
             {
                 //arrange
-                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock();
                 MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                MakeASignalsWebService();
                 //act
 
                 var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
@@ -328,10 +296,9 @@ namespace WebService.Tests
             public void GivenNoData_WhenGettingAData_GetDataIsCalledWithCorrectDatumDouble()
             {
                 //arrange
-                MakeADataRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock();
                 MakeASignalsRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                MakeASignalsWebService();
                 //act
 
                 var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
@@ -397,7 +364,37 @@ namespace WebService.Tests
                         return s;
                     });
             }
+            private void MakeASignalsWebService()
+            {
 
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+
+            }
+            private void MakeASignalsRepositoryMock(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                 .Setup(sr => sr.Get(It.IsAny<int>()))
+                 .Returns(SignalWith(id: dummyInt,
+                    dataType: dataType,
+                    granularity: granularity,
+                    path: path));
+
+            }
+            private void MakeASignalsRepositoryMockWithCorrectId(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                 .Setup(sr => sr.Get(It.Is<int>(s => s == dummyInt)))
+                 .Returns(SignalWith(id: dummyInt,
+                    dataType: dataType,
+                    granularity: granularity,
+                    path: path));
+
+            }
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }
     }
