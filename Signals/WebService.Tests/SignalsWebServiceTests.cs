@@ -239,7 +239,19 @@ namespace WebService.Tests
             [TestMethod]
             public void CreatedMvpForSignal_WhenGetting_IsReturned()
             {
+                SetupWebServiceForMvpOperations();
+                Dto.MissingValuePolicy.MissingValuePolicy policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(id => id == 1))).Returns(new Signal() { Id = 1 });
 
+                missingValueRepoMock.Setup(mv => mv.Get(It.Is<Signal>(s => s.Id == 1)))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyString());
+
+                signalsWebService.SetMissingValuePolicy(1,policy);
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result,typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy));
             }
             
             
