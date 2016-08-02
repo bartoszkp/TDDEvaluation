@@ -17,4 +17,12 @@ namespace Domain.Exceptions
         {
         }
     }
+
+    public class InvalidSignalId : Exception
+    {
+        public InvalidSignalId()
+            : base("Cannot read Signal with current id. Signal with typed Id probably doesnt exists.")
+        {
+        }
+    }
 }

@@ -27,7 +27,9 @@ namespace Domain.Services.Implementation
 
         public Signal GetById(int signalId)
         {
-            return this.signalsRepository.Get(signalId);
+            var result = this.signalsRepository.Get(signalId);
+            if (result == null) throw new InvalidSignalId();
+            else return result;
         }
 
         public Signal Add(Signal newSignal)
@@ -45,6 +47,22 @@ namespace Domain.Services.Implementation
             var result = this.signalsRepository.Get(pathDto);
             if (result == null) throw new InvalidPathArgument();
             else return result;
+        }
+
+        public void SetData(IEnumerable<Datum<double>> newDomainDatum)
+        {
+            this.signalsDataRepository.SetData(newDomainDatum);
+        }
+
+        public IEnumerable<Datum<double>> GetData(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var result = this.signalsDataRepository.GetData<double>(getSignal, fromIncludedUtc, toExcludedUtc);
+            var newDatum = new List<Datum<double>>();
+            foreach (var f in result)
+            {
+                newDatum.Add(new Datum<double>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
+            }
+            return newDatum;
         }
     }
 }

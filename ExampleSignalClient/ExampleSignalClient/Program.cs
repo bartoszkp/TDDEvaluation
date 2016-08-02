@@ -9,21 +9,20 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var newSignal = new Signal()
+            client.Add(new Signal() { DataType = DataType.Boolean, Granularity = Granularity.Day, Path = new Path() { Components = new[] { "x", "someSignal" } } }); //FOR TESTING PURPOSE
+
+            client.SetData(1, new Datum[] {
+            new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+            new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+            new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+
+            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+            foreach (var d in result)
             {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "root", "dayDecimal1" } }
-            };
+                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
+            }
 
-            client.Add(newSignal);
-
-            var result = client.Get(new Path() { Components = new[] { "root", "dayDecimal1" } });
-
-            Console.WriteLine(result.Id.Value);
-            Console.WriteLine(result.DataType);
-            Console.WriteLine(result.Granularity);
-            Console.WriteLine(string.Join("/", result.Path.Components));
             Console.ReadKey();
         }
     }
