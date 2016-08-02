@@ -309,7 +309,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignal_WhenSettingMissingValue_DoNotThrowException()
             {
                 //arrange
