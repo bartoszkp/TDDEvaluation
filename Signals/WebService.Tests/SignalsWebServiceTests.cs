@@ -324,7 +324,26 @@ namespace WebService.Tests
                 //assert
 
             }
-         
+
+            [TestMethod]
+            
+            public void GivenSignal_WhenSettingMissingValue_SetMissingValuePolicyIsCalled()
+            {
+                //arrange
+                dummyInt = 2;
+                int anotherId = 3;
+                MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Boolean, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
+                MakeAMissingValuePolicyRepositoryMock();
+                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
+                //act
+
+                signalsWebService.SetMissingValuePolicy(anotherId, policy);
+                //assert
+                missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+
+
+            }
+
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
