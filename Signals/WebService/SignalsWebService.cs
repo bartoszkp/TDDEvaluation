@@ -76,6 +76,11 @@ namespace WebService
             var mvp = policy?.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
             var signal = signalsDomainService?.GetById(signalId);
+            
+            if(signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
 
             this.signalsDomainService?.SetMissingValuePolicy(
                 signal,
