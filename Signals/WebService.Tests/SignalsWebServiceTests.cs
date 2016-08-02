@@ -164,8 +164,8 @@ namespace WebService.Tests
                     Granularity = Dto.Granularity.Hour,
                     Path = new Dto.Path() { Components = new string[] { "root", "signal1" } }
                 };
-                signalWebService.Add(dummySignal);
                 var dummyPath = Path.FromString("root/signal1");
+                signalRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(path => path.Equals(dummyPath)))).Returns(dummySignal.ToDomain<Domain.Signal>());
 
                 var result = signalWebService.Get(dummyPath.ToDto<Dto.Path>());
 
