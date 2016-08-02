@@ -54,5 +54,15 @@ namespace Domain.Services.Implementation
             if (signal == null) throw new ArgumentException();
             missingValuePolicyRepository.Set(signal, policy);
         }
+
+        public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(int signalID)
+        {
+            Signal signal = signalsRepository.Get(signalID);
+
+            MissingValuePolicyBase result = missingValuePolicyRepository.Get(signal);
+
+            return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType)
+               as MissingValuePolicy.MissingValuePolicyBase;
+        }
     }
 }
