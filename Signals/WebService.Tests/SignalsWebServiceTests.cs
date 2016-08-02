@@ -260,6 +260,8 @@ namespace WebService.Tests
             {
                 SetupWebService();
 
+                missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger());
+
                 signalsWebService.GetMissingValuePolicy(0);
             }
 
@@ -268,6 +270,8 @@ namespace WebService.Tests
             {
                 SetupWebService();
                 int id = 1;
+
+                missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger());
 
                 signalsWebService.GetMissingValuePolicy(id);
 
@@ -284,6 +288,8 @@ namespace WebService.Tests
                 {
                     Id = id
                 });
+
+                missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger());
 
                 signalsWebService.GetMissingValuePolicy(id);
 
