@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+
 
 namespace WebService.Tests
 {
@@ -117,6 +119,19 @@ namespace WebService.Tests
                 var result = signalsWebService.GetById(0);
 
                 Assert.IsNull(result);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                var dummyPath = Path.FromString("root/signal");
+
+                signalWebService.Get(dummyPath.ToDto<Dto.Path>());
+                
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
