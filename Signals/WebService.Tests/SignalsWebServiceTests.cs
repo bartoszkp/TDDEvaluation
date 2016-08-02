@@ -228,6 +228,15 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(notExistingPath);
             }
 
+            private Dto.Datum[] GetDatum()
+            {
+                return new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
+            }
 
             [TestMethod]
             [ExpectedException(typeof(SignalIsNullException))]
@@ -235,12 +244,7 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                Dto.Datum[] data = new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
-                };
+                Dto.Datum[] data = GetDatum();
 
                 int notExistingSignalID = 8;
                 signalsWebService.SetData(notExistingSignalID, data);
@@ -256,12 +260,7 @@ namespace WebService.Tests
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal")));
 
-                Dto.Datum[] data = new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
-                };
+                Dto.Datum[] data = GetDatum();
 
                 signalsWebService.SetData(signalId, data);
             }
