@@ -190,28 +190,7 @@ namespace WebService.Tests
 
             //    GettingByFalsePathAssertion(pathDto);
             //}
-
-
-            [TestMethod]
-            public void SetMissingValuePolicy_DoesNotThrow()
-            {
-                signalsWebService = new SignalsWebService(null);
-
-                signalsWebService.SetMissingValuePolicy(0, null);
-            }
-
-            [TestMethod]
-            public void GivenDefaultSignalAndDefaultSpecificValueMissingValuePolicy_WhenSettingMissingValuePolicy_RepositorySetIsCalled()
-            {
-                SetupForDefaultSignal();
-
-                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
-
-                signalsWebService.SetMissingValuePolicy(0, policy);
-
-                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
-            }
-
+            
             [TestMethod]
             public void GivenASignal_WhenSettingMissingValuePolicy_RepositorySetAndGetIsCalled()
             {
