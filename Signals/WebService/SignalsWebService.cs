@@ -74,31 +74,31 @@ namespace WebService
                     {
                         var item = signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
                             .ToList();
-                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.Decimal:
                     {
                         var item = signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)
                             .ToList();
-                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.Double:
                     {
                         var item = signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
                             .ToList();
-                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.Integer:
                     {
                         var item = signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
                             .ToList();
-                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.String:
                     {
                         var item = signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)
                             .ToList();
-                        return item.ToDto<IEnumerable<Dto.Datum>>();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 default:
                     {
@@ -179,7 +179,7 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            var domianPolicy = policy?.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+            var domianPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             this.signalsDomainService.SetMissingValuePolicy(signalId, domianPolicy);
         }
     }

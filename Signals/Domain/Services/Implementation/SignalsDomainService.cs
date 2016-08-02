@@ -45,7 +45,10 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path pathDto)
         {
-            return this.signalsRepository.Get(pathDto);
+            var item = this.signalsRepository.Get(pathDto);
+            if(item == null)
+                throw new InvalidCastException("Signal dosen't exist");
+            return item;
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> data)
