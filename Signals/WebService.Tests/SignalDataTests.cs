@@ -22,17 +22,24 @@ namespace WebService.Tests
         [ExpectedException(typeof(NoSuchSignalException))]
         public void SignalNotExists_GetData_ThrowsException()
         {
-            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
-            signalsRepoMock = new Mock<ISignalsRepository>();
-
-            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, null);
-            signalsWebService = new SignalsWebService(domainService);
+            SetupWebService();
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns((Signal)null);
 
 
             var result = signalsWebService.GetData(1, new DateTime(), new DateTime());
 
         }
+
+
+        private void SetupWebService()
+        {
+            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+            signalsRepoMock = new Mock<ISignalsRepository>();
+            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, null);
+            signalsWebService = new SignalsWebService(domainService);
+
+        }
+
 
         private Mock<ISignalsDataRepository> signalsDataRepoMock;
         private Mock<ISignalsRepository> signalsRepoMock;
