@@ -13,12 +13,12 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Decimal,
                 Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "root", "dayDecimal1" } }
+                Path = new Path() { Components = new[] { "root", "dayDecimal4" } }
             };
 
             client.Add(newSignal);
 
-            var result = client.Get(new Path() { Components = new[] { "root", "dayDecimal1" } });
+            var result = client.Get(new Path() { Components = new[] { "root", "dayDecimal4" } });
 
             Console.WriteLine(result.Id.Value);
             Console.WriteLine(result.DataType);

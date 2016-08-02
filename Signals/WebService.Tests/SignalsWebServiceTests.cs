@@ -86,7 +86,33 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void 
+            public void GivenNoSignals_WhenGettingByPathWithEmptyContent_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "" } });
+
+                Assert.AreEqual(null, result);
+            }
+
+            [TestMethod]
+            public void GivenASignalFromDomainToDto_WhenTryingToGetByPath_ReturnsTheSameSignal()
+            {
+                GivenNoSignals();
+
+                GivenASignalWithPath(SignalWith(
+                    id: 1,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
+
+                Assert.AreEqual(1, result.Id);
+                Assert.AreEqual(Dto.DataType.Integer, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Second, result.Granularity);
+                CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+            }
 
             private Dto.Signal SignalWith(
                 int? id = null,
@@ -107,7 +133,7 @@ namespace WebService.Tests
                 int id,
                 Domain.DataType dataType,
                 Domain.Granularity granularity,
-                Domain.Path path)
+                Domain.Path path = null)
             {
                 return new Domain.Signal()
                 {
@@ -136,6 +162,15 @@ namespace WebService.Tests
                     .Setup(sr => sr.Get(signal.Id.Value))
                     .Returns(signal);
             }
+            private void GivenASignalWithPath(Signal signal)
+            {
+                GivenNoSignals();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Path))
+                    .Returns(signal);
+            }
+
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }

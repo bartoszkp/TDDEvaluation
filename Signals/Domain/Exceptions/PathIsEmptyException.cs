@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    class PathIsNullException: Exception
+    public class PathIsEmptyException: Exception
     {
-        public PathIsNullException()
-            : base("When adding new signal, Path of the signal can't be null value.")
+        public PathIsEmptyException()
+            : base("When adding new signal, Path of the signal can't be null.")
         {
         }
     }

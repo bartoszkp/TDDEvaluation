@@ -40,14 +40,14 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(signalId);
         }
 
-        public Signal Get(Path pathDto)
-        {
-            if (pathDto.Equals(null))
+        public Signal Get(Path newPath)
+        { 
+            if(newPath.Components.Equals(""))
             {
-                throw new PathIsNullException();
+                throw new PathIsEmptyException();
             }
 
-            return this.signalsRepository.Get(pathDto);
+            return this.signalsRepository.Get(newPath);
         }
     }
 }
