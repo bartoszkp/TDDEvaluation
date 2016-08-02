@@ -304,6 +304,27 @@ namespace WebService.Tests
                 dataRepositoryMock.Verify(sr => sr.GetData<Dto.Datum>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
             }
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignalWithThatId_WhenGettingADataWithThatId_ThrowsArgumentException()
+            {
+
+                //arrange
+              var anotherId = 5;
+                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeASignalsRepositoryMockWithCorrectId(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                //act
+
+                var result = signalsWebService.GetData(anotherId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                //assert
+              
+
+            }
+
+
             private  Datum[] MakeData(Dto.Quality quality,DateTime date, object value  )
             {
                 
