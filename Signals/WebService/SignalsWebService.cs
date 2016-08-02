@@ -92,23 +92,23 @@ namespace WebService
             switch (signal.DataType)
             {
                 case Dto.DataType.Double:
-                    this.signalsDomainService.SetData(signalId,
+                    this.signalsDomainService.SetData(signal.ToDomain<Domain.Signal>(),
                         data.ToDomain<IEnumerable<Domain.Datum<Double>>>());
                     break;
                 case Dto.DataType.Integer:
-                    this.signalsDomainService.SetData(signalId,
+                    this.signalsDomainService.SetData(signal.ToDomain<Domain.Signal>(),
                         data.ToDomain<IEnumerable<Domain.Datum<Int32>>>());
                     break;
                 case Dto.DataType.Boolean:
-                    this.signalsDomainService.SetData(signalId,
+                    this.signalsDomainService.SetData(signal.ToDomain<Domain.Signal>(),
                         data.ToDomain<IEnumerable<Domain.Datum<Boolean>>>());
                     break;
                 case Dto.DataType.Decimal:
-                    this.signalsDomainService.SetData(signalId,
+                    this.signalsDomainService.SetData(signal.ToDomain<Domain.Signal>(),
                         data.ToDomain<IEnumerable<Domain.Datum<Decimal>>>());
                     break;
                 case Dto.DataType.String:
-                    this.signalsDomainService.SetData(signalId,
+                    this.signalsDomainService.SetData(signal.ToDomain<Domain.Signal>(),
                         data.ToDomain<IEnumerable<Domain.Datum<String>>>());
                     break;
             }

@@ -43,9 +43,13 @@ namespace Domain.Services.Implementation
             return signal;
         }
 
-        public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
+        public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
-            this.signalsDataRepository.SetData<T>(data);
+            List<Datum<T>> dataList = data.ToList();
+            for (int i =0;i < dataList.Count; ++i)
+                dataList[i].Signal = signal;
+
+            this.signalsDataRepository.SetData<T>(dataList);
         }
 
         public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
