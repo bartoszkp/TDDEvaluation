@@ -164,7 +164,7 @@ namespace WebService.Tests
             [ExpectedException(typeof(NoSuchSignalException))]
             public void GivenNoSuchSignal_GettingMissingValuePolicy_ThrowsException()
             {
-                SetupWebServiceForGettingMissingValuePolicy();
+                SetupWebServiceForMvpOperations();
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
@@ -172,7 +172,7 @@ namespace WebService.Tests
             [TestMethod]
             public void SignalHasNoSpecfiedPolicy_GettingMissingValuePolicy_ReturnsNull()
             {
-                SetupWebServiceForGettingMissingValuePolicy();
+                SetupWebServiceForMvpOperations();
                 signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal());
                 missingValueRepoMock.Setup(mv => mv.Get(It.IsAny<Signal>())).Returns((MissingValuePolicyBase)null);
 
@@ -184,7 +184,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenSignal_GettingMissingValuePolicy_SpecificPolicyIsReturned()
             {
-                SetupWebServiceForGettingMissingValuePolicy();
+                SetupWebServiceForMvpOperations();
                 signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal());
 
                 missingValueRepoMock.Setup(mv => mv.Get(It.IsAny<Signal>()))
@@ -197,9 +197,22 @@ namespace WebService.Tests
 
             }
 
+
+            [TestMethod]
+            [ExpectedException(typeof(NoSuchSignalException))]
+            public void NoSuchSignal_SetMissingValuePolicy_ThrowsException()
+            {
+                SetupWebServiceForMvpOperations();
+                Dto.MissingValuePolicy.MissingValuePolicy policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns((Signal)null);
+
+                signalsWebService.SetMissingValuePolicy(1, policy);
+
+            }
+
             
             
-            private void SetupWebServiceForGettingMissingValuePolicy()
+            private void SetupWebServiceForMvpOperations()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
