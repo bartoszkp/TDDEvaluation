@@ -274,6 +274,30 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
             }
 
+            [TestMethod]
+            public void GivenASignalId_WhenGettingMissingValuePolic_RepositoryGetIsCalledWithGivenPolicy()
+            {
+                SetupWebService();
+                int id = 1;
+
+                Dto.MissingValuePolicy.MissingValuePolicy mvp = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                {
+                    Id = id,
+                    DataType = Dto.DataType.Integer,
+                    Quality = Dto.Quality.Good,
+                    Value = (int)2
+                };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(new Domain.Signal()
+                {
+                    Id = id
+                });
+
+                signalsWebService.GetMissingValuePolicy(id);
+
+                missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Get(It.Is<Domain.Signal>(s => s.Id == id)), Times.Once);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
