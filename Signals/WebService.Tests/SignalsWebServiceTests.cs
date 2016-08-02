@@ -254,6 +254,31 @@ namespace WebService.Tests
                 Assert.Fail();
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingSpecificMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                SetupMissingValueTest(existingSignal);
+
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Double,
+                    Quality = Dto.Quality.Fair,
+                    Value = (double)1.5
+                };
+                
+                signalsWebService.SetMissingValuePolicy(1, policy);
+
+                VerifyRepositorySetAndGetIsCalled(existingSignal, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -378,7 +403,31 @@ namespace WebService.Tests
             private void VerifyRepositorySetAndGetIsCalled(Domain.Signal existingSignal)
             {
                 signalsRepositoryMock.Verify(srm => srm.Get(1));
-                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.Is<Domain.Signal>( s=>
+                (
+                    s.Id == existingSignal.Id
+                    && s.DataType == existingSignal.DataType
+                    && s.Granularity == existingSignal.Granularity
+                    && s.Path == existingSignal.Path
+                )), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            }
+
+            private void VerifyRepositorySetAndGetIsCalled(Domain.Signal existingSignal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
+            {
+                var specificPolicy = (Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>)policy;
+                signalsRepositoryMock.Verify(srm => srm.Get(1));
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.Is<Domain.Signal>(s =>
+               (
+                   s.Id == existingSignal.Id
+                   && s.DataType == existingSignal.DataType
+                   && s.Granularity == existingSignal.Granularity
+                   && s.Path == existingSignal.Path
+               )), It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>(svmvp => 
+               (
+                svmvp.NativeDataType == policy.NativeDataType
+                && svmvp.Quality == specificPolicy.Quality
+                && svmvp.Value == specificPolicy.Value
+               ))));
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
