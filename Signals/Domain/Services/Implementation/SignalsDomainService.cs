@@ -42,10 +42,25 @@ namespace Domain.Services.Implementation
 
         public void SetData(int signalId, IEnumerable<Datum<double>> data)
         {
-            if (GetById(signalId) == null)
+            Signal foundSignal = GetById(signalId);
+            if (foundSignal == null)
                 throw new SignalNotExistException();
 
+            foreach (Datum<double> d in data)
+            {
+                d.Signal = foundSignal;
+            }
+
             signalsDataRepository.SetData(data);
+        }
+
+        public IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            Signal foundSignal = GetById(signalId);
+            if (foundSignal == null)
+                throw new SignalNotExistException();
+
+            return signalsDataRepository.GetData<double>(foundSignal, fromIncludedUtc, toExcludedUtc);
         }
     }
 }

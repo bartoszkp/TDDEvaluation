@@ -57,17 +57,25 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            List<Dto.Datum> dtoDatum = new List<Dto.Datum>();
+
+            IEnumerable<Domain.Datum<double>> domainDatum = signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+
+            foreach (Domain.Datum<double> d in domainDatum)
+            {
+                dtoDatum.Add(d.ToDto<Dto.Datum>());
+            }
+
+            return dtoDatum;
         }
 
-        public void SetData(int signalId, IEnumerable<Datum> data)
+        public void SetData(int signalId, IEnumerable<Dto.Datum> data)
         {
-            List<Dto.Datum> dtoData = new List<Dto.Datum>(data);
             List<Domain.Datum<double>> domainData = new List<Domain.Datum<double>>();
             
-            foreach (Dto.Datum d in dtoData)
+            foreach (Dto.Datum dtoDatum in data)
             {
-                domainData.Add(d.ToDomain<Domain.Datum<double>>());
+                domainData.Add(dtoDatum.ToDomain<Domain.Datum<double>>());
             }
 
             signalsDomainService.SetData(signalId, domainData);
