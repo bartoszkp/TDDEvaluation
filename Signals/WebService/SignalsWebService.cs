@@ -61,7 +61,9 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new SignalNotFoundException(signalId);
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
