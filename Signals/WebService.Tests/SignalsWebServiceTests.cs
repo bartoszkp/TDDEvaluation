@@ -152,6 +152,28 @@ namespace WebService.Tests
                 signalWebService.Get(dummyPath.ToDto<Dto.Path>());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPathWhichExistsInRepository_ReturnedIsTheSignal()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                var dummySignal = new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Decimal,
+                    Granularity = Dto.Granularity.Hour,
+                    Path = new Dto.Path() { Components = new string[] { "root", "signal1" } }
+                };
+                signalWebService.Add(dummySignal);
+                var dummyPath = Path.FromString("root/signal1");
+
+                var result = signalWebService.Get(dummyPath.ToDto<Dto.Path>());
+
+                Assert.AreEqual(dummySignal.Granularity, result.Granularity);
+                Assert.AreEqual(dummySignal.DataType, result.DataType);
+                CollectionAssert.AreEqual(dummySignal.Path.Components.ToArray(), result.Path.Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
