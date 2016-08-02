@@ -173,6 +173,7 @@ namespace WebService.Tests
             public void SignalHasNoSpecfiedPolicy_GettingMissingValuePolicy_ReturnsNull()
             {
                 SetupWebServiceForMissingValuePolicy();
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal());
                 missingValueRepoMock.Setup(mv => mv.Get(It.IsAny<Signal>())).Returns((MissingValuePolicyBase)null);
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
