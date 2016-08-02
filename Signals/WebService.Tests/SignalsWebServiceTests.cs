@@ -238,6 +238,15 @@ namespace WebService.Tests
                 };
             }
 
+            private void GivenASignalForSettingData(int signalId)
+            {
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+            }
+
             [TestMethod]
             [ExpectedException(typeof(SignalIsNullException))]
             public void GivenNoSignals_WhenSettingData_ThrowsSignalIsNullException()
@@ -251,14 +260,10 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingData_DontThrows()
+            public void GivenASignalForSettingData_WhenSettingData_DontThrows()
             {
                 int signalId = 6;
-                GivenASignal(SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal")));
+                GivenASignalForSettingData(signalId);
 
                 Dto.Datum[] data = GetDatum();
 
@@ -266,14 +271,10 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingData_VerifingRepositoryFunctionsGetAndSetData()
+            public void GivenASignalForSettingData_WhenSettingData_VerifingRepositoryFunctionsGetAndSetData()
             {
-                var signalId = 3;
-                GivenASignal(SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal")));
+                int signalId = 3;
+                GivenASignalForSettingData(signalId);
 
                 Dto.Datum[] data = GetDatum();
 
