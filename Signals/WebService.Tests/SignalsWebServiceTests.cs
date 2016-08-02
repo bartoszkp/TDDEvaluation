@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -153,8 +154,8 @@ namespace WebService.Tests
                 GivenNoSignals();
                 int id = 5;
                 signalsWebService.SetData(id, null);
-            }
-
+            }            
+            
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -182,7 +183,9 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();                
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -196,6 +199,9 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Path))
                     .Returns(existingSignal);
+                signalsDataRepoMock
+                    .Setup(sd => sd.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()))
+                    .Verifiable("Signals data repository's SetData() not called");
             }
 
             private void GivenRepositoryThatAssigns(int id)
@@ -210,6 +216,7 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepoMock;
         }
     }
 }
