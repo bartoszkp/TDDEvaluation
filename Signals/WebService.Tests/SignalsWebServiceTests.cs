@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -154,6 +155,28 @@ namespace WebService.Tests
                 int id = 5;
                 signalsWebService.SetData(id, null);
             }
+            [TestMethod]
+            public void GivenOneSignalAndSignalData_WhenSettingDataForSignal_DataRepositorySetDataIsCalled()
+            {
+                int id = 1;
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(id, DataType.Double, Granularity.Day, path.ToDomain<Domain.Path>());
+                
+                GivenASignal(signal);
+
+                var dtoData = new Dto.Datum[]
+                {
+                    new Dto.Datum()
+                    {
+                        Quality = Dto.Quality.Fair,
+                        Timestamp = new System.DateTime(2000, 1, 1),
+                        Value = (double)1
+                    }
+                };
+
+                signalsWebService.SetData(id, dtoData);
+                signalsDataRepoMock.Verify(sd => sd.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+            }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
@@ -182,7 +205,9 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -210,6 +235,7 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepoMock;
         }
     }
 }
