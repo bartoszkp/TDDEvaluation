@@ -116,12 +116,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSetMissingValuePolicy_CalledMissingValuePolicyRepository()
             {
-                GivenASignal(SignalWith(
-                    id: 1,
-                    dataType: DataType.Boolean,
-                    granularity: Granularity.Month,
-                    path: Path.FromString("x/y")
-                    ));
+                GivenASignal(GetTestSignal());
 
                 Dto.MissingValuePolicy.MissingValuePolicy mvpDTO = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
                 
@@ -137,12 +132,7 @@ namespace WebService.Tests
                 int correctId = 1;
                 int invalidId = 123;
 
-                GivenASignal(SignalWith(
-                    id: correctId,
-                    dataType: DataType.Boolean,
-                    granularity: Granularity.Month,
-                    path: Path.FromString("x/y")
-                    ));
+                GivenASignal(GetTestSignal());
 
                 signalsWebService.SetMissingValuePolicy(invalidId, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
             }
