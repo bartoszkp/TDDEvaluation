@@ -100,7 +100,10 @@ namespace WebService
 
         public void SetSignalData(int signalId, IEnumerable<Datum> data)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+
+            if (signal == null)
+                throw new NoSuchSignalException("Could not get data for not existing signal");
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
