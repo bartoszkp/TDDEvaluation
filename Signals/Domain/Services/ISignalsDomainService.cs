@@ -11,6 +11,6 @@ namespace Domain.Services
 
         Signal GetByPath(Path signalPath);
 
-        void SetData();
+        void SetData(int signalId);
     }
 }

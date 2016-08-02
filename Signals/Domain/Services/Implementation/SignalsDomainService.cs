@@ -43,9 +43,11 @@ namespace Domain.Services.Implementation
             return signal;
         }
 
-        public void SetData()
+        public void SetData(int signalId)
         {
-            throw new SignalIsNullException();
+            var signal = this.signalsRepository.Get(signalId);
+            if (signal == null)
+                throw new SignalIsNullException();
         }
     }
 }
