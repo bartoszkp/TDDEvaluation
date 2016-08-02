@@ -70,7 +70,7 @@ namespace WebService
                  var list = new List<Domain.Datum<double>>();
            
 
-            signalsDomainService.SetData<double>(list);
+                signalsDomainService.SetData<double>(list);
 
             }
            
