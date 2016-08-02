@@ -34,5 +34,10 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
+
+        public void SetData<T>(IEnumerable<Datum<T>> data)
+        {
+            signalsDataRepository.SetData(data);
+        }
     }
 }

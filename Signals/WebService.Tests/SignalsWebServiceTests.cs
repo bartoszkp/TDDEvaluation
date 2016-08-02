@@ -148,7 +148,7 @@ namespace WebService.Tests
 
                 ////assert
 
-                dataRepositoryMock.Verify(sr => sr.SetData<double>(It.IsAny<System.Collections.Generic.ICollection<Datum<double>>>()));
+                dataRepositoryMock.Verify(sr => sr.SetData<Datum>(It.IsAny<System.Collections.Generic.ICollection<Datum<Datum>>>()));
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
