@@ -219,6 +219,22 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(1,null);
             }
 
+            [TestMethod]
+            public void CreatedNewSignal_HasNoMvpByDefault()
+            {
+                SetupWebServiceForMvpOperations();
+                var newSignal = SignalWith(1,
+                                               dataType: DataType.Integer,
+                                               granularity: Granularity.Hour,
+                                               path: Path.FromString("x/y"));
+                signalsRepositoryMock.Setup(sr => sr.Add(newSignal)).Returns(newSignal);
+                var dtoSignal = signalsWebService.Add(newSignal.ToDto<Dto.Signal>());
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(id => id == 1))).Returns(newSignal);
+
+                missingValueRepoMock.Setup(mv => mv.Get(newSignal)).Returns((MissingValuePolicyBase)null);
+
+            }
+
             
             
             private void SetupWebServiceForMvpOperations()
