@@ -47,5 +47,11 @@ namespace Domain.Services.Implementation
         {
             this.signalsDataRepository.SetData<T>(data);
         }
+
+        public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            return new List<Datum<T>>() { new Datum<T>() {
+                Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1) } };
+        }
     }
 }
