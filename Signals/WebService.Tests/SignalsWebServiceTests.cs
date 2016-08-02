@@ -227,8 +227,7 @@ namespace WebService.Tests
                 var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
                 signalsWebService.SetMissingValuePolicy(1, policy);
 
-                signalsRepositoryMock.Verify(srm => srm.Get(1));
-                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+                VerifyRepositorySetAndGetIsCalled();
             }
 
             [TestMethod]
@@ -247,17 +246,7 @@ namespace WebService.Tests
                 var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
                 signalsWebService.SetMissingValuePolicy(1, policy);
 
-                signalsRepositoryMock.Verify(srm => srm.Get(1));
-                missingValuePolicyRepositoryMock
-                    .Verify(mvp => mvp.Set(
-                        It.Is<Domain.Signal>(s => 
-                        (
-                            s.Id == existingSignal.Id
-                            && s.DataType == existingSignal.DataType
-                            && s.Granularity == existingSignal.Granularity
-                            && s.Path == existingSignal.Path
-                        )),
-                        It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+                VerifyRepositorySetAndGetIsCalled(existingSignal);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
@@ -375,7 +364,19 @@ namespace WebService.Tests
 
             }
 
-        private Mock<ISignalsRepository> signalsRepositoryMock;
+            private void VerifyRepositorySetAndGetIsCalled()
+            {
+                signalsRepositoryMock.Verify(srm => srm.Get(1));
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            }
+
+            private void VerifyRepositorySetAndGetIsCalled(Domain.Signal existingSignal)
+            {
+                signalsRepositoryMock.Verify(srm => srm.Get(1));
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            }
+
+            private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
         }
     }
