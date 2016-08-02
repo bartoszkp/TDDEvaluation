@@ -64,6 +64,12 @@ namespace WebService
             var signal = GetById(signalId);
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
+                        
+            if(data == null)
+            {
+                signalsDomainService.SetData(null);
+                return;
+            }
 
             int i = 0;
             if (signal.DataType == DataType.Double)
