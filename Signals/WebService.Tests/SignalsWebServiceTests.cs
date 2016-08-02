@@ -204,9 +204,11 @@ namespace WebService.Tests
             {
                 var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
                 missingValuePolicyRepositoryMock
                     .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
-                var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
                 var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
