@@ -59,7 +59,8 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var result = signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+            return result.ToDto<IEnumerable<Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
