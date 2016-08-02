@@ -155,6 +155,7 @@ namespace WebService.Tests
                 int id = 5;
                 signalsWebService.SetData(id, null);
             }
+
             [TestMethod]
             public void GivenOneSignalAndSignalData_WhenSettingDataForSignal_DataRepositorySetDataIsCalled()
             {
@@ -175,6 +176,19 @@ namespace WebService.Tests
                 };
 
                 signalsWebService.SetData(id, dtoData);
+                signalsDataRepoMock.Verify(sd => sd.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+            }
+
+            [TestMethod]
+            public void GivenOneSignalAndNoData_WhenSettingDataForSignal_ArgumentNullExceptionIsNotThrown()
+            {
+                int id = 1;
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(id, DataType.Double, Granularity.Day, path.ToDomain<Domain.Path>());
+
+                GivenASignal(signal);
+
+                signalsWebService.SetData(id, null);
                 signalsDataRepoMock.Verify(sd => sd.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
             }
 
