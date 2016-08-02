@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -63,6 +64,11 @@ namespace Domain.Services.Implementation
                 newDatum.Add(new Datum<double>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
             }
             return newDatum;
+        }
+
+        public void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase)
+        {
+            this.missingValuePolicyRepository.Set(domainSetMVPSignal, domainPolicyBase);
         }
     }
 }
