@@ -241,21 +241,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingData_DontThrows()
-            {
-                int signalId = 6;
-                GivenASignal(SignalWith(
-                   id: signalId,
-                   dataType: Domain.DataType.Double,
-                   granularity: Domain.Granularity.Month,
-                   path: Domain.Path.FromString("root/signal")));
-
-                Dto.Datum[] data = GetDtoDatumDouble();
-
-                signalsWebService.SetData(signalId, data);
-            }
-
-            [TestMethod]
             public void GivenASignal_WhenSettingData_VerifingRepositoryFunctionsGetAndSetData()
             {
                 int signalId = 3;
@@ -273,31 +258,6 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
                 signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
-            }
-
-            [TestMethod]
-            public void GivenASignal_WhenSettingData_UsingIntsInstedOfDouble()
-            {
-                int signalId = 7;
-                GivenASignal(SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Integer,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal")));
-
-                Dto.Datum[] data = new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
-                };
-
-                signalsDataRepositoryMock.Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
-
-                signalsWebService.SetData(signalId, data);
-
-                signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
-                signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
             }
 
             [TestMethod]
@@ -322,9 +282,6 @@ namespace WebService.Tests
                     });
 
                 signalsWebService.SetData(signalId, data);
-
-                signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
-                signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
             }
 
             [TestMethod]
@@ -337,22 +294,6 @@ namespace WebService.Tests
                 int notExistingSignalID = 8;
                 signalsWebService.GetData(notExistingSignalID, from, to);
             }
-
-            [TestMethod]
-            public void GivenASignal_WhenGettingData_DontThrows()
-            {
-                int signalId = 7;
-                GivenASignal(SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Integer,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal")));
-
-                DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
-
-                signalsWebService.GetData(signalId, from, to);
-            }
-
 
             [TestMethod]
             public void GivenASignal_WhenGettingData_ReturnsDatum()
