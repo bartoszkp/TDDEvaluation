@@ -323,7 +323,22 @@ namespace WebService.Tests
               
 
             }
+            [TestMethod]
+            public void GivenNoData_WhenGettingAData_GetDataIsCalledWithCorrectDatum()
+            {
+                //arrange
+                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                //act
 
+                var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                //assert
+                dataRepositoryMock.Verify(sr => sr.GetData<int>(It.IsAny<Domain.Signal>(), new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)));
+
+            }
 
             private  Datum[] MakeData(Dto.Quality quality,DateTime date, object value  )
             {
