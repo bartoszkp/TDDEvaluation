@@ -362,6 +362,17 @@ namespace WebService.Tests
                 signalsWebService.SetData(0, null);
             }
 
+            [TestMethod]
+            public void GivenNoData_WhenSettingData_CallsGetByIdWithPassedId()
+            {
+                SetupWebService();
+                int id = 1;
+
+                signalsWebService.SetData(id, null);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
