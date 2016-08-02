@@ -58,5 +58,10 @@ namespace Domain.Services.Implementation
 
             return this.missingValuePolicyRepository.Get(signal);
         }
+
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase policy)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
