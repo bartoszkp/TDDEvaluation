@@ -160,7 +160,9 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-           
+
+           var sig= signalsDomainService.GetById(signalId);
+            if (sig == null) throw new ArgumentException();
         }
     }
 }
