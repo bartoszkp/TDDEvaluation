@@ -309,6 +309,17 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
                 signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(SignalIsNullException))]
+            public void GivenNoSignals_WhenGettingData_ThrowsSignalIsNullException()
+            {
+                GivenNoSignals();
+
+                DateTime from = new DateTime(2000, 1, 1),to = new DateTime(2000, 3, 1);
+                int notExistingSignalID = 8;
+                signalsWebService.GetData(notExistingSignalID, from, to);
+            }
         }
     }
 }
