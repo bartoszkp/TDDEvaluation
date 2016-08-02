@@ -167,13 +167,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
-
-            [TestMethod]
-            [ExpectedException(typeof(System.ArgumentNullException))]
-            public void GivenNullSignal_GettingMissingValuePolicy_ThrowsArgumentNullExcepton()
-            {
-
-            }
+            
             
             private void SetupWebServiceForMissingValuePolicy()
             {
