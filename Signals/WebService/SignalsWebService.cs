@@ -59,6 +59,9 @@ namespace WebService
             if (signalsDomainService != null)
             {
                 var sig = signalsDomainService.GetById(signalId);
+
+                if (sig == null) throw new ArgumentException();
+
                 return signalsDomainService.GetData<Dto.Datum>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
             }
             return new Datum[] { new Datum()};
