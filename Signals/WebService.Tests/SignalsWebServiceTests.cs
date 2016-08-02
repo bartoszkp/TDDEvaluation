@@ -133,9 +133,26 @@ namespace WebService.Tests
                 signalsWebService.SetData(dummyInt,dummyData);
                 //assert
             }
-
-
             [TestMethod]
+           [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoId_WhenSettingData_ThrowsException()
+            {
+                var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
+                MakeASignalsRepositoryMockWithCorrectId(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+
+                MakeASignalsWebService();
+
+
+                ////act
+                signalsWebService.SetData(dummyInt+5, dummyData);
+
+                ////assert
+
+             
+            }
+
+        [TestMethod]
             public void GivenDataDouble_WhenSettingData_SetDataIsCalled()
             {
                 //arrange
@@ -158,12 +175,7 @@ namespace WebService.Tests
             private void MakeADataRepositoryMock(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
             {
                 dataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsRepositoryMock
-                 .Setup(sr => sr.Get(dummyInt))
-                 .Returns(SignalWith(id: dummyInt,
-                    dataType: dataType,
-                    granularity: granularity,
-                    path: path));
+            
 
             }
             private void MakeASignalsWebService()
@@ -186,31 +198,19 @@ namespace WebService.Tests
                     path: path));
 
             }
-            
-            [TestMethod]
-            public void GivenDataDouble_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
+            private void MakeASignalsRepositoryMockWithCorrectId(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
             {
-                //arrange
-                dummyValue = 1.0;
-                var dummyData = MakeData(Dto.Quality.Fair,new DateTime(2000,1,1),1.0);
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                 .Setup(sr => sr.Get(It.Is<int>(s=>s==dummyInt)))
+                 .Returns(SignalWith(id: dummyInt,
+                    dataType: dataType,
+                    granularity: granularity,
+                    path: path));
 
-                MakeASignalsRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeASignalsWebService();
-             
-                ////act
-                signalsWebService.SetData(dummyInt, dummyData);
-
-                ////assert
-
-                dataRepositoryMock.Verify(sr => sr.SetData<double>(
-                    It.Is<System.Collections.Generic.ICollection<Datum<double>>>(s =>
-                    s.ToArray()[0].Value == (double)dummyValue &&
-                    s.ToArray()[0].Quality == Domain.Quality.Fair &&
-                    s.ToArray()[0].Timestamp == new DateTime(2000, 1, 1)
-                )));
             }
-            
+
+
             [TestMethod]
             public void GivenDataInt_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
             {
