@@ -88,7 +88,7 @@ namespace Domain.Services.Implementation
             foreach (var d in dataList)
                 d.Signal = signal;
 
-            this.signalsDataRepository.SetData<T>(dataList);
+            this.signalsDataRepository.SetData(dataList);
         }
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -96,6 +96,17 @@ namespace Domain.Services.Implementation
             var signal = this.signalsRepository.Get(signalId);
 
             return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+        }
+
+        public Type GetDataTypeById(int signalId)
+        {
+            var dataType = this.signalsRepository.Get(signalId)
+                ?.DataType;
+
+            if (dataType.HasValue == false)
+                throw new SignalDoesntExistException();
+
+            return DataTypeUtils.GetNativeType(dataType.Value);
         }
     }
 }
