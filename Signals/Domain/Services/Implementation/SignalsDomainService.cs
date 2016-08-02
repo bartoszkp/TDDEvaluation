@@ -73,5 +73,13 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository.Set(signal,policy);
 
         }
+
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
     }
 }
