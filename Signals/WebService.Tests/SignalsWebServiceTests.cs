@@ -228,13 +228,24 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(notExistingPath);
             }
 
-            private Dto.Datum[] GetDatum()
+            private Dto.Datum[] GetDatumDouble()
             {
                 return new Dto.Datum[]
                 {
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
+            }
+
+
+            private Dto.Datum[] GetDatumInt()
+            {
+                return new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
                 };
             }
 
@@ -253,7 +264,7 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                Dto.Datum[] data = GetDatum();
+                Dto.Datum[] data = GetDatumDouble();
 
                 int notExistingSignalID = 8;
                 signalsWebService.SetData(notExistingSignalID, data);
@@ -265,7 +276,7 @@ namespace WebService.Tests
                 int signalId = 6;
                 GivenASignalForSettingData(signalId);
 
-                Dto.Datum[] data = GetDatum();
+                Dto.Datum[] data = GetDatumDouble();
 
                 signalsWebService.SetData(signalId, data);
             }
@@ -276,7 +287,7 @@ namespace WebService.Tests
                 int signalId = 3;
                 GivenASignalForSettingData(signalId);
 
-                Dto.Datum[] data = GetDatum();
+                Dto.Datum[] data = GetDatumDouble();
 
                 signalsDataRepositoryMock.Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
 
@@ -284,6 +295,22 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
                 signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
+            }
+
+            [TestMethod]
+            public void GivenASignalForSettingData_WhenSettingData_UsingIntsInstedOfDouble()
+            {
+                int signalId = 3;
+                GivenASignalForSettingData(signalId);
+
+                Dto.Datum[] data = GetDatumInt();
+
+                signalsDataRepositoryMock.Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
+
+                signalsWebService.SetData(signalId, data);
+
+                signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
+                signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
             }
         }
     }
