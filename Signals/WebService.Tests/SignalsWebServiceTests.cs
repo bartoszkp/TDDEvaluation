@@ -130,7 +130,7 @@ namespace WebService.Tests
                     .Returns(signal);
                 missingValuePolicyRepositoryMock
                     .Setup(mvpr => mvpr.Get(It.Is<Domain.Signal>(s => s == signal)))
-                    .Returns<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>(null);
+                    .Returns<DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger>(null);
 
                 var result = signalsWebService.GetMissingValuePolicy(signal.Id.Value);
                 Assert.IsNull(result);
@@ -162,24 +162,27 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(signal.Id.Value))
                     .Returns(signal);
-                var mvp = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                var mvp = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
                 {
-                    Id = 32,
-                    DataType = Dto.DataType.Double,
-                    Signal = signal.ToDto<Dto.Signal>()
+                    Id = 45,
+                    Quality = Quality.Fair,
+                    Signal = signal,
+                    Value = (double)2.25
                 };
                 missingValuePolicyRepositoryMock
                     .Setup(mvpr => mvpr.Get(It.Is<Domain.Signal>(s => s == signal)))
-                    .Returns(mvp.ToDomain <Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>());
+                    .Returns(mvp);
+
+                var mvpDto = mvp.ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
 
                 Dto.MissingValuePolicy.MissingValuePolicy result 
                     = signalsWebService.GetMissingValuePolicy(signal.Id.Value);
-                Assert.AreEqual(mvp.Id, result.Id);
-                Assert.AreEqual(mvp.DataType, result.DataType);
-                Assert.AreEqual(mvp.Signal.Id, result.Signal.Id);
-                Assert.AreEqual(mvp.Signal.DataType, result.Signal.DataType);
-                Assert.AreEqual(mvp.Signal.Granularity, result.Signal.Granularity);
-                Assert.AreEqual(mvp.Signal.Path.ToString(), result.Signal.Path.ToString());
+                Assert.AreEqual(mvpDto.Id, result.Id);
+                Assert.AreEqual(mvpDto.DataType, result.DataType);
+                Assert.AreEqual(mvpDto.Signal.Id, result.Signal.Id);
+                Assert.AreEqual(mvpDto.Signal.DataType, result.Signal.DataType);
+                Assert.AreEqual(mvpDto.Signal.Granularity, result.Signal.Granularity);
+                Assert.AreEqual(mvpDto.Signal.Path.ToString(), result.Signal.Path.ToString());
             }
 
             [TestMethod]

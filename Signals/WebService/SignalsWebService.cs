@@ -70,8 +70,7 @@ namespace WebService
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
             var result = signalsDomainService.GetMissingValuePolicyBase(signalId);
-            var resultDto = result?.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
-            return resultDto;
+            return result?.ToDto<MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)

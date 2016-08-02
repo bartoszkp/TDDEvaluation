@@ -58,8 +58,11 @@ namespace Domain.Services.Implementation
             {
                 throw new SignalWithThisIdNonExistException();
             }
-            var result = missingValuePolicyRepository.Get(signal);
-            return result;
+            var mvp = missingValuePolicyRepository.Get(signal);
+            if (mvp == null)
+                return null;
+            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                as MissingValuePolicy.MissingValuePolicyBase;
         }
 
         public void SetMissingValuePolicyBase(int signalId, MissingValuePolicyBase policy)
