@@ -66,7 +66,7 @@ namespace WebService
 
             if (signal == null)
                 throw new NoSuchSignalException("Could not get data for not existing signal");
-            return null;
+            throw new NotImplementedException();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
