@@ -241,6 +241,40 @@ namespace WebService.Tests
                     s.ToArray()[0].Timestamp == new DateTime(2000, 1, 1)
                 )));
             }
+
+
+
+            [TestMethod]
+            public void GivenDataInt_WhenSettingDataWithOneDatum_SetDataIsCalledSignalIsCorrect()
+            {
+                //arrange
+
+
+
+                int dummyInt = 2;
+                dummyValue = 1;
+
+                var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
+
+                MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeASignalsWebService();
+
+
+
+                ////act
+                signalsWebService.SetData(dummyInt, dummyData);
+
+                ////assert
+
+                dataRepositoryMock.Verify(sr => sr.SetData<int>(
+                    It.Is<System.Collections.Generic.ICollection<Datum<int>>>(s =>
+                    s.ToArray()[0].Value == (int)dummyValue &&
+                    s.ToArray()[0].Quality == Domain.Quality.Fair &&
+                    s.ToArray()[0].Timestamp == new DateTime(2000, 1, 1)&&
+                    s.ToArray()[0].Signal.Id == dummyInt
+                )));
+            }
             
             private  Datum[] MakeData(Dto.Quality quality,DateTime date, object value  )
             {
