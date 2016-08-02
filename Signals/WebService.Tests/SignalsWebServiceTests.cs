@@ -373,7 +373,7 @@ namespace WebService.Tests
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
                 
-                var result = (Dto.MissingValuePolicy.SpecificValueMissingValuePolicy)signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value);
+                var result = signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
 
                 Assert.AreEqual(existingPolicy.Id, result.Id);
                 Assert.AreEqual(existingPolicy.Quality, result.Quality);
