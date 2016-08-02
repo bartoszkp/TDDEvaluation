@@ -75,8 +75,9 @@ namespace WebService
 
             if (mvp == null) return null;
 
-            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy;
+            /*return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                as MissingValuePolicy;*/
+            return mvp.ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
             
 
         }

@@ -164,7 +164,7 @@ namespace WebService.Tests
             [ExpectedException(typeof(NoSuchSignalException))]
             public void GivenNoSuchSignal_GettingMissingValuePolicy_ThrowsException()
             {
-                SetupWebServiceForMissingValuePolicy();
+                SetupWebServiceForGettingMissingValuePolicy();
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
@@ -172,7 +172,7 @@ namespace WebService.Tests
             [TestMethod]
             public void SignalHasNoSpecfiedPolicy_GettingMissingValuePolicy_ReturnsNull()
             {
-                SetupWebServiceForMissingValuePolicy();
+                SetupWebServiceForGettingMissingValuePolicy();
                 signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal());
                 missingValueRepoMock.Setup(mv => mv.Get(It.IsAny<Signal>())).Returns((MissingValuePolicyBase)null);
 
@@ -181,9 +181,25 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GivenSignal_GettingMissingValuePolicy_SpecificPolicyIsReturned()
+            {
+                SetupWebServiceForGettingMissingValuePolicy();
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal());
+
+                missingValueRepoMock.Setup(mv => mv.Get(It.IsAny<Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean());
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result,typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy));
+
+
+            }
+
             
             
-            private void SetupWebServiceForMissingValuePolicy()
+            private void SetupWebServiceForGettingMissingValuePolicy()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
