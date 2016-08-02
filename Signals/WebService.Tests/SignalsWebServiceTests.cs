@@ -255,32 +255,7 @@ namespace WebService.Tests
                     policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>(),
                     signalsRepositoryMock, missingValuePolicyRepositoryMock);
             }
-
-            [TestMethod]
-            public void GetMissingValuePolicy_DoesNotThrow()
-            {
-                signalsWebService = new SignalsWebService(null);
-
-                signalsWebService.GetMissingValuePolicy(0);
-            }
-
-            [TestMethod]
-            public void GivenNoSignals_WhenGettingMissingValuePolicy_ReturnsGetIsCalled()
-            {
-                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                missingValuePolicyRepositoryMock
-                    .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()));
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.GetMissingValuePolicy(0);
-
-                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Get(It.IsAny<Domain.Signal>()));
-            }
-
+            
             [TestMethod]
             public void GivenASignal_WhenGettingMissingValuePolicy_RepositoryGetIsCalled()
             {
