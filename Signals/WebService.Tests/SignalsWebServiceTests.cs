@@ -127,7 +127,7 @@ namespace WebService.Tests
             public void GivenNoData_WhenSettingData_DoesNotThrowException()
             {
                 //arrange
-                var dummyData = MakeData();
+                var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
                 signalsWebService = new SignalsWebService(null);
                 //act
                 signalsWebService.SetData(dummyInt,dummyData);
@@ -140,7 +140,9 @@ namespace WebService.Tests
             {
                 //arrange
 
-                var dummyData = MakeData();
+                var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
+                MakeASignalsRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
 
                 MakeASignalsWebService();
                
@@ -153,28 +155,47 @@ namespace WebService.Tests
                 dataRepositoryMock.Verify(sr => sr.SetData<double>(It.IsAny<System.Collections.Generic.ICollection<Datum<double>>>()));
             }
             private Mock<ISignalsDataRepository> dataRepositoryMock;
-            private void MakeASignalsWebService()
+            private void MakeADataRepositoryMock(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
             {
-                 dataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                dataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock
                  .Setup(sr => sr.Get(dummyInt))
                  .Returns(SignalWith(id: dummyInt,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Year,
-                    path: Domain.Path.FromString("root/signal")));
+                    dataType: dataType,
+                    granularity: granularity,
+                    path: path));
+
+            }
+            private void MakeASignalsWebService()
+            {
+                 
+               
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
               
             }
+            private void MakeASignalsRepositoryMock(int dummyInt, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                 .Setup(sr => sr.Get(It.IsAny<int>()))
+                 .Returns(SignalWith(id: dummyInt,
+                    dataType: dataType,
+                    granularity: granularity,
+                    path: path));
 
+            }
+            
             [TestMethod]
             public void GivenDataDouble_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
             {
                 //arrange
+                dummyValue = 1.0;
+                var dummyData = MakeData(Dto.Quality.Fair,new DateTime(2000,1,1),1.0);
 
-                var dummyData = MakeData();
+                MakeASignalsRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
                 MakeASignalsWebService();
              
                 ////act
@@ -189,6 +210,7 @@ namespace WebService.Tests
                     s.ToArray()[0].Timestamp == new DateTime(2000, 1, 1)
                 )));
             }
+            
             [TestMethod]
             public void GivenDataInt_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
             {
@@ -198,18 +220,14 @@ namespace WebService.Tests
 
                 int dummyInt = 2;
                 dummyValue = 1;
-                var dummyData= new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 } };
+                
+                var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
 
-                dataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                 .Setup(sr => sr.Get(dummyInt))
-                 .Returns(SignalWith(id: dummyInt,
-                    dataType: Domain.DataType.Integer,
-                    granularity: Domain.Granularity.Year,
-                    path: Domain.Path.FromString("root/signal")));
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeASignalsWebService();
+
+          
 
                 ////act
                 signalsWebService.SetData(dummyInt, dummyData);
@@ -223,11 +241,11 @@ namespace WebService.Tests
                     s.ToArray()[0].Timestamp == new DateTime(2000, 1, 1)
                 )));
             }
-            private  Datum[] MakeData()
+            
+            private  Datum[] MakeData(Dto.Quality quality,DateTime date, object value  )
             {
-                int dummyInt = 2;
-                dummyValue = 1.0;
-                return new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } };
+                
+                return new Datum[] { new Datum() { Quality = quality, Timestamp = date, Value = value } };
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
