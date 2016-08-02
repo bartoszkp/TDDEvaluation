@@ -78,7 +78,7 @@ namespace WebService
             var signal = signalsDomainService?.GetById(signalId);
 
             this.signalsDomainService?.SetMissingValuePolicy(
-                signalId,
+                signal,
                 mvp);
         }
     }
