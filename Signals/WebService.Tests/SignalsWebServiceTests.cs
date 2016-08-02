@@ -354,6 +354,14 @@ namespace WebService.Tests
                 signalsWebService.GetMissingValuePolicy(nonExistingId);
             }
 
+            [TestMethod]
+            public void GivenNoData_WhenSettingData_DoesNotThrow()
+            {
+                SetupWebService();
+
+                signalsWebService.SetData(0, null);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
