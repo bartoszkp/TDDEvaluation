@@ -337,6 +337,19 @@ namespace WebService.Tests
                 });
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentException))]
+            public void GivenNonExistingId_WhenGettingMissingValuePolicy_ThrowsArgumentException()
+            {
+                SetupWebService();
+
+                int nonExistingId = 4;
+
+                signalsRepositoryMock.Setup(srm => srm.Get(nonExistingId)).Returns((Domain.Signal)null);
+
+                signalsWebService.GetMissingValuePolicy(nonExistingId);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
