@@ -210,6 +210,15 @@ namespace WebService.Tests
 
             }
 
+
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentNullException))]
+            public void GivenNullPolicy_SetMissingValuePolicy_ThrowsArgumentNullException()
+            {
+                SetupWebServiceForMvpOperations();
+                signalsWebService.SetMissingValuePolicy(1,null);
+            }
+
             
             
             private void SetupWebServiceForMvpOperations()
