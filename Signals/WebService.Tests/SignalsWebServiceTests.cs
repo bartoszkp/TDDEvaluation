@@ -352,6 +352,32 @@ namespace WebService.Tests
                 if (!(signalsWebService.GetData(signalId, from, to) is IEnumerable<Dto.Datum>))
                     Assert.Fail();
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_VerifyDataRepositoryFunctions()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<double>(
+                    It.IsAny<Signal>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<DateTime>()));
+
+                signalsWebService.GetData(signalId, from, to);
+
+                signalsDataRepositoryMock.Verify(x => x.GetData<double>(
+                    It.IsAny<Signal>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<DateTime>()));
+            }
         }
     }
 }
