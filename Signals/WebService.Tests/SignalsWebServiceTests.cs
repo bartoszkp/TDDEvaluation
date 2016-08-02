@@ -250,7 +250,13 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.Get(1));
                 missingValuePolicyRepositoryMock
                     .Verify(mvp => mvp.Set(
-                        It.Is<Domain.Signal>(s => s == existingSignal),
+                        It.Is<Domain.Signal>(s => 
+                        (
+                            s.Id == existingSignal.Id
+                            && s.DataType == existingSignal.DataType
+                            && s.Granularity == existingSignal.Granularity
+                            && s.Path == existingSignal.Path
+                        )),
                         It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
             }
 
