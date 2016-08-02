@@ -275,18 +275,10 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalId_WhenGettingMissingValuePolic_RepositoryGetIsCalledWithGivenPolicy()
+            public void GivenASignalId_WhenGettingMissingValuePolic_RepositoryGetIsCalledWithGivenSignal()
             {
                 SetupWebService();
                 int id = 1;
-
-                Dto.MissingValuePolicy.MissingValuePolicy mvp = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
-                {
-                    Id = id,
-                    DataType = Dto.DataType.Integer,
-                    Quality = Dto.Quality.Good,
-                    Value = (int)2
-                };
 
                 signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(new Domain.Signal()
                 {
