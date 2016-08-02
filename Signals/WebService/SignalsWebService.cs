@@ -66,15 +66,64 @@ namespace WebService
             if (signalsDomainService != null)
             {
                 var result = signalsDomainService.GetById(signalId);
-         
-                 var list = new List<Domain.Datum<double>>();
-            foreach (var i in data)
-            {
 
-                list.Add(i.ToDomain<Domain.Datum<double>>());
-            }
+                switch (result.DataType)
+                {
+                    case Domain.DataType.Boolean:
+                        var list1 = new List<Domain.Datum<Boolean>>();
+                        foreach (var i in data)
+                        {
 
-            signalsDomainService.SetData<double>(list);
+                            list1.Add(i.ToDomain<Domain.Datum<Boolean>>());
+                        }
+
+                        signalsDomainService.SetData<Boolean>(list1);
+                        break;
+                    case Domain.DataType.Integer:
+                        var list2 = new List<Domain.Datum<int>>();
+                        foreach (var i in data)
+                        {
+
+                            list2.Add(i.ToDomain<Domain.Datum<int>>());
+                        }
+
+                        signalsDomainService.SetData<int>(list2);
+                        break;
+                    case Domain.DataType.Double:
+                        var list3 = new List<Domain.Datum<double>>();
+                        foreach (var i in data)
+                        {
+
+                            list3.Add(i.ToDomain<Domain.Datum<double>>());
+                        }
+
+                        signalsDomainService.SetData<double>(list3);
+                        break;
+                    case Domain.DataType.Decimal:
+                        var list4 = new List<Domain.Datum<Decimal>>();
+                        foreach (var i in data)
+                        {
+
+                            list4.Add(i.ToDomain<Domain.Datum<Decimal>>());
+                        }
+
+                        signalsDomainService.SetData<Decimal>(list4);
+                        break;
+                    case Domain.DataType.String:
+                        var list5 = new List<Domain.Datum<String>>();
+                        foreach (var i in data)
+                        {
+
+                            list5.Add(i.ToDomain<Domain.Datum<String>>());
+                        }
+
+                        signalsDomainService.SetData<String>(list5);
+                        break;
+                    default:
+                        break;
+                }
+
+           
 
             }
            

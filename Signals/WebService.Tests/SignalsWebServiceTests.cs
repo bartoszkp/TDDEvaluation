@@ -194,7 +194,11 @@ namespace WebService.Tests
             {
                 //arrange
 
-                var dummyData = MakeData();
+                
+
+                int dummyInt = 2;
+                dummyValue = 1;
+                var dummyData= new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 } };
 
                 dataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
