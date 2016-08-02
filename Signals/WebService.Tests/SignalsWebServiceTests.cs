@@ -5,6 +5,8 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Dto;
+using System;
 
 namespace WebService.Tests
 {
@@ -51,8 +53,8 @@ namespace WebService.Tests
                     path: new Dto.Path() { Components = new[] { "root", "signal" } }));
 
                 signalsRepositoryMock.Verify(sr => sr.Add(It.Is<Domain.Signal>(passedSignal
-                    => passedSignal.DataType == DataType.Decimal
-                        && passedSignal.Granularity == Granularity.Week
+                    => passedSignal.DataType == Domain.DataType.Decimal
+                        && passedSignal.Granularity == Domain.Granularity.Week
                         && passedSignal.Path.ToString() == "root/signal")));
             }
 
@@ -129,6 +131,24 @@ namespace WebService.Tests
                 //act
                 signalsWebService.SetData(signalId, null);
                 //assert
+            }
+
+
+            [TestMethod]
+            public void GivenData_WhenSettingData_SetDataIsCalled()
+            {
+                //arrange
+                int dummyInt = 2;
+                var dummyData = new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } };
+                var dataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalsDomainService = new SignalsDomainService(null, dataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                ////act
+                signalsWebService.SetData( dummyInt,dummyData);
+
+                ////assert
+
+                dataRepositoryMock.Verify(sr => sr.SetData<double>(It.IsAny<System.Collections.Generic.ICollection<Datum<double>>>()));
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
