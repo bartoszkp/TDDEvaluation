@@ -163,15 +163,26 @@ namespace WebService.Tests
             [ExpectedException(typeof(NoSuchSignalException))]
             public void GivenNoSuchSignal_GettingMissingValuePolicy_ThrowsException()
             {
-                missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,null, missingValueRepoMock.Object);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupWebServiceForMissingValuePolicy();
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentNullException))]
+            public void GivenNullSignal_GettingMissingValuePolicy_ThrowsArgumentNullExcepton()
+            {
+
+            }
+            
+            private void SetupWebServiceForMissingValuePolicy()
+            {
+                missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValueRepoMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
 
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
