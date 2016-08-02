@@ -142,18 +142,8 @@ namespace WebService.Tests
 
                 var dummyData = MakeData();
 
-                var dataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                 .Setup(sr => sr.Get(dummyInt))
-                 .Returns(SignalWith(id: dummyInt,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Year,
-                    path: Domain.Path.FromString("root/signal")));
-
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                MakeASignalsWebService();
+               
 
                 ////act
                 signalsWebService.SetData(dummyInt, dummyData);
@@ -162,13 +152,10 @@ namespace WebService.Tests
 
                 dataRepositoryMock.Verify(sr => sr.SetData<double>(It.IsAny<System.Collections.Generic.ICollection<Datum<double>>>()));
             }
-            [TestMethod]
-            public void GivenDataDouble_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
+            private Mock<ISignalsDataRepository> dataRepositoryMock;
+            private void MakeASignalsWebService()
             {
-                //arrange
-
-                var dummyData = MakeData();
-
+                 dataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
                  .Setup(sr => sr.Get(dummyInt))
@@ -176,10 +163,20 @@ namespace WebService.Tests
                     dataType: Domain.DataType.Double,
                     granularity: Domain.Granularity.Year,
                     path: Domain.Path.FromString("root/signal")));
-
-                var dataRepositoryMock = new Mock<ISignalsDataRepository>();
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
+
+              
+            }
+
+            [TestMethod]
+            public void GivenDataDouble_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
+            {
+                //arrange
+
+                var dummyData = MakeData();
+                MakeASignalsWebService();
+             
                 ////act
                 signalsWebService.SetData(dummyInt, dummyData);
 
