@@ -264,6 +264,26 @@ namespace WebService.Tests
 
                 signalsWebService.SetData(signalId, data);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingData_VerifingRepositoryFunctionsGetAndSetData()
+            {
+                var signalId = 3;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                Dto.Datum[] data = GetDatum();
+
+                signalsDataRepositoryMock.Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
+
+                signalsWebService.SetData(signalId, data);
+
+                signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
+                signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
+            }
         }
     }
 }
