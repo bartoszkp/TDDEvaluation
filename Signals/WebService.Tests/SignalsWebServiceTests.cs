@@ -146,6 +146,15 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(path.Components.ToArray(), result.Path.Components.ToArray());
             }
 
+            [ExpectedException(typeof(SignalNotFoundException))]
+            [TestMethod]
+            public void GivenNoSignals_WhenSettingDataForSignal_ThrowsSignalNotFoundException()
+            {
+                GivenNoSignals();
+                int id = 5;
+                signalsWebService.SetData(id, null);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
