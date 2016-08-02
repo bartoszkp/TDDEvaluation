@@ -56,7 +56,10 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new NoSuchSignalException("Cannot get missing value policy for not exisitng signal");
 
-            return this.missingValuePolicyRepository.Get(signal);
+            var mvp = this.missingValuePolicyRepository.Get(signal);
+
+            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                as MissingValuePolicy.MissingValuePolicyBase; 
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase policy)

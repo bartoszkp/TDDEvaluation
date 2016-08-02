@@ -235,6 +235,12 @@ namespace WebService.Tests
 
             }
 
+
+            [TestMethod]
+            public void CreatedMvpForSignal_WhenGetting_IsReturned()
+            {
+
+            }
             
             
             private void SetupWebServiceForMvpOperations()
