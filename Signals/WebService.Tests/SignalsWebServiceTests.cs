@@ -288,22 +288,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
                 //assert
             }
-            [TestMethod]
-            public void GivenNoData_WhenGettingAData_GetDataIsCalled()
-            {
-                //arrange
-                MakeADataRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
-                //act
-               
-                var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
-
-                //assert
-                dataRepositoryMock.Verify(sr => sr.GetData<Dto.Datum>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
-
-            }
+           
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignalWithThatId_WhenGettingADataWithThatId_ThrowsArgumentException()
@@ -336,7 +321,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
                 //assert
-                dataRepositoryMock.Verify(sr => sr.GetData<int>(It.IsAny<Domain.Signal>(), new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)));
+                dataRepositoryMock.Verify(sr => sr.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
             }
 
