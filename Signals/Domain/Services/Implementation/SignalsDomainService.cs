@@ -60,6 +60,9 @@ namespace Domain.Services.Implementation
         {
             var signal = this.GetById(signalId);
 
+            if (signal == null)
+                throw new ArgumentException("Signal with given Id not found.");
+
             var mvp = this.missingValuePolicyRepository.Get(signal);
 
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
