@@ -307,6 +307,26 @@ namespace WebService.Tests
                 dataRepositoryMock.Verify(sr => sr.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignal_WhenSettingMissingValue_DoNotThrowException()
+            {
+                //arrange
+                dummyInt = 2;
+                Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
+                //act
+
+                signalsWebService.SetMissingValuePolicy(dummyInt, policy);
+                //assert
+
+            }
+
+
+
             private  Datum[] MakeData(Dto.Quality quality,DateTime date, object value  )
             {
                 
