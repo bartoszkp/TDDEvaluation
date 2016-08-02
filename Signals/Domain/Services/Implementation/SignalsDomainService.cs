@@ -42,5 +42,10 @@ namespace Domain.Services.Implementation
                 throw new SignalIsNullException();
             return signal;
         }
+
+        public void SetData()
+        {
+            throw new SignalIsNullException();
+        }
     }
 }

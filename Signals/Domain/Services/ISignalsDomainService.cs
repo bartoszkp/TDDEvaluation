@@ -9,5 +9,7 @@ namespace Domain.Services
 
         Signal GetById(int signalId);
         Signal GetByPath(Path signalPath);
+
+        void SetData();
     }
 }
