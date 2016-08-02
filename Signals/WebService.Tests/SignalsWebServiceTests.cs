@@ -275,6 +275,19 @@ namespace WebService.Tests
                     s.ToArray()[0].Signal.Id == dummyInt
                 )));
             }
+
+
+            [TestMethod]
+            public void GivenNoData_WhenGettingAData_DoNotThrowException()
+            {
+                //arrange
+                dataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalsDomainService = new SignalsDomainService(null, dataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                //act
+                var result = signalsWebService.GetData(dummyInt, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+                //assert
+            }
             
             private  Datum[] MakeData(Dto.Quality quality,DateTime date, object value  )
             {
