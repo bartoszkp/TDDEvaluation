@@ -122,6 +122,7 @@ namespace WebService.Tests
             }
 
             private int dummyInt;
+            private object dummyValue;
             [TestMethod]
             public void GivenNoData_WhenSettingData_DoesNotThrowException()
             {
@@ -151,10 +152,32 @@ namespace WebService.Tests
 
                 dataRepositoryMock.Verify(sr => sr.SetData<Datum>(It.IsAny<System.Collections.Generic.ICollection<Datum<Datum>>>()));
             }
+            [TestMethod]
+            public void GivenData_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
+            {
+                //arrange
 
+                var dummyData = MakeData();
+
+                var dataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalsDomainService = new SignalsDomainService(null, dataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                ////act
+                signalsWebService.SetData(dummyInt, dummyData);
+
+                ////assert
+
+                dataRepositoryMock.Verify(sr => sr.SetData<double>(
+                    It.Is<System.Collections.Generic.ICollection<Datum<double>>>(s =>
+                    s.ToArray()[0].Value == (double)dummyValue &&
+                    s.ToArray()[0].Quality== Domain.Quality.Fair&&
+                    s.ToArray()[0].Timestamp== new DateTime(2000, 1, 1)
+                )));
+            }
             private  Datum[] MakeData()
             {
                 int dummyInt = 2;
+                dummyValue = 1.0;
                 return new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } };
             }
 
