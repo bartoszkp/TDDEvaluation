@@ -14,5 +14,6 @@ namespace Domain.Repositories
         void SetData<T>(IEnumerable<Datum<T>> data);
 
         void DeleteData<T>(Signal signal);
+
     }
 }
