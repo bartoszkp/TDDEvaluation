@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -27,7 +28,10 @@ namespace Domain.Services.Implementation
 
         public Signal GetById(int signalId)
         {
-            return this.signalsRepository.Get(signalId);
+            var item = this.signalsRepository.Get(signalId);
+            if (item == null)
+                throw new InvalidCastException("Signal dosen't exist");
+            return item;
         }
 
         public Signal Add(Signal newSignal)
@@ -36,17 +40,12 @@ namespace Domain.Services.Implementation
             {
                 throw new IdNotNullException();
             }
-
             return this.signalsRepository.Add(newSignal);
         }
 
         public Signal Get(Path pathDto)
         {
-            var item = this.signalsRepository.Get(pathDto);
-            if (item == null)
-                throw new InvalidOperationException("Invalid Path, signal dosen't exist");
-
-            return item;
+            return this.signalsRepository.Get(pathDto);
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> data)
@@ -58,6 +57,23 @@ namespace Domain.Services.Implementation
         {
             var items = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
             return items;
+        }
+
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domianPolicy)
+        {
+            var signal = this.GetById(signalId);
+            this.missingValuePolicyRepository.Set(signal, domianPolicy);
+        }
+
+        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
+        {
+            var signal = this.GetById(signalId);
+            var mvp = this.missingValuePolicyRepository.Get(signal);
+            if(mvp != null)
+                return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                as MissingValuePolicy.MissingValuePolicyBase;
+            else
+                return null;
         }
     }
 }

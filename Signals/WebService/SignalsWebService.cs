@@ -111,10 +111,6 @@ namespace WebService
         {
             var signal = signalsDomainService.GetById(signalId);
 
-            if (signal == null)
-                throw new InvalidCastException("Signal dosen't exist");
-
-
             switch (signal.DataType)
             {
                 case Domain.DataType.Decimal:
@@ -177,12 +173,14 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            throw new NotImplementedException();
+            var item = signalsDomainService.GetMissingValuePolicy(signalId);
+            return item?.ToDto<MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            throw new NotImplementedException();
+            var domianPolicy = policy?.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+            this.signalsDomainService.SetMissingValuePolicy(signalId, domianPolicy);
         }
     }
 }
