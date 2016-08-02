@@ -163,6 +163,13 @@ namespace WebService
 
            var sig= signalsDomainService.GetById(signalId);
             if (sig == null) throw new ArgumentException();
+           
+           
+           signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<Boolean>>());
+             
+            
+            
+
         }
     }
 }

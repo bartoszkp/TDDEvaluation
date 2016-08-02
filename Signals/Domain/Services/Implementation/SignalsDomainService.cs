@@ -48,7 +48,7 @@ namespace Domain.Services.Implementation
 
         public void Set(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
-            throw new NotImplementedException();
+            missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
     }
 }
