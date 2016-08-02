@@ -73,6 +73,8 @@ namespace WebService
         {
             var mvp = this.signalsDomainService.GetMissingValuePolicy(signalId);
 
+            if (mvp == null) return null;
+
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy;
             
