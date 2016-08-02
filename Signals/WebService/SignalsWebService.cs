@@ -71,24 +71,48 @@ namespace WebService
                 
                 switch (result.DataType)
                 {
+                    
                     case Domain.DataType.Boolean:
 
-                        signalsDomainService.SetData<Boolean>(data.Select(s => s.ToDomain<Domain.Datum<Boolean>>()).ToList());
-
+                        var list=(data.Select(s => s.ToDomain<Domain.Datum<Boolean>>()).ToList());
+                        for (int i= 0;i < list.Count;i++ )
+                        {
+                            list[i].Signal = result;
+                        }
+                        signalsDomainService.SetData<Boolean>(list);
                         break;
                     case Domain.DataType.Integer:
 
-                        signalsDomainService.SetData<int>(data.Select(s => s.ToDomain<Domain.Datum<int>>()).ToList());
+                        var list2 = (data.Select(s => s.ToDomain<Domain.Datum<int>>()).ToList());
+                        for (int i = 0; i < list2.Count; i++)
+                        {
+                            list2[i].Signal = result;
+                        }
+                        signalsDomainService.SetData<int>(list2);
                         break;
                     case Domain.DataType.Double:
-
-                        signalsDomainService.SetData<double>(data.Select(s => s.ToDomain<Domain.Datum<double>>()).ToList());
+                        var list3 = (data.Select(s => s.ToDomain<Domain.Datum<double>>()).ToList());
+                        for (int i = 0; i < list3.Count; i++)
+                        {
+                            list3[i].Signal = result;
+                        }
+                        signalsDomainService.SetData<double>(list3);
                         break;
                     case Domain.DataType.Decimal:
-                        signalsDomainService.SetData<decimal>(data.Select(s => s.ToDomain<Domain.Datum<decimal>>()).ToList());
+                        var list4 = (data.Select(s => s.ToDomain<Domain.Datum<Decimal>>()).ToList());
+                        for (int i = 0; i < list4.Count; i++)
+                        {
+                            list4[i].Signal = result;
+                        }
+                        signalsDomainService.SetData<Decimal>(list4);
                         break;
                     case Domain.DataType.String:
-                        signalsDomainService.SetData<string>(data.Select(s => s.ToDomain<Domain.Datum<string>>()).ToList());
+                        var list5 = (data.Select(s => s.ToDomain<Domain.Datum<String>>()).ToList());
+                        for (int i = 0; i < list5.Count; i++)
+                        {
+                            list5[i].Signal = result;
+                        }
+                        signalsDomainService.SetData<String>(list5);
                         break;
                     default:
                         break;
