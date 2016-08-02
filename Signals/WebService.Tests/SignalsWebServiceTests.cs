@@ -301,6 +301,33 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignal_WhenSettingData_ChecksIfSignalHasBeenSet()
+            {
+                int signalId = 7;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                Dto.Datum[] data = GetDtoDatumDouble();
+
+                signalsDataRepositoryMock
+                    .Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()))
+                    .Callback<IEnumerable<Domain.Datum<double>>>(x => {
+                        foreach(var match in x)
+                        {
+                            if (match.Signal == null) throw new SignalForDatumHasNotBeenSet();
+                        }
+                    });
+
+                signalsWebService.SetData(signalId, data);
+
+                signalsRepositoryMock.Verify(x => x.Get(It.Is<int>(y => y.Equals(signalId))));
+                signalsDataRepositoryMock.Verify(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
+            }
+
+            [TestMethod]
             [ExpectedException(typeof(SignalIsNullException))]
             public void GivenNoSignals_WhenGettingData_ThrowsSignalIsNullException()
             {
