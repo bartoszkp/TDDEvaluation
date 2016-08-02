@@ -114,7 +114,7 @@ namespace WebService.Tests
             public void WhenGettingByPathWithEmptyPath_ThrowSignalWithThisPathNonExistException()
             {
                 GivenNoSignals();
-                signalsWebService.Get(new Dto.Path() { Components = new[] { "fd", "fg" }});
+                signalsWebService.Get(new Dto.Path() { Components = new[] { "fd", "fg" } });
             }
 
             [TestMethod]
@@ -175,7 +175,7 @@ namespace WebService.Tests
 
                 var mvpDto = mvp.ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
 
-                Dto.MissingValuePolicy.MissingValuePolicy result 
+                Dto.MissingValuePolicy.MissingValuePolicy result
                     = signalsWebService.GetMissingValuePolicy(signal.Id.Value);
                 Assert.AreEqual(mvpDto.Id, result.Id);
                 Assert.AreEqual(mvpDto.DataType, result.DataType);
@@ -231,6 +231,52 @@ namespace WebService.Tests
                     .Setup(sr => sr.Get(signalId))
                     .Returns<Domain.Signal>(null);
                 signalsWebService.SetMissingValuePolicy(signalId, new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisIdNonExistException))]
+            public void WhenGettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException()
+            {
+                int signalId = 78;
+                prepareDataRepository();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signalId))
+                    .Returns<Domain.Signal>(null);
+                signalsWebService.GetData(signalId, System.DateTime.MinValue, System.DateTime.Today);
+            }
+
+            [TestMethod]
+            public void WhenGettingDataForExistSignal_ReturnsData()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 978,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Week,
+                    Path = Path.FromString("ghf/vbc")
+                };
+                prepareDataRepository();
+                var enumerable = new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new System.DateTime(2000, 3, 1), Value = (double)2 } };
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<double>(
+                        It.Is<Domain.Signal>(s => s == signal),
+                        It.Is<System.DateTime>(dt => dt == System.DateTime.MinValue),
+                        It.Is<System.DateTime>(dt => dt == System.DateTime.Today)))
+                    .Returns(enumerable.ToDomain<System.Collections.Generic.IEnumerable<Datum<double>>>);
+
+                var result = signalsWebService.GetData(signal.Id.Value, System.DateTime.MinValue, System.DateTime.Today);
+                
+                int i = 0;
+                foreach (var d in result)
+                {
+                    Assert.AreEqual(enumerable[i++], d);
+                }
             }
 
             private Dto.Signal SignalWith(
@@ -291,8 +337,17 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
+            private void prepareDataRepository()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
         }
     }
 }

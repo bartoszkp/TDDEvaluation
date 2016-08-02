@@ -75,13 +75,12 @@ namespace Domain.Services.Implementation
             missingValuePolicyRepository.Set(signal, policy);
         }
 
-        public IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<object>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Signal signal = GetById(signalId);
             if (signal == null)
                 throw new SignalWithThisIdNonExistException();
-            signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc);
-            throw new NotImplementedException();
+            return signalsDataRepository.GetData<object>(signal, fromIncludedUtc, toExcludedUtc);
         }
     }
 }
