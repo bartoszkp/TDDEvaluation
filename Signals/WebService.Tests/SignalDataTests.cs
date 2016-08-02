@@ -32,7 +32,6 @@ namespace WebService.Tests
 
             var result = signalsWebService.GetData(1, new DateTime(), new DateTime());
 
-
         }
 
         private Mock<ISignalsDataRepository> signalsDataRepoMock;

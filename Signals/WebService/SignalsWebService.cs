@@ -12,6 +12,7 @@ using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
 using Mapster;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -61,7 +62,11 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+
+            if (signal == null)
+                throw new NoSuchSignalException("Could not get data for not existing signal");
+            return null;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

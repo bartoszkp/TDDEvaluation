@@ -76,7 +76,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
         }
 
 
