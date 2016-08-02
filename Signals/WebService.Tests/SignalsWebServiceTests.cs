@@ -216,6 +216,33 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicy_RepositorySetAndGetIsCalled()
+            {
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+
+                GivenASignal(SignalWith(
+                        id: 1,
+                        dataType: Domain.DataType.String,
+                        granularity: Domain.Granularity.Year,
+                        path: Domain.Path.FromString("root/signal")));
+
+
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(1, policy);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(1));
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
