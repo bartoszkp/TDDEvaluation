@@ -366,10 +366,18 @@ namespace WebService.Tests
 
                 DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
 
-                signalsDataRepositoryMock.Setup(x => x.GetData<double>(
+                IEnumerable<Domain.Datum<double>> data = GetDatumDouble().ToDomain<IEnumerable<Domain.Datum<double>>>();
+
+                signalsDataRepositoryMock.Setup(asd => asd.GetData<double>(
                     It.IsAny<Signal>(),
                     It.IsAny<DateTime>(),
-                    It.IsAny<DateTime>()));
+                    It.IsAny<DateTime>())).Returns((Signal p,DateTime d,DateTime e) => {
+                        Domain.Datum<double>[] data2 = new Domain.Datum<double>[]
+                        {
+                            new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 5 }
+                        };
+                        return data2;
+                    });
 
                 signalsWebService.GetData(signalId, from, to);
 
