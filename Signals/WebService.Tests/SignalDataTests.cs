@@ -66,7 +66,20 @@ namespace WebService.Tests
             Assert.IsNotNull(result);
         }
 
-        
+
+        [TestMethod]
+        [ExpectedException(typeof(NoSuchSignalException))]
+        public void SignalNotExists_SetSignalData_ThrowsException()
+        {
+            SetupWebService();
+            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns((Signal)null);
+
+            Mock<IEnumerable<Dto.Datum>> signalDataMock = new Mock<IEnumerable<Dto.Datum>>();
+
+            signalsWebService.SetSignalData(1,signalDataMock.Object);
+
+        }
+
 
 
 
