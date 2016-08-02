@@ -263,6 +263,17 @@ namespace WebService.Tests
                 signalsWebService.GetMissingValuePolicy(0);
             }
 
+            [TestMethod]
+            public void GivenSignalId_WhenGettingMissingValuePolicy_IdIsPassedToDomainToGetSignalById()
+            {
+                SetupWebService();
+                int id = 1;
+
+                signalsWebService.GetMissingValuePolicy(id);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
