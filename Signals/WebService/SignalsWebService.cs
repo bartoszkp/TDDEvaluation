@@ -70,7 +70,7 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            throw new NotImplementedException();
+            return new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
