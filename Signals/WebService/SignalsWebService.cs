@@ -61,8 +61,29 @@ namespace WebService
                 var sig = signalsDomainService.GetById(signalId);
 
                 if (sig == null) throw new ArgumentException();
+                var k = sig.DataType;
+                switch (k)
+                {
+                    case Domain.DataType.Boolean:
+                        return signalsDomainService.GetData<Boolean>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+                        break;
+                    case Domain.DataType.Integer:
+                        return signalsDomainService.GetData<int>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+                        break;
+                    case Domain.DataType.Double:
+                        return signalsDomainService.GetData<double>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+                        break;
+                    case Domain.DataType.Decimal:
+                        return signalsDomainService.GetData<decimal>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+                        break;
+                    case Domain.DataType.String:
+                        return signalsDomainService.GetData<string>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+                        break;
+                    default:
+                        break;
+                }
 
-                return signalsDomainService.GetData<int>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+              
             }
             return new Datum[] { new Datum()};
         }
