@@ -287,22 +287,21 @@ namespace WebService.Tests
                 signalsWebService.GetMissingValuePolicy(0);
             }
 
-            //[TestMethod]
-            //public void GivenNoSignals_WhenGettingMissingValuePolicy_ReturnsGetIsCalled()
-            //{
-            //    missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-            //    missingValuePolicyRepositoryMock
-            //        .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
-            //        .Returns<Domain.MissingValuePolicy.MissingValuePolicyBase>(mvp => mvp);
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingMissingValuePolicy_ReturnsGetIsCalled()
+            {
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()));
+                
+                var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
 
-            //    var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
-            //    signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsWebService.GetMissingValuePolicy(0);
 
-            //    signalsWebService.GetMissingValuePolicy(0);
-
-            //    missingValuePolicyRepositoryMock.Verify(mvp => mvp.Get(It.IsAny<Domain.Signal>()));
-            // }
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Get(It.IsAny<Domain.Signal>()));
+            }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
