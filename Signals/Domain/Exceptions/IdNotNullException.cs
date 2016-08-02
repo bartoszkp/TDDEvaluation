@@ -9,4 +9,12 @@ namespace Domain.Exceptions
         {
         }
     }
+
+    public class InvalidPathArgument : Exception
+    {
+        public InvalidPathArgument()
+            : base("Cannot read Signal with current path. Typed Path probably doesnt exists.")
+        {
+        }
+    }
 }

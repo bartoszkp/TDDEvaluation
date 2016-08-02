@@ -22,12 +22,14 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
-            throw new NotImplementedException();
+            var path = pathDto.ToDomain<Domain.Path>();
+            var result = this.signalsDomainService.Get(path);
+            return result.ToDto<Dto.Signal>();
         }
 
         public Signal GetById(int signalId)

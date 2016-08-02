@@ -16,8 +16,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -38,6 +38,13 @@ namespace Domain.Services.Implementation
             }
 
             return this.signalsRepository.Add(newSignal);
+        }
+
+        public Signal Get(Path pathDto)
+        {
+            var result = this.signalsRepository.Get(pathDto);
+            if (result == null) throw new InvalidPathArgument();
+            else return result;
         }
     }
 }
