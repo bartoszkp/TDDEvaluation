@@ -42,7 +42,7 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path path)
         {
-            if (path.Components.ToArray()[0].Trim()== "")
+            if (signalsRepository.Get(path) == null)
             {
                 throw new ArgumentException("incorrect path");
             }

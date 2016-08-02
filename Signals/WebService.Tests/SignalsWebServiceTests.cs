@@ -90,33 +90,38 @@ namespace WebService.Tests
             [ExpectedException(typeof(ArgumentException))]
             public void Get_IncorrectPath_ThrowException()
             {
-                GivenNoSignals();
 
-                signalsWebService.Get(new Dto.Path {
-                    Components = new[] {" ","x"}
-                }); 
+                var path = new Dto.Path
+                {
+                    Components = new[] { "x", "y" }
+                };
+
+                GivenNoSignals();
+                signalsRepositoryMock.Setup(x=>x.Get(path.ToDomain<Domain.Path>())).Returns((Domain.Signal)null);
+
+                signalsWebService.Get(path); 
 
             }
 
             [TestMethod]
             public void Get_SignalWithThisPathExist_ReturnThisSignal()
             {
-                var signal = new Dto.Signal()
-                {
-                    DataType = Dto.DataType.Decimal,
-                    Granularity = Dto.Granularity.Day,
-                    Path = new Dto.Path() { Components = new[] { "x", "y" } }
-                };
-                GivenNoSignals();
-                signalsRepositoryMock.Setup(x => x.Get(Path.FromString("x/y"))).Returns(signal.ToDomain<Domain.Signal>());
-                signalsWebService.Add(signal);
-
+                var signal =  SignalWith(null,Dto.DataType.Boolean, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y" } });
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+              
                 var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "x", "y" } });
 
-                Assert.AreEqual(signal.Id, result.Id);
-                Assert.AreEqual(signal.Granularity, result.Granularity);
-                Assert.AreEqual(signal.DataType, result.DataType);
-                CollectionAssert.AreEqual(signal.Path.Components.ToArray(), result.Path.Components.ToArray());
+                Assert.AreEqual(CompareSignals(signal, result), true);
+            }
+
+            private bool CompareSignals(Dto.Signal signal1, Dto.Signal signal2)
+            {
+                if (signal1.Id == signal2.Id && signal1.DataType == signal2.DataType
+                    && signal1.Granularity == signal2.Granularity && signal1.Path.ToString() == signal2.Path.ToString())
+                {
+                    return true;
+                }
+                return false;
             }
 
             private Dto.Signal SignalWith(
@@ -163,9 +168,16 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                signalsRepositoryMock
-                    .Setup(sr => sr.Get(signal.Id.Value))
-                    .Returns(signal);
+                try
+                {
+                    signalsRepositoryMock
+                        .Setup(sr => sr.Get(signal.Id.Value))
+                        .Returns(signal);
+                }
+                catch { }
+                
+                    signalsRepositoryMock.Setup(x => x.Get(Path.FromString("x/y"))).Returns(signal.ToDomain<Domain.Signal>());
+                
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
