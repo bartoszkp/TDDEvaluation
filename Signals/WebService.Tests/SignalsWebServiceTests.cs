@@ -145,11 +145,85 @@ namespace WebService.Tests
                     ));
 
                 signalsWebService.SetMissingValuePolicy(invalidId, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
+            }
+            [TestMethod]
+            public void GivenASignal_WhenGetMissingValuePolicy_ColledmissingValuePolicyRepository()
+            {
+                GivenASignal(GetTestSignal());
 
+                signalsWebService.GetMissingValuePolicy(1);
+
+                missingValuePolicyRepositoryMock.Verify(s => s.Get(It.IsAny<Signal>()));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGetMissingValuePolicyWithNewSignal_ReturnNull()
+            {
+                GivenASignal(GetTestSignal());
 
+                var res = signalsWebService.GetMissingValuePolicy(1);
 
+                Assert.IsNull(res);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGetMissingValuePolicyWithInvalidID_ReturnException()
+            {
+                GivenASignal(GetTestSignal());
+                int invalidID = -1;
+                var res = signalsWebService.GetMissingValuePolicy(invalidID);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGetMissingValuePolicy_ReturnCorrectMVP()
+            {
+                Signal signal = GetTestSignal();
+                GivenASignal(signal);
+                int id = 1;
+
+                SpecificValueMissingValuePolicy<bool> MVP = new SpecificValueMissingValuePolicy<bool>()
+                {
+                    Id = id,
+                    Quality = Quality.Fair,
+                    Signal = signal,
+                    Value = true,
+                };
+
+                missingValuePolicyRepositoryMock
+                    .Setup(s => s.Get(signal))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean() {
+                        Id = id,
+                        Quality = Quality.Fair,
+                        Signal = signal,
+                        Value = true,
+                    });
+
+                Dto.MissingValuePolicy.MissingValuePolicy resultMVP = signalsWebService.GetMissingValuePolicy(id);
+
+                Assert.AreEqual(MVP.Id.Value, resultMVP.Id.Value);
+                Assert.IsTrue(EqualsSignal(MVP.Signal, resultMVP.Signal.ToDomain<Domain.Signal>()));
+                Assert.AreEqual(MVP.NativeDataType.Name.ToString(), resultMVP.DataType.ToString());
+            }
+
+            private bool EqualsSignal(Signal a, Signal b)
+            {
+                if (a.Id != b.Id) return false;
+                if (a.DataType != b.DataType) return false;
+                if (a.Granularity != b.Granularity) return false;
+                if (a.Path.ToString() != b.Path.ToString()) return false;
+                return true;
+            }
+            private Signal GetTestSignal()
+            {
+                return new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("x/y"),
+                };
+            }
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
