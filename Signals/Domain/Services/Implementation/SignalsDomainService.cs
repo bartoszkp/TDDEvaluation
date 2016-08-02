@@ -70,5 +70,12 @@ namespace Domain.Services.Implementation
         {
             this.missingValuePolicyRepository.Set(domainSetMVPSignal, domainPolicyBase);
         }
+
+        public MissingValuePolicy.MissingValuePolicyBase GetMVP(Signal domainSignal)
+        {
+            var result = this.missingValuePolicyRepository.Get(domainSignal);
+            if (result == null) return null;
+            else return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
+        }
     }
 }

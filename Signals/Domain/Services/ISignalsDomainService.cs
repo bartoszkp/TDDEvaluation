@@ -16,5 +16,6 @@ namespace Domain.Services
 
         IEnumerable<Datum<double>> GetData(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
         void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase);
+        MissingValuePolicy.MissingValuePolicyBase GetMVP(Signal domainSignal);
     }
 }
