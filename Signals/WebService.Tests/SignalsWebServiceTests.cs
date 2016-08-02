@@ -110,11 +110,11 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.PathIsEmptyException))]
-            public void WhenGettingByPathWithEmptyPath_ThrowPathIsEmptyException()
+            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisPathNonExistException))]
+            public void WhenGettingByPathWithEmptyPath_ThrowSignalWithThisPathNonExistException()
             {
                 GivenNoSignals();
-                signalsWebService.Get(new Dto.Path());
+                signalsWebService.Get(new Dto.Path() { Components = new[] { "fd", "fg" }});
             }
 
             [TestMethod]

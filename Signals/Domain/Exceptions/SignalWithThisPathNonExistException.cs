@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class PathIsEmptyException : Exception
+    public class SignalWithThisPathNonExistException : Exception
     {
-        public PathIsEmptyException()
-            :base ("When getting signal by path, path must not be empty")
+        public SignalWithThisPathNonExistException()
+            :base ("Signal with this path non exist")
         {
 
         }
