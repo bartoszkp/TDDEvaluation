@@ -245,6 +245,26 @@ namespace WebService.Tests
                 int notExistingSignalID = 8;
                 signalsWebService.SetData(notExistingSignalID, data);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingData_DontThrows()
+            {
+                int signalId = 6;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                Dto.Datum[] data = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
+
+                signalsWebService.SetData(signalId, data);
+            }
         }
     }
 }
