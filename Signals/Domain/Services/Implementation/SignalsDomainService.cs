@@ -71,6 +71,7 @@ namespace Domain.Services.Implementation
         {
             if(datum == null)
             {
+                this.signalsDataRepository.SetData<double>(datum);
                 return;
             }
 
