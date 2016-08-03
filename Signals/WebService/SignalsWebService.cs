@@ -119,7 +119,9 @@ namespace WebService
             Domain.Signal signal = this.signalsDomainService.GetById(signalId);
             if (signal == null)
                 throw new CouldntGetASignalException();
-            return null;
+
+            return this.signalsDomainService.GetMissingValuePolicy<Double>(signal)
+                .ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
