@@ -65,6 +65,11 @@ namespace WebService
         {
             var signal = this.signalsDomainService?.GetById(signalId);
             
+            if(signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>());
         }
 

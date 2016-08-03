@@ -384,6 +384,7 @@ namespace WebService.Tests
                 catch(KeyNotFoundException kne)
                 {
                     Assert.IsNotNull(kne);
+                    return;
                 }
                 Assert.Fail();
             }
