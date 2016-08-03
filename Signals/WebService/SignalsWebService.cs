@@ -65,7 +65,7 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var dataDomain = data.ToDomain<IEnumerable<Domain.Datum<object>>>();
+            var dataDomain = data?.ToDomain<IEnumerable<Domain.Datum<object>>>();
             signalsDomainService.SetData(signalId, dataDomain);
         }
 

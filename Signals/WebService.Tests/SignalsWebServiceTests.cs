@@ -279,6 +279,46 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisIdNonExistException))]
+            public void WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException()
+            {
+                int signalId = 546;
+                prepareDataRepository();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signalId))
+                    .Returns<Domain.Signal>(null);
+                signalsWebService.SetData(signalId, null);
+            }
+
+            [TestMethod]
+            public void WhenSettingDataForExistSignal_CallsRepositorySetData()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 567,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Week,
+                    Path = Path.FromString("sfda/xvbc/jhkl")
+                };
+                prepareDataRepository();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.SetData<double>(It.IsAny<System.Collections.Generic.IEnumerable<Domain.Datum<double>>>()));
+
+                var enumerable = new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2016, 1, 16), Value = 7.0 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new System.DateTime(2020, 2, 21), Value = 2.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new System.DateTime(2003, 3, 18), Value = 78.4 } };
+                signalsWebService.SetData(signal.Id.Value, enumerable);
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<object>(
+                    It.Is<System.Collections.Generic.IEnumerable<Domain.Datum<object>>>(
+                        d => IEnumerableDatumAreEqual(enumerable, d, signal))));
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -307,6 +347,24 @@ namespace WebService.Tests
                     Granularity = granularity,
                     Path = path
                 };
+            }
+
+            private bool IEnumerableDatumAreEqual(System.Collections.Generic.IEnumerable<Dto.Datum> datumDto,
+                System.Collections.Generic.IEnumerable<Domain.Datum<object>> datumDomain,
+                Domain.Signal signal)
+            {        
+                foreach (var dt in datumDto.Zip(datumDomain, System.Tuple.Create))
+                {
+                    var datum = dt.Item2.ToDto<Dto.Datum>();
+                    if (!(dt.Item1.Quality == datum.Quality
+                        && dt.Item1.Timestamp == datum.Timestamp
+                        && signal.Id == dt.Item2.Signal.Id 
+                        && signal.DataType == dt.Item2.Signal.DataType
+                        && signal.Granularity == dt.Item2.Signal.Granularity
+                        && signal.Path.ToString() == dt.Item2.Signal.Path.ToString()))
+                        return false;
+                }
+                return true;
             }
 
             private void GivenNoSignals()
