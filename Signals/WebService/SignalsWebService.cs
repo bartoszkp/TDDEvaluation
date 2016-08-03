@@ -65,19 +65,19 @@ namespace WebService
             {
                 case Dto.DataType.Double:
                     return this.signalsDomainService.GetData<Double>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.Integer:
                     return this.signalsDomainService.GetData<Int32>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.Boolean:
                     return this.signalsDomainService.GetData<Boolean>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.Decimal:
                     return this.signalsDomainService.GetData<Decimal>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.String:
                     return this.signalsDomainService.GetData<String>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
             }
 
             return null;
