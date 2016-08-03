@@ -393,7 +393,7 @@ namespace WebService.Tests
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                signalsWebService.GetData(existingSignal.Id.Value, new DateTime(), new DateTime());
+                signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
                 signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
 
