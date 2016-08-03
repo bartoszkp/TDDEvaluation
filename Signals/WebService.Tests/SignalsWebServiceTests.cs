@@ -456,7 +456,7 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            public void WhenGettingByPath_FunctionWorks()
+            public void WhenGettingByPath_FunctionCompile()
             {
                 //arrange
                 var path = new Dto.Path() { Components = new[] { "x", "y" } };
@@ -468,6 +468,7 @@ namespace WebService.Tests
                 
 
             }
+          
             [TestMethod]
             public void WhenGettingByPath_ReturnsSignal()
             {
@@ -479,6 +480,21 @@ namespace WebService.Tests
                 var result = signalsWebService.Get(path);
                 //assert
                 Assert.IsInstanceOfType(result, typeof(Dto.Signal));
+
+            }
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalByPath_GetIsCalled()
+            {
+                //arrange
+                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                MakeMocks();
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Path>()));
+                signalsWebService = new SignalsWebService(null);
+
+                //act
+                var result = signalsWebService.Get(path);
+                //assert
+                signalsRepositoryMock.Verify(s => s.Get(It.IsAny<Domain.Path>()));
 
             }
             private void MakeAMissingValuePolicyRepositoryMock()
