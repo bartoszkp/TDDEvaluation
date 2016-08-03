@@ -350,17 +350,14 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingData_RepositoryGetDataAndGetIsCalled()
+            public void GivenASignal_WhenGettingDataFromSpecificSignal_RepositoryGetDataAndGetIsCalled()
             {
                 var existingSignal = ExistingSignal();
 
                 GivenASignal(existingSignal);
 
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsRepositoryMock
-                    .Setup(srm => srm.Get(It.IsAny<int>()));
-
+                
                 signalsDataRepositoryMock
                     .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
@@ -368,9 +365,9 @@ namespace WebService.Tests
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                signalsWebService.GetData(0, new DateTime(), new DateTime());
+                signalsWebService.GetData(existingSignal.Id.Value, new DateTime(), new DateTime());
 
-                signalsRepositoryMock.Verify(srm => srm.Get(It.IsAny<int>()));
+                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
             }
 
