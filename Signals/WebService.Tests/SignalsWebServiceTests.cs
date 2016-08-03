@@ -444,6 +444,25 @@ namespace WebService.Tests
                 if (!(this.signalsWebService.GetMissingValuePolicy(signalId) is Dto.MissingValuePolicy.MissingValuePolicy))
                     Assert.Fail();
             }
+
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingMissingValuePolicy_VaryfingCallOfRepositoryFunctioGet()
+            {
+                int signalId = 2;
+                Signal signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Integer,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                this.missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(s => s == signal)));
+
+                this.signalsWebService.GetMissingValuePolicy(signalId);
+
+                this.missingValuePolicyRepositoryMock.Verify(x => x.Get(It.Is<Domain.Signal>(s => s == signal)));
+            }
         }
     }
 }
