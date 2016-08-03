@@ -460,7 +460,9 @@ namespace WebService.Tests
             {
                 //arrange
                 var path = new Dto.Path() { Components = new[] { "x", "y" } };
-                signalsWebService = new SignalsWebService(null);
+                MakeMocks();
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
+                MakeASignalsWebService();
 
                 //act
                 var result = signalsWebService.Get(path);
@@ -473,9 +475,10 @@ namespace WebService.Tests
             public void WhenGettingByPath_ReturnsSignal()
             {
                 //arrange
-                var path = new Dto.Path() { Components = new[] { "x", "y" } };
-                signalsWebService = new SignalsWebService(null);
-
+                Dto.Path path = MakePathFromString(new[] { "x", "y" });
+                MakeMocks();
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
+                MakeASignalsWebService();
                 //act
                 var result = signalsWebService.Get(path);
                 //assert
@@ -486,11 +489,11 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingSignalByPath_GetIsCalled()
             {
                 //arrange
-                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                Dto.Path path = MakePathFromString(new[] { "x", "y" });
                 MakeMocks();
-                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Path>()));
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
+
+                MakeASignalsWebService();
 
                 //act
                 var result = signalsWebService.Get(path);
@@ -503,11 +506,9 @@ namespace WebService.Tests
             {
                 //arrange
                 dummyInt = 2;
-                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                Dto.Path path = MakePathFromString(new[] { "x", "y" });
                 MakeMocks();
-                signalsRepositoryMock
-                    .Setup(sr => sr.Get(It.IsAny<Domain.Path>()))
-                    .Returns(SignalWith(id:dummyInt,dataType: Domain.DataType.Boolean,granularity:Domain.Granularity.Day,path:Domain.Path.FromString("x/y")));
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
 
                 MakeASignalsWebService();
                 //act
@@ -517,6 +518,19 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
                 Assert.AreEqual(dummyInt, result.Id);
             }
+
+            private static Dto.Path MakePathFromString(string [] str)
+            {
+                return new Dto.Path() { Components = str };
+            }
+
+            private void SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal()
+            {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<Domain.Path>()))
+                    .Returns(SignalWith(id: dummyInt, dataType: Domain.DataType.Boolean, granularity: Domain.Granularity.Day, path: Domain.Path.FromString("x/y")));
+            }
+
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
