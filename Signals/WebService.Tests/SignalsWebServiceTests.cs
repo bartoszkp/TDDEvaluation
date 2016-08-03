@@ -360,7 +360,7 @@ namespace WebService.Tests
             {
                 SetupWebService();
 
-                var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
+                var dataDto = new Dto.Datum[] {  };
 
                 signalsWebService.SetData(0, dataDto);
             }
@@ -371,7 +371,7 @@ namespace WebService.Tests
                 SetupWebService();
 
                 int id = 1;
-                var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
+                var dataDto = new Dto.Datum[] {  };
 
                 signalsWebService.SetData(id, dataDto);
 
