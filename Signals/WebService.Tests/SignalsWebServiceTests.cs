@@ -296,33 +296,7 @@ namespace WebService.Tests
             //        SetupVerifyOrAssert();
             //        verifyOrAssert.AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService);
             //    }
-
-            [TestMethod]
-            public void SetData_DoesNotThrow()
-            {
-                signalsWebService = new SignalsWebService(null);
-
-                signalsWebService.SetData(0, null);
-            }
-
-            [TestMethod]
-            public void GivenNoSignals_WhenSettingData_RepositoryGetDataIsCalled()
-            {
-                var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));                    
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(0, null);
-
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
-            }
-
+            
             [TestMethod]
             public void GivenASignalAndDatum_WhenSettingData_RepositoryGetDataAndGetIsCalled()
             {
