@@ -60,7 +60,11 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            this.GetById(signalId);
+            var signal = this.GetById(signalId);
+
+            if (signal == null)
+                throw new ArgumentException("Signal with given Id not found.");
+
             return new Datum[] { };
         }
 
