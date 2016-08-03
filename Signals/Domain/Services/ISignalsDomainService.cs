@@ -13,5 +13,6 @@ namespace Domain.Services
         MissingValuePolicyBase GetMissingValuePolicyBase(int signalId);
         void SetMissingValuePolicyBase(int signalId, MissingValuePolicyBase policy);
         IEnumerable<Datum<object>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+        void SetData(int signalId, IEnumerable<Datum<object>> dataDomain);
     }
 }

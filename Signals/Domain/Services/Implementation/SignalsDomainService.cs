@@ -82,5 +82,16 @@ namespace Domain.Services.Implementation
                 throw new SignalWithThisIdNonExistException();
             return signalsDataRepository.GetData<object>(signal, fromIncludedUtc, toExcludedUtc);
         }
+
+        public void SetData(int signalId, IEnumerable<Datum<object>> dataDomain)
+        {
+            Signal signal = GetById(signalId);
+            if (signal == null)
+                throw new SignalWithThisIdNonExistException();
+
+            foreach (var d in dataDomain)
+                d.Signal = signal;
+            signalsDataRepository.SetData<object>(dataDomain);
+        }
     }
 }
