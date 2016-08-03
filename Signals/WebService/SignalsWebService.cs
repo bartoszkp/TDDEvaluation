@@ -170,10 +170,6 @@ namespace WebService
 
             signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
 
-         
-            
-
-
 
         }
     }

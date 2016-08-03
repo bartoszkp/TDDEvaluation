@@ -377,6 +377,21 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void ThereIsNoSignal_WhenGettingMissingValuePolicy_GetThrowException()
+            {
+                //arrange
+                dummyInt = 2;
+                int anotherId = 3;
+                MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Boolean, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
+                MakeAMissingValuePolicyRepositoryMock();
+
+                //act
+                var result = signalsWebService.GetMissingValuePolicy(anotherId);
+                //assert
+            }
+
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
