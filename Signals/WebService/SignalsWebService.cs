@@ -121,7 +121,9 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            throw new CouldntGetASignalException();
+            Domain.Signal signal = this.signalsDomainService.GetById(signalId);
+            if (signal == null)
+                throw new CouldntGetASignalException();
         }
     }
 }
