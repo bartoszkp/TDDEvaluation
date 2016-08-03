@@ -520,14 +520,21 @@ namespace WebService.Tests
                 SetupWebService();
                 int id = 5;
 
-                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(SignalWith(DataType.Integer, Granularity.Month, Path.FromString("root/signalInt"), id));
+                var signal = SignalWith(DataType.Integer, Granularity.Month, Path.FromString("root/signalInt"), id);
+
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
 
                 signalsWebService.GetData(id, DateTime.MinValue, DateTime.MaxValue);
 
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == id &&
-                    s.DataType == DataType.Integer &&
-                    s.Granularity == Granularity.Month &&
-                    s.Path.ToString() == "root/signalInt"), DateTime.MinValue, DateTime.MaxValue));
+                VerifyGetDataCallOnSignalsDataRepositoryMock<int>(signal, DateTime.MinValue, DateTime.MaxValue);
+            }
+            
+            private void VerifyGetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+            {
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
+                    s.DataType == signal.DataType &&
+                    s.Granularity == signal.Granularity &&
+                    s.Path.ToString() == signal.Path.ToString()), fromIncludedUtc, toExcludedUtc));
             }
 
             private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
