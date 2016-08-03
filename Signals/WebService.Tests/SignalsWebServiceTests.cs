@@ -196,6 +196,20 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, dtoData);
                 signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<bool>>>()));
             }
+
+            [TestMethod]
+            public void GivenASignalAndDataOfIntegers_WhenSettingDataForSignal_DoesNotThrow()
+            {
+                int id = 1;
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(id, DataType.Integer, Granularity.Day, path.ToDomain<Domain.Path>());
+
+                GivenASignal(signal);
+                var dtoData = DatumWith(1, new System.DateTime(2000, 1, 1));
+
+                signalsWebService.SetData(id, dtoData);
+                signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<bool>>>()));
+            }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
