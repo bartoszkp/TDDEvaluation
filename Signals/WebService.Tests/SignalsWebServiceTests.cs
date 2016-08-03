@@ -3,6 +3,7 @@ using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
 using Dto.Conversions;
+using Dto.MissingValuePolicy;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -150,8 +151,9 @@ namespace WebService.Tests
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
-                    signalsDataRepositoryMock.Object, null);
+                    signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -177,6 +179,7 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
+            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
 
             private Dto.Path GivenASignalByPath()
             {
@@ -379,6 +382,31 @@ namespace WebService.Tests
                     path: Domain.Path.FromString("root/signal")));
 
                 this.signalsWebService.SetMissingValuePolicy(signalId, null);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicy_VaryfingCallRepositorySetFunctions()
+            {
+                int signalId = 2;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var missingValuePolicy = new SpecificValueMissingValuePolicy() {
+                    DataType = Dto.DataType.Double, 
+                    Quality = Dto.Quality.Fair, 
+                    Value = (double)1.5 };
+
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(),
+                    It.IsAny<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>>()));
+
+                this.signalsWebService.SetMissingValuePolicy(signalId, missingValuePolicy);
+
+                missingValuePolicyRepositoryMock.Verify(x => x.Set(It.IsAny<Domain.Signal>(),
+                    It.IsAny<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>>()));
             }
         }
     }
