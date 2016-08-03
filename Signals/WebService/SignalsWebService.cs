@@ -67,6 +67,9 @@ namespace WebService
         {
             var signal = this.GetById(signalId);
 
+            if (signal == null)
+                throw new ArgumentException("Signal with given Id not found.");
+
             var dataDomain = new List<Domain.Datum<int>>();
 
             for (int i = 0; i < data.Count(); i++)
