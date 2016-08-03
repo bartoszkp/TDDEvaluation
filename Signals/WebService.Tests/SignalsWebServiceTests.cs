@@ -364,8 +364,8 @@ namespace WebService.Tests
             public void GivenNoSignal_WhenSettingMissingValuePolicy_ThrowsCouldntGetASignalException()
             {
                 GivenNoSignals();
-                int signalId = 3;
-                this.signalsWebService.SetMissingValuePolicy(3,null);
+                int nonExistingSignalId = 3;
+                this.signalsWebService.SetMissingValuePolicy(nonExistingSignalId,null);
             }
         }
     }
