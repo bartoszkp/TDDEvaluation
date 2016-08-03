@@ -310,9 +310,11 @@ namespace WebService.Tests
             {
                 var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
                 signalsDataRepositoryMock
                     .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));                    
-                var signalsDomainService = new SignalsDomainService(null, signalsDataRepositoryMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
