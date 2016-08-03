@@ -208,7 +208,7 @@ namespace WebService.Tests
                 var dtoData = DatumWith(1, new System.DateTime(2000, 1, 1));
 
                 signalsWebService.SetData(id, dtoData);
-                signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<bool>>>()));
+                signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<int>>>()));
             }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
