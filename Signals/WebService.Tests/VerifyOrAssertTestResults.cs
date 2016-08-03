@@ -5,12 +5,16 @@ using System.Collections.Generic;
 using Moq;
 using Domain.Repositories;
 using Dto.Conversions;
+using DataAccess.GenericInstantiations;
+using Domain.MissingValuePolicy;
+using Domain;
+using Dto;
 
 namespace WebService.Tests
 {
-    class VerifyAndAssertTestResults
+    class VerifyOrAssertTestResults
     {
-        public void GettingByPathAssertion(Dto.Signal result)
+        internal void GettingByPathAssertion(Dto.Signal result)
         {
             Assert.AreEqual(1, result.Id);
             Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
@@ -18,7 +22,7 @@ namespace WebService.Tests
             CollectionAssert.AreEqual(new[] { "root", "signal1" }, result.Path.Components.ToArray());
         }
 
-        public void GettingByFalsePathAssertion(Dto.Path pathDto, ISignalsWebService signalsWebService)
+        internal void GettingByFalsePathAssertion(Dto.Path pathDto, ISignalsWebService signalsWebService)
         {
             try
             {
@@ -32,7 +36,7 @@ namespace WebService.Tests
             Assert.Fail();
         }
 
-        public void AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(ISignalsWebService signalsWebService)
+        internal void AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(ISignalsWebService signalsWebService)
         {
             var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
             try
@@ -47,13 +51,28 @@ namespace WebService.Tests
             Assert.Fail();
         }
 
-        public void VerifyRepositorySetAndGetIsCalled(Mock<ISignalsRepository> signalsRepositoryMock, Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock)
+        internal void AssertAddingASignalReturnsThisSignal(Dto.Signal result)
+        {
+            Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
+            Assert.AreEqual(Dto.Granularity.Week, result.Granularity);
+            CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+        }
+
+        internal void AssertRepositoryAddIsCalled(Mock<ISignalsRepository> signalsRepositoryMock)
+        {
+            signalsRepositoryMock.Verify(sr => sr.Add(It.Is<Domain.Signal>(passedSignal
+                => passedSignal.DataType == Domain.DataType.Decimal
+                    && passedSignal.Granularity == Domain.Granularity.Week
+                    && passedSignal.Path.ToString() == "root/signal")));
+        }
+
+        internal void VerifyRepositorySetAndGetIsCalled(Mock<ISignalsRepository> signalsRepositoryMock, Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock)
         {
             signalsRepositoryMock.Verify(srm => srm.Get(1));
             missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
         }
 
-        public void VerifyRepositorySetAndGetIsCalled(Domain.Signal existingSignal,
+        internal void VerifyRepositorySetAndGetIsCalled(Domain.Signal existingSignal,
             Mock<ISignalsRepository> signalsRepositoryMock,
             Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock)
         {
@@ -67,7 +86,15 @@ namespace WebService.Tests
            )), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
         }
 
-        public void VerifyRepositorySetAndGetIsCalled(Domain.Signal existingSignal,
+        internal void AssertGettingSignalsByItsId(int signalId, Dto.Signal result)
+        {
+            Assert.AreEqual(signalId, result.Id);
+            Assert.AreEqual(Dto.DataType.String, result.DataType);
+            Assert.AreEqual(Dto.Granularity.Year, result.Granularity);
+            CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
+        }
+
+        internal void VerifyRepositorySetAndGetIsCalled(Domain.Signal existingSignal,
             Domain.MissingValuePolicy.MissingValuePolicyBase policy,
             Mock<ISignalsRepository> signalsRepositoryMock,
             Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock)
@@ -88,7 +115,7 @@ namespace WebService.Tests
            ))));
         }
 
-        public void AssertGetMissingValuePolicyIsExceptionThrownInvalidKey(ISignalsWebService signalsWebService)
+        internal void AssertGetMissingValuePolicyIsExceptionThrownInvalidKey(ISignalsWebService signalsWebService)
         {
             try
             {
@@ -100,6 +127,25 @@ namespace WebService.Tests
                 return;
             }
             Assert.Fail();
+        }
+
+        internal void AssertGetIsReturningSpecificPolicy(SpecificValueMissingValuePolicyDouble existingPolicy, SpecificValueMissingValuePolicy<double> result)
+        {
+            Assert.AreEqual(existingPolicy.Id, result.Id);
+            Assert.AreEqual(existingPolicy.Quality, result.Quality);
+            Assert.AreEqual(existingPolicy.Value, result.Value);
+        }
+
+        internal void VerifyRepositoryGetIsCalled(Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock, Domain.Signal existingSignal)
+        {
+            missingValuePolicyRepositoryMock.Verify(mvp => mvp.Get(It.Is<Domain.Signal>(s =>
+            (
+                existingSignal.Id == existingSignal.Id
+                && existingSignal.DataType == s.DataType
+                && existingSignal.Granularity == s.Granularity
+                && existingSignal.Path == s.Path
+            ))));
+
         }
     }
 }
