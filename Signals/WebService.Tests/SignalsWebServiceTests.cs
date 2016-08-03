@@ -514,6 +514,22 @@ namespace WebService.Tests
                 signalsWebService.GetData(1, invalidFromDate, invalidToDate);
             }
 
+            [TestMethod]
+            public void GivenIdMatchingSignalOfDataTypeInteger_WhenGettingData_RepositoryGetDataIsCalledWithCorrectDataType()
+            {
+                SetupWebService();
+                int id = 5;
+
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(SignalWith(DataType.Integer, Granularity.Month, Path.FromString("root/signalInt"), id));
+
+                signalsWebService.GetData(id, DateTime.MinValue, DateTime.MaxValue);
+
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == id &&
+                    s.DataType == DataType.Integer &&
+                    s.Granularity == Granularity.Month &&
+                    s.Path.ToString() == "root/signalInt"), DateTime.MinValue, DateTime.MaxValue));
+            }
+
             private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
             {
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data =>
