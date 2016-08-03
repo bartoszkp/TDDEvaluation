@@ -424,7 +424,7 @@ namespace WebService.Tests
                 int signalId = 2;
                 GivenASignal(SignalWith(
                     id: signalId,
-                    dataType: Domain.DataType.Integer,
+                    dataType: Domain.DataType.Double,
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal")));
 
@@ -437,7 +437,7 @@ namespace WebService.Tests
                 int signalId = 2;
                 GivenASignal(SignalWith(
                     id: signalId,
-                    dataType: Domain.DataType.Integer,
+                    dataType: Domain.DataType.Double,
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal")));
 
