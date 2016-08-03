@@ -157,7 +157,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenOneSignalAndSignalData_WhenSettingDataForSignal_DataRepositorySetDataIsCalled()
+            public void GivenASignalAndSignalDataOfDoubles_WhenSettingDataForSignal_DataRepositorySetDataIsCalled()
             {
                 int id = 1;
                 var path = new Dto.Path() { Components = new[] { "root", "signal" } };
@@ -176,11 +176,11 @@ namespace WebService.Tests
                 };
 
                 signalsWebService.SetData(id, dtoData);
-                signalsDataRepoMock.Verify(sd => sd.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+                signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<double>>>()));
             }
 
             [TestMethod]
-            public void GivenOneSignalAndNoData_WhenSettingDataForSignal_ArgumentNullExceptionIsNotThrown()
+            public void GivenASignalAndNoData_WhenSettingDataForSignal_ArgumentNullExceptionIsNotThrown()
             {
                 int id = 1;
                 var path = new Dto.Path() { Components = new[] { "root", "signal" } };
@@ -189,9 +189,9 @@ namespace WebService.Tests
                 GivenASignal(signal);
 
                 signalsWebService.SetData(id, null);
-                signalsDataRepoMock.Verify(sd => sd.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+                signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<double>>>()));
             }
-
+                        
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
