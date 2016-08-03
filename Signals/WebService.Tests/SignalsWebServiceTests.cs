@@ -140,7 +140,7 @@ namespace WebService.Tests
             {
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
                 MakeASignalsRepositoryMockWithCorrectId(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock();
+                MakeMocks();
 
                 MakeASignalsWebService();
 
@@ -159,8 +159,9 @@ namespace WebService.Tests
                 //arrange
 
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
+                MakeMocks();
                 MakeASignalsRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock();
+                
 
                 MakeASignalsWebService();
                
@@ -173,10 +174,11 @@ namespace WebService.Tests
                 dataRepositoryMock.Verify(sr => sr.SetData<double>(It.IsAny<System.Collections.Generic.ICollection<Datum<double>>>()));
             }
             private Mock<ISignalsDataRepository> dataRepositoryMock;
-            private void MakeADataRepositoryMock()
+            private void MakeMocks()
             {
                 dataRepositoryMock = new Mock<ISignalsDataRepository>();
-            
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
             }
          
@@ -193,9 +195,9 @@ namespace WebService.Tests
                 dummyValue = 1;
                 
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
-
+                MakeMocks();
                 MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock();
+               
                 MakeASignalsWebService();
 
           
@@ -226,9 +228,9 @@ namespace WebService.Tests
                 dummyValue = 1;
 
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
+                MakeMocks();
 
                 MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
-                MakeADataRepositoryMock();
                 MakeASignalsWebService();
 
 
@@ -267,7 +269,7 @@ namespace WebService.Tests
 
                 //arrange
               var anotherId = 5;
-                MakeADataRepositoryMock();
+                MakeMocks();
                 MakeASignalsRepositoryMockWithCorrectId(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
                 MakeASignalsWebService();
                 //act
@@ -282,7 +284,7 @@ namespace WebService.Tests
             public void GivenNoData_WhenGettingAData_GetDataIsCalledWithCorrectDatum()
             {
                 //arrange
-                MakeADataRepositoryMock();
+                MakeMocks();
                 MakeASignalsRepositoryMock(2, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
                 MakeASignalsWebService();
                 //act
@@ -297,7 +299,7 @@ namespace WebService.Tests
             public void GivenNoData_WhenGettingAData_GetDataIsCalledWithCorrectDatumDouble()
             {
                 //arrange
-                MakeADataRepositoryMock();
+                MakeMocks();
                 MakeASignalsRepositoryMock(2, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
                 MakeASignalsWebService();
                 //act
@@ -398,6 +400,7 @@ namespace WebService.Tests
             {
                 //arrange
                 dummyInt = 2;
+                MakeMocks();
                 MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Boolean, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
                 MakeAMissingValuePolicyRepositoryMock();
                 //act
@@ -413,24 +416,27 @@ namespace WebService.Tests
             {
                 //arrange
                 dummyInt = 2;
+                MakeMocks();
                 MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Boolean, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
+                MakeAMissingValuePolicyRepositoryMock();
 
-                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                MakeASignalsWebService();
 
-                missingValuePolicyRepositoryMock.Setup(sr=>sr.Get(It.IsAny<Domain.Signal>())).Returns(new FirstOrderMissingValuePolicyDecimal());
+               
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
-                signalsWebService = new SignalsWebService(signalsDomainService);
+             
                 //act
                 var result=signalsWebService.GetMissingValuePolicy(dummyInt);
                 //assert
                 Assert.IsNotNull(result);
 
             }
+
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                missingValuePolicyRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Signal>())).Returns(new FirstOrderMissingValuePolicyDecimal());
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -495,7 +501,7 @@ namespace WebService.Tests
             {
 
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
 
