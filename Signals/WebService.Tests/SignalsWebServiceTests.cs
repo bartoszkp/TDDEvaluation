@@ -323,36 +323,36 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
             }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenSettingData_RepositoryGetDataAndGetIsCalled()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignal_WhenSettingData_RepositoryGetDataAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    var existingDatum = new Dto.Datum[]
-            //    {
-            //            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-            //            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-            //            new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
-            //    };
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
 
-            //    var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-            //    signalsDataRepositoryMock
-            //        .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+                var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
 
-            //    GivenASignal(existingSignal);
+                GivenASignal(existingSignal);
 
-            //    var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
 
-            //    signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
-            //    signalsWebService.SetData(1, existingDatum);
+                signalsWebService.SetData(1, existingDatum);
 
-            //    signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-            //    foreach (var ed in existingDatum)
-            //    {
-            //        signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d => d == ed)));
-            //    }
-            //}
+                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+                foreach (var ed in existingDatum)
+                {
+                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d => d == ed)));
+                }
+            }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
