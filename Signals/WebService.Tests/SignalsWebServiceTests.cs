@@ -406,15 +406,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetData(id, dataDto);
 
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<int>(It.Is<IEnumerable<Datum<int>>>(data =>
-                    data.ElementAt(0).Quality == Quality.Good &&
-                    data.ElementAt(0).Timestamp == new System.DateTime(2000, 1, 1) &&
-                    data.ElementAt(0).Value == 2 &&
-                    data.ElementAt(0).Signal.Id == signalDomain.Id &&
-                    data.ElementAt(0).Signal.DataType == signalDomain.DataType &&
-                    data.ElementAt(0).Signal.Granularity == signalDomain.Granularity &&
-                    data.ElementAt(0).Signal.Path.ToString() == signalDomain.Path.ToString())),
-                    Times.Once);
+                VerifySetDataCallOnSignalsDataRepositoryMock<int>(signalDomain, new System.DateTime(2000, 1, 1), 2);
             }
 
             [TestMethod]
@@ -445,14 +437,19 @@ namespace WebService.Tests
 
                 signalsWebService.SetData(id, dataDtoDouble);
 
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(data =>
-                    data.ElementAt(0).Quality == Quality.Good &&
-                    data.ElementAt(0).Timestamp == new System.DateTime(2000, 1, 1) &&
-                    data.ElementAt(0).Value == (double)2.5 &&
-                    data.ElementAt(0).Signal.Id == signalDomainDouble.Id &&
-                    data.ElementAt(0).Signal.DataType == signalDomainDouble.DataType &&
-                    data.ElementAt(0).Signal.Granularity == signalDomainDouble.Granularity &&
-                    data.ElementAt(0).Signal.Path.ToString() == signalDomainDouble.Path.ToString())),
+                VerifySetDataCallOnSignalsDataRepositoryMock<double>(signalDomainDouble, new System.DateTime(2000, 1, 1), 2.5);
+            }
+
+            private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
+            {
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data =>
+                    data.ElementAt(elementNumber).Quality == quality &&
+                    data.ElementAt(elementNumber).Timestamp == timeStamp &&
+                    data.ElementAt(elementNumber).Value.Equals(value) &&
+                    data.ElementAt(elementNumber).Signal.Id == signal.Id &&
+                    data.ElementAt(elementNumber).Signal.DataType == signal.DataType &&
+                    data.ElementAt(elementNumber).Signal.Granularity == signal.Granularity &&
+                    data.ElementAt(elementNumber).Signal.Path.ToString() == signal.Path.ToString())),
                     Times.Once);
             }
 
