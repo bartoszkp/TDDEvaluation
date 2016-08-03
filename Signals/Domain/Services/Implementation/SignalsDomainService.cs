@@ -58,7 +58,7 @@ namespace Domain.Services.Implementation
             return this.signalsDataRepository.GetData<T>(signal,fromIncludedUtc,toExcludedUtc);
         }
 
-        public void SetMissingValuePolicy<T>(Signal signal, Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T> policy)
+        public void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
         {
             this.missingValuePolicyRepository.Set(signal,policy);
         }

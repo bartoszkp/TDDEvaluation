@@ -15,7 +15,7 @@ namespace Domain.Services
 
         IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
-        void SetMissingValuePolicy<T>(Signal signal, Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T> policy);
+        void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy);
 
         MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal);
     }

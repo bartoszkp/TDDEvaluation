@@ -132,7 +132,7 @@ namespace WebService
 
             this.signalsDomainService.SetMissingValuePolicy(
                 signal.ToDomain<Domain.Signal>(),
-                policy.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>>());
+                policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
         }
     }
 }

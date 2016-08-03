@@ -382,7 +382,8 @@ namespace WebService.Tests
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal")));
 
-                this.signalsWebService.SetMissingValuePolicy(signalId, null);
+                this.signalsWebService.SetMissingValuePolicy(signalId, 
+                    new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
             }
 
             [TestMethod]
