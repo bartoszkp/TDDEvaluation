@@ -115,11 +115,11 @@ namespace WebService.Tests
            ))));
         }
 
-        internal void AssertGetMissingValuePolicyIsExceptionThrownInvalidKey(ISignalsWebService signalsWebService)
+        internal void AssertGetMissingValuePolicyIsExceptionThrownWhenInvalidKey(ISignalsWebService signalsWebService, int wrongId)
         {
             try
             {
-                signalsWebService.GetMissingValuePolicy(3).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
+                signalsWebService.GetMissingValuePolicy(wrongId).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
             }
             catch (KeyNotFoundException kne)
             {
@@ -146,6 +146,43 @@ namespace WebService.Tests
                 && existingSignal.Path == s.Path
             ))));
 
+        }
+
+        internal void AssertSetDataIsExceptionThrownWhenInvalidKey(ISignalsWebService signalsWebService, int wrongSignalId)
+        {
+            try
+            {
+                signalsWebService.SetData(wrongSignalId, null);
+            }
+            catch (KeyNotFoundException kne)
+            {
+                Assert.IsNotNull(kne);
+                return;
+            }
+            Assert.Fail();
+        }
+
+        internal void VerifyRepositoryGetDataAndGetIsCalled(
+            Domain.Signal existingSignal,
+            Datum[] existingDatum,
+            Mock<ISignalsDataRepository> signalsDataRepositoryMock,
+            Mock<ISignalsRepository> signalsRepositoryMock)
+        {
+            signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+
+            var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>();
+            int index = 0;
+
+            foreach (var ed in datum)
+            {
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d =>
+                (
+                    d.ElementAt(index).Quality == ed.Quality
+                    && d.ElementAt(index).Timestamp == ed.Timestamp
+                    && d.ElementAt(index).Value == ed.Value
+                ))));
+                index++;
+            }
         }
     }
 }
