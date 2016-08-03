@@ -235,6 +235,20 @@ namespace WebService.Tests
 
                 signalsWebService.GetData(id, dateFrom, dateTo);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingItsData_ReturnsNotNull()
+            {
+                int id = 1;
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(id, DataType.Double, Granularity.Day, path.ToDomain<Domain.Path>());
+                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
+
+                GivenASignal(signal);            
+
+                var result = signalsWebService.GetData(id, dateFrom, dateTo);
+                Assert.IsNotNull(result);
+            }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
