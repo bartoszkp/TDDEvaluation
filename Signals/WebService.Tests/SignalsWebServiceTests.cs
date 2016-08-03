@@ -465,9 +465,22 @@ namespace WebService.Tests
                 //act
                 var result = signalsWebService.Get(path);
                 //assert
+                
 
             }
+            [TestMethod]
+            public void WhenGettingByPath_ReturnsSignal()
+            {
+                //arrange
+                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                signalsWebService = new SignalsWebService(null);
 
+                //act
+                var result = signalsWebService.Get(path);
+                //assert
+                Assert.IsInstanceOfType(result, typeof(Domain.Signal));
+
+            }
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
