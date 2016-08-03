@@ -90,6 +90,35 @@ namespace WebService.Tests
         }
 
 
+        [TestMethod]
+        public void SetSignalData_SameDataReturned_WhenGettingIt()
+        {
+            SetupWebService();
+            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal() { Id = 1, DataType = DataType.Integer });
+
+            Mock<IEnumerable<Datum<int>>> returnedDataMock = new Mock<IEnumerable<Datum<int>>>();
+            Mock<IEnumerable<Dto.Datum>> signalDataMock = new Mock<IEnumerable<Dto.Datum>>();
+
+            signalsDataRepoMock.Setup(sd => sd.GetData<int>
+                        (It.Is<Signal>(s => s.Id == 1),
+                        It.IsAny<DateTime>(),
+                        It.IsAny<DateTime>())).Returns(returnedDataMock.Object);
+
+
+
+            signalsWebService.SetSignalData(1, signalDataMock.Object);
+
+            var createdSignalData = signalsWebService.GetSignalData(1, new DateTime(), new DateTime());
+
+            Assert.IsNotNull(createdSignalData);
+            Assert.IsInstanceOfType(createdSignalData, typeof(IEnumerable<Dto.Datum>));
+
+
+        }
+
+
+
+
 
         private void SetupWebService()
         {
