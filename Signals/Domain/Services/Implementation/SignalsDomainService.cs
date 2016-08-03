@@ -69,9 +69,9 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void SetData(IEnumerable<Datum<int>> dataDomain)
+        public void SetData<T>(IEnumerable<Datum<T>> dataDomain)
         {
-            this.signalsDataRepository.SetData<int>(dataDomain);
+            this.signalsDataRepository.SetData<T>(dataDomain);
         }
     }
 }

@@ -70,15 +70,30 @@ namespace WebService
             if (signal == null)
                 throw new ArgumentException("Signal with given Id not found.");
 
-            var dataDomain = new List<Domain.Datum<int>>();
-
-            for (int i = 0; i < data.Count(); i++)
+            if (signal.DataType == DataType.Integer)
             {
-                dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<int>>());
-                dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
-            }
+                var dataDomain = new List<Domain.Datum<int>>();
 
-            this.signalsDomainService.SetData(dataDomain);
+                for (int i = 0; i < data.Count(); i++)
+                {
+                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<int>>());
+                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+                }
+
+                this.signalsDomainService.SetData(dataDomain);
+            }
+            else if (signal.DataType == DataType.Double)
+            {
+                var dataDomain = new List<Domain.Datum<double>>();
+
+                for (int i = 0; i < data.Count(); i++)
+                {
+                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<double>>());
+                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+                }
+
+                this.signalsDomainService.SetData(dataDomain);
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
