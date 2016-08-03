@@ -59,7 +59,7 @@ namespace WebService
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = this.signalsDomainService?.GetById(signalId);
-
+            
             var datum = this.signalsDomainService?.GetData(signal, fromIncludedUtc, toExcludedUtc);
 
             return datum?.ToDto<IEnumerable<Dto.Datum>>();
