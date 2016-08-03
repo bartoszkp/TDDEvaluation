@@ -473,6 +473,17 @@ namespace WebService.Tests
                 signalsWebService.GetData(1, System.DateTime.MinValue, System.DateTime.MaxValue);
             }
 
+            [TestMethod]
+            public void GivenSignalId_WhenGettingData_CallsGetByIdWithPassedId()
+            {
+                SetupWebService();
+                int id = 3;
+
+                signalsWebService.GetData(id, System.DateTime.MinValue, System.DateTime.MaxValue);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
+            }
+
             private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
             {
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data =>
