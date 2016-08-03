@@ -63,7 +63,7 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            throw new NotImplementedException();
+            
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
