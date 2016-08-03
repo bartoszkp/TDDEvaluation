@@ -430,6 +430,20 @@ namespace WebService.Tests
 
                 this.signalsWebService.GetMissingValuePolicy(signalId);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingMissingValuePolicy_ReturnsDefaultMissingValuePolicy()
+            {
+                int signalId = 2;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Integer,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                if (!(this.signalsWebService.GetMissingValuePolicy(signalId) is Dto.MissingValuePolicy.MissingValuePolicy))
+                    Assert.Fail();
+            }
         }
     }
 }
