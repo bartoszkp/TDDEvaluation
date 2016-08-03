@@ -167,23 +167,19 @@ namespace WebService.Tests
 
                 var pathDomain = Domain.Path.FromString("root/signal");
 
-                GivenASignal_SetupSignalsRepositoryMock(new Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Double,
-                    Granularity = Granularity.Month,
-                    Path = pathDomain
-                });
+                GivenASignal_SetupSignalsRepositoryMock(SignalWith(
+                    DataType.Double,
+                    Granularity.Month, 
+                    Path.FromString("root/signal"), 
+                    1));
 
                 var result = signalsWebService.Get(pathDto);
 
-                AssertSignalsAreEqual(result, new Dto.Signal()
-                {
-                    Id = 1,
-                    DataType = Dto.DataType.Double,
-                    Granularity = Dto.Granularity.Month,
-                    Path = pathDto
-                });
+                AssertSignalsAreEqual(result, SignalWith(
+                    Dto.DataType.Double, 
+                    Dto.Granularity.Month, 
+                    new Dto.Path() { Components = new[] { "root", "signal" } }, 
+                    1));
             }
 
             [TestMethod]
@@ -307,13 +303,7 @@ namespace WebService.Tests
                 SetupWebService();
                 int id = 5;
 
-                var signal = new Domain.Signal()
-                {
-                    Id = id, 
-                    DataType = DataType.Integer,
-                    Granularity = Granularity.Week,
-                    Path = Domain.Path.FromString("root/signal")
-                };
+                var signal = SignalWith(DataType.Integer, Granularity.Week, Path.FromString("root/signal"), id);
 
                 signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
 
@@ -330,16 +320,14 @@ namespace WebService.Tests
                 var result = signalsWebService.GetMissingValuePolicy(id);
 
                 Assert.AreEqual(result.Id, id);
-                AssertSignalsAreEqual(result.Signal, new Dto.Signal()
-                {
-                    Id = id,
-                    DataType = Dto.DataType.Integer,
-                    Granularity = Dto.Granularity.Week,
-                    Path = new Dto.Path()
+                AssertSignalsAreEqual(result.Signal, SignalWith(
+                    Dto.DataType.Integer, 
+                    Dto.Granularity.Week, 
+                    new Dto.Path()
                     {
                         Components = new[] { "root", "signal" }
-                    }
-                });
+                    }, 
+                    id));
             }
 
             [TestMethod]
@@ -403,13 +391,7 @@ namespace WebService.Tests
 
                 var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
 
-                var signalDomain = new Domain.Signal()
-                {
-                    Id = id,
-                    DataType = DataType.Integer,
-                    Granularity = Granularity.Day,
-                    Path = Path.FromString("root/signal")
-                };
+                var signalDomain = SignalWith(DataType.Integer, Granularity.Day, Path.FromString("root/signal"), id);
 
                 signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDomain);
 
@@ -432,17 +414,18 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
+            private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path, int? id = null)
             {
                 return new Dto.Signal()
                 {
+                    Id = id,
                     DataType = dataType,
                     Granularity = granularity,
                     Path = path
                 };
             }
 
-            private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            private Domain.Signal SignalWith(Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path, int? id = null)
             {
                 return new Domain.Signal()
                 {
