@@ -228,6 +228,8 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingData_ThrowsSignalNotFoundException()
             {
+                GivenNoSignals();
+
                 int id = 5;
                 System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
 
