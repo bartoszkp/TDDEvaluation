@@ -408,6 +408,15 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(x => x.Set(It.IsAny<Domain.Signal>(),
                     It.IsAny<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>>()));
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignals_WhenGettingMissingValuePolicy_ThrowsCouldntGetASignalException()
+            {
+                GivenNoSignals();
+                int nonExistingSignalId = 3;
+                this.signalsWebService.GetMissingValuePolicy(nonExistingSignalId);
+            }
         }
     }
 }
