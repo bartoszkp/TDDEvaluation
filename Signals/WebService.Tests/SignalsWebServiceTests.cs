@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -84,6 +85,40 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Granularity.Second, result.Granularity);
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
+
+
+
+            [TestMethod]
+            public void WhenGettingByPath_ReturnsIt()
+            {
+                GivenNoSignals();
+                var signalDomain = new Domain.Signal()
+                {
+                    Id = 100,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("root/signal"),
+                };
+                signalsRepositoryMock.Setup(srm => srm.Get(It.Is<Domain.Path>(p => p.ToString() == signalDomain.Path.ToString())))
+                    .Returns(signalDomain);
+
+                var signalDto = signalDomain.ToDto<Dto.Signal>();
+                var result = signalsWebService.Get(signalDomain.ToDto<Dto.Signal>().Path);
+
+                Assert.AreEqual(signalDto.Id, result.Id);
+                Assert.AreEqual(signalDto.DataType, result.DataType);
+                Assert.AreEqual(signalDto.Granularity, result.Granularity);
+                Assert.AreEqual(signalDto.Path.ToString(), result.Path.ToString());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.PathNotExistException))]
+            public void WhenGettingPathIsNotExistOrIsNullOrIsIsEmpty_ReportException()
+            {
+                GivenNoSignals();
+                signalsWebService.Get(null);
+            }
+            
 
             private Dto.Signal SignalWith(
                 int? id = null,

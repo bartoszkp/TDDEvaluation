@@ -42,12 +42,15 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path path)
         {
-            var result = signalsRepository.Get(path);
-            if (result == null)
-            {
-                return null;
-            }
-            return result;
+            
+                var result = signalsRepository.Get(path);
+                if (result == null)
+                {
+                    throw new PathNotExistException();
+                }
+                return result;
+            
+            
         }
     }
 }

@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -27,9 +28,9 @@ namespace WebService
 
         public Signal Get(Path pathDto)
         {
-            Domain.Path path = pathDto.ToDomain<Domain.Path>();
-            var result = this.signalsDomainService.Get(path);
-            return result?.ToDto<Dto.Signal>();
+                Domain.Path path = pathDto.ToDomain<Domain.Path>();
+                var result = this.signalsDomainService.Get(path);
+                return result.ToDto<Dto.Signal>();
         }
 
         public Signal GetById(int signalId)
