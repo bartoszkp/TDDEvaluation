@@ -378,7 +378,10 @@ namespace WebService.Tests
 
                 var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
 
-                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Signal());
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Signal()
+                {
+                    DataType = DataType.Integer
+                });
 
                 signalsWebService.SetData(id, dataDto);
 
