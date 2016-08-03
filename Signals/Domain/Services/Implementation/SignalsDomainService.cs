@@ -33,7 +33,7 @@ namespace Domain.Services.Implementation
 
         public Signal GetById(int signalId)
         {
-            return this.signalsRepository.Get(signalId);
+            return this.signalsRepository?.Get(signalId);
         }
 
         public Signal Get(Path pathDomain)

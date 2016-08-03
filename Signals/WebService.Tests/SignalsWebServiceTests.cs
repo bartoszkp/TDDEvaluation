@@ -364,7 +364,7 @@ namespace WebService.Tests
                 signalsDataRepositoryMock
                     .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
-                var signalsDomainService = new SignalsDomainService(null, signalsDataRepositoryMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
