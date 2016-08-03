@@ -321,6 +321,27 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingData_RepositoryGetDataAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
+
+                var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(0, null);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
