@@ -581,18 +581,28 @@ namespace WebService.Tests
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 2), Value = (int)3 }
                 };
 
-                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
-
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(It.IsAny<Signal>(), dateFrom, dateTo)).Returns(dataReturned);
+                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<int>(id, signal, dateFrom, dateTo, dataReturned);
 
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
 
-                Assert.IsTrue(result.Any());
-                for (int i = 0; i < result.Count(); i++)
+                AssertDataIsEqual(result, expectedData);
+            }
+
+            private void SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<T>(int id, Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, IEnumerable<Domain.Datum<T>> dataReturned)
+            {
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
+
+                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<T>(It.IsAny<Signal>(), fromIncludedUtc, toExcludedUtc)).Returns(dataReturned);
+            }
+
+            private void AssertDataIsEqual(IEnumerable<Dto.Datum> data1, IEnumerable<Dto.Datum> data2)
+            {
+                Assert.AreEqual(data1.Count(), data2.Count());
+                for (int i = 0; i < data1.Count(); i++)
                 {
-                    Assert.AreEqual(result.ElementAt(i).Quality, expectedData.ElementAt(i).Quality);
-                    Assert.AreEqual(result.ElementAt(i).Timestamp, expectedData.ElementAt(i).Timestamp);
-                    Assert.AreEqual(result.ElementAt(i).Value, expectedData.ElementAt(i).Value);
+                    Assert.AreEqual(data1.ElementAt(i).Quality, data2.ElementAt(i).Quality);
+                    Assert.AreEqual(data1.ElementAt(i).Timestamp, data2.ElementAt(i).Timestamp);
+                    Assert.AreEqual(data1.ElementAt(i).Value, data2.ElementAt(i).Value);
                 }
             }
             
