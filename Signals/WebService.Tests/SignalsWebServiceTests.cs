@@ -235,6 +235,26 @@ namespace WebService.Tests
 
                 signalsWebService.GetData(id, dateFrom, dateTo);
             }
+
+            [TestMethod]
+            public void GivenASignalAndDataOfIntegers_WhenGettingItsData_DataRepositoryGetDataIsCalled()
+            {
+                int id = 1;                
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(id, DataType.Integer, Granularity.Day, path.ToDomain<Domain.Path>());
+                GivenASignal(signal);
+
+                Dto.Datum[] dtoData;
+                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
+                dtoData = DatumWith(1, dateFrom, 3);
+
+                signalsDataRepoMock
+                    .Setup(sd => sd.GetData<int>(signal, dateFrom, dateTo))
+                    .Returns<IEnumerable<Dto.Datum>>(null);
+                
+                signalsWebService.GetData(id, dateFrom, dateTo);
+                signalsDataRepoMock.Verify(sd => sd.GetData<int>(It.IsAny<Domain.Signal>(), dateFrom, dateTo));
+            }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
