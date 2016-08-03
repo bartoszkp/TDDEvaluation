@@ -212,6 +212,17 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, dtoData);
                 signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<decimal>>>()));
             }
+
+            [TestMethod]
+            public void GivenASignalAndDataOfStrings_WhenSettingDataForSignal_DoesNotThrow()
+            {
+                int id = 1;
+                Dto.Datum[] dtoData;
+                GivenASignalAndDataOf(DataType.String, "str", out dtoData, id);
+
+                signalsWebService.SetData(id, dtoData);
+                signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<string>>>()));
+            }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
