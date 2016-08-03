@@ -120,7 +120,7 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
-            return this.signalsDomainService.GetMissingValuePolicy<Double>(signal)
+            return this.signalsDomainService.GetMissingValuePolicy(signal)
                 .ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
         }
 

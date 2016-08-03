@@ -9,6 +9,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using Domain.Exceptions;
+using DataAccess.GenericInstantiations;
 
 namespace WebService.Tests
 {
@@ -420,9 +421,8 @@ namespace WebService.Tests
                 GivenASignal(signal);
 
                 this.missingValuePolicyRepositoryMock
-                    .Setup(x => x.Get(It.Is<Domain.Signal>(s => s == signal)))
-                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>() as
-                        Domain.MissingValuePolicy.MissingValuePolicyBase);
+                    .Setup(x => x.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new SpecificValueMissingValuePolicyDouble());
             }
 
             [TestMethod]
@@ -435,7 +435,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingMissingValuePolicy_ReturnsDefaultMissingValuePolicy()
+            public void GivenASignalForGettingMissingValuePolicy_WhenGettingMissingValuePolicy_ReturnsDefaultMissingValuePolicy()
             {
                 int signalId = 2;
                 GivenASignalForGettingMissingValuePolicy(signalId);
@@ -446,7 +446,7 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            public void GivenASignal_WhenGettingMissingValuePolicy_VaryfingCallOfRepositoryFunctioGet()
+            public void GivenASignalForGettingMissingValuePolicy_WhenGettingMissingValuePolicy_VaryfingCallOfRepositoryFunctioGet()
             {
                 int signalId = 2;
                 GivenASignalForGettingMissingValuePolicy(signalId);
