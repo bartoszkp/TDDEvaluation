@@ -9,26 +9,25 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var newSignal = new Signal()
+            var signal = new Signal()
             {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "signal44"} }
+                   DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path =  new Path() { Components = new[] { "root", "signal" } }
             };
 
-            var id = client.Add(newSignal).Id.Value;
-        
-            client.SetData(id, new Datum[] {
-                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+            var id = client.Add(signal).Id.Value;
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+            var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
 
-            foreach (var d in result)
-            {
-                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
-            }
+            client.SetMissingValuePolicy(id, mvp);
+
+            var result = client.GetMissingValuePolicy(id) as Signals.SpecificValueMissingValuePolicy;
+
+            Console.WriteLine(result.Signal.Id.Value);
+            Console.WriteLine(result.DataType);
+            Console.WriteLine(result.Quality);
+            Console.WriteLine(result.Value);
             Console.WriteLine("end");
             Console.ReadKey();
         }

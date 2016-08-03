@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Domain.MissingValuePolicy;
 
 namespace Domain.Services
 {
@@ -12,5 +13,8 @@ namespace Domain.Services
         void SetData(int signalId, IEnumerable<Datum<double>> data);
 
         IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+
+        void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp);
+
     }
 }
