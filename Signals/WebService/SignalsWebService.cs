@@ -161,34 +161,16 @@ namespace WebService
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
             
-           var sig= signalsDomainService.GetById(signalId);
+            var sig= signalsDomainService.GetById(signalId);
             if (sig == null) throw new ArgumentException();
+
+
+
+            policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+
+            signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+
          
-       
-
-              var k = sig.DataType;
-            switch (k)
-            {
-                case Domain.DataType.Boolean:
-                    signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<Boolean>>());
-                    break;
-                case Domain.DataType.Integer:
-                    signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<int>>());
-                    break;
-                case Domain.DataType.Double:
-                    signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<double>>());
-                    break;
-                case Domain.DataType.Decimal:
-                    signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<decimal>>());
-                    break;
-                case Domain.DataType.String:
-                    signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<string>>());
-                    break;
-
-                default:
-                    break;
-            }
-
             
 
 

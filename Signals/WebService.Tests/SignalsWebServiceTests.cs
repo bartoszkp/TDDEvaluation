@@ -352,7 +352,7 @@ namespace WebService.Tests
 
                 MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Decimal, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
                 MakeAMissingValuePolicyRepositoryMock();
-                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
+                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy() {DataType=Dto.DataType.Decimal };
                 //act
 
                 signalsWebService.SetMissingValuePolicy(dummyInt, policy);
@@ -373,7 +373,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetMissingValuePolicy(dummyInt, policy);
                 //assert
-                missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.Is<Domain.Signal>(s => s.Id == dummyInt), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<Decimal>>()));
+                missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.Is<Domain.Signal>(s => s.Id == dummyInt), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
 
             }
 
