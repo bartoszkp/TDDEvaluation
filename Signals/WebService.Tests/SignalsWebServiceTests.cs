@@ -363,6 +363,31 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenSettingDataWithWrongSignalId_ExceptionIsThrown()
+            {
+                var existingSignal = ExistingSignal();
+                int wrongSignalId = 3;
+                var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+
+                GivenASignal(existingSignal);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                try
+                {
+                    signalsWebService.SetData(wrongSignalId, null);
+                }
+                catch(KeyNotFoundException kne)
+                {
+                    Assert.IsNotNull(kne);
+                }
+                Assert.Fail();
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
