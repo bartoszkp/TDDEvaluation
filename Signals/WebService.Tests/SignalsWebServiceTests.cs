@@ -324,7 +324,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingData_RepositoryGetDataAndGetIsCalled()
+            public void GivenASignalAndDatum_WhenSettingData_RepositoryGetDataAndGetIsCalled()
             {
                 var existingSignal = ExistingSignal();
 
@@ -348,9 +348,18 @@ namespace WebService.Tests
                 signalsWebService.SetData(1, existingDatum);
 
                 signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-                foreach (var ed in existingDatum)
+
+                var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>();
+                int index = 0;
+                foreach (var ed in datum)
                 {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d => d == ed)));
+                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d =>
+                    (
+                        d.ElementAt(index).Quality == ed.Quality
+                        && d.ElementAt(index).Timestamp == ed.Timestamp
+                        && d.ElementAt(index).Value == ed.Value
+                    ))));
+                    index++;
                 }
             }
 
