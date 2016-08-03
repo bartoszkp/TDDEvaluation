@@ -440,6 +440,31 @@ namespace WebService.Tests
                 VerifySetDataCallOnSignalsDataRepositoryMock<double>(signalDomainDouble, new System.DateTime(2000, 1, 1), 2.5);
             }
 
+            [TestMethod]
+            public void GivenDataOfDifferentTypes_WhenSettingData_RepositorySetDataIsCalledWithCorrectDataType()
+            {
+                SetupWebService();
+                int id = 1;
+
+                var dataDtoDecimal = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (decimal)2.5m } };
+                var signalDomainDecimal = SignalWith(DataType.Decimal, Granularity.Day, Path.FromString("root/signal"), id);
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDomainDecimal);
+                signalsWebService.SetData(id, dataDtoDecimal);
+                VerifySetDataCallOnSignalsDataRepositoryMock<decimal>(signalDomainDecimal, new System.DateTime(2000, 1, 1), 2.5m);
+
+                var dataDtoBoolean = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = true } };
+                var signalDomainBoolean = SignalWith(DataType.Boolean, Granularity.Day, Path.FromString("root/signal"), id);
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDomainBoolean);
+                signalsWebService.SetData(id, dataDtoBoolean);
+                VerifySetDataCallOnSignalsDataRepositoryMock<bool>(signalDomainBoolean, new System.DateTime(2000, 1, 1), true);
+
+                var dataDtoString = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = "aa" } };
+                var signalDomainString = SignalWith(DataType.String, Granularity.Day, Path.FromString("root/signal"), id);
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDomainString);
+                signalsWebService.SetData(id, dataDtoString);
+                VerifySetDataCallOnSignalsDataRepositoryMock<string>(signalDomainString, new System.DateTime(2000, 1, 1), "aa");
+            }
+
             private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
             {
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data =>
