@@ -428,6 +428,31 @@ namespace WebService.Tests
                 signalsWebService.SetData(nonExistingId, dataDto);
             }
 
+            [TestMethod]
+            public void GivenDataOfTypeDouble_WhenSettingData_RepositorySetDataIsCalledWithCorrectDataType()
+            {
+                SetupWebService();
+                int id = 1;
+
+                var dataDtoDouble = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (double)2.5 } };
+
+                var signalDomainDouble = SignalWith(DataType.Double, Granularity.Day, Path.FromString("root/signal"), id);
+
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDomainDouble);
+
+                signalsWebService.SetData(id, dataDtoDouble);
+
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(data =>
+                    data.ElementAt(0).Quality == Quality.Good &&
+                    data.ElementAt(0).Timestamp == new System.DateTime(2000, 1, 1) &&
+                    data.ElementAt(0).Value == (double)2.5 &&
+                    data.ElementAt(0).Signal.Id == signalDomainDouble.Id &&
+                    data.ElementAt(0).Signal.DataType == signalDomainDouble.DataType &&
+                    data.ElementAt(0).Signal.Granularity == signalDomainDouble.Granularity &&
+                    data.ElementAt(0).Signal.Path.ToString() == signalDomainDouble.Path.ToString())),
+                    Times.Once);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
