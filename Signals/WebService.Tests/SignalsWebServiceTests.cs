@@ -417,6 +417,19 @@ namespace WebService.Tests
                 int nonExistingSignalId = 3;
                 this.signalsWebService.GetMissingValuePolicy(nonExistingSignalId);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingMissingValuePolicy_DontThrows()
+            {
+                int signalId = 2;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Integer,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                this.signalsWebService.GetMissingValuePolicy(signalId);
+            }
         }
     }
 }
