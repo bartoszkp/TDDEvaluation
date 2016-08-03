@@ -350,6 +350,8 @@ namespace WebService.Tests
 
                 var dataDto = new Dto.Datum[] {  };
 
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Signal());
+
                 signalsWebService.SetData(0, dataDto);
             }
 
@@ -360,6 +362,8 @@ namespace WebService.Tests
 
                 int id = 1;
                 var dataDto = new Dto.Datum[] {  };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Signal());
 
                 signalsWebService.SetData(id, dataDto);
 
@@ -373,6 +377,8 @@ namespace WebService.Tests
                 int id = 4;
 
                 var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Signal());
 
                 signalsWebService.SetData(id, dataDto);
 
