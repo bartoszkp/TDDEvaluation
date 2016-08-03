@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace WebService.Tests
 {
@@ -171,6 +172,34 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
+
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingASignalsData_RepositorySetDataIsCalled()
+            {
+                Datum<double>[] dataToSet = new Datum<double>[] {
+                        new Datum<double>() { Id = 1, Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Datum<double>() { Id = 2, Quality = Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
+                        new Datum<double>() { Id = 3, Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 },
+                        };
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sr => sr.SetData(dataToSet));
+
+                var signalsDomainService = new SignalsDomainService(null, signalsDataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, new Dto.Datum[] 
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 },
+                });
+
+                signalsDataRepositoryMock.Verify(sr => sr.SetData(dataToSet));
+            }
         }
     }
 }
