@@ -498,6 +498,25 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(s => s.Get(It.IsAny<Domain.Path>()));
 
             }
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalByPath_GetIsCalledWithCorrectValues()
+            {
+                //arrange
+                dummyInt = 2;
+                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                MakeMocks();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<Domain.Path>()))
+                    .Returns(SignalWith(id:dummyInt,dataType: Domain.DataType.Boolean,granularity:Domain.Granularity.Day,path:Domain.Path.FromString("x/y")));
+
+                MakeASignalsWebService();
+                //act
+                var result = signalsWebService.Get(path);
+                //assert
+                Assert.AreEqual(Domain.DataType.Boolean, result.DataType);
+                Assert.AreEqual(Domain.Granularity.Day, result.Granularity);
+                Assert.AreEqual(dummyInt, result.Id);
+            }
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
