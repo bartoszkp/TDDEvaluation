@@ -392,6 +392,20 @@ namespace WebService.Tests
                 //assert
             }
 
+            [TestMethod]
+            public void ThereIsSignal_WhenGettingMissingValuePolicy_GetMissingValuePolicyIsCalled()
+            {
+                //arrange
+                dummyInt = 2;
+                MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Boolean, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
+                MakeAMissingValuePolicyRepositoryMock();
+                //act
+
+                var result = signalsWebService.GetMissingValuePolicy(dummyInt);
+                //assert
+
+                missingValuePolicyRepositoryMock.Verify(sr => sr.Get(It.Is<Domain.Signal>(s => s.Id == dummyInt)));
+            }
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
