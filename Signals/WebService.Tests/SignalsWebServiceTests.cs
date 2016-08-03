@@ -455,6 +455,18 @@ namespace WebService.Tests
             }
 
 
+            [TestMethod]
+            public void WhenGettingByPath_FunctionWorks()
+            {
+                //arrange
+                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                signalsWebService = new SignalsWebService(null);
+
+                //act
+                var result = signalsWebService.Get(path);
+                //assert
+            }
+
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
@@ -500,6 +512,8 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
+
+           
 
             private void GivenASignal(Domain.Signal existingSignal)
             {

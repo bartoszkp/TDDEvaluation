@@ -13,7 +13,7 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "sign1al299144421" } }
+                Path = new Path() { Components = new[] { "root", "signal36" } }
             };
 
             var id = client.Add(newSignal).Id.Value;
@@ -24,9 +24,9 @@ namespace ExampleSignalClient
 
             var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
 
-            client.SetMissingValuePolicy(27, mvp);
+            client.SetMissingValuePolicy(100, mvp);
 
-            var result1 = client.GetMissingValuePolicy(5) as Signals.SpecificValueMissingValuePolicy;
+            var result1 = client.GetMissingValuePolicy(1) as Signals.SpecificValueMissingValuePolicy;
 
             Console.WriteLine(result1.Signal.Id.Value);
             Console.WriteLine(result1.DataType);
