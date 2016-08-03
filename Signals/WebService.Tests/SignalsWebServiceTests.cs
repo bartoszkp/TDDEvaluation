@@ -489,7 +489,8 @@ namespace WebService.Tests
                 var path = new Dto.Path() { Components = new[] { "x", "y" } };
                 MakeMocks();
                 signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Path>()));
-                signalsWebService = new SignalsWebService(null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
                 //act
                 var result = signalsWebService.Get(path);
