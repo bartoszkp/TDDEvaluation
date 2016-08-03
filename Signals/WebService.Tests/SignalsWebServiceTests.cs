@@ -408,6 +408,20 @@ namespace WebService.Tests
                     Times.Once);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentException))]
+            public void GivenNonExistingSignalId_WhenSettingData_ThrowsArgumentException()
+            {
+                SetupWebService();
+                int nonExistingId = 6;
+
+                var dataDto = new Dto.Datum[] { };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(nonExistingId)).Returns((Domain.Signal)null);
+
+                signalsWebService.SetData(nonExistingId, dataDto);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
