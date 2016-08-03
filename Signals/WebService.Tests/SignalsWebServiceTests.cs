@@ -518,6 +518,24 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
                 Assert.AreEqual(dummyInt, result.Id);
             }
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignal_WhenGettingSignalByPath_ThrowsException()
+            {
+                //arrange
+                dummyInt = 2;
+                Dto.Path path = MakePathFromString(new[] { "x", "y" });
+                MakeMocks();
+                SignalsRepositoryMock_GetSpecificPath_ReturnsToEachSignal(Domain.Path.FromString("x/y"));
+
+                MakeASignalsWebService();
+                //act
+                var result = signalsWebService.Get(path);
+                //assert
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
+                Assert.AreEqual(dummyInt, result.Id);
+            }
 
             private static Dto.Path MakePathFromString(string [] str)
             {
@@ -530,7 +548,12 @@ namespace WebService.Tests
                     .Setup(sr => sr.Get(It.IsAny<Domain.Path>()))
                     .Returns(SignalWith(id: dummyInt, dataType: Domain.DataType.Boolean, granularity: Domain.Granularity.Day, path: Domain.Path.FromString("x/y")));
             }
-
+            private void SignalsRepositoryMock_GetSpecificPath_ReturnsToEachSignal(Domain.Path path)
+            {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.Is<Domain.Path>(s=>s.Components==path.Components)))
+                    .Returns(SignalWith(id: dummyInt, dataType: Domain.DataType.Boolean, granularity: Domain.Granularity.Day, path: Domain.Path.FromString("x/y")));
+            }
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
