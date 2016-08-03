@@ -6,6 +6,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
+using System;
 
 namespace WebService.Tests
 {
@@ -498,6 +499,19 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(srm => srm.Get(nonExistingId)).Returns((Domain.Signal)null);
 
                 signalsWebService.GetData(nonExistingId, System.DateTime.MinValue, System.DateTime.MaxValue);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentException))]
+            public void GivenFromDateLaterThanToDate_WhenGettingData_ThrowsArgumentException()
+            {
+                SetupWebService();
+                DateTime invalidFromDate = new DateTime(2001, 1, 1);
+                DateTime invalidToDate = new DateTime(2000, 1, 1);
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
+
+                signalsWebService.GetData(1, invalidFromDate, invalidToDate);
             }
 
             private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
