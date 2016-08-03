@@ -297,20 +297,20 @@ namespace WebService.Tests
             //    verifyOrAssert.AssertGetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService, wrongId);
             //}
 
-            //[TestMethod]
-            //public void GivenASignalAndDatum_WhenSettingData_RepositoryGetDataAndGetIsCalled()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenSettingData_RepositorySetDataAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    var existingDatum = ExistingDatum();
+                var existingDatum = ExistingDatum();
 
-            //    SetupSettingData(existingSignal);
+                SetupSettingData(existingSignal);
 
-            //    signalsWebService.SetData(1, existingDatum);
+                signalsWebService.SetData(1, existingDatum);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.VerifyRepositoryGetDataAndGetIsCalled(existingSignal, existingDatum, signalsDataRepositoryMock, signalsRepositoryMock);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.VerifyRepositoryGetDataAndGetIsCalled(existingSignal, existingDatum, signalsDataRepositoryMock, signalsRepositoryMock);
+            }
 
             //[TestMethod]
             //public void GivenASignalAndDatum_WhenSettingDataWithWrongSignalId_ExceptionIsThrown()
@@ -331,7 +331,7 @@ namespace WebService.Tests
 
                 signalsWebService.GetData(0, new DateTime(), new DateTime());
             }
-
+            
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
