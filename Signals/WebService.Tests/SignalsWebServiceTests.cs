@@ -239,19 +239,12 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignalAndDataOfIntegers_WhenGettingItsData_DataRepositoryGetDataIsCalled()
             {
-                int id = 1;                
-                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
-                var signal = SignalWith(id, DataType.Integer, Granularity.Day, path.ToDomain<Domain.Path>());
-                GivenASignal(signal);
-
+                int id = 1;
                 Dto.Datum[] dtoData;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
-                dtoData = DatumWith(1, dateFrom, 3);
-
-                signalsDataRepoMock
-                    .Setup(sd => sd.GetData<int>(signal, dateFrom, dateTo))
-                    .Returns<IEnumerable<Dto.Datum>>(null);
+                var signal = GivenASignalAndDataOf(DataType.Integer, 1, out dtoData, id);
                 
+                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
+
                 signalsWebService.GetData(id, dateFrom, dateTo);
                 signalsDataRepoMock.Verify(sd => sd.GetData<int>(It.IsAny<Domain.Signal>(), dateFrom, dateTo));
             }
@@ -292,6 +285,16 @@ namespace WebService.Tests
                 return dtoData;
             }
 
+            private Domain.Datum<T>[]DatumWith<T>(int size, System.DateTime fromDate)
+            {
+                var data = new Domain.Datum<T>[size];
+
+                for(int i = 0; i < size; ++i)                
+                    data[i] = new Datum<T>() { Timestamp = fromDate.AddMonths(i) };
+                
+                return data;
+            }
+
             private void GivenNoSignals()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -327,13 +330,20 @@ namespace WebService.Tests
                     });
             }      
             
-            private void GivenASignalAndDataOf(DataType dataType, object datumValue, out Dto.Datum[] dtoData, int signalId = 1, int numberOfDatums = 1)
+            private Signal GivenASignalAndDataOf(DataType dataType, object datumValue, out Dto.Datum[] dtoData, int signalId = 1, int numberOfDatums = 1)
             {
                 var path = new Dto.Path() { Components = new[] { "root", "signal" } };
-                var signal = SignalWith(signalId, dataType, Granularity.Day, path.ToDomain<Domain.Path>());                
+                var signal = SignalWith(signalId, dataType, Granularity.Day, path.ToDomain<Domain.Path>());
+                var date = new System.DateTime(2000, 1, 1);
 
                 GivenASignal(signal);
-                dtoData = DatumWith(datumValue, new System.DateTime(2000, 1, 1), numberOfDatums);
+                dtoData = DatumWith(datumValue, date, numberOfDatums);
+
+                signalsDataRepoMock
+                    .Setup(sd => sd.GetData<int>(signal, date, date.AddMonths(numberOfDatums)))
+                    .Returns(DatumWith<int>(numberOfDatums - 1, date));
+
+                return signal;
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
