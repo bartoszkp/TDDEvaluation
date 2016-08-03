@@ -371,6 +371,38 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingSpecificDataFromSpecificSignal_RepositoryGetDataAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
+
+                var existingDatum = ExistingDatum();
+
+                GivenASignal(existingSignal);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(
+                        existingSignal,
+                        existingDatum.First().Timestamp,
+                        existingDatum.Last().Timestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>());
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.GetData(existingSignal.Id.Value, new DateTime(), new DateTime());
+
+                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(
+                    existingSignal,
+                    existingDatum.First().Timestamp,
+                    existingDatum.Last().Timestamp));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -409,8 +441,7 @@ namespace WebService.Tests
                     .Setup(srm => srm.Get(existingSignal.Path))
                     .Returns(existingSignal);
             }
-
-
+            
             private void GivenNoSignals()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
