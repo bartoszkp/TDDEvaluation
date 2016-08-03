@@ -58,7 +58,7 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return null;
+            return this.signalsDomainService?.GetData(null, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
