@@ -395,6 +395,37 @@ namespace WebService.Tests
                     Times.Once);
             }
 
+            [TestMethod]
+            public void GivenData_WhenSettingData_SignalFoundByGetByIdIsAssignedToDataPassedToRepository()
+            {
+                SetupWebService();
+                int id = 4;
+
+                var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
+
+                var signalDomain = new Domain.Signal()
+                {
+                    Id = id,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("root/signal")
+                };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDomain);
+
+                signalsWebService.SetData(id, dataDto);
+
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<int>(It.Is<IEnumerable<Datum<int>>>(data =>
+                    data.ElementAt(0).Quality == Quality.Good &&
+                    data.ElementAt(0).Timestamp == new System.DateTime(2000, 1, 1) &&
+                    data.ElementAt(0).Value == 2 &&
+                    data.ElementAt(0).Signal.Id == signalDomain.Id &&
+                    data.ElementAt(0).Signal.DataType == signalDomain.DataType &&
+                    data.ElementAt(0).Signal.Granularity == signalDomain.Granularity &&
+                    data.ElementAt(0).Signal.Path.ToString() == signalDomain.Path.ToString())),
+                    Times.Once);
+            }
+
             private void SetupWebService()
             {
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
