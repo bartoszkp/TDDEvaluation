@@ -91,6 +91,11 @@ namespace WebService
                 var domain_data = ConvertCollectionDtoToDomainAndSetData<decimal>(data, signal);
                 signalsDomainService.SetData(domain_data);
             }
+            else if(signal.DataType == DataType.String)
+            {
+                var domain_data = ConvertCollectionDtoToDomainAndSetData<string>(data, signal);
+                signalsDomainService.SetData(domain_data);
+            }
             else
                 throw new NotImplementedException();
             
