@@ -63,6 +63,8 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
+            var signal = this.signalsDomainService.GetById(signalId);
+            
             this.signalsDomainService?.SetData(null);
         }
 
