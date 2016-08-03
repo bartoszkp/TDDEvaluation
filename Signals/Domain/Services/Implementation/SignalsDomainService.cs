@@ -81,6 +81,9 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
+            if (data == null)
+                throw new ArgumentNullException("Attempted to set null data for a signal");
+
             throw new NotImplementedException();
         }
     }

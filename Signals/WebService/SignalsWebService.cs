@@ -105,6 +105,35 @@ namespace WebService
             if (signal == null)
                 throw new NoSuchSignalException("Could not get data for not existing signal");
 
+            
+
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    var domainBoolData = data?.ToDomain<IEnumerable<Domain.Datum<bool>>>();
+                    signalsDomainService.SetData(domainBoolData); 
+                    break;
+
+                case DataType.Integer:
+                    var domainIntData = data?.ToDomain<IEnumerable<Domain.Datum<int>>>();
+                    signalsDomainService.SetData(domainIntData);
+                    break;
+
+                case DataType.Double:
+                    var domainDoubleData = data?.ToDomain<IEnumerable<Domain.Datum<double>>>();
+                    signalsDomainService.SetData(domainDoubleData);
+                    break;
+
+                case DataType.Decimal:
+                    var domainDecimalData = data?.ToDomain<IEnumerable<Domain.Datum<decimal>>>();
+                    signalsDomainService.SetData(domainDecimalData);
+                    break;
+
+                case DataType.String:
+                    var domainStringData = data?.ToDomain<IEnumerable<Domain.Datum<string>>>();
+                    signalsDomainService.SetData(domainStringData);
+                    break;
+            }
 
         }
 

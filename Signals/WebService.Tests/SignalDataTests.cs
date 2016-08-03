@@ -85,6 +85,7 @@ namespace WebService.Tests
         public void GivenNullData_SetSignalData_ThrowsException()
         {
             SetupWebService();
+            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal() { Id = 1 });
             signalsWebService.SetSignalData(1, null);
         }
 
