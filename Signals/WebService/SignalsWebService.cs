@@ -160,10 +160,13 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-
+            
            var sig= signalsDomainService.GetById(signalId);
             if (sig == null) throw new ArgumentException();
-            var k = sig.DataType;
+         
+       
+
+              var k = sig.DataType;
             switch (k)
             {
                 case Domain.DataType.Boolean:
@@ -181,14 +184,14 @@ namespace WebService
                 case Domain.DataType.String:
                     signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<string>>());
                     break;
+
                 default:
                     break;
             }
 
             
-             
-            
-            
+
+
 
         }
     }

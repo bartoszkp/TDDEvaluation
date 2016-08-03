@@ -360,6 +360,22 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.Is<Domain.Signal>(s => s.Id == dummyInt), It.IsAny<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<Decimal>>()));
 
             }
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicy_SetIsCalledWithTheSameMissingValuePolicy()
+            {
+                //arrange
+                dummyInt = 2;
+
+                MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Decimal, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
+                MakeAMissingValuePolicyRepositoryMock();
+                var policy = new Dto.MissingValuePolicy.NoneQualityMissingValuePolicy();
+                //act
+
+                signalsWebService.SetMissingValuePolicy(dummyInt, policy);
+                //assert
+                missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.Is<Domain.Signal>(s => s.Id == dummyInt), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<Decimal>>()));
+
+            }
 
             private void MakeAMissingValuePolicyRepositoryMock()
             {
