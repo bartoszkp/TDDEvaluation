@@ -26,7 +26,7 @@ namespace WebService.Tests
             SetupWebService();
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns((Signal)null);
 
-            var result = signalsWebService.GetSignalData(1, new DateTime(), new DateTime());
+            var result = signalsWebService.GetData(1, new DateTime(), new DateTime());
 
         }
 
@@ -42,7 +42,7 @@ namespace WebService.Tests
                                                                 .Returns((IEnumerable<Datum<double>>)null);
 
 
-            var result = signalsWebService.GetSignalData(1, new DateTime(2016, 1, 1), new DateTime(2016, 3, 1));
+            var result = signalsWebService.GetData(1, new DateTime(2016, 1, 1), new DateTime(2016, 3, 1));
 
             Assert.IsNull(result);
 
@@ -61,7 +61,7 @@ namespace WebService.Tests
                                                                It.IsAny<DateTime>()))
                                                                 .Returns(resultDataMock.Object);
 
-            var result = signalsWebService.GetSignalData(1, new DateTime(), new DateTime());
+            var result = signalsWebService.GetData(1, new DateTime(), new DateTime());
 
             Assert.IsNotNull(result);
         }
@@ -76,7 +76,7 @@ namespace WebService.Tests
 
             Mock<IEnumerable<Dto.Datum>> signalDataMock = new Mock<IEnumerable<Dto.Datum>>();
 
-            signalsWebService.SetSignalData(1, signalDataMock.Object);
+            signalsWebService.SetData(1, signalDataMock.Object);
 
         }
 
@@ -86,7 +86,7 @@ namespace WebService.Tests
         {
             SetupWebService();
             signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal() { Id = 1 });
-            signalsWebService.SetSignalData(1, null);
+            signalsWebService.SetData(1, null);
         }
 
 
@@ -106,9 +106,9 @@ namespace WebService.Tests
 
 
 
-            signalsWebService.SetSignalData(1, signalDataMock.Object);
+            signalsWebService.SetData(1, signalDataMock.Object);
 
-            var createdSignalData = signalsWebService.GetSignalData(1, new DateTime(), new DateTime());
+            var createdSignalData = signalsWebService.GetData(1, new DateTime(), new DateTime());
 
             Assert.IsNotNull(createdSignalData);
             Assert.IsInstanceOfType(createdSignalData, typeof(IEnumerable<Dto.Datum>));

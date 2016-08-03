@@ -60,7 +60,7 @@ namespace WebService
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Datum> GetSignalData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = GetById(signalId);
 
@@ -98,7 +98,7 @@ namespace WebService
 
         }
 
-        public void SetSignalData(int signalId, IEnumerable<Datum> data)
+        public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var signal = GetById(signalId);
 
