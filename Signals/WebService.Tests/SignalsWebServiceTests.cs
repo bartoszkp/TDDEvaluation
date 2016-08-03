@@ -223,6 +223,16 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, dtoData);
                 signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<string>>>()));
             }
+
+            [ExpectedException(typeof(SignalNotFoundException))]
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingData_ThrowsSignalNotFoundException()
+            {
+                int id = 5;
+                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
+
+                signalsWebService.GetData(id, dateFrom, dateTo);
+            }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
