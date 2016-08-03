@@ -15,6 +15,7 @@ namespace WebService.Tests
         public class SignalsWebServiceTests
         {
             private ISignalsWebService signalsWebService;
+            private SignalsDomainService signalDomainService;
 
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
@@ -178,7 +179,21 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSettingASignalsData_RepositorySetDataIsCalled()
             {
-                GivenNoSignals();
+                MockSetup();
+
+                Datum<double>[] dataToSet = new Datum<double>[] {
+                        new Datum<double>() { Id = 1, Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Datum<double>() { Id = 2, Quality = Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
+                        new Datum<double>() { Id = 3, Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 },
+                        };
+
+                signalDomainService.SetData(1, dataToSet);
+                signalsDataRepositoryMock.Verify(sr => sr.SetData(dataToSet));
+            }
+
+            private void MockSetup()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
                 signalsRepositoryMock
                     .Setup(srm => srm.Get(It.Is<int>(signalId => signalId == 1)))
@@ -190,35 +205,15 @@ namespace WebService.Tests
                         Path = Domain.Path.FromString("example/signal"),
                     });
 
-                signalsWebService.Add(new Dto.Signal()
-                {
-                    DataType = Dto.DataType.Boolean,
-                    Granularity = Dto.Granularity.Day,
-                    Path = new Dto.Path { Components = new[] { "example", "signal" } },
-                });
-
-                Datum<double>[] dataToSet = new Datum<double>[] {
-                        new Datum<double>() { Id = 1, Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                        new Datum<double>() { Id = 1, Quality = Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
-                        new Datum<double>() { Id = 1, Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 },
-                        };
-
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
                 signalsDataRepositoryMock
-                    .Setup(sr => sr.SetData(dataToSet));
+                    .Setup(sr => sr.SetData(new Datum<double>[] {
+                        new Datum<double>() { Id = 1, Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Datum<double>() { Id = 2, Quality = Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
+                        new Datum<double>() { Id = 3, Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 } }));
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(1, new Dto.Datum[] 
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 },
-                });
-
-                signalsDomainService.SetData(1, dataToSet);
-                signalsDataRepositoryMock.Verify(sr => sr.SetData(dataToSet));
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
             }
         }
     }
