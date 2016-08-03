@@ -67,9 +67,19 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void SetData(IEnumerable<Datum<double>> datum)
+        public void SetData(Signal signal, IEnumerable<Datum<double>> datum)
         {
-            this.signalsDataRepository.SetData<double>(null);
+            if(datum == null)
+            {
+                return;
+            }
+
+            foreach(var d in datum)
+            {
+                d.Signal = signal;
+            }
+
+            this.signalsDataRepository.SetData<double>(datum);
         }
     }
 }

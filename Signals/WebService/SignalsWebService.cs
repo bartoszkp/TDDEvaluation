@@ -65,7 +65,7 @@ namespace WebService
         {
             var signal = this.signalsDomainService?.GetById(signalId);
             
-            this.signalsDomainService?.SetData(null);
+            this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>());
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
