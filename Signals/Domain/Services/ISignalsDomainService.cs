@@ -11,8 +11,6 @@ namespace Domain.Services
 
         Signal Get(Path path);
 
-        void SetData(IEnumerable<Datum<double>> domain_data);
-
-        void SetData(IEnumerable<Datum<bool>> domain_data);
+        void SetData<T>(IEnumerable<Datum<T>> domain_data);
     }
 }

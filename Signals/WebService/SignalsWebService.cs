@@ -67,31 +67,18 @@ namespace WebService
                         
             if(data == null)
             {
-                signalsDomainService.SetData(null);
+                signalsDomainService.SetData<double>(null);
                 return;
             }
-
-            int i = 0;
+            
             if (signal.DataType == DataType.Double)
             {
-                var domain_data = new Domain.Datum<double>[data.Count()];
-                foreach (var datum in data)
-                {
-                    domain_data[i] = datum.ToDomain<Domain.Datum<double>>();
-                    domain_data[i].Signal = signal.ToDomain<Domain.Signal>();
-                    ++i;
-                }
+                var domain_data = ConvertCollectionDtoToDomainAndSetData<double>(data, signal);
                 signalsDomainService.SetData(domain_data);
             }
             else if(signal.DataType == DataType.Boolean)
             {
-                var domain_data = new Domain.Datum<bool>[data.Count()];
-                foreach(var datum in data)
-                {
-                    domain_data[i] = datum.ToDomain<Domain.Datum<bool>>();
-                    domain_data[i].Signal = signal.ToDomain<Domain.Signal>();
-                    ++i;
-                }
+                var domain_data = ConvertCollectionDtoToDomainAndSetData<bool>(data, signal);
                 signalsDomainService.SetData(domain_data);
             }
             else
@@ -107,6 +94,20 @@ namespace WebService
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
             throw new NotImplementedException();
+        }
+
+        private IEnumerable<Domain.Datum<T>> ConvertCollectionDtoToDomainAndSetData<T>(IEnumerable<Datum> data, Signal signal)
+        {
+            int i = 0;
+            var domain_data = new Domain.Datum<T>[data.Count()];
+            foreach (var datum in data)
+            {
+                domain_data[i] = datum.ToDomain<Domain.Datum<T>>();
+                domain_data[i].Signal = signal.ToDomain<Domain.Signal>();
+                ++i;
+            }
+
+            return domain_data;     
         }
     }
 }
