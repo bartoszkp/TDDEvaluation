@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Dto;
 using System;
+using DataAccess.GenericInstantiations;
 
 namespace WebService.Tests
 {
@@ -405,6 +406,26 @@ namespace WebService.Tests
                 //assert
 
                 missingValuePolicyRepositoryMock.Verify(sr => sr.Get(It.Is<Domain.Signal>(s => s.Id == dummyInt)));
+            }
+
+            [TestMethod]
+            public void ThereIsOldSignal_WhenGettingMissingValuePolicy_ReturnNotNull()
+            {
+                //arrange
+                dummyInt = 2;
+                MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Boolean, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock.Setup(sr=>sr.Get(It.IsAny<Domain.Signal>())).Returns(new FirstOrderMissingValuePolicyDecimal());
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                //act
+                var result=signalsWebService.GetMissingValuePolicy(dummyInt);
+                //assert
+                Assert.IsNotNull(result);
+
             }
             private void MakeAMissingValuePolicyRepositoryMock()
             {
