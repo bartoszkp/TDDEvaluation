@@ -588,6 +588,43 @@ namespace WebService.Tests
                 AssertDataIsEqual(result, expectedData);
             }
 
+            [TestMethod]
+            public void GivenSignalIdsMatchingSignalOfDifferentDataTypes_WhenGettingData_ReturnsExpectedData()
+            {
+                SetupWebService();
+                int id = 6;
+                DateTime dateFrom = new DateTime(2001, 1, 1);
+                DateTime dateTo = new DateTime(2001, 1, 7);
+
+                var signalDouble = SignalWith(DataType.Double, Granularity.Month, Path.FromString("root/signal"), id);
+                var expectedDataDouble = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (double)2.5 } };
+                var dataReturnedDouble = new Domain.Datum<double>[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)2.5 } };
+                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<double>(id, signalDouble, dateFrom, dateTo, dataReturnedDouble);
+                var resultDouble = signalsWebService.GetData(id, dateFrom, dateTo);
+                AssertDataIsEqual(resultDouble, expectedDataDouble);
+
+                var signalDecimal = SignalWith(DataType.Decimal, Granularity.Month, Path.FromString("root/signal"), id);
+                var expectedDataDecimal = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (decimal)2.5m } };
+                var dataReturnedDecimal = new Domain.Datum<decimal>[] { new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (decimal)2.5m } };
+                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<decimal>(id, signalDecimal, dateFrom, dateTo, dataReturnedDecimal);
+                var resultDecimal = signalsWebService.GetData(id, dateFrom, dateTo);
+                AssertDataIsEqual(resultDecimal, expectedDataDecimal);
+
+                var signalBoolean = SignalWith(DataType.Boolean, Granularity.Month, Path.FromString("root/signal"), id);
+                var expectedDataBoolean = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = true } };
+                var dataReturnedBoolean = new Domain.Datum<bool>[] { new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = true } };
+                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<bool>(id, signalBoolean, dateFrom, dateTo, dataReturnedBoolean);
+                var resultBoolean = signalsWebService.GetData(id, dateFrom, dateTo);
+                AssertDataIsEqual(resultBoolean, expectedDataBoolean);
+
+                var signalString = SignalWith(DataType.String, Granularity.Month, Path.FromString("root/signal"), id);
+                var expectedDataString = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = "aa" } };
+                var dataReturnedString = new Domain.Datum<string>[] { new Datum<string>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "aa" } };
+                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<string>(id, signalString, dateFrom, dateTo, dataReturnedString);
+                var resultString = signalsWebService.GetData(id, dateFrom, dateTo);
+                AssertDataIsEqual(resultString, expectedDataString);
+            }
+
             private void SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<T>(int id, Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, IEnumerable<Domain.Datum<T>> dataReturned)
             {
                 signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
