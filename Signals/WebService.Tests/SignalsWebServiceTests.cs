@@ -164,16 +164,7 @@ namespace WebService.Tests
                 var signal = SignalWith(id, DataType.Double, Granularity.Day, path.ToDomain<Domain.Path>());
                 
                 GivenASignal(signal);
-
-                var dtoData = new Dto.Datum[]
-                {
-                    new Dto.Datum()
-                    {
-                        Quality = Dto.Quality.Fair,
-                        Timestamp = new System.DateTime(2000, 1, 1),
-                        Value = (double)1
-                    }
-                };
+                var dtoData = DatumWith(1.0, new System.DateTime(2000, 1, 1) );
 
                 signalsWebService.SetData(id, dtoData);
                 signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<double>>>()));
@@ -200,16 +191,7 @@ namespace WebService.Tests
                 var signal = SignalWith(id, DataType.Boolean, Granularity.Day, path.ToDomain<Domain.Path>());
 
                 GivenASignal(signal);
-
-                var dtoData = new Dto.Datum[]
-                {
-                    new Dto.Datum()
-                    {
-                        Quality = Dto.Quality.Fair,
-                        Timestamp = new System.DateTime(2000, 1, 1),
-                        Value = (bool)false
-                    }
-                };
+                var dtoData = DatumWith(false, new System.DateTime(2000, 1, 1));
 
                 signalsWebService.SetData(id, dtoData);
                 signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<bool>>>()));
@@ -269,6 +251,21 @@ namespace WebService.Tests
                         s.Id = id;
                         return s;
                     });
+            }
+
+            private Dto.Datum[] DatumWith(object value, System.DateTime timestamp, Dto.Quality quality = Dto.Quality.Fair, int numberOfElements = 1)
+            {
+                var dtoData = new Dto.Datum[numberOfElements];
+                for(int i = 0; i < numberOfElements; ++i)
+                {
+                    dtoData[i] = new Dto.Datum()
+                    {
+                        Quality = quality,
+                        Timestamp = timestamp.AddMonths(i),
+                        Value = value
+                    };
+                }
+                return dtoData;
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
