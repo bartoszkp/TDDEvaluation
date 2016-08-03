@@ -83,6 +83,17 @@ namespace WebService
                 }
                 signalsDomainService.SetData(domain_data);
             }
+            else if(signal.DataType == DataType.Boolean)
+            {
+                var domain_data = new Domain.Datum<bool>[data.Count()];
+                foreach(var datum in data)
+                {
+                    domain_data[i] = datum.ToDomain<Domain.Datum<bool>>();
+                    domain_data[i].Signal = signal.ToDomain<Domain.Signal>();
+                    ++i;
+                }
+                signalsDomainService.SetData(domain_data);
+            }
             else
                 throw new NotImplementedException();
             

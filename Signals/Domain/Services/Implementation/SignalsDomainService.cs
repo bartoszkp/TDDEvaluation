@@ -44,5 +44,10 @@ namespace Domain.Services.Implementation
         {
             this.signalsDataRepository.SetData(domain_data);
         }
+
+        public void SetData(IEnumerable<Datum<bool>> domain_data)
+        {
+            this.signalsDataRepository.SetData(domain_data);
+        }
     }
 }
