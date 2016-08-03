@@ -465,6 +465,14 @@ namespace WebService.Tests
                 VerifySetDataCallOnSignalsDataRepositoryMock<string>(signalDomainString, new System.DateTime(2000, 1, 1), "aa");
             }
 
+            [TestMethod]
+            public void WhenGettingDataDoesNotThrow()
+            {
+                SetupWebService();
+
+                signalsWebService.GetData(1, System.DateTime.MinValue, System.DateTime.MaxValue);
+            }
+
             private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
             {
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data =>
