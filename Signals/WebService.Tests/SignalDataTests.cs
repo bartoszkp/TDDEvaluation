@@ -76,10 +76,17 @@ namespace WebService.Tests
 
             Mock<IEnumerable<Dto.Datum>> signalDataMock = new Mock<IEnumerable<Dto.Datum>>();
 
-            signalsWebService.SetSignalData(1,signalDataMock.Object);
+            signalsWebService.SetSignalData(1, signalDataMock.Object);
 
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void GivenNullData_SetSignalData_ThrowsException()
+        {
+            SetupWebService();
+            signalsWebService.SetSignalData(1, null);
+        }
 
 
 
