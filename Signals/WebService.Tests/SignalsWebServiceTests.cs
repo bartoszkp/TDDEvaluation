@@ -409,6 +409,22 @@ namespace WebService.Tests
                     It.IsAny<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>>()));
             }
 
+
+            private void GivenASignalForGettingMissingValuePolicy(int signalId)
+            {
+                Signal signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                this.missingValuePolicyRepositoryMock
+                    .Setup(x => x.Get(It.Is<Domain.Signal>(s => s == signal)))
+                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>() as
+                        Domain.MissingValuePolicy.MissingValuePolicyBase);
+            }
+
             [TestMethod]
             [ExpectedException(typeof(CouldntGetASignalException))]
             public void GivenNoSignals_WhenGettingMissingValuePolicy_ThrowsCouldntGetASignalException()
@@ -419,39 +435,10 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingMissingValuePolicy_DontThrows()
-            {
-                int signalId = 2;
-               Signal signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
-
-                this.missingValuePolicyRepositoryMock
-                    .Setup(x => x.Get(It.Is<Domain.Signal>(s => s == signal)))
-                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>() as
-                        Domain.MissingValuePolicy.MissingValuePolicyBase);
-
-                this.signalsWebService.GetMissingValuePolicy(signalId);
-            }
-
-            [TestMethod]
             public void GivenASignal_WhenGettingMissingValuePolicy_ReturnsDefaultMissingValuePolicy()
             {
                 int signalId = 2;
-                Signal signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
-
-                this.missingValuePolicyRepositoryMock
-                    .Setup(x => x.Get(It.Is<Domain.Signal>(s => s == signal)))
-                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>() as
-                        Domain.MissingValuePolicy.MissingValuePolicyBase);
+                GivenASignalForGettingMissingValuePolicy(signalId);
 
                 if (!(this.signalsWebService.GetMissingValuePolicy(signalId) is Dto.MissingValuePolicy.MissingValuePolicy))
                     Assert.Fail();
@@ -462,17 +449,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingMissingValuePolicy_VaryfingCallOfRepositoryFunctioGet()
             {
                 int signalId = 2;
-                Signal signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
-
-                this.missingValuePolicyRepositoryMock
-                    .Setup(x => x.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<Double>() as
-                        Domain.MissingValuePolicy.MissingValuePolicyBase);
+                GivenASignalForGettingMissingValuePolicy(signalId);
 
                 this.signalsWebService.GetMissingValuePolicy(signalId);
 
