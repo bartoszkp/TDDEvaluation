@@ -305,6 +305,22 @@ namespace WebService.Tests
                 signalsWebService.SetData(0, null);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenSettingData_RepositoryGetDataIsCalled()
+            {
+                var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));                    
+                var signalsDomainService = new SignalsDomainService(null, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(0, null);
+
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
