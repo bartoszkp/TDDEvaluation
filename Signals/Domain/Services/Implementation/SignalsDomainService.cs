@@ -73,5 +73,10 @@ namespace Domain.Services.Implementation
         {
             this.signalsDataRepository.SetData<T>(dataDomain);
         }
+
+        public void GetData(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            this.signalsDataRepository.GetData<int>(signal, fromIncludedUtc, toExcludedUtc);
+        }
     }
 }

@@ -68,6 +68,10 @@ namespace WebService
             if (signal == null)
                 throw new ArgumentException("Signal with given Id not found.");
 
+            var signalDomain = signal.ToDomain<Domain.Signal>();
+
+            this.signalsDomainService.GetData(signalDomain, fromIncludedUtc, toExcludedUtc);
+
             return new Datum[] { };
         }
 
