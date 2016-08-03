@@ -158,9 +158,9 @@ namespace WebService
             var sig = signalsDomainService.GetById(signalId);
             if (sig == null) throw new ArgumentException();
 
-         var result=   signalsDomainService.Get(sig.ToDomain<Domain.Signal>());
-            if (result == null) return null;
-            return result.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+             return    signalsDomainService.Get(sig.ToDomain<Domain.Signal>())?.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+
+            
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
