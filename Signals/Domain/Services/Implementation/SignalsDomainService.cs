@@ -84,7 +84,7 @@ namespace Domain.Services.Implementation
             if (data == null)
                 throw new ArgumentNullException("Attempted to set null data for a signal");
 
-            throw new NotImplementedException();
+            signalsDataRepository.SetData(data);
         }
     }
 }
