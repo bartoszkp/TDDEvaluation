@@ -116,7 +116,10 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            throw new CouldntGetASignalException();
+            Domain.Signal signal = this.signalsDomainService.GetById(signalId);
+            if (signal == null)
+                throw new CouldntGetASignalException();
+            return null;
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
