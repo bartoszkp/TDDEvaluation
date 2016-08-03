@@ -558,6 +558,43 @@ namespace WebService.Tests
                 signalsWebService.GetData(id, dateFrom, dateTo);
                 VerifyGetDataCallOnSignalsDataRepositoryMock<string>(signalString, dateFrom, dateTo);
             }
+
+            [TestMethod]
+            public void GivenASignalIdMatchingSignalOfDataTypeInteger_WhenGettingData_ReturnsExpectedData()
+            {
+                SetupWebService();
+                int id = 6;
+
+                DateTime dateFrom = new DateTime(2001, 1, 1);
+                DateTime dateTo = new DateTime(2001, 1, 7);
+
+                var signal = SignalWith(DataType.Integer, Granularity.Month, Path.FromString("root/signalInt"), id);
+                var expectedData = new Dto.Datum[] 
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 2), Value = (int)3 }
+                };
+
+                var dataReturned = new Domain.Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (int)2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 2), Value = (int)3 }
+                };
+
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
+
+                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(It.IsAny<Signal>(), dateFrom, dateTo)).Returns(dataReturned);
+
+                var result = signalsWebService.GetData(id, dateFrom, dateTo);
+
+                Assert.IsTrue(result.Any());
+                for (int i = 0; i < result.Count(); i++)
+                {
+                    Assert.AreEqual(result.ElementAt(i).Quality, expectedData.ElementAt(i).Quality);
+                    Assert.AreEqual(result.ElementAt(i).Timestamp, expectedData.ElementAt(i).Timestamp);
+                    Assert.AreEqual(result.ElementAt(i).Value, expectedData.ElementAt(i).Value);
+                }
+            }
             
             private void VerifyGetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
             {
