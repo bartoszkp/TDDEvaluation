@@ -70,7 +70,26 @@ namespace WebService
 
             var signalDomain = signal.ToDomain<Domain.Signal>();
 
-            this.signalsDomainService.GetData(signalDomain, fromIncludedUtc, toExcludedUtc);
+            if (signal.DataType == DataType.Integer)
+            {
+                this.signalsDomainService.GetData<int>(signalDomain, fromIncludedUtc, toExcludedUtc);
+            }
+            else if (signal.DataType == DataType.Double)
+            {
+                this.signalsDomainService.GetData<double>(signalDomain, fromIncludedUtc, toExcludedUtc);
+            }
+            else if (signal.DataType == DataType.Decimal)
+            {
+                this.signalsDomainService.GetData<decimal>(signalDomain, fromIncludedUtc, toExcludedUtc);
+            }
+            else if (signal.DataType == DataType.Boolean)
+            {
+                this.signalsDomainService.GetData<bool>(signalDomain, fromIncludedUtc, toExcludedUtc);
+            }
+            else if (signal.DataType == DataType.String)
+            {
+                this.signalsDomainService.GetData<string>(signalDomain, fromIncludedUtc, toExcludedUtc);
+            }
 
             return new Datum[] { };
         }
