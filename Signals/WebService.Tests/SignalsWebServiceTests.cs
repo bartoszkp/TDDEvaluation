@@ -528,10 +528,40 @@ namespace WebService.Tests
 
                 VerifyGetDataCallOnSignalsDataRepositoryMock<int>(signal, DateTime.MinValue, DateTime.MaxValue);
             }
+
+            [TestMethod]
+            public void GivenSignalsOfDifferentDataTypes_WhenGettingData_RepositoryGetDataIsCalledWithCorrectDataType()
+            {
+                SetupWebService();
+                int id = 2;
+
+                DateTime dateFrom = new DateTime(2000, 1, 1);
+                DateTime dateTo = new DateTime(2000, 1, 5);
+
+                var signalDouble = SignalWith(DataType.Double, Granularity.Day, Path.FromString("root/signal"), id);
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDouble);
+                signalsWebService.GetData(id, dateFrom, dateTo);
+                VerifyGetDataCallOnSignalsDataRepositoryMock<double>(signalDouble, dateFrom, dateTo);
+
+                var signalDecimal = SignalWith(DataType.Decimal, Granularity.Day, Path.FromString("root/signal"), id);
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalDecimal);
+                signalsWebService.GetData(id, dateFrom, dateTo);
+                VerifyGetDataCallOnSignalsDataRepositoryMock<decimal>(signalDecimal, dateFrom, dateTo);
+
+                var signalBoolean = SignalWith(DataType.Boolean, Granularity.Day, Path.FromString("root/signal"), id);
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalBoolean);
+                signalsWebService.GetData(id, dateFrom, dateTo);
+                VerifyGetDataCallOnSignalsDataRepositoryMock<bool>(signalBoolean, dateFrom, dateTo);
+
+                var signalString = SignalWith(DataType.String, Granularity.Day, Path.FromString("root/signal"), id);
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signalString);
+                signalsWebService.GetData(id, dateFrom, dateTo);
+                VerifyGetDataCallOnSignalsDataRepositoryMock<string>(signalString, dateFrom, dateTo);
+            }
             
             private void VerifyGetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
             {
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
                     s.DataType == signal.DataType &&
                     s.Granularity == signal.Granularity &&
                     s.Path.ToString() == signal.Path.ToString()), fromIncludedUtc, toExcludedUtc));
