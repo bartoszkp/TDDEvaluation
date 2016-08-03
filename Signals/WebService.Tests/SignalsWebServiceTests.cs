@@ -478,7 +478,7 @@ namespace WebService.Tests
                 //act
                 var result = signalsWebService.Get(path);
                 //assert
-                Assert.IsInstanceOfType(result, typeof(Domain.Signal));
+                Assert.IsInstanceOfType(result, typeof(Dto.Signal));
 
             }
             private void MakeAMissingValuePolicyRepositoryMock()

@@ -27,7 +27,7 @@ namespace WebService
 
         public Signal Get(Path pathDto)
         {
-            return null;
+            return new Dto.Signal();
         }
 
         public Signal GetById(int signalId)
