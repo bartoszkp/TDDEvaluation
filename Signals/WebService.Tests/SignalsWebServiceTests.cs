@@ -470,6 +470,8 @@ namespace WebService.Tests
             {
                 SetupWebService();
 
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
+
                 signalsWebService.GetData(1, System.DateTime.MinValue, System.DateTime.MaxValue);
             }
 
@@ -478,6 +480,8 @@ namespace WebService.Tests
             {
                 SetupWebService();
                 int id = 3;
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
 
                 signalsWebService.GetData(id, System.DateTime.MinValue, System.DateTime.MaxValue);
 
