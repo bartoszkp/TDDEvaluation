@@ -255,25 +255,6 @@ namespace WebService.Tests
                 signalsWebService.GetData(id, dateFrom, dateTo);
                 signalsDataRepoMock.Verify(sd => sd.GetData<int>(It.IsAny<Domain.Signal>(), dateFrom, dateTo));
             }
-
-            [TestMethod]
-            public void GivenASignalAndDataOfIntegers_WhenGettingItsDataUpToOneMonthAhead_DataIsReturnedFromTheGivenTimePeriod()
-            {
-                int id = 1;
-                int numberOfDatums = 3;
-                Dto.Datum[] dtoData;
-                var dateFrom = new System.DateTime(2000, 1, 1);               
-
-                var signal = GivenASignalAndDataOf(DataType.Integer, 1, out dtoData, dateFrom, id, numberOfDatums);
-                var result = signalsWebService.GetData(id, dateFrom, dateFrom.AddMonths(numberOfDatums));              
-
-                Assert.IsNotNull(result);
-                Assert.AreEqual(numberOfDatums, result.Count());
-
-                var resultArray = result.ToArray();
-                for (int i = 0; i < numberOfDatums; ++i)                
-                    Assert.AreEqual(dateFrom.AddMonths(i), resultArray[i].Timestamp);                                
-            }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
