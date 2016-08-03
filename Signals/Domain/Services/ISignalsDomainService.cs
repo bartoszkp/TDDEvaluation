@@ -12,5 +12,7 @@ namespace Domain.Services
         Signal Get(Path path);
 
         void SetData<T>(IEnumerable<Datum<T>> domain_data);
+
+        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
     }
 }

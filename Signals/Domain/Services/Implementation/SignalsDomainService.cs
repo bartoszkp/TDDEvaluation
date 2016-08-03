@@ -44,5 +44,10 @@ namespace Domain.Services.Implementation
         {
             this.signalsDataRepository.SetData(domain_data);
         }
+
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
+        {
+            return this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
+        }
     }
 }

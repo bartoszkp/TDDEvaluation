@@ -60,7 +60,12 @@ namespace WebService
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
 
-            return null;
+            if (signal.DataType == DataType.Integer)
+            {
+                var data = signalsDomainService.GetData<int>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
+            }
+
+            return null;            
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
