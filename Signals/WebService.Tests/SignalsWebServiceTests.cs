@@ -431,14 +431,35 @@ namespace WebService.Tests
                 Assert.IsNotNull(result);
 
             }
+            [TestMethod]
+            public void ThereIsOldSignal_WhenGettingMissingValuePolicy_ReturnCorrectValues()
+            {
+                //arrange
+                dummyInt = 2;
+                MakeMocks();
+                MakeASignalsRepositoryMockWithCorrectId(dummyInt, Domain.DataType.Boolean, Domain.Granularity.Day, Domain.Path.FromString("x/y"));
+                MakeAMissingValuePolicyRepositoryMock();
 
+                MakeASignalsWebService();
+
+
+
+
+                //act
+                var result = signalsWebService.GetMissingValuePolicy(dummyInt)as Dto.MissingValuePolicy.FirstOrderMissingValuePolicy;
+                //assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
+                Assert.AreEqual(dummyInt, result.Signal.Id);
+
+            }
 
 
             private void MakeAMissingValuePolicyRepositoryMock()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
-                missingValuePolicyRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Signal>())).Returns(new FirstOrderMissingValuePolicyDecimal());
+                missingValuePolicyRepositoryMock.Setup(sr => sr.Get(It.IsAny<Domain.Signal>())).Returns(new FirstOrderMissingValuePolicyDecimal() { Signal= new Domain.Signal() { Id=dummyInt} });
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
