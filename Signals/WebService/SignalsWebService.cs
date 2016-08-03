@@ -74,30 +74,50 @@ namespace WebService
             if (signal.DataType == DataType.Integer)
             {
                 var dataDomain = this.signalsDomainService.GetData<int>(signalDomain, fromIncludedUtc, toExcludedUtc);
+
                 for (int i = 0; i < dataDomain.Count(); i++)
                 {
                     dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
                 }
-                return dataDto;
             }
             else if (signal.DataType == DataType.Double)
             {
-                this.signalsDomainService.GetData<double>(signalDomain, fromIncludedUtc, toExcludedUtc);
+                var dataDomain = this.signalsDomainService.GetData<double>(signalDomain, fromIncludedUtc, toExcludedUtc);
+
+                for (int i = 0; i < dataDomain.Count(); i++)
+                {
+                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
+                }
             }
             else if (signal.DataType == DataType.Decimal)
             {
-                this.signalsDomainService.GetData<decimal>(signalDomain, fromIncludedUtc, toExcludedUtc);
+                var dataDomain = this.signalsDomainService.GetData<decimal>(signalDomain, fromIncludedUtc, toExcludedUtc);
+
+                for (int i = 0; i < dataDomain.Count(); i++)
+                {
+                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
+                }
             }
             else if (signal.DataType == DataType.Boolean)
             {
-                this.signalsDomainService.GetData<bool>(signalDomain, fromIncludedUtc, toExcludedUtc);
+                var dataDomain = this.signalsDomainService.GetData<bool>(signalDomain, fromIncludedUtc, toExcludedUtc);
+
+                for (int i = 0; i < dataDomain.Count(); i++)
+                {
+                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
+                }
             }
             else if (signal.DataType == DataType.String)
             {
-                this.signalsDomainService.GetData<string>(signalDomain, fromIncludedUtc, toExcludedUtc);
+                var dataDomain = this.signalsDomainService.GetData<string>(signalDomain, fromIncludedUtc, toExcludedUtc);
+
+                for (int i = 0; i < dataDomain.Count(); i++)
+                {
+                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
+                }
             }
 
-            return new Datum[] { };
+            return dataDto;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
