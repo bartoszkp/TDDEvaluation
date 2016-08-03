@@ -68,16 +68,16 @@ namespace WebService
                         .ToList().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.Integer:
                     return this.signalsDomainService.GetData<Int32>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToDto<IEnumerable<Dto.Datum>>();
+                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.Boolean:
                     return this.signalsDomainService.GetData<Boolean>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToDto<IEnumerable<Dto.Datum>>();
+                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.Decimal:
                     return this.signalsDomainService.GetData<Decimal>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToDto<IEnumerable<Dto.Datum>>();
+                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.String:
                     return this.signalsDomainService.GetData<String>(signalId, fromIncludedUtc, toExcludedUtc)
-                        .ToDto<IEnumerable<Dto.Datum>>();
+                        .ToList().ToDto<IEnumerable<Dto.Datum>>();
             }
 
             return null;
