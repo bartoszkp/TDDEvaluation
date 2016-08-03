@@ -56,7 +56,11 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new SignalNotFoundException(signalId);
+
+            return null;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
