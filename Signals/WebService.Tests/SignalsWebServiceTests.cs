@@ -484,6 +484,18 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.ArgumentException))]
+            public void GivenNonExistingId_WhenGettingData_ThrowsArgumentException()
+            {
+                SetupWebService();
+                int nonExistingId = 12;
+
+                signalsRepositoryMock.Setup(srm => srm.Get(nonExistingId)).Returns((Domain.Signal)null);
+
+                signalsWebService.GetData(nonExistingId, System.DateTime.MinValue, System.DateTime.MaxValue);
+            }
+
             private void VerifySetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, System.DateTime timeStamp, T value, Domain.Quality quality = Quality.Good, int elementNumber = 0)
             {
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data =>
