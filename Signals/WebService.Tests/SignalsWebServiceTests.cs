@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -283,7 +284,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalId_WhenGettingMissingValuePolic_RepositoryGetIsCalledWithGivenSignal()
+            public void GivenASignalId_WhenGettingMissingValuePolicy_RepositoryGetIsCalledWithGivenSignal()
             {
                 SetupWebService();
                 int id = 1;
@@ -371,6 +372,23 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, null);
 
                 signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
+            }
+
+            [TestMethod]
+            public void GivenData_WhenSettingData_RepositorySetIsCalledWithCorrectData()
+            {
+                SetupWebService();
+                int id = 4;
+
+                var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
+
+                signalsWebService.SetData(id, dataDto);
+
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<int>(It.Is<IEnumerable<Datum<int>>>(data => 
+                    data.ElementAt(0).Quality == Quality.Good &&
+                    data.ElementAt(0).Timestamp == new System.DateTime(2000, 1, 1) &&
+                    data.ElementAt(0).Value == 2)), 
+                    Times.Once);
             }
 
             private void SetupWebService()
