@@ -361,7 +361,7 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(CouldntGetASignalException))]
-            public void GivenNoSignal_WhenSettingMissingValuePolicy_ThrowsCouldntGetASignalException()
+            public void GivenNoSignals_WhenSettingMissingValuePolicy_ThrowsCouldntGetASignalException()
             {
                 GivenNoSignals();
                 int nonExistingSignalId = 3;
@@ -371,7 +371,6 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSettingMissingValuePolicy_DontThrows()
             {
-                GivenNoSignals();
                 int signalId = 2;
                 GivenASignal(SignalWith(
                     id: signalId,
