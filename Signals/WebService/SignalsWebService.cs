@@ -60,6 +60,7 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            this.GetById(signalId);
             return new Datum[] { };
         }
 
