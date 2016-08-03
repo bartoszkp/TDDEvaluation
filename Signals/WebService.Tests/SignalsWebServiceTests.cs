@@ -157,7 +157,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndSignalDataOfDoubles_WhenSettingDataForSignal_DataRepositorySetDataIsCalled()
+            public void GivenASignalAndDataOfDoubles_WhenSettingDataForSignal_DataRepositorySetDataIsCalled()
             {
                 int id = 1;
                 Dto.Datum[] dtoData;
