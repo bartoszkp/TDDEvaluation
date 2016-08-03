@@ -513,8 +513,8 @@ namespace WebService.Tests
                 //act
                 var result = signalsWebService.Get(path);
                 //assert
-                Assert.AreEqual(Domain.DataType.Boolean, result.DataType);
-                Assert.AreEqual(Domain.Granularity.Day, result.Granularity);
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
                 Assert.AreEqual(dummyInt, result.Id);
             }
             private void MakeAMissingValuePolicyRepositoryMock()
