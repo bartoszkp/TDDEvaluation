@@ -69,10 +69,16 @@ namespace WebService
                 throw new ArgumentException("Signal with given Id not found.");
 
             var signalDomain = signal.ToDomain<Domain.Signal>();
+            var dataDto = new List<Datum>();
 
             if (signal.DataType == DataType.Integer)
             {
-                this.signalsDomainService.GetData<int>(signalDomain, fromIncludedUtc, toExcludedUtc);
+                var dataDomain = this.signalsDomainService.GetData<int>(signalDomain, fromIncludedUtc, toExcludedUtc);
+                for (int i = 0; i < dataDomain.Count(); i++)
+                {
+                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
+                }
+                return dataDto;
             }
             else if (signal.DataType == DataType.Double)
             {
