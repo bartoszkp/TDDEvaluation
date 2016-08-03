@@ -94,6 +94,42 @@ namespace WebService
 
                 this.signalsDomainService.SetData(dataDomain);
             }
+            else if (signal.DataType == DataType.Decimal)
+            {
+                var dataDomain = new List<Domain.Datum<decimal>>();
+
+                for (int i = 0; i < data.Count(); i++)
+                {
+                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<decimal>>());
+                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+                }
+
+                this.signalsDomainService.SetData(dataDomain);
+            }
+            else if (signal.DataType == DataType.Boolean)
+            {
+                var dataDomain = new List<Domain.Datum<bool>>();
+
+                for (int i = 0; i < data.Count(); i++)
+                {
+                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<bool>>());
+                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+                }
+
+                this.signalsDomainService.SetData(dataDomain);
+            }
+            else if (signal.DataType == DataType.String)
+            {
+                var dataDomain = new List<Domain.Datum<string>>();
+
+                for (int i = 0; i < data.Count(); i++)
+                {
+                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<string>>());
+                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+                }
+
+                this.signalsDomainService.SetData(dataDomain);
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
