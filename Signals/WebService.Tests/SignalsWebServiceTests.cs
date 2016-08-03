@@ -358,6 +358,15 @@ namespace WebService.Tests
                     It.IsAny<DateTime>(),
                     It.IsAny<DateTime>()));
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignal_WhenSettingMissingValuePolicy_ThrowsCouldntGetASignalException()
+            {
+                GivenNoSignals();
+                int signalId = 3;
+                this.signalsWebService.SetMissingValuePolicy(3,null);
+            }
         }
     }
 }
