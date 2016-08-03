@@ -34,5 +34,17 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
+
+        public void SetData(int signalId, IEnumerable<Datum<double>> data)
+        {
+            var signal = GetById(signalId);
+
+            foreach (var item in data)
+            {
+                item.Signal = signal;
+            }
+
+            signalsDataRepository.SetData<double>(data);
+        }
     }
 }
