@@ -360,16 +360,20 @@ namespace WebService.Tests
             {
                 SetupWebService();
 
-                signalsWebService.SetData(0, null);
+                var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
+
+                signalsWebService.SetData(0, dataDto);
             }
 
             [TestMethod]
             public void GivenNoData_WhenSettingData_CallsGetByIdWithPassedId()
             {
                 SetupWebService();
-                int id = 1;
 
-                signalsWebService.SetData(id, null);
+                int id = 1;
+                var dataDto = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 } };
+
+                signalsWebService.SetData(id, dataDto);
 
                 signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
             }
