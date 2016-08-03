@@ -99,16 +99,13 @@ namespace WebService.Tests
                     Granularity = Granularity.Day,
                     Path = Path.FromString("root/signal"),
                 };
-                signalsRepositoryMock.Setup(srm => srm.Get(It.Is<Domain.Path>(p => p.ToString() == signalDomain.Path.ToString())))
+                signalsRepositoryMock.Setup(srm => srm.Get(It.Is<Domain.Path>(s => s.ToString() == signalDomain.Path.ToString())))
                     .Returns(signalDomain);
 
                 var signalDto = signalDomain.ToDto<Dto.Signal>();
-                var result = signalsWebService.Get(signalDomain.ToDto<Dto.Signal>().Path);
+                var result = signalsWebService.Get(signalDto.Path);
 
-                Assert.AreEqual(signalDto.Id, result.Id);
-                Assert.AreEqual(signalDto.DataType, result.DataType);
-                Assert.AreEqual(signalDto.Granularity, result.Granularity);
-                Assert.AreEqual(signalDto.Path.ToString(), result.Path.ToString());
+                MatchSignals(signalDto.ToDomain<Domain.Signal>(), result.ToDomain<Domain.Signal>());
             }
 
             [TestMethod]
@@ -118,8 +115,8 @@ namespace WebService.Tests
                 GivenNoSignals();
                 signalsWebService.Get(null);
             }
-            
 
+            
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -169,7 +166,14 @@ namespace WebService.Tests
                     .Returns(signal);
             }
 
+            private bool MatchSignals(Signal signal, Signal result)
+            {
+                return ((signal.Id == result.Id) && (signal.DataType == result.DataType)
+                    && (signal.Granularity == result.Granularity) && (signal.Path.ToString() == result.Path.ToString()));
+            }
+
             private Mock<ISignalsRepository> signalsRepositoryMock;
+
         }
     }
 }

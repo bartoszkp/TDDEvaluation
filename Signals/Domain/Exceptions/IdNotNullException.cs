@@ -19,9 +19,9 @@ namespace Domain.Exceptions
         }
     }
 
-    public class PathIsEmptyOrNullException: Exception
+    public class SignalIsNotException: Exception
     {
-        public PathIsEmptyOrNullException(): base("Path can't be not null and empty")
+        public SignalIsNotException(): base("Sighnal with this Id is not Exist")
         {
 
         }

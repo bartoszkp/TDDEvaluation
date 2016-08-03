@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -28,10 +29,7 @@ namespace Domain.Services.Implementation
         public Signal Add(Signal newSignal)
         {
             if (newSignal.Id.HasValue)
-            {
                 throw new IdNotNullException();
-            }
-
             return this.signalsRepository.Add(newSignal);
         }
 
@@ -45,9 +43,7 @@ namespace Domain.Services.Implementation
             
                 var result = signalsRepository.Get(path);
                 if (result == null)
-                {
                     throw new PathNotExistException();
-                }
                 return result;
             
             
