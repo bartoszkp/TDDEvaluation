@@ -9,21 +9,28 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var newSignal = new Signal()
+            Signal signal = new Signal()
             {
-                DataType = DataType.Double,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "signal1" } }
+                DataType = DataType.Double,
+                Path = new Path() { Components = new[] { "root3", "monthDouble" } }
             };
 
-            var id = client.Add(newSignal).Id.Value;
+            var returnedSignal = client.Add(signal);
 
-            var result = client.GetById(id);
+            client.SetData((int)returnedSignal.Id, new Datum[] {
+                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+            });
 
-            Console.WriteLine(result.Id);
-            Console.WriteLine(result.DataType);
-            Console.WriteLine(result.Granularity);
-            Console.WriteLine(string.Join("/", result.Path.Components));
+            var result = client.GetData((int)returnedSignal.Id, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+            foreach (var d in result)
+            {
+                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
+            }
+
             Console.ReadKey();
         }
     }
