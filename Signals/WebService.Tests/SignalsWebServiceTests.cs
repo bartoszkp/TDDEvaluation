@@ -116,7 +116,52 @@ namespace WebService.Tests
                 signalsWebService.Get(null);
             }
 
-            
+
+            [TestMethod]
+            public void WhenSetMissingValuePolicy_RepositoryGet()
+            {
+                SetupSignalsWebServiceAndMissingValue();
+                var signal = new Domain.Signal()
+                {
+                    Id = 101,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Minute,
+                    Path = Path.FromString("path/pat/pa")
+                };
+                signalsRepositoryMock.Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
+                missingValuePolicyRepositoryMock
+                    .Setup(mvpr => mvpr.Set(It.Is<Domain.Signal>(s => s == signal),
+                                            It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+
+                var mvp = new Dto.MissingValuePolicy.NoneQualityMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Decimal,
+                    Signal = signal.ToDto<Dto.Signal>()
+                };
+                var mvpDomain = mvp.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+
+                signalsWebService.SetMissingValuePolicy(signal.Id.Value, mvp);
+
+                missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set(
+                    It.Is<Domain.Signal>(s => s == signal),
+                    It.Is<Domain.MissingValuePolicy.MissingValuePolicyBase>(
+                        m => m.NativeDataType == mvpDomain.NativeDataType
+                        && VerifyMissingValue(m,signal))));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalIsNotException))]
+            public void WhenSettingMissingValuePolicyWhenNotExis_ReportException()
+            {
+                SetupSignalsWebServiceAndMissingValue();
+                int signalId = 101;
+                signalsRepositoryMock.Setup(sr => sr.Get(signalId))
+                    .Returns<Domain.Signal>(null);
+                signalsWebService.SetMissingValuePolicy(signalId, new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy());
+            }
+
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -166,13 +211,31 @@ namespace WebService.Tests
                     .Returns(signal);
             }
 
+
+
             private bool MatchSignals(Signal signal, Signal result)
             {
                 return ((signal.Id == result.Id) && (signal.DataType == result.DataType)
                     && (signal.Granularity == result.Granularity) && (signal.Path.ToString() == result.Path.ToString()));
             }
 
+            private bool VerifyMissingValue(Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicyBase, Signal signal)
+            {
+                return ((signal.Id == missingValuePolicyBase.Signal.Id) && (signal.DataType == missingValuePolicyBase.Signal.DataType)
+                    && (signal.Granularity == missingValuePolicyBase.Signal.Granularity) && (signal.Path.ToString() == missingValuePolicyBase.Signal.Path.ToString()));
+            }
+
+            private void SetupSignalsWebServiceAndMissingValue()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
 
         }
     }
