@@ -35,6 +35,30 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(signalId);
         }
 
+        public void SetData(int signalId, IEnumerable<Datum<bool>> data)
+        {
+            var signal = GetById(signalId);
+
+            foreach (var item in data)
+            {
+                item.Signal = signal;
+            }
+
+            signalsDataRepository.SetData(data);
+        }
+
+        public void SetData(int signalId, IEnumerable<Datum<decimal>> data)
+        {
+            var signal = GetById(signalId);
+
+            foreach (var item in data)
+            {
+                item.Signal = signal;
+            }
+
+            signalsDataRepository.SetData(data);
+        }
+
         public void SetData(int signalId, IEnumerable<Datum<double>> data)
         {
             var signal = GetById(signalId);
@@ -44,7 +68,31 @@ namespace Domain.Services.Implementation
                 item.Signal = signal;
             }
 
-            signalsDataRepository.SetData<double>(data);
+            signalsDataRepository.SetData(data);
+        }
+
+        public void SetData(int signalId, IEnumerable<Datum<int>> data)
+        {
+            var signal = GetById(signalId);
+
+            foreach (var item in data)
+            {
+                item.Signal = signal;
+            }
+
+            signalsDataRepository.SetData(data);
+        }
+
+        public void SetData(int signalId, IEnumerable<Datum<string>> data)
+        {
+            var signal = GetById(signalId);
+
+            foreach (var item in data)
+            {
+                item.Signal = signal;
+            }
+
+            signalsDataRepository.SetData(data);
         }
     }
 }
