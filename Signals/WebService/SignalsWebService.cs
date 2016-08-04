@@ -80,6 +80,11 @@ namespace WebService
                 var data = signalsDomainService.GetData<decimal>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
                 return ConvertCollectionDomainToDto(data);
             }
+            else if (signal.DataType == DataType.String)
+            {
+                var data = signalsDomainService.GetData<string>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
+                return ConvertCollectionDomainToDto(data);
+            }
             else throw new NotImplementedException();          
         }
 
