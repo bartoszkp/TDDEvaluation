@@ -59,7 +59,8 @@ namespace Domain.Services.Implementation
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signalDomain)
         {
             var result = this.missingValuePolicyRepository.Get(signalDomain);
-            if (result == null) return null;
+            if (result == null)
+                throw new IdNotNullException();
             else
                 return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
         }
