@@ -240,10 +240,9 @@ namespace WebService.Tests
             public void GivenASignalAndDataOfIntegers_WhenGettingItsData_DataRepositoryGetDataIsCalled()
             {
                 int id = 1;
-                Dto.Datum[] dtoData;
-                var signal = GivenASignalAndDataOf(DataType.Integer, 1, out dtoData, id);
-                
                 System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
+
+                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Integer, 1, id);
 
                 signalsWebService.GetData(id, dateFrom, dateTo);
                 signalsDataRepoMock.Verify(sd => sd.GetData<int>(It.IsAny<Domain.Signal>(), dateFrom, dateTo));
@@ -255,10 +254,9 @@ namespace WebService.Tests
                 int id = 1;
                 int numberOfDatums = 3;
                 int numberOfDatumsFromPeriod = numberOfDatums - 1;
-                Dto.Datum[] dtoData;
-                var signal = GivenASignalAndDataOf(DataType.Integer, 1, out dtoData, id, numberOfDatums);
-
                 System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+
+                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Integer, 1, id, numberOfDatums);                
 
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
 
@@ -276,10 +274,9 @@ namespace WebService.Tests
                 int id = 1;
                 int numberOfDatums = 3;
                 int numberOfDatumsFromPeriod = numberOfDatums - 1;
-                Dto.Datum[] dtoData;
-                var signal = GivenASignalAndDataOf(DataType.Double, 1.0, out dtoData, id, numberOfDatums);
-
                 System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+
+                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Double, 1.0, id, numberOfDatums);                
 
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
 
@@ -379,7 +376,7 @@ namespace WebService.Tests
                     .Returns(DatumWith<T>(numberOfDatums - 1, date));
             }
 
-            private Signal GivenASignalAndDataOf(DataType dataType, object datumValue, out Dto.Datum[] dtoData, int signalId = 1, int numberOfDatums = 1)
+            private void GivenASignalAndDataOf(DataType dataType, object datumValue, out Dto.Datum[] dtoData, int signalId = 1, int numberOfDatums = 1)
             {
                 var path = new Dto.Path() { Components = new[] { "root", "signal" } };
                 var signal = SignalWith(signalId, dataType, Granularity.Day, path.ToDomain<Domain.Path>());
@@ -387,8 +384,16 @@ namespace WebService.Tests
 
                 GivenASignal(signal);
                 dtoData = DatumWith(datumValue, date, numberOfDatums);
+            }
 
-                switch(dataType)
+            private Signal GivenASignalAndDataRepositoryWithSetups(System.DateTime date, DataType dataType, object datumValue, int signalId = 1, int numberOfDatums = 1)
+            {
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(signalId, dataType, Granularity.Day, path.ToDomain<Domain.Path>());
+
+                GivenASignal(signal);
+
+                switch (dataType)
                 {
                     case DataType.Boolean:
                         GivenDataRepositoryThatReturnsDatums<bool>(signalId, numberOfDatums, date);
@@ -406,10 +411,9 @@ namespace WebService.Tests
                         GivenDataRepositoryThatReturnsDatums<string>(signalId, numberOfDatums, date);
                         break;
                 }
-                
 
                 return signal;
-            }
+            }            
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<ISignalsDataRepository> signalsDataRepoMock;
