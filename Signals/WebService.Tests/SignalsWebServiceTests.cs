@@ -370,8 +370,15 @@ namespace WebService.Tests
                         s.Id = id;
                         return s;
                     });
-            }      
-            
+            }
+
+            private void GivenDataRepositoryThatReturnsDatums<T>(int signalId, int numberOfDatums, System.DateTime date)
+            {
+                signalsDataRepoMock
+                    .Setup(sd => sd.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId), date, date.AddMonths(numberOfDatums)))
+                    .Returns(DatumWith<T>(numberOfDatums - 1, date));
+            }
+
             private Signal GivenASignalAndDataOf(DataType dataType, object datumValue, out Dto.Datum[] dtoData, int signalId = 1, int numberOfDatums = 1)
             {
                 var path = new Dto.Path() { Components = new[] { "root", "signal" } };
@@ -381,14 +388,25 @@ namespace WebService.Tests
                 GivenASignal(signal);
                 dtoData = DatumWith(datumValue, date, numberOfDatums);
 
-                signalsDataRepoMock
-                    .Setup(sd => sd.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signalId), date, date.AddMonths(numberOfDatums)))
-                    .Returns(DatumWith<int>(numberOfDatums - 1, date));
-
-                signalsDataRepoMock
-                    .Setup(sd => sd.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signalId), date, date.AddMonths(numberOfDatums)))
-                    .Returns(DatumWith<double>(numberOfDatums - 1, date));
-
+                switch(dataType)
+                {
+                    case DataType.Boolean:
+                        GivenDataRepositoryThatReturnsDatums<bool>(signalId, numberOfDatums, date);
+                        break;
+                    case DataType.Decimal:
+                        GivenDataRepositoryThatReturnsDatums<decimal>(signalId, numberOfDatums, date);
+                        break;
+                    case DataType.Double:
+                        GivenDataRepositoryThatReturnsDatums<double>(signalId, numberOfDatums, date);
+                        break;
+                    case DataType.Integer:
+                        GivenDataRepositoryThatReturnsDatums<int>(signalId, numberOfDatums, date);
+                        break;
+                    case DataType.String:
+                        GivenDataRepositoryThatReturnsDatums<string>(signalId, numberOfDatums, date);
+                        break;
+                }
+                
 
                 return signal;
             }
