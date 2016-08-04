@@ -522,21 +522,31 @@ namespace WebService.Tests
             [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignal_WhenGettingSignalByPath_ThrowsException()
             {
+
                 //arrange
                 dummyInt = 2;
-                Dto.Path path = MakePathFromString(new[] { "x", "y" });
+                Dto.Path path = MakePathFromString(new[] { "a", "y" });
                 MakeMocks();
-                SignalsRepositoryMock_GetSpecificPath_ReturnsToEachSignal(Domain.Path.FromString("x/y"));
+                SignalsRepositoryMock_GetSpecificPaths_ReturnsToSpecificPathASignal(new[] { "x", "y" });
 
                 MakeASignalsWebService();
                 //act
                 var result = signalsWebService.Get(path);
                 //assert
-                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
-                Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
-                Assert.AreEqual(dummyInt, result.Id);
-            }
 
+            }
+            private void SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal()
+            {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<Domain.Path>()))
+                    .Returns(SignalWith(id: dummyInt, dataType: Domain.DataType.Boolean, granularity: Domain.Granularity.Day, path: Domain.Path.FromString("x/y")));
+            }
+            private void SignalsRepositoryMock_GetSpecificPaths_ReturnsToSpecificPathASignal(string[] correctPath)
+            {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.Is<Domain.Path>(s => s.Components.ToArray().SequenceEqual(correctPath))))
+                    .Returns(SignalWith(id: dummyInt, dataType: Domain.DataType.Boolean, granularity: Domain.Granularity.Day, path: Domain.Path.FromString(correctPath.ToString())));
+            }
             private static Dto.Path MakePathFromString(string [] str)
             {
                 return new Dto.Path() { Components = str };
