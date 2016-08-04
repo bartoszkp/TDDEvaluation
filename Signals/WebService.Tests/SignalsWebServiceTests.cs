@@ -357,6 +357,16 @@ namespace WebService.Tests
                 );                
             }
 
+            [ExpectedException(typeof(SignalNotFoundException))]
+            [TestMethod]
+            public void GivenNoSignals_GettingMissingValuePolicy_ThrowsSignalNotFoundException()
+            {
+                int id = 5;
+                GivenNoSignals();
+
+                signalsWebService.GetMissingValuePolicy(id);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
