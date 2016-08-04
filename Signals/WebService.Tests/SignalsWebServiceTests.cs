@@ -367,6 +367,19 @@ namespace WebService.Tests
                 signalsWebService.GetMissingValuePolicy(id);
             }
 
+            [TestMethod]
+            public void GivenASignal_GettingItsMissingValuePolicy_MVPRepositorysGetIsCalled()
+            {
+                int signalId = 1;
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(signalId, DataType.Integer, Granularity.Day, path.ToDomain<Domain.Path>());
+
+                GivenASignal(signal);
+                
+                signalsWebService.GetMissingValuePolicy(signalId);
+                mvpRepositoryMock.Verify(m => m.Get(It.IsAny<Signal>()));                
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
