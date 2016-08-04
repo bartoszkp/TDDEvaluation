@@ -62,7 +62,13 @@ namespace WebService
 
             if (signal.DataType == DataType.Integer)
             {
-                var data = signalsDomainService.GetData<int>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);                
+                var data = signalsDomainService.GetData<int>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
+                int i = 0;
+                var dto_data = new Dto.Datum[data.Count()];
+                foreach (var datum in data)
+                    dto_data[i++] = datum.ToDto<Dto.Datum>();
+
+                return dto_data;
             }
 
             return null;            
