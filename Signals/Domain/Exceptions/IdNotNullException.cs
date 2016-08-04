@@ -25,4 +25,12 @@ namespace Domain.Exceptions
         {
         }
     }
+
+    public class InvalidValueType : Exception
+    {
+        public InvalidValueType()
+            : base("Cannot SET/GET datum. Probably typed datum type is not supported. Supported types are: int32, decimal, double, string.")
+        {
+        }
+    }
 }

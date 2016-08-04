@@ -50,20 +50,114 @@ namespace Domain.Services.Implementation
             else return result;
         }
 
-        public void SetData(IEnumerable<Datum<double>> newDomainDatum)
+        public void SetData(IEnumerable<Datum<object>> newDomainDatum)
         {
-            this.signalsDataRepository.SetData(newDomainDatum);
+            try
+            {
+                switch (newDomainDatum.First().Value.GetType().ToString())
+                {
+                    case "System.Double":
+                        var newList = new List<Datum<double>>();
+                        foreach (Datum<object> d in newDomainDatum)
+                        {
+                            newList.Add(new Datum<double>() { Quality = d.Quality, Signal = d.Signal, Timestamp = d.Timestamp, Value = Convert.ToDouble(d.Value) });
+                        }
+                        this.signalsDataRepository.SetData(newList);
+                        break;
+                    case "System.Decimal":
+                        var newList1 = new List<Datum<decimal>>();
+                        foreach (Datum<object> d in newDomainDatum)
+                        {
+                            newList1.Add(new Datum<decimal>() { Quality = d.Quality, Signal = d.Signal, Timestamp = d.Timestamp, Value = Convert.ToDecimal(d.Value) });
+                        }
+                        this.signalsDataRepository.SetData(newList1);
+                        break;
+                    case "System.Int32":
+                        var newList2 = new List<Datum<int>>();
+                        foreach (Datum<object> d in newDomainDatum)
+                        {
+                            newList2.Add(new Datum<int>() { Quality = d.Quality, Signal = d.Signal, Timestamp = d.Timestamp, Value = Convert.ToInt32(d.Value) });
+                        }
+                        this.signalsDataRepository.SetData(newList2);
+                        break;
+                    case "System.String":
+                        var newList3 = new List<Datum<string>>();
+                        foreach (Datum<object> d in newDomainDatum)
+                        {
+                            newList3.Add(new Datum<string>() { Quality = d.Quality, Signal = d.Signal, Timestamp = d.Timestamp, Value = Convert.ToString(d.Value) });
+                        }
+                        this.signalsDataRepository.SetData(newList3);
+                        break;
+                    case "System.Boolean":
+                        var newList4 = new List<Datum<bool>>();
+                        foreach (Datum<object> d in newDomainDatum)
+                        {
+                            newList4.Add(new Datum<bool>() { Quality = d.Quality, Signal = d.Signal, Timestamp = d.Timestamp, Value = Convert.ToBoolean(d.Value) });
+                        }
+                        this.signalsDataRepository.SetData(newList4);
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+                throw new InvalidValueType();
+            }
         }
 
-        public IEnumerable<Datum<double>> GetData(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<object>> GetData(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var result = this.signalsDataRepository.GetData<double>(getSignal, fromIncludedUtc, toExcludedUtc);
-            var newDatum = new List<Datum<double>>();
-            foreach (var f in result)
+            var newDatum = new List<Datum<object>>();
+
+            try
             {
-                newDatum.Add(new Datum<double>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
+                switch (getSignal.DataType)
+                {
+                    case DataType.Double:
+                        var result1 = this.signalsDataRepository.GetData<double>(getSignal, fromIncludedUtc, toExcludedUtc);
+                        foreach (var f in result1)
+                        {
+                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
+                        }
+                        return newDatum;
+
+                    case DataType.Decimal:
+                        var result2 = this.signalsDataRepository.GetData<decimal>(getSignal, fromIncludedUtc, toExcludedUtc);
+                        foreach (var f in result2)
+                        {
+                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
+                        }
+                        return newDatum;
+
+                    case DataType.Integer:
+                        var result3 = this.signalsDataRepository.GetData<int>(getSignal, fromIncludedUtc, toExcludedUtc);
+                        foreach (var f in result3)
+                        {
+                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
+                        }
+                        return newDatum;
+
+                    case DataType.String:
+                        var result4 = this.signalsDataRepository.GetData<string>(getSignal, fromIncludedUtc, toExcludedUtc);
+                        foreach (var f in result4)
+                        {
+                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
+                        }
+                        return newDatum;
+
+                    case DataType.Boolean:
+                        var result5 = this.signalsDataRepository.GetData<bool>(getSignal, fromIncludedUtc, toExcludedUtc);
+                        foreach (var f in result5)
+                        {
+                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
+                        }
+                        return newDatum;
+                    default: return null;
+                }
             }
-            return newDatum;
+            catch (Exception)
+            {
+                throw new InvalidValueType();
+            }
         }
 
         public void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase)

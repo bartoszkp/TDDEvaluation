@@ -63,8 +63,9 @@ namespace WebService
         {
             var getSignal = this.signalsDomainService.GetById(signalId);
             var result = this.signalsDomainService.GetData(getSignal, fromIncludedUtc, toExcludedUtc);
+
             var dtoDatum = new List<Dto.Datum>();
-            foreach (Domain.Datum<double> d in result)
+            foreach (Domain.Datum<object> d in result)
             {
                 var quality = d.Quality.ToDto<Dto.Quality>();
                 dtoDatum.Add(new Datum() { Value = d.Value, Quality = quality, Timestamp = d.Timestamp });
@@ -75,12 +76,13 @@ namespace WebService
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var setDataSignal = this.signalsDomainService.GetById(signalId);
-            var newDomainDatum = new List<Domain.Datum<double>>();
+
+            var newDomainDatum = new List<Domain.Datum<object>>();
 
             foreach (Datum d in data)
             {
-                var domainDatum = d.ToDomain<Domain.Datum<double>>();
-                newDomainDatum.Add(new Domain.Datum<double> { Signal = setDataSignal, Quality = domainDatum.Quality, Timestamp = domainDatum.Timestamp, Value = domainDatum.Value });
+                var domainDatum = d.ToDomain<Domain.Datum<object>>();
+                newDomainDatum.Add(new Domain.Datum<object> { Signal = setDataSignal, Quality = domainDatum.Quality, Timestamp = domainDatum.Timestamp, Value = domainDatum.Value });
             }
             this.signalsDomainService.SetData(newDomainDatum);
         }
