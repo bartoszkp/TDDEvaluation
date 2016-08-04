@@ -350,7 +350,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingDataFromSpecificSignal_RepositoryGetDataAndGetIsCalled()
+            public void GivenASignal_WhenGettingDataForSpecificSignal_RepositoryGetDataAndGetIsCalled()
             {
                 var existingSignal = ExistingSignal();
 
@@ -372,7 +372,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingSpecificDataFromSpecificSignal_RepositoryGetDataAndGetIsCalled()
+            public void GivenASignal_WhenGettingSpecificDataForSpecificSignal_RepositoryGetDataAndGetIsCalled()
             {
                 var existingSignal = ExistingSignal();
 
@@ -401,6 +401,12 @@ namespace WebService.Tests
                     existingSignal,
                     existingDatum.First().Timestamp,
                     existingDatum.Last().Timestamp));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSpecificDataFromSpecificSignal_ReturnsThisData()
+            {
+
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
