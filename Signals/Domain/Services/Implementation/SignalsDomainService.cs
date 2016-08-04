@@ -62,10 +62,16 @@ namespace Domain.Services.Implementation
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
+            if (signal == null)
+            {
+                throw new ArgumentException("no signal with this id");
+            }
             var mvp = missingValuePolicyRepository.Get(signal);
 
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
+
+
     }
 }

@@ -63,6 +63,10 @@
     <Compile Include="SignalsWebServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{753af1ca-26dd-444d-8011-2251671cc444}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Domain\Domain.csproj">
       <Project>{7643117C-25CB-4B38-8D3D-EFA38E2DC719}</Project>
       <Name>Domain</Name>
