@@ -78,12 +78,21 @@ namespace WebService
             {
                 throw new KeyNotFoundException();
             }
-            if(data.First().Value.GetType() == typeof(int))
+            if (data.First().Value.GetType() == typeof(int))
             {
                 this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<int>>>());
                 return;
             }
-            this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>());
+            else if (data.First().Value.GetType() == typeof(double))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>());
+                return;
+            }
+            else if(data.First().Value.GetType() == typeof(bool))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<bool>>>());
+                return;
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
