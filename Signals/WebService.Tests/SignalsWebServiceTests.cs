@@ -459,39 +459,46 @@ namespace WebService.Tests
             public void WhenGettingByPath_FunctionCompile()
             {
                 //arrange
-                var path = new Dto.Path() { Components = new[] { "x", "y" } };
+                Dto.Path path = ArrangeGetByPath(new[] { "x", "y" });
                 MakeMocks();
-                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal();
                 MakeASignalsWebService();
 
                 //act
                 var result = signalsWebService.Get(path);
                 //assert
-                
 
             }
-          
+            private Dto.Path ArrangeGetByPath(string[] s)
+            {
+                dummyInt = 2;
+                MakeMocks();
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal();
+                return new Dto.Path() { Components = s };
+            }
+
+
             [TestMethod]
             public void WhenGettingByPath_ReturnsSignal()
             {
+
                 //arrange
-                Dto.Path path = MakePathFromString(new[] { "x", "y" });
-                MakeMocks();
-                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
+                Dto.Path path = ArrangeGetByPath(new[] { "x", "y" });
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal();
                 MakeASignalsWebService();
                 //act
                 var result = signalsWebService.Get(path);
                 //assert
                 Assert.IsInstanceOfType(result, typeof(Dto.Signal));
 
+
             }
             [TestMethod]
             public void GivenASignal_WhenGettingSignalByPath_GetIsCalled()
             {
                 //arrange
-                Dto.Path path = MakePathFromString(new[] { "x", "y" });
-                MakeMocks();
-                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
+                Dto.Path path = ArrangeGetByPath(new[] { "x", "y" });
+                SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal();
 
                 MakeASignalsWebService();
 
@@ -500,15 +507,15 @@ namespace WebService.Tests
                 //assert
                 signalsRepositoryMock.Verify(s => s.Get(It.IsAny<Domain.Path>()));
 
+
             }
             [TestMethod]
             public void GivenASignal_WhenGettingSignalByPath_GetIsCalledWithCorrectValues()
             {
                 //arrange
-                dummyInt = 2;
-                Dto.Path path = MakePathFromString(new[] { "x", "y" });
-                MakeMocks();
-                SignalsRepositoryMock_GetAllPaths_ReturnsToEachSignal();
+
+                Dto.Path path = ArrangeGetByPath(new[] { "x", "y" });
+
 
                 MakeASignalsWebService();
                 //act
@@ -517,6 +524,7 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Day, result.Granularity);
                 Assert.AreEqual(dummyInt, result.Id);
+
             }
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
@@ -535,6 +543,24 @@ namespace WebService.Tests
                 //assert
 
             }
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalBySpecificPath_GetIsCalled()
+            {
+                //arrange
+                dummyInt = 2;
+                var correctPath = new[] { "x", "y" };
+                Dto.Path path = MakePathFromString(correctPath);
+                MakeMocks();
+                SignalsRepositoryMock_GetSpecificPaths_ReturnsToSpecificPathASignal(correctPath);
+
+                MakeASignalsWebService();
+                //act
+                var result = signalsWebService.Get(path);
+                //assert
+                signalsRepositoryMock.Verify(s => s.Get(It.Is<Domain.Path>(d => d.Components.ToArray().SequenceEqual(new[] { "x", "y" }))));
+               
+            }
+
             private void SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal()
             {
                 signalsRepositoryMock
