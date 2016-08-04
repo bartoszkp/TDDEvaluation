@@ -404,7 +404,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingSpecificDataFromSpecificSignal_ReturnsThisData()
+            public void GivenASignal_WhenGettingSpecificDataForSpecificSignal_ReturnsThisData()
             {
                 var existingSignal = ExistingSignal();
 
@@ -435,6 +435,39 @@ namespace WebService.Tests
                     Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
                     index++;
                 }
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataForSignalWithWrongId_ThrowsException()
+            {
+                var wrongSignalId = 3;
+
+                var existingSignal = ExistingSignal();
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(
+                        existingSignal,
+                        It.IsAny<DateTime>(),
+                        It.IsAny<DateTime>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                try
+                {
+                    signalsWebService.GetData(wrongSignalId, new DateTime(), new DateTime());
+                }
+                catch(KeyNotFoundException kne)
+                {
+                    Assert.IsNotNull(kne);
+                    return;
+                }
+                Assert.Fail();
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
