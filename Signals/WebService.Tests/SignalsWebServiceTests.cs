@@ -207,14 +207,13 @@ namespace WebService.Tests
                 var signalWebService = new SignalsWebService(signalDomainService);
                 var dummySignal = new Signal()
                 {
-                    Id=1,
                     DataType = DataType.Decimal,
                     Granularity = Granularity.Hour,
                     Path = Path.FromString("root/signal")
                 };
-                signalsWebService.Add(dummySignal.ToDto<Dto.Signal>());
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
 
-                var result = signalsWebService.GetMissingValuePolicy(1);
+                var result = signalWebService.GetMissingValuePolicy(1);
 
                 Assert.IsNull(result);
             }
