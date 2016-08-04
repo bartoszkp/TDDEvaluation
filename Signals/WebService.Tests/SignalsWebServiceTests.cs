@@ -187,6 +187,18 @@ namespace WebService.Tests
                 signalWebService.GetMissingValuePolicy(1);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGettingMissingValuePolicyOfSignalWhichDoesNotExistInRepository_ThrowedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns<Signal>(signal => signal);
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalWebService.GetMissingValuePolicy(1);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
