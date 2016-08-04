@@ -137,7 +137,10 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new SignalNotFoundException(signalId);
+
         }
 
         private IEnumerable<Domain.Datum<T>> ConvertCollectionDtoToDomainAndSetData<T>(IEnumerable<Datum> data, Signal signal)
