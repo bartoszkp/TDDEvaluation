@@ -93,6 +93,11 @@ namespace WebService
                 this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<bool>>>());
                 return;
             }
+            else if(data.First().Value.GetType() == typeof(string))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<string>>>());
+                return;
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
