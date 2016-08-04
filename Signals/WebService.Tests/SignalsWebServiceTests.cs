@@ -99,9 +99,9 @@ namespace WebService.Tests
                 Setup_SignalsRepo(signalId);        
                 
                 signalsWebService.SetData(signalId, new Dto.Datum[] {
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (bool)true },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (bool)false },
+                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (bool)true } });
 
             }
 
@@ -130,9 +130,9 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("root/signal44")
                 };
 
-                List<Domain.Datum<double>> addedCollection = new List<Datum<double>>(new Datum<double>[] {
-                new Datum<double>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (double)5 },
-                new Datum<double>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (double)7.5, } });
+                List<Domain.Datum<object>> addedCollection = new List<Datum<object>>(new Datum<object>[] {
+                new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
+                new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
 
                 Setup_SignalsRepoAndSignalsDataRepo(domainSignal);         
 
@@ -141,8 +141,8 @@ namespace WebService.Tests
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(), new DateTime()).ToList();
 
                 List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (double)5},
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (double)7.5 } });
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5},
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7 } });
 
                 Assert.IsTrue(expectedResult.Count == result.Count);
                 Assert.IsTrue(AssertDtoLists(expectedResult, result));
@@ -281,15 +281,15 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void GivenAColletionOfDatums(IEnumerable<Datum<double>> data, Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+            private void GivenAColletionOfDatums(IEnumerable<Datum<object>> data, Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
             {
                 signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData<double>(signal, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Setup(sdr => sdr.GetData<object>(signal, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(data);
             }
 
 
-            //collectionAssert doesn't work couse must convert property Value: (object) to (double)
+            //collectionAssert doesn't work couse must convert property Value: (object) to (int)
             private bool AssertDtoLists(List<Datum> expectedResult, List<Datum> result)
             {
                 bool isTrue = true;
@@ -306,7 +306,7 @@ namespace WebService.Tests
                         isTrue = false;
                         break;
                     }
-                    if ((double)expectedResult[i].Value != (double)result[i].Value)
+                    if ((int)expectedResult[i].Value != (int)result[i].Value)
                     {
                         isTrue = false;
                         break;

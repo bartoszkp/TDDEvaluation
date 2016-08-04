@@ -10,9 +10,9 @@ namespace Domain.Services
 
         Signal GetById(int signalId);
 
-        void SetData(int signalId, IEnumerable<Datum<double>> data);
+        void SetData(int signalId, IEnumerable<Datum<object>> data);
 
-        IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+        IEnumerable<Datum<object>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
         void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp);
 

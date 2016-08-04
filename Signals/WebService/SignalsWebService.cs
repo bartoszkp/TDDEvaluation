@@ -59,9 +59,9 @@ namespace WebService
         {
             List<Dto.Datum> dtoDatum = new List<Dto.Datum>();
 
-            IEnumerable<Domain.Datum<double>> domainDatum = signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+            IEnumerable<Domain.Datum<object>> domainDatum = signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc);
 
-            foreach (Domain.Datum<double> d in domainDatum)
+            foreach (Domain.Datum<object> d in domainDatum)
             {
                 dtoDatum.Add(d.ToDto<Dto.Datum>());
             }
@@ -71,11 +71,11 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Dto.Datum> data)
         {
-            List<Domain.Datum<double>> domainData = new List<Domain.Datum<double>>();
+            List<Domain.Datum<object>> domainData = new List<Domain.Datum<object>>();
             
             foreach (Dto.Datum dtoDatum in data)
             {
-                domainData.Add(dtoDatum.ToDomain<Domain.Datum<double>>());
+                domainData.Add(dtoDatum.ToDomain<Domain.Datum<object>>());
             }
 
             signalsDomainService.SetData(signalId, domainData);
@@ -88,7 +88,7 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            var domainMvp = policy.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
+            var domainMvp = policy.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<object>>();
 
             signalsDomainService.SetMissingValuePolicy(signalId, domainMvp);
         }
