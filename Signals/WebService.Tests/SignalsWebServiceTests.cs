@@ -199,6 +199,26 @@ namespace WebService.Tests
                 signalWebService.GetMissingValuePolicy(1);
             }
 
+            [TestMethod]
+            public void GivenASignalWithoutSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNull()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                var dummySignal = new Signal()
+                {
+                    Id=1,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("root/signal")
+                };
+                signalsWebService.Add(dummySignal.ToDto<Dto.Signal>());
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+
+                Assert.IsNull(result);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
