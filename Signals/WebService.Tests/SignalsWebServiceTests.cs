@@ -126,11 +126,7 @@ namespace WebService.Tests
             [TestMethod]
             public void SetMissingValuePolicy_SignalWithGivenIdExist_SetCalled()
             {
-
-                GivenNoSignals();
-
-                var signal = new Signal { Id = 1, DataType = DataType.Integer, Granularity = Granularity.Year, Path = Path.FromString("x/y") };
-                GivenASignal(signal);
+                GivenASignal(new Signal { Id = 1, DataType = DataType.Integer, Granularity = Granularity.Year, Path = Path.FromString("x/y") });
 
                 signalsWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.NoneQualityMissingValuePolicy() { DataType = Dto.DataType.Boolean });
 
@@ -186,7 +182,7 @@ namespace WebService.Tests
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
 
-                missingValuePolicyMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
+                missingValuePolicyMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
 
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
