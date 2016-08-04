@@ -269,6 +269,26 @@ namespace WebService.Tests
                 for (int i = 0; i < numberOfDatumsFromPeriod; ++i)
                     Assert.AreEqual(dateFrom.AddMonths(i), result_array[i].Timestamp);
             }
+            [TestMethod]
+            public void GivenASignalAndDataOfDoubles_WhenGettingItsData_ResultsTimestampsAreEqualToSignalsDataTimestamps()
+            {
+                int id = 1;
+                int numberOfDatums = 3;
+                int numberOfDatumsFromPeriod = numberOfDatums - 1;
+                Dto.Datum[] dtoData;
+                var signal = GivenASignalAndDataOf(DataType.Double, 1.0, out dtoData, id, numberOfDatums);
+
+                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+
+                var result = signalsWebService.GetData(id, dateFrom, dateTo);
+
+                Assert.IsNotNull(result);
+                Assert.AreEqual(numberOfDatumsFromPeriod, result.Count());
+
+                var result_array = result.ToArray();
+                for (int i = 0; i < numberOfDatumsFromPeriod; ++i)
+                    Assert.AreEqual(dateFrom.AddMonths(i), result_array[i].Timestamp);
+            }
                         
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
