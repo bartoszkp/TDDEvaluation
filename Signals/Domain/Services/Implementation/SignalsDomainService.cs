@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -48,6 +49,35 @@ namespace Domain.Services.Implementation
             }
 
             return this.signalsRepository.Get(newPath);
+        }
+
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase mvpDomain)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            if (signal == null)
+            {
+                throw new SignalIsNullException();
+            }
+
+            this.missingValuePolicyRepository.Set(signal, mvpDomain);
+        }
+
+        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            if (signal == null)
+            {
+                throw new SignalIsNullException();
+            }
+            else
+            {
+                var mvp = this.missingValuePolicyRepository.Get(signal);
+
+                return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                    as MissingValuePolicy.MissingValuePolicyBase;
+            }
         }
     }
 }

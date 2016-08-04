@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Domain.MissingValuePolicy;
 
 namespace Domain.Services
 {
@@ -10,5 +11,9 @@ namespace Domain.Services
         Signal GetById(int signalId);
 
         Signal Get(Path newPath);
+
+        void SetMissingValuePolicy(int signalId, MissingValuePolicyBase mvpDomain);
+
+        MissingValuePolicyBase GetMissingValuePolicy(int signalId);
     }
 }
