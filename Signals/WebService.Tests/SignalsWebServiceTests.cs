@@ -218,6 +218,42 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GivenASignalWithSetMVP_WhenGettingMVPofTheSignal_ReturnedIsMVPofTheSignal()
+            {
+                var dummySignal = new Signal()
+                {
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("root/signal")
+                };
+                var dummyMissingValuePolicy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Integer,
+                    Quality = Dto.Quality.Poor,
+                    Signal = dummySignal.ToDto<Dto.Signal>(),
+                    Id = 1,
+                    Value = 10.0
+                };
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                signalMissingValuePolicyRepositoryMock.Setup(smvpr => smvpr.Get(It.Is<Signal>(signal => 
+                    signal.DataType == dummySignal.DataType && 
+                    signal.Granularity == dummySignal.Granularity && 
+                    signal.Path.Equals(dummySignal.Path))))
+                .Returns(dummyMissingValuePolicy.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>());
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
+
+                var result = signalWebService.GetMissingValuePolicy(1);
+
+                Assert.AreEqual(dummyMissingValuePolicy.DataType, result.DataType);
+                Assert.AreEqual(dummyMissingValuePolicy.Id, result.Id);
+                Assert.AreEqual(dummyMissingValuePolicy.Signal, result.Signal);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -271,7 +307,5 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }
-
-
     }
 }
