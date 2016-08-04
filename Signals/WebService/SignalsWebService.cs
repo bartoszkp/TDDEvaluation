@@ -99,53 +99,39 @@ namespace WebService
                 var result = signalsDomainService.GetById(signalId);
 
                 if (result == null) throw new ArgumentException();
-                
+
+                var type = data.ToArray()[0].Value.GetType();
+                if(data.Any(s=>s.Value.GetType()!=type))
+                 throw new ArgumentException(); 
+
+
                 switch (result.DataType)
                 {
-                    
+
                     case Domain.DataType.Boolean:
-                        if (data.ToArray()[0].Value.GetType() != typeof(Boolean)) throw new ArgumentException();
-                        var list=(data.Select(s => s.ToDomain<Domain.Datum<Boolean>>()).ToList());
-                        for (int i= 0;i < list.Count;i++ )
-                        {
-                            list[i].Signal = result;
-                        }
+                        if (type != typeof(Boolean)) throw new ArgumentException();
+                        var list = (data.Select(s => {Domain.Datum<Boolean> sr= s.ToDomain<Domain.Datum<Boolean>>(); sr.Signal=result; return sr; }).ToList());
                         signalsDomainService.SetData<Boolean>(list);
                         break;
                     case Domain.DataType.Integer:
-                        if (data.ToArray()[0].Value.GetType() != typeof(int)) throw new ArgumentException();
-                        var list2 = (data.Select(s => s.ToDomain<Domain.Datum<int>>()).ToList());
-                        for (int i = 0; i < list2.Count; i++)
-                        {
-                            list2[i].Signal = result;
-                        }
+                        if (type != typeof(int)) throw new ArgumentException();
+                        var list2 = (data.Select(s => { Domain.Datum<int> sr = s.ToDomain<Domain.Datum<int>>(); sr.Signal = result; return sr; }).ToList());
                         signalsDomainService.SetData<int>(list2);
                         break;
                     case Domain.DataType.Double:
-                        if (data.ToArray()[0].Value.GetType() != typeof(double)) throw new ArgumentException();
-                        var list3 = (data.Select(s => s.ToDomain<Domain.Datum<double>>()).ToList());
-                        for (int i = 0; i < list3.Count; i++)
-                        {
-                            list3[i].Signal = result;
-                        }
+                        if (type != typeof(double)) throw new ArgumentException();
+                        var list3 = (data.Select(s => { Domain.Datum<double> sr = s.ToDomain<Domain.Datum<double>>(); sr.Signal = result; return sr; }).ToList());
+                        
                         signalsDomainService.SetData<double>(list3);
                         break;
                     case Domain.DataType.Decimal:
-                        if (data.ToArray()[0].Value.GetType() != typeof(decimal)) throw new ArgumentException();
-                        var list4 = (data.Select(s => s.ToDomain<Domain.Datum<Decimal>>()).ToList());
-                        for (int i = 0; i < list4.Count; i++)
-                        {
-                            list4[i].Signal = result;
-                        }
+                        if (type != typeof(decimal)) throw new ArgumentException();
+                        var list4 = (data.Select(s => { Domain.Datum<decimal> sr = s.ToDomain<Domain.Datum<decimal>>(); sr.Signal = result; return sr; }).ToList());
                         signalsDomainService.SetData<Decimal>(list4);
                         break;
                     case Domain.DataType.String:
-                        if (data.ToArray()[0].Value.GetType() != typeof(string)) throw new ArgumentException();
-                        var list5 = (data.Select(s => s.ToDomain<Domain.Datum<String>>()).ToList());
-                        for (int i = 0; i < list5.Count; i++)
-                        {
-                            list5[i].Signal = result;
-                        }
+                        if (type != typeof(string)) throw new ArgumentException();
+                        var list5 = (data.Select(s => { Domain.Datum<string> sr = s.ToDomain<Domain.Datum<string>>(); sr.Signal = result; return sr; }).ToList());
                         signalsDomainService.SetData<String>(list5);
                         break;
                     default:
