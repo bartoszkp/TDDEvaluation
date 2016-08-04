@@ -63,6 +63,9 @@ namespace WebService
         {
             var signal = GetById(signalId);
 
+            if (signal == null)
+                throw new Domain.Exceptions.SettingNotExistingSignalDataException();
+
             if(signal.DataType == Dto.DataType.Boolean)
             {
                 List<Domain.Datum<bool>> domainDatumList = new List<Domain.Datum<bool>>();

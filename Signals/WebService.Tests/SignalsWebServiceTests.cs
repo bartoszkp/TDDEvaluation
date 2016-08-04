@@ -200,9 +200,11 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SettingNotExistingSignalDataException))]
             public void GivenASignal_WhenSettingDataForNotExistingSignal_ThrowsNotExistingSignalException()
             {
                 MockSetup();
+                signalsWebService = new SignalsWebService(signalDomainService);
 
                 Datum<double>[] dataToSet = new Datum<double>[] {
                         new Datum<double>() { Id = 1, Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
@@ -217,6 +219,7 @@ namespace WebService.Tests
                         };
 
                 signalsWebService.SetData(100, DtoDataToSet);
+                signalDomainService.SetData(1, dataToSet);
                 signalsDataRepositoryMock.Verify(sr => sr.SetData(dataToSet));
             }
         }
