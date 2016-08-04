@@ -406,7 +406,35 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGettingSpecificDataFromSpecificSignal_ReturnsThisData()
             {
+                var existingSignal = ExistingSignal();
 
+                var existingDatum = ExistingDatum();
+
+                GivenASignal(existingSignal);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(
+                        existingSignal,
+                        existingDatum.First().Timestamp,
+                        existingDatum.Last().Timestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>());
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+
+                int index = 0;
+                foreach (var ed in existingDatum)
+                {
+                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
+                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
+                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
+                    index++;
+                }
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
