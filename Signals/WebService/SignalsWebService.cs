@@ -72,7 +72,7 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
