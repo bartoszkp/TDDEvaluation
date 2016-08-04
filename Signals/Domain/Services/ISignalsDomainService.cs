@@ -10,7 +10,5 @@ namespace Domain.Services
         Signal GetById(int signalId);
 
         Signal GetByPath(Path path);
-
-        void SetData(int signalId, IEnumerable<Datum<double>> collection);
     }
 }

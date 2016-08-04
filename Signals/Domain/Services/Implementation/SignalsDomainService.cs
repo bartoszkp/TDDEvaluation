@@ -39,10 +39,5 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(path);
         }
-
-        public void SetData(int signalId, IEnumerable<Datum<double>> collection)
-        {
-            signalsDataRepository.SetData<double>(collection);
-        }
     }
 }

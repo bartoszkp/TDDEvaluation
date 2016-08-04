@@ -174,6 +174,19 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(dummySignal.Path.Components.ToArray(), result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignals_WhenGettingMissingValuePolicyOfAnySignal_ThrowedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns<Signal>(signal => signal);
+                signalRepositoryMock.Setup(sr => sr.Get(It.IsAny<Path>())).Returns<Signal>(signal => signal);
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalWebService.GetMissingValuePolicy(1);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -227,5 +240,7 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }
+
+
     }
 }

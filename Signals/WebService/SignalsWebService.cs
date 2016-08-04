@@ -67,9 +67,7 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            IEnumerable<Domain.Datum<double>> collection = data.ToDomain<IEnumerable<Domain.Datum<double>>>();
-
-            signalsDomainService.SetData(signalId, collection);
+            throw new NotImplementedException();
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
