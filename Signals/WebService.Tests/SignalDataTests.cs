@@ -75,6 +75,7 @@ namespace WebService.Tests
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
             Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(IEnumerable<Dto.Datum>));
         }
 
 
@@ -102,7 +103,7 @@ namespace WebService.Tests
 
 
         [TestMethod]
-        public void SetSignalData_SameDataReturned_WhenGettingIt()
+        public void SignalExists_SetSignalData_WithNonNullData()
         {
             SetupWebService();
             var returnedSignal = new Signal() { Id = 1, DataType = DataType.Integer };
