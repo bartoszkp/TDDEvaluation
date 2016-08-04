@@ -60,6 +60,11 @@ namespace WebService
         {
             var signal = this.signalsDomainService?.GetById(signalId);
             
+            if(signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             var datum = this.signalsDomainService?.GetData(signal, fromIncludedUtc, toExcludedUtc);
 
             return datum?.ToDto<IEnumerable<Dto.Datum>>();

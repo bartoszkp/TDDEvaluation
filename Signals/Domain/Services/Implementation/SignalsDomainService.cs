@@ -85,10 +85,6 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<double>> GetData(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            if(signal == null)
-            {
-                return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc);
-            }
             return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
     }
