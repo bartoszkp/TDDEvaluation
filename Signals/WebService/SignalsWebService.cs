@@ -60,12 +60,7 @@ namespace WebService
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
 
-            if (signal.DataType == DataType.Integer)
-            {
-                var data = signalsDomainService.GetData<int>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
-                return ConvertCollectionDomainToDto(data);
-            }
-            else if (signal.DataType == DataType.Double)
+            if (signal.DataType == DataType.Double)
             {
                 var data = signalsDomainService.GetData<double>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
                 return ConvertCollectionDomainToDto(data);
@@ -75,6 +70,11 @@ namespace WebService
                 var data = signalsDomainService.GetData<bool>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
                 return ConvertCollectionDomainToDto(data);
             }
+            else if (signal.DataType == DataType.Integer)
+            {
+                var data = signalsDomainService.GetData<int>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
+                return ConvertCollectionDomainToDto(data);
+            }            
             else if (signal.DataType == DataType.Decimal)
             {
                 var data = signalsDomainService.GetData<decimal>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
