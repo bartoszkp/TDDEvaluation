@@ -81,7 +81,7 @@ namespace WebService
         }
         private IEnumerable<Dto.Datum> GetDataWithType<T>(Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            IEnumerable<Domain.Datum<Double>> result = signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+            IEnumerable<Domain.Datum<T>> result = signalsDomainService.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
             return result.ToDto<IEnumerable<Dto.Datum>>();
         }
 
@@ -107,7 +107,6 @@ namespace WebService
         private IEnumerable<Domain.Datum<T>> FillDatum<T>(Domain.Signal signal, IEnumerable<Domain.Datum<T>> dataDomain)
         {
             List<Domain.Datum<T>> result = new List<Domain.Datum<T>>();
-
             foreach (var d in dataDomain)
             {
                 var temp = d;
