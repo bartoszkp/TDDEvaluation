@@ -337,6 +337,25 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(id, null);
             }
 
+            [TestMethod]
+            public void GivenASignal_SettingMissingValuePolicy_MVPReposSetIsCalled()
+            {
+                int signalId = 1;
+                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
+                var signal = SignalWith(signalId, DataType.Integer, Granularity.Day, path.ToDomain<Domain.Path>());
+
+                GivenASignal(signal);
+
+                signalsWebService.SetMissingValuePolicy(signalId, null);
+
+                mvpRepositoryMock.Verify(
+                    m => m.Set(
+                        It.Is<Domain.Signal>(s => s.Id == signalId), 
+                        It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()
+                    )
+                );                
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -390,8 +409,10 @@ namespace WebService.Tests
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
                 signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -466,6 +487,7 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<ISignalsDataRepository> signalsDataRepoMock;
+            private Mock<IMissingValuePolicyRepository> mvpRepositoryMock;
         }
     }
 }
