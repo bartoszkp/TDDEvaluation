@@ -69,5 +69,10 @@ namespace Domain.Services.Implementation
             }
             else return null;
         }
+
+        public void SetData<T>(IEnumerable<Datum<T>> data)
+        {
+            signalsDataRepository.SetData<T>(data);
+        }
     }
 }
