@@ -8,7 +8,7 @@ namespace ExampleSignalClient
         static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-
+            
             client.SetData(1, new Datum[] {
                        new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
                         new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
