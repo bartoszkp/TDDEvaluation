@@ -179,7 +179,34 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(signalId, result);
 
                 missingValuePolicyRepoMock.Verify(mvp => mvp.Set(signal, It.IsAny<MissingValuePolicyBase>()));
-            }                       
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalNotExistException))]
+            public void GivenNoSignals_GetMissingValuePolicy_ExpectedException()
+            {
+                int signalId = 2;
+
+                Setup_SignalsRepo(signalId);
+
+                signalsWebService.GetMissingValuePolicy(signalId);
+            }
+
+            [TestMethod]
+            public void GivenASignalNotAddedAnyConfiguration_GetMissingValuePolicy_ReturnsNull()
+            {
+                var signalId = 3;
+                Domain.Signal signal = (SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Minute,
+                    path: Domain.Path.FromString("root/signal8")));
+
+                Setup_SignalsRepoAndMissingValuePolicyRepo(signal);
+             
+                var result = signalsWebService.GetMissingValuePolicy(signalId);
+                Assert.IsNull(result);
+            } 
 
             private Dto.Signal SignalWith(
                 int? id = null,

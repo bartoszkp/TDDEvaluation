@@ -13,14 +13,14 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "signal22" } }
+                Path = new Path() { Components = new[] { "root", "signal27 " } }
             };
 
             var id = client.Add(signal).Id.Value;
 
-          //  var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
+            var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
 
-           // client.SetMissingValuePolicy(id, mvp);
+            client.SetMissingValuePolicy(id, mvp);
 
             var result = client.GetMissingValuePolicy(id) as Signals.SpecificValueMissingValuePolicy;
             if (result == null)
