@@ -222,6 +222,19 @@ namespace WebService.Tests
                 signalDomainService.SetData(1, dataToSet);
                 signalsDataRepositoryMock.Verify(sr => sr.SetData(dataToSet));
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_ReturnsCorrectData()
+            {
+                MockSetup();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData(1, new DateTime(2016, 8, 1), new DateTime(2016, 8, 4)));
+
+                signalsWebService.GetData(1, new DateTime(2016, 8, 1), new DateTime(2016, 8, 4));
+                signalsDataRepositoryMock.Verify(sr => sr.GetData(1, new DateTime(2016, 8, 1), new DateTime(2016, 8, 4)));
+            }
         }
     }
 }
