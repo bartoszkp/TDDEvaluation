@@ -237,9 +237,36 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.Fair, result.Quality);
                 CheckIfDtoSignalAreEqual(
                     result.Signal, signalId, Dto.DataType.Double, Dto.Granularity.Minute, new Dto.Path() { Components = new[] { "root", "signal8" } } );
-
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalNotExistException))]
+            public void GivenNoSignals_GetIdByPath_ExpectedException()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
+            }
+
+            [TestMethod]
+            public void GivenASignal_GetIdByPath_ReturnsIt()
+            {
+                Dto.Path dtoPath = new Dto.Path() { Components = new[] { "x", "y" } };
+
+                GivenASignal(SignalWith(
+                   id: 5,
+                   dataType: Domain.DataType.Boolean,
+                   granularity: Domain.Granularity.Hour,
+                   path: Domain.Path.FromString("x/y")));
+
+                var result = signalsWebService.Get(dtoPath);
+
+                Assert.AreEqual(5, result.Id);
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
+                Assert.AreEqual(Dto.Granularity.Hour, result.Granularity);
+                CollectionAssert.AreEqual(dtoPath.Components.ToArray(), result.Path.Components.ToArray());
+            }
+            
 
             private Dto.Signal SignalWith(
                 int? id = null,
@@ -288,6 +315,10 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(signal.Id.Value))
                     .Returns(signal);
+
+                signalsRepositoryMock
+                   .Setup(sr => sr.Get(signal.Path))
+                   .Returns(signal);
             }
 
             private void Setup_SignalsRepo(int signalId)
@@ -320,8 +351,7 @@ namespace WebService.Tests
                     .Setup(sdr => sdr.GetData<object>(signal, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(data);
             }
-
-
+            
             //collectionAssert doesn't work couse must convert property Value: (object) to (int)
             private bool AssertDtoLists(List<Datum> expectedResult, List<Datum> result)
             {
@@ -363,7 +393,6 @@ namespace WebService.Tests
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
-
 
             private void Setup_SignalsRepoAndMissingValuePolicyRepo_SetupGetMethod(Domain.Signal signal, SpecificValueMissingValuePolicyDouble returnedMvp)
             {
