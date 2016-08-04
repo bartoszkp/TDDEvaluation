@@ -141,6 +141,9 @@ namespace WebService
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
 
+            var domain_policy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+
+            signalsDomainService.SetMissingValuePolicy(signal.ToDomain<Domain.Signal>(), domain_policy);
         }
 
         private IEnumerable<Domain.Datum<T>> ConvertCollectionDtoToDomainAndSetData<T>(IEnumerable<Datum> data, Signal signal)
