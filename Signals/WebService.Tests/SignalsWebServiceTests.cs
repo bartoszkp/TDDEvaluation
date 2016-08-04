@@ -6,6 +6,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
+using DataAccess.GenericInstantiations;
 
 namespace WebService.Tests
 {
@@ -391,7 +392,7 @@ namespace WebService.Tests
 
                 mvpRepositoryMock
                     .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
-                    .Returns(new Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<int>() { Signal = signal});
+                    .Returns(new SpecificValueMissingValuePolicyInteger());
                 
                 var result = signalsWebService.GetMissingValuePolicy(signalId);
 
