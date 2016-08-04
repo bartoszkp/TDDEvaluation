@@ -269,7 +269,28 @@ namespace WebService.Tests
                 for (int i = 0; i < numberOfDatumsFromPeriod; ++i)
                     Assert.AreEqual(dateFrom.AddMonths(i), result_array[i].Timestamp);
             }
-                        
+
+            [TestMethod]
+            public void GivenASignalAndDataOfDoubles_WhenGettingItsData_ResultsTimestampsAreEqualToSignalsDataTimestamps()
+            {
+                int id = 1;
+                int numberOfDatums = 3;
+                int numberOfDatumsFromPeriod = numberOfDatums - 1;
+                Dto.Datum[] dtoData;
+                var signal = GivenASignalAndDataOf(DataType.Double, 1.0, out dtoData, id, numberOfDatums);
+
+                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+
+                var result = signalsWebService.GetData(id, dateFrom, dateTo);
+
+                Assert.IsNotNull(result);
+                Assert.AreEqual(numberOfDatumsFromPeriod, result.Count());
+
+                var result_array = result.ToArray();
+                for (int i = 0; i < numberOfDatumsFromPeriod; ++i)
+                    Assert.AreEqual(dateFrom.AddMonths(i), result_array[i].Timestamp);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -363,6 +384,11 @@ namespace WebService.Tests
                 signalsDataRepoMock
                     .Setup(sd => sd.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signalId), date, date.AddMonths(numberOfDatums)))
                     .Returns(DatumWith<int>(numberOfDatums - 1, date));
+
+                signalsDataRepoMock
+                    .Setup(sd => sd.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signalId), date, date.AddMonths(numberOfDatums)))
+                    .Returns(DatumWith<double>(numberOfDatums - 1, date));
+
 
                 return signal;
             }
