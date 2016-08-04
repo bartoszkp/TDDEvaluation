@@ -303,12 +303,7 @@ namespace WebService.Tests
             {
                 var existingSignal = ExistingSignal();
 
-                var existingDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
-                };
+                var existingDatum = ExistingDatum();
 
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsDataRepositoryMock
@@ -343,7 +338,12 @@ namespace WebService.Tests
             {
                 var existingSignal = ExistingSignal();
 
-                var existingDatum = ExistingDatum();
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
+                };
 
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsDataRepositoryMock

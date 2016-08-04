@@ -78,7 +78,11 @@ namespace WebService
             {
                 throw new KeyNotFoundException();
             }
-
+            if(data.First().Value.GetType() == typeof(int))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<int>>>());
+                return;
+            }
             this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>());
         }
 

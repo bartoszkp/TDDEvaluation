@@ -67,11 +67,11 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void SetData(Signal signal, IEnumerable<Datum<double>> datum)
+        public void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum)
         {
             if(datum == null)
             {
-                this.signalsDataRepository.SetData<double>(datum);
+                this.signalsDataRepository.SetData<T>(datum);
                 return;
             }
 
@@ -80,7 +80,7 @@ namespace Domain.Services.Implementation
                 d.Signal = signal;
             }
 
-            this.signalsDataRepository.SetData<double>(datum);
+            this.signalsDataRepository.SetData<T>(datum);
         }
 
         public IEnumerable<Datum<double>> GetData(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
