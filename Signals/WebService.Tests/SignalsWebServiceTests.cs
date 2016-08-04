@@ -135,7 +135,7 @@ namespace WebService.Tests
                 //assert
             }
             [TestMethod]
-           [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(ArgumentException))]
             public void GivenNoId_WhenSettingData_ThrowsException()
             {
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
@@ -153,7 +153,7 @@ namespace WebService.Tests
              
             }
 
-        [TestMethod]
+            [TestMethod]
             public void GivenDataDouble_WhenSettingData_SetDataIsCalled()
             {
                 //arrange
@@ -181,9 +181,22 @@ namespace WebService.Tests
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
             }
-         
 
 
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenSignalWithDecimal_WhenSettingDataWithInt_SetDataThrowsException()
+            {
+                //arrange
+                var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
+                MakeMocks();
+                MakeASignalsRepositoryMock(2, Domain.DataType.Decimal, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                //act
+                signalsWebService.SetData(dummyInt, dummyData);
+                //assert
+
+            }
             [TestMethod]
             public void GivenDataInt_WhenSettingDataWithOneDatum_SetDataIsCalledWithTheSameDatum()
             {
