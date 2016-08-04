@@ -192,6 +192,8 @@ namespace WebService.Tests
                 var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1);
                 MakeMocks();
                 MakeASignalsRepositoryMock(2, Domain.DataType.Decimal, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeASignalsWebService();
+
                 //act
                 signalsWebService.SetData(dummyInt, dummyData);
                 //assert
