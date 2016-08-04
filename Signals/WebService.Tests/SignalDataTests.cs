@@ -52,14 +52,25 @@ namespace WebService.Tests
         public void SignalHasData_GetData_DataIsReturned()
         {
             SetupWebService();
-            Mock<IEnumerable<Domain.Datum<double>>> resultDataMock = new Mock<IEnumerable<Datum<double>>>();
+            IEnumerable<Datum<double>> resultData = new[] { new Domain.Datum<double>() { Quality = Quality.Fair,
+                                                                 Timestamp = new DateTime(2000, 1, 1),
+                                                                 Value = 1.2 },
+
+                                                                 new Domain.Datum<double>() { Quality = Quality.Fair,
+                                                                 Timestamp = new DateTime(2000, 2, 1),
+                                                                 Value = 1.5 },
+
+                                                                 new Domain.Datum<double>() { Quality = Quality.Fair,
+                                                                 Timestamp = new DateTime(2000, 1, 1),
+                                                                 Value = 2.4 }
+                                                          };
 
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1, DataType = DataType.Double });
 
             signalsDataRepoMock.Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == 1 && s.DataType == DataType.Double),
                                                                It.IsAny<DateTime>(),
                                                                It.IsAny<DateTime>()))
-                                                                .Returns(resultDataMock.Object);
+                                                                .Returns(resultData);
 
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
@@ -94,24 +105,23 @@ namespace WebService.Tests
         public void SetSignalData_SameDataReturned_WhenGettingIt()
         {
             SetupWebService();
-            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal() { Id = 1, DataType = DataType.Integer });
+            var returnedSignal = new Signal() { Id = 1, DataType = DataType.Integer };
+            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(returnedSignal);
 
-            Mock<IEnumerable<Datum<int>>> returnedDataMock = new Mock<IEnumerable<Datum<int>>>();
-            Mock<IEnumerable<Dto.Datum>> signalDataMock = new Mock<IEnumerable<Dto.Datum>>();
+            IEnumerable<Dto.Datum> dtoSignalData = new[] { new Dto.Datum() { Quality = Dto.Quality.Fair,
+                                                                 Timestamp = new DateTime(2000, 1, 1),
+                                                                 Value = 1 },
 
-            signalsDataRepoMock.Setup(sd => sd.GetData<int>
-                        (It.Is<Signal>(s => s.Id == 1),
-                        It.IsAny<DateTime>(),
-                        It.IsAny<DateTime>())).Returns(returnedDataMock.Object);
+                                                           new Dto.Datum() { Quality = Dto.Quality.Good,
+                                                                 Timestamp = new DateTime(2000, 2, 1),
+                                                                 Value = 1 },
 
+                                                           new Dto.Datum() { Quality = Dto.Quality.Poor,
+                                                                 Timestamp = new DateTime(2000, 3, 1),
+                                                                 Value = 2 } };
 
-
-            signalsWebService.SetData(1, signalDataMock.Object);
-
-            var createdSignalData = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
-
-            Assert.IsNotNull(createdSignalData);
-            Assert.IsInstanceOfType(createdSignalData, typeof(IEnumerable<Dto.Datum>));
+            signalsWebService.SetData(1, dtoSignalData);
+            signalsDataRepoMock.Verify(sr => sr.SetData(It.IsAny<IEnumerable<Datum<int>>>()), Times.Once);
 
 
         }

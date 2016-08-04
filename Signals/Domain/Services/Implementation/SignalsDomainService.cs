@@ -83,6 +83,7 @@ namespace Domain.Services.Implementation
         {
             if (data == null)
                 throw new ArgumentNullException("Attempted to set null data for a signal");
+
             SetSignalForDatumCollection(data, signal);
 
             signalsDataRepository.SetData(data);
@@ -90,7 +91,7 @@ namespace Domain.Services.Implementation
 
         private void SetSignalForDatumCollection<T>(IEnumerable<Domain.Datum<T>> data, Signal signal)
         {
-            if (!data.Any())
+            if (!data.Any() || signal == null)
                 return;
 
             foreach (var datum in data)

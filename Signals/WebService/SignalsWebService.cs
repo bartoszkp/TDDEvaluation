@@ -109,27 +109,27 @@ namespace WebService
             switch (signal.DataType)
             {
                 case DataType.Boolean:
-                    var domainBoolData = data?.ToDomain<IEnumerable<Domain.Datum<bool>>>();
+                    var domainBoolData = data?.ToDomain<IEnumerable<Domain.Datum<bool>>>().ToArray();
                     signalsDomainService.SetData(domainBoolData,signal.ToDomain<Domain.Signal>()); 
                     break;
 
                 case DataType.Integer:
-                    var domainIntData = data?.ToDomain<IEnumerable<Domain.Datum<int>>>();
+                    var domainIntData = data?.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray(); 
                     signalsDomainService.SetData(domainIntData, signal.ToDomain<Domain.Signal>());
                     break;
 
                 case DataType.Double:
-                    var domainDoubleData = data?.ToDomain<IEnumerable<Domain.Datum<double>>>();
+                    var domainDoubleData = data?.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray(); 
                     signalsDomainService.SetData(domainDoubleData, signal.ToDomain<Domain.Signal>());
                     break;
 
                 case DataType.Decimal:
-                    var domainDecimalData = data?.ToDomain<IEnumerable<Domain.Datum<decimal>>>();
+                    var domainDecimalData = data?.ToDomain<IEnumerable<Domain.Datum<decimal>>>().ToArray();
                     signalsDomainService.SetData(domainDecimalData, signal.ToDomain<Domain.Signal>());
                     break;
 
                 case DataType.String:
-                    var domainStringData = data?.ToDomain<IEnumerable<Domain.Datum<string>>>();
+                    var domainStringData = data?.ToDomain<IEnumerable<Domain.Datum<string>>>().ToArray(); 
                     signalsDomainService.SetData(domainStringData, signal.ToDomain<Domain.Signal>());
                     break;
             }
