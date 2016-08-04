@@ -374,6 +374,46 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalAndBoolDatum_WhenSettingData_RepositorySetDataAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (bool)true },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (bool)false },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (bool)false }
+                };
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<bool>(It.IsAny<IEnumerable<Datum<bool>>>()));
+
+                GivenASignal(existingSignal);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, existingDatum);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+
+                var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<bool>>>();
+                int index = 0;
+
+                foreach (var ed in datum)
+                {
+                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<bool>(It.Is<IEnumerable<Datum<bool>>>(d =>
+                    (
+                        d.ElementAt(index).Quality == ed.Quality
+                        && d.ElementAt(index).Timestamp == ed.Timestamp
+                        && d.ElementAt(index).Value == ed.Value
+                    ))));
+                    index++;
+                }
+            }
+
+            [TestMethod]
             public void GivenASignalAndDatum_WhenSettingDataWithWrongSignalId_ExceptionIsThrown()
             {
                 var existingSignal = ExistingSignal();
