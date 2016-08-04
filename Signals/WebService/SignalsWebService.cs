@@ -110,27 +110,27 @@ namespace WebService
             {
                 case DataType.Boolean:
                     var domainBoolData = data?.ToDomain<IEnumerable<Domain.Datum<bool>>>();
-                    signalsDomainService.SetData(domainBoolData); 
+                    signalsDomainService.SetData(domainBoolData,signal.ToDomain<Domain.Signal>()); 
                     break;
 
                 case DataType.Integer:
                     var domainIntData = data?.ToDomain<IEnumerable<Domain.Datum<int>>>();
-                    signalsDomainService.SetData(domainIntData);
+                    signalsDomainService.SetData(domainIntData, signal.ToDomain<Domain.Signal>());
                     break;
 
                 case DataType.Double:
                     var domainDoubleData = data?.ToDomain<IEnumerable<Domain.Datum<double>>>();
-                    signalsDomainService.SetData(domainDoubleData);
+                    signalsDomainService.SetData(domainDoubleData, signal.ToDomain<Domain.Signal>());
                     break;
 
                 case DataType.Decimal:
                     var domainDecimalData = data?.ToDomain<IEnumerable<Domain.Datum<decimal>>>();
-                    signalsDomainService.SetData(domainDecimalData);
+                    signalsDomainService.SetData(domainDecimalData, signal.ToDomain<Domain.Signal>());
                     break;
 
                 case DataType.String:
                     var domainStringData = data?.ToDomain<IEnumerable<Domain.Datum<string>>>();
-                    signalsDomainService.SetData(domainStringData);
+                    signalsDomainService.SetData(domainStringData, signal.ToDomain<Domain.Signal>());
                     break;
             }
 
@@ -156,5 +156,10 @@ namespace WebService
             var domainPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             signalsDomainService.SetMissingValuePolicy(signalId, domainPolicy);
         }
+
+
+        
+
+
     }
 }

@@ -70,7 +70,7 @@ namespace Domain.Services.Implementation
             var signal = GetById(signalId);
             if (signal == null)
                 throw new NoSuchSignalException("Attempted to set missing value policy to a non exsisting signal");
-            this.missingValuePolicyRepository.Set(signal,policy);
+            this.missingValuePolicyRepository.Set(signal, policy);
 
         }
 
@@ -79,12 +79,26 @@ namespace Domain.Services.Implementation
             return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
 
-        public void SetData<T>(IEnumerable<Datum<T>> data)
+        public void SetData<T>(IEnumerable<Datum<T>> data, Signal signal)
         {
             if (data == null)
                 throw new ArgumentNullException("Attempted to set null data for a signal");
+            SetSignalForDatumCollection(data, signal);
 
             signalsDataRepository.SetData(data);
         }
+
+        private void SetSignalForDatumCollection<T>(IEnumerable<Domain.Datum<T>> data, Signal signal)
+        {
+            if (!data.Any())
+                return;
+
+            foreach (var datum in data)
+            {
+                datum.Signal = signal;
+            }
+        }
+
+
     }
 }

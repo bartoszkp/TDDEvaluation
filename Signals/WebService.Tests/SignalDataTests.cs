@@ -56,12 +56,12 @@ namespace WebService.Tests
 
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1, DataType = DataType.Double });
 
-            signalsDataRepoMock.Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == 1),
+            signalsDataRepoMock.Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == 1 && s.DataType == DataType.Double),
                                                                It.IsAny<DateTime>(),
                                                                It.IsAny<DateTime>()))
                                                                 .Returns(resultDataMock.Object);
 
-            var result = signalsWebService.GetData(1, new DateTime(), new DateTime());
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
             Assert.IsNotNull(result);
         }
@@ -108,24 +108,13 @@ namespace WebService.Tests
 
             signalsWebService.SetData(1, signalDataMock.Object);
 
-            var createdSignalData = signalsWebService.GetData(1, new DateTime(), new DateTime());
+            var createdSignalData = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
             Assert.IsNotNull(createdSignalData);
             Assert.IsInstanceOfType(createdSignalData, typeof(IEnumerable<Dto.Datum>));
 
 
         }
-
-
-        [TestMethod]
-        public void MyTestMethod()
-        {
-
-        }
-
-
-
-
 
         private void SetupWebService()
         {
