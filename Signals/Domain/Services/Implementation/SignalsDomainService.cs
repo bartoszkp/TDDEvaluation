@@ -6,6 +6,8 @@ using Domain.Infrastructure;
 using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
+using Domain;
+using System.Collections;
 
 namespace Domain.Services.Implementation
 {
@@ -63,6 +65,17 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             else
                 return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        public void SetData(int signalId, IEnumerable<double> data)
+        {
+
+            var result = signalsRepository.Get(signalId);
+            if(result == null)
+            {
+                throw new IdNotNullException();
+            }
+            
         }
     }
 }
