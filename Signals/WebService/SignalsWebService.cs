@@ -69,7 +69,6 @@ namespace WebService
 
             var domainSignal = signal.ToDomain<Domain.Signal>();
 
-
             switch (signal.DataType)
             {
                 case DataType.Boolean:
