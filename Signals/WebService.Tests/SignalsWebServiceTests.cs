@@ -301,6 +301,19 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataOfDecimals_WhenGettingItsData_DoesNotThrow()
+            {
+                int id = 1;
+                int numberOfDatums = 3;
+                int numberOfDatumsFromPeriod = numberOfDatums - 1;
+                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+
+                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Decimal, 99m, id, numberOfDatums);
+
+                var result = signalsWebService.GetData(id, dateFrom, dateTo);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
