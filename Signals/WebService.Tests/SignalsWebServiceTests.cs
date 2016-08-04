@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using Domain.MissingValuePolicy;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -116,10 +117,10 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSetMissingValuePolicy_CalledMissingValuePolicyRepository()
             {
-                GivenASignal(GetTestSignal());
+                GivenASignal(SignalWith());
 
                 Dto.MissingValuePolicy.MissingValuePolicy mvpDTO = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
-                
+
                 signalsWebService.SetMissingValuePolicy(1, mvpDTO);
 
                 missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.IsAny<Domain.Signal>(), It.IsAny<MissingValuePolicyBase>()));
@@ -132,14 +133,14 @@ namespace WebService.Tests
                 int correctId = 1;
                 int invalidId = 123;
 
-                GivenASignal(GetTestSignal());
+                GivenASignal(SignalWith());
 
                 signalsWebService.SetMissingValuePolicy(invalidId, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
             }
             [TestMethod]
             public void GivenASignal_WhenGetMissingValuePolicy_ColledmissingValuePolicyRepository()
             {
-                GivenASignal(GetTestSignal());
+                GivenASignal(SignalWith());
 
                 signalsWebService.GetMissingValuePolicy(1);
 
@@ -149,7 +150,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGetMissingValuePolicyWithNewSignal_ReturnNull()
             {
-                GivenASignal(GetTestSignal());
+                GivenASignal(SignalWith());
 
                 var res = signalsWebService.GetMissingValuePolicy(1);
 
@@ -160,7 +161,7 @@ namespace WebService.Tests
             [ExpectedException(typeof(ArgumentException))]
             public void GivenASignal_WhenGetMissingValuePolicyWithInvalidID_ReturnException()
             {
-                GivenASignal(GetTestSignal());
+                GivenASignal(SignalWith());
                 int invalidID = -1;
                 var res = signalsWebService.GetMissingValuePolicy(invalidID);
             }
@@ -168,7 +169,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGetMissingValuePolicy_ReturnCorrectMVP()
             {
-                Signal signal = GetTestSignal();
+                Signal signal = SignalWith();
                 GivenASignal(signal);
                 int id = 1;
 
@@ -182,7 +183,8 @@ namespace WebService.Tests
 
                 missingValuePolicyRepositoryMock
                     .Setup(s => s.Get(signal))
-                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean() {
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean()
+                    {
                         Id = id,
                         Quality = Quality.Fair,
                         Signal = signal,
@@ -196,6 +198,51 @@ namespace WebService.Tests
                 Assert.AreEqual(MVP.NativeDataType.Name.ToString(), resultMVP.DataType.ToString());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSetDataIsInvokedWithVariousTypes_CalledDataRepisitory()
+            {
+                GivenASignal(SignalWith(DataType.Boolean));
+                SetDataCalledVerify<bool>();
+                GivenASignal(SignalWith(DataType.Decimal));
+                SetDataCalledVerify<decimal>();
+                GivenASignal(SignalWith(DataType.Double));
+                SetDataCalledVerify<double>();
+                GivenASignal(SignalWith(DataType.Integer));
+                SetDataCalledVerify<int>();
+                GivenASignal(SignalWith(DataType.String));
+                SetDataCalledVerify<string>();
+            }
+            private void SetDataCalledVerify<T>()
+            {
+                signalsWebService.SetData(1, GetDtoDatum<T>());
+                signalDataRepository.Verify(s => s.SetData<T>(It.IsAny<IEnumerable<Domain.Datum<T>>>()));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSetDataWithInvalidId_ReturnException()
+            {
+                int invalidID = 999;
+                GivenASignal(SignalWith());
+                signalsWebService.SetData(invalidID, GetDtoDatum<bool>());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(InvalidCastException))]
+            public void GivenASignal_WhenSetDataTypesSignalAndDatumAreDiferent_ReturnException()
+            {
+                GivenASignal(SignalWith(DataType.Integer));
+                SetDataCalledVerify<bool>();
+            }
+
+
+            private IEnumerable<Dto.Datum> GetDtoDatum<T>()
+            {
+                return new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = default(T) },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = default(T) },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = default(T) } };
+            }
             private bool EqualsSignal(Signal a, Signal b)
             {
                 if (a.Id != b.Id) return false;
@@ -204,12 +251,22 @@ namespace WebService.Tests
                 if (a.Path.ToString() != b.Path.ToString()) return false;
                 return true;
             }
-            private Signal GetTestSignal()
+            private Signal SignalWith()
             {
                 return new Signal()
                 {
                     Id = 1,
                     DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("x/y"),
+                };
+            }
+            private Signal SignalWith(DataType dataType)
+            {
+                return new Signal()
+                {
+                    Id = 1,
+                    DataType = dataType,
                     Granularity = Granularity.Month,
                     Path = Path.FromString("x/y"),
                 };
@@ -228,12 +285,12 @@ namespace WebService.Tests
                     Path = path
                 };
             }
-
             private Domain.Signal SignalWith(
                 int id,
                 Domain.DataType dataType,
                 Domain.Granularity granularity,
-                Domain.Path path)
+                Domain.Path path
+                )
             {
                 return new Domain.Signal()
                 {
@@ -248,11 +305,15 @@ namespace WebService.Tests
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
+                signalDataRepository = new Mock<ISignalsDataRepository>();
+
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepository.Object, missingValuePolicyRepositoryMock.Object);
+
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -270,6 +331,7 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalDataRepository;
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
         }
     }

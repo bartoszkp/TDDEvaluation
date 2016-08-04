@@ -63,39 +63,44 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> dataDto)
         {
-            Domain.Signal signal = signalsDomainService.GetById(signalId);
-            Type type = signal.DataType.GetNativeType();
-            if (type == typeof(bool))
+            Domain.Signal signal = this.GetById(signalId)?.ToDomain<Domain.Signal>();
+
+            if (signal == null) { throw new ArgumentException(); }
+
+            Type signalType = signal.DataType.GetNativeType();
+            if (signalType == typeof(bool))
             {
-                var dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<Boolean>>>();
+                var dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<bool>>>();
                 dataDomain = FillDatum<bool>(signal, dataDomain);
-                this.signalsDomainService.SetData<Boolean>(dataDomain);
+                this.signalsDomainService.SetData<bool>(dataDomain);
             }
-            if (type == typeof(int))
+            if (signalType == typeof(int))
             {
                 var dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<int>>>();
+                dataDomain = FillDatum<int>(signal, dataDomain);
                 this.signalsDomainService.SetData<int>(dataDomain);
             }
-            if (type == typeof(double))
+            if (signalType == typeof(double))
             {
                 var dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<double>>>();
                 dataDomain = FillDatum<double>(signal, dataDomain);
                 this.signalsDomainService.SetData<double>(dataDomain);
             }
-            if (type == typeof(decimal))
+            if (signalType == typeof(decimal))
             {
                 var dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<decimal>>>();
+                dataDomain = FillDatum<decimal>(signal, dataDomain);
                 this.signalsDomainService.SetData<decimal>(dataDomain);
             }
-            if (type == typeof(string))
+            if (signalType == typeof(string))
             {
                 var dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<string>>>();
+                dataDomain = FillDatum<string>(signal, dataDomain);
                 this.signalsDomainService.SetData<string>(dataDomain);
             }
         }
         private IEnumerable<Domain.Datum<T>> FillDatum<T>(Domain.Signal signal, IEnumerable<Domain.Datum<T>> dataDomain)
         {
-
             List<Domain.Datum<T>> result = new List<Domain.Datum<T>>();
 
             foreach (var d in dataDomain)
