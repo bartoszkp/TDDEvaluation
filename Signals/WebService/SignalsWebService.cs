@@ -63,15 +63,9 @@ namespace WebService
             if (signal.DataType == DataType.Integer)
             {
                 var data = signalsDomainService.GetData<int>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc);
-                int i = 0;
-                var dto_data = new Dto.Datum[data.Count()];
-                foreach (var datum in data)
-                    dto_data[i++] = datum.ToDto<Dto.Datum>();
-
-                return dto_data;
+                return ConvertCollectionDomainToDto(data);
             }
-
-            return null;            
+            else throw new NotImplementedException();          
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
@@ -138,6 +132,15 @@ namespace WebService
             }
 
             return domain_data;     
+        }
+        private IEnumerable<Dto.Datum> ConvertCollectionDomainToDto<T>(IEnumerable<Domain.Datum<T>> data)
+        {
+            int i = 0;
+            var dto_data = new Dto.Datum[data.Count()];
+            foreach (var datum in data)
+                dto_data[i++] = datum.ToDto<Dto.Datum>();
+
+            return dto_data;
         }
     }
 }
