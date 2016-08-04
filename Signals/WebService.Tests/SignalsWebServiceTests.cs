@@ -323,32 +323,7 @@ namespace WebService.Tests
             //    SetupVerifyOrAssert();
             //    verifyOrAssert.AssertSetDataIsExceptionThrownWhenInvalidKey(signalsWebService, wrongSignalId);
             //}
-
-            [TestMethod]
-            public void GetData_DoesNotThrow()
-            {
-                signalsWebService = new SignalsWebService(null);
-
-                signalsWebService.GetData(0, new DateTime(), new DateTime());
-            }
-
-            [TestMethod]
-            public void GivenNoSignals_WhenGettingData_RepositoryGetDataIsCalled()
-            {
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
-
-                var signalsDomainService = new SignalsDomainService(null, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.GetData(0, new DateTime(), new DateTime());
-
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
-            }
-
+            
             [TestMethod]
             public void GivenASignal_WhenGettingDataForSpecificSignal_RepositoryGetDataAndGetIsCalled()
             {
