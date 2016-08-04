@@ -338,7 +338,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_SettingMissingValuePolicy_MVPReposSetIsCalled()
+            public void GivenASignalAndAPolicy_SettingMissingValuePolicy_MVPReposSetIsCalled()
             {
                 int signalId = 1;
                 var path = new Dto.Path() { Components = new[] { "root", "signal" } };
@@ -346,7 +346,8 @@ namespace WebService.Tests
 
                 GivenASignal(signal);
 
-                signalsWebService.SetMissingValuePolicy(signalId, null);
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
 
                 mvpRepositoryMock.Verify(
                     m => m.Set(
