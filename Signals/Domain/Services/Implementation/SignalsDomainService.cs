@@ -89,7 +89,7 @@ namespace Domain.Services.Implementation
             {
                 return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc);
             }
-            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
     }
 }
