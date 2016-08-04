@@ -86,8 +86,6 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
-
-
             [TestMethod]
             public void WhenGettingByPath_ReturnsIt()
             {
@@ -115,7 +113,6 @@ namespace WebService.Tests
                 GivenNoSignals();
                 signalsWebService.Get(null);
             }
-
 
             [TestMethod]
             public void WhenSetMissingValuePolicy_RepositoryGet()
@@ -160,6 +157,8 @@ namespace WebService.Tests
                     .Returns<Domain.Signal>(null);
                 signalsWebService.SetMissingValuePolicy(signalId, new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy());
             }
+
+
 
 
             private Dto.Signal SignalWith(
