@@ -254,6 +254,7 @@ namespace WebService.Tests
             {
                 int id = 1;
                 int numberOfDatums = 3;
+                int numberOfDatumsFromPeriod = numberOfDatums - 1;
                 Dto.Datum[] dtoData;
                 var signal = GivenASignalAndDataOf(DataType.Integer, 1, out dtoData, id, numberOfDatums);
 
@@ -262,10 +263,10 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
 
                 Assert.IsNotNull(result);
-                Assert.AreEqual(numberOfDatums - 1, result.Count());
+                Assert.AreEqual(numberOfDatumsFromPeriod, result.Count());
 
                 var result_array = result.ToArray();
-                for (int i = 0; i < numberOfDatums; ++i)
+                for (int i = 0; i < numberOfDatumsFromPeriod; ++i)
                     Assert.AreEqual(dateFrom.AddMonths(i), result_array[i].Timestamp);
             }
                         
@@ -360,7 +361,7 @@ namespace WebService.Tests
                 dtoData = DatumWith(datumValue, date, numberOfDatums);
 
                 signalsDataRepoMock
-                    .Setup(sd => sd.GetData<int>(signal, date, date.AddMonths(numberOfDatums)))
+                    .Setup(sd => sd.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signalId), date, date.AddMonths(numberOfDatums)))
                     .Returns(DatumWith<int>(numberOfDatums - 1, date));
 
                 return signal;
