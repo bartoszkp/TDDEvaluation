@@ -36,6 +36,16 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Add(newSignal);
         }
 
+        public Signal GetByPath(Path domainPath)
+        {
+            Signal foundSignal = signalsRepository.Get(domainPath);
+
+            if (foundSignal == null)
+                throw new SignalNotExistException();
+
+            return foundSignal;
+        }
+
         public Signal GetById(int signalId)
         {
             return this.signalsRepository.Get(signalId);

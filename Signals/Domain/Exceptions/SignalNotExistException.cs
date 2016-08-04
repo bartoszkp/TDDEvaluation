@@ -9,6 +9,6 @@ namespace Domain.Exceptions
     public class SignalNotExistException : Exception
     {
         public SignalNotExistException()
-            : base("Signal with this Id does not exist") { }
+            : base("Could not get signal id or path is incorrect") { }
     }
 }
