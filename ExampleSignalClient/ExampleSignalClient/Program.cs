@@ -9,35 +9,25 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            //var newSignal = new Signal()
-            //{
-            //    DataType = DataType.Double,
-            //    Granularity = Granularity.Month,
-            //   Path = new Path() { Components = new[] { "", "" } }
-            //};
+            var newSignal = new Signal()
+            {
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "", "" } }
+            };
 
-            //client.Add(newSignal);
+            client.Add(newSignal);
 
-            //var result = client.Get(new Path() { Components = new[] { "root1", "signal1" } });
+            var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
 
-            //Console.WriteLine(result.Id.Value);
-            //Console.WriteLine(result.DataType);
-            //Console.WriteLine(result.Granularity);
-            //Console.WriteLine(string.Join("/", result.Path.Components));
-
-
-            var mvp = new Signals.NoneQualityMissingValuePolicy() { DataType = DataType.Double };
             client.SetMissingValuePolicy(1, mvp);
 
-            //var result = client.GetMissingValuePolicy(1) as Signals.NoneQualityMissingValuePolicy;
+            var result = client.GetMissingValuePolicy(1) as Signals.SpecificValueMissingValuePolicy;
 
-            //Console.WriteLine(result.Signal.Id.Value);
-            //Console.WriteLine(result.DataType);
-            //Console.ReadKey();
-
-
-            Console.WriteLine("good");
-
+            Console.WriteLine(result.Signal.Id.Value);
+            Console.WriteLine(result.DataType);
+            Console.WriteLine(result.Quality);
+            Console.WriteLine(result.Value);
             Console.ReadKey();
         }
     }
