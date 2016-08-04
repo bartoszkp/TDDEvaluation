@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -49,5 +50,16 @@ namespace Domain.Services.Implementation
            
             return signalsRepository.Get(path);
         }
+
+        public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase domainMissingValuePolicy)
+        {
+            if (signal == null)
+            {
+                throw new ArgumentException("no signal with this id");
+            }
+            missingValuePolicyRepository.Set(signal, domainMissingValuePolicy);
+        }
+
+       
     }
 }
