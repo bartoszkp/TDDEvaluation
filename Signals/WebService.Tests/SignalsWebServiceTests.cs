@@ -210,7 +210,18 @@ namespace WebService.Tests
 
 
 
-            
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
+            public void WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException()
+            {
+                int signalId = 105;
+                prepareDataRepository();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signalId))
+                    .Returns<Domain.Signal>(null);
+                signalsWebService.SetData(signalId, null);
+            }
             
 
             private Dto.Signal SignalWith(
