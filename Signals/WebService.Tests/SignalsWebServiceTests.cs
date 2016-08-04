@@ -9,6 +9,7 @@ using Moq;
 using System;
 using DataAccess;
 using DataAccess.GenericInstantiations;
+using Dto;
 
 namespace WebService.Tests
 {
@@ -20,330 +21,335 @@ namespace WebService.Tests
             private ISignalsWebService signalsWebService;
             private VerifyOrAssertTestResults verifyOrAssert;
 
-            //[TestMethod]
-            //public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
-            //{
-            //    GivenNoSignals();
-
-            //    var result = signalsWebService.Add(new Dto.Signal());
-
-            //    Assert.IsNotNull(result);
-            //}
-
-            //[TestMethod]
-            //public void GivenNoSignals_WhenAddingASignal_ReturnsTheSameSignalExceptForId()
-            //{
-            //    GivenNoSignals();
-
-            //    var result = signalsWebService.Add(SignalWith(
-            //        dataType: Dto.DataType.Decimal,
-            //        granularity: Dto.Granularity.Week,
-            //        path: new Dto.Path() { Components = new[] { "root", "signal" } }));
-
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.AssertAddingASignalReturnsThisSignal(result);
-            //}
-
-            //[TestMethod]
-            //public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
-            //{
-            //    GivenNoSignals();
-
-            //    signalsWebService.Add(SignalWith(
-            //        dataType: Dto.DataType.Decimal,
-            //        granularity: Dto.Granularity.Week,
-            //        path: new Dto.Path() { Components = new[] { "root", "signal" } }));
-
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.AssertRepositoryAddIsCalled(signalsRepositoryMock);
-            //}
-
-            //[TestMethod]
-            //public void GivenNoSignals_WhenAddingASignal_ReturnsIdFromRepository()
-            //{
-            //    var signalId = 1;
-            //    GivenNoSignals();
-            //    GivenRepositoryThatAssigns(id: signalId);
-
-            //    var result = signalsWebService.Add(SignalWith(
-            //        dataType: Dto.DataType.Decimal,
-            //        granularity: Dto.Granularity.Week,
-            //        path: new Dto.Path() { Components = new[] { "root", "signal" } }));
-
-            //    Assert.AreEqual(signalId, result.Id);
-            //}
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.Add(new Dto.Signal());
+
+                Assert.IsNotNull(result);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_ReturnsTheSameSignalExceptForId()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Decimal,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
+
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertAddingASignalReturnsThisSignal(result);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Decimal,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
+
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertRepositoryAddIsCalled(signalsRepositoryMock);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_ReturnsIdFromRepository()
+            {
+                var signalId = 1;
+                GivenNoSignals();
+                GivenRepositoryThatAssigns(id: signalId);
+
+                var result = signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Decimal,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
+
+                Assert.AreEqual(signalId, result.Id);
+            }
 
-            //[TestMethod]
-            //public void GivenNoSignals_WhenGettingById_DoesNotThrow()
-            //{
-            //    GivenNoSignals();
-
-            //    signalsWebService.GetById(0);
-            //}
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingById_DoesNotThrow()
+            {
+                GivenNoSignals();
+
+                signalsWebService.GetById(0);
+            }
 
-
-            //[TestMethod]
-            //public void GivenASignal_WhenGettingByItsId_ReturnsIt()
-            //{
-            //    var signalId = 1;
-            //    GivenASignal(SignalWith(
-            //        id: signalId,
-            //        dataType: Domain.DataType.String,
-            //        granularity: Domain.Granularity.Year,
-            //        path: Domain.Path.FromString("root/signal")));
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingByItsId_ReturnsIt()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: Domain.Path.FromString("root/signal")));
 
-            //    var result = signalsWebService.GetById(signalId);
-
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.AssertGettingSignalsByItsId(signalId, result);
-            //}
-
-            //[TestMethod]
-            //public void GivenNoSignals_WhenGettingById_RepositoryGetIsCalledWithGivenId()
-            //{
-            //    var signalId = 1;
-            //    GivenNoSignals();
+                var result = signalsWebService.GetById(signalId);
+
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertGettingSignalsByItsId(signalId, result);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingById_RepositoryGetIsCalledWithGivenId()
+            {
+                var signalId = 1;
+                GivenNoSignals();
 
-            //    signalsWebService.GetById(signalId);
+                signalsWebService.GetById(signalId);
 
-            //    signalsRepositoryMock.Verify(sr => sr.Get(signalId));
-            //}
+                signalsRepositoryMock.Verify(sr => sr.Get(signalId));
+            }
 
-            //[TestMethod]
-            //public void GivenNoSignals_WhenGettingById_ReturnsNull()
-            //{
-            //    GivenNoSignals();
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingById_ReturnsNull()
+            {
+                GivenNoSignals();
 
-            //    var result = signalsWebService.GetById(0);
+                var result = signalsWebService.GetById(0);
 
-            //    Assert.IsNull(result);
-            //}
+                Assert.IsNull(result);
+            }
 
-            //[TestMethod]
-            //public void GivenNoSignals_WhenGettingByPath_DoesNotThrow()
-            //{
-            //    signalsWebService = new SignalsWebService(null);
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingByPath_DoesNotThrow()
+            {
+                signalsWebService = new SignalsWebService(null);
 
-            //    signalsWebService.Get(null);
-            //}
+                signalsWebService.Get(null);
+            }
 
-            //[TestMethod]
-            //public void GivenNoSignals_WhenGettingByPath_ReturnsNull()
-            //{
-            //    signalsWebService = new SignalsWebService(null);
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingByPath_ReturnsNull()
+            {
+                signalsWebService = new SignalsWebService(null);
 
-            //    var result = signalsWebService.Get(null);
+                var result = signalsWebService.Get(null);
 
-            //    Assert.IsNull(result);
-            //}
+                Assert.IsNull(result);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenGettingByPath_RepositoryGetIsCalled()
-            //{
-            //    string path = "root/signal1";
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPath_RepositoryGetIsCalled()
+            {
+                string path = "root/signal1";
 
-            //    GivenASignalSetupGetByPath(SignalWith(
-            //        id: 1,
-            //        dataType: DataType.Boolean,
-            //        granularity: Granularity.Day,
-            //        path: Domain.Path.FromString((path))));
+                GivenASignalSetupGetByPath(SignalWith(
+                    id: 1,
+                    dataType: Domain.DataType.Boolean,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString((path))));
 
-            //    var pathDto = new Dto.Path() { Components = new[] { "root", "signal1" } };
+                var pathDto = new Dto.Path() { Components = new[] { "root", "signal1" } };
 
-            //    signalsWebService.Get(pathDto);
+                signalsWebService.Get(pathDto);
 
-            //    signalsRepositoryMock.Verify(srm => srm.Get(Domain.Path.FromString(path)));
-            //}
+                signalsRepositoryMock.Verify(srm => srm.Get(Domain.Path.FromString(path)));
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenGettingByPath_ReturnsIt()
-            //{
-            //    string path = "root/signal1";
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPath_ReturnsIt()
+            {
+                string path = "root/signal1";
 
-            //    GivenASignalSetupGetByPath(SignalWith(
-            //        id: 1,
-            //        dataType: DataType.Boolean,
-            //        granularity: Granularity.Day,
-            //        path: Domain.Path.FromString((path))));
+                GivenASignalSetupGetByPath(SignalWith(
+                    id: 1,
+                    dataType: Domain.DataType.Boolean,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString((path))));
 
-            //    var pathDto = new Dto.Path() { Components = new[] { "root", "signal1" } };
+                var pathDto = new Dto.Path() { Components = new[] { "root", "signal1" } };
 
-            //    var result = signalsWebService.Get(pathDto);
+                var result = signalsWebService.Get(pathDto);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.GettingByPathAssertion(result);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.GettingByPathAssertion(result);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenGettingByFalsePath_ThrowsException()
-            //{
-            //    string path = "root/signal1";
+            [TestMethod]
+            public void GivenASignal_WhenGettingByFalsePath_ThrowsException()
+            {
+                string path = "root/signal1";
 
-            //    GivenASignalSetupGetByPath(SignalWith(
-            //        id: 1,
-            //        dataType: DataType.Boolean,
-            //        granularity: Granularity.Day,
-            //        path: Domain.Path.FromString((path))));
+                GivenASignalSetupGetByPath(SignalWith(
+                    id: 1,
+                    dataType: Domain.DataType.Boolean,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString((path))));
 
-            //    var pathDto = new Dto.Path() { Components = new[] { "root", "signal3" } };
+                var pathDto = new Dto.Path() { Components = new[] { "root", "signal3" } };
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.GettingByFalsePathAssertion(pathDto, signalsWebService);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.GettingByFalsePathAssertion(pathDto, signalsWebService);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenSettingMissingValuePolicy_RepositorySetAndGetIsCalled()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicy_RepositorySetAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    SetupSettingMissingValueTest(existingSignal);
+                SetupSettingMissingValueTest(existingSignal);
 
-            //    var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
-            //    signalsWebService.SetMissingValuePolicy(1, policy);
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(1, policy);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.VerifyRepositorySetAndGetIsCalled(signalsRepositoryMock, missingValuePolicyRepositoryMock);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.VerifyRepositorySetAndGetIsCalled(signalsRepositoryMock, missingValuePolicyRepositoryMock);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenSettingMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    SetupSettingMissingValueTest(existingSignal);
+                SetupSettingMissingValueTest(existingSignal);
 
-            //    var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
-            //    signalsWebService.SetMissingValuePolicy(1, policy);
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(1, policy);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.VerifyRepositorySetAndGetIsCalled(existingSignal, signalsRepositoryMock, missingValuePolicyRepositoryMock);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.VerifyRepositorySetAndGetIsCalled(existingSignal, signalsRepositoryMock, missingValuePolicyRepositoryMock);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenSettingMissingValuePolicyForNonExistingSignal_ThrowsException()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignal_WhenSettingMissingValuePolicyForNonExistingSignal_ThrowsException()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    SetupSettingMissingValueTest(existingSignal);
+                SetupSettingMissingValueTest(existingSignal);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertSetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenSettingSpecificMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignal_WhenSettingSpecificMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    SetupSettingMissingValueTest(existingSignal);
+                SetupSettingMissingValueTest(existingSignal);
 
-            //    var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
-            //    {
-            //        DataType = Dto.DataType.Double,
-            //        Quality = Dto.Quality.Fair,
-            //        Value = (double)1.5
-            //    };
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Double,
+                    Quality = Dto.Quality.Fair,
+                    Value = (double)1.5
+                };
 
-            //    signalsWebService.SetMissingValuePolicy(1, policy);
+                signalsWebService.SetMissingValuePolicy(1, policy);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.VerifyRepositorySetAndGetIsCalled(
-            //        existingSignal,
-            //        policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>(),
-            //        signalsRepositoryMock, missingValuePolicyRepositoryMock);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.VerifyRepositorySetAndGetIsCalled(
+                    existingSignal,
+                    policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>(),
+                    signalsRepositoryMock, missingValuePolicyRepositoryMock);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenGettingMissingValuePolicy_RepositoryGetIsCalled()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignal_WhenGettingMissingValuePolicy_RepositoryGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(existingSignal);
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(existingSignal);
 
-            //    signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value);
+                signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.VerifyRepositoryGetIsCalled(missingValuePolicyRepositoryMock, existingSignal);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.VerifyRepositoryGetIsCalled(missingValuePolicyRepositoryMock, existingSignal);
+            }
 
-            //[TestMethod]
-            //public void GivenAMissingValuePolicy_WhenGettingMissingValuePolicy_ReturnsThisPolicy()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenAMissingValuePolicy_WhenGettingMissingValuePolicy_ReturnsThisPolicy()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    var existingPolicy = ExistingPolicy();
+                var existingPolicy = ExistingPolicy();
 
-            //    SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(existingSignal, existingPolicy);
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(existingSignal, existingPolicy);
 
-            //    var result = signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
+                var result = signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
 
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.AssertGetIsReturningSpecificPolicy(existingPolicy, result);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertGetIsReturningSpecificPolicy(existingPolicy, result);
+            }
 
-            //[TestMethod]
-            //public void GivenASignal_WhenGettingMissingValuePolicyForNonExistingSignal_ThrowsException()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignal_WhenGettingMissingValuePolicyForNonExistingSignal_ThrowsException()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    var existingPolicy = ExistingPolicy();
+                var existingPolicy = ExistingPolicy();
 
-            //    int wrongId = 3;
+                int wrongId = 3;
 
-            //    SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(existingSignal, existingPolicy, existingSignal.Id.Value);
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(existingSignal, existingPolicy, existingSignal.Id.Value);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.AssertGetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService, wrongId);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertGetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService, wrongId);
+            }
 
-            //[TestMethod]
-            //public void GivenASignalAndDatum_WhenSettingData_RepositorySetDataAndGetIsCalled()
-            //{
-            //    var existingSignal = ExistingSignal();
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenSettingData_RepositorySetDataAndGetIsCalled()
+            {
+                var existingSignal = ExistingSignal();
 
-            //    var existingDatum = ExistingDatum();
+                var existingDatum = ExistingDatum();
 
-            //    SetupSettingData(existingSignal);
+                SetupSettingData(existingSignal);
 
-            //    signalsWebService.SetData(1, existingDatum);
+                signalsWebService.SetData(1, existingDatum);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.VerifyRepositoryGetDataAndGetIsCalled(existingSignal, existingDatum, signalsDataRepositoryMock, signalsRepositoryMock);
-            //}
+                SetupVerifyOrAssert();
+                verifyOrAssert.VerifyRepositorySetDataAndGetIsCalled(existingSignal, existingDatum, signalsDataRepositoryMock, signalsRepositoryMock);
+            }
 
-            //[TestMethod]
-            //public void GivenASignalAndDatum_WhenSettingDataWithWrongSignalId_ExceptionIsThrown()
-            //{
-            //    var existingSignal = ExistingSignal();
-            //    int wrongSignalId = 3;
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenSettingDataWithWrongSignalId_ExceptionIsThrown()
+            {
+                var existingSignal = ExistingSignal();
+                int wrongSignalId = 3;
 
-            //    SetupSettingData(existingSignal);
+                SetupSettingData(existingSignal);
 
-            //    SetupVerifyOrAssert();
-            //    verifyOrAssert.AssertSetDataIsExceptionThrownWhenInvalidKey(signalsWebService, wrongSignalId);
-            //}
-            
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertSetDataIsExceptionThrownWhenInvalidKey(signalsWebService, wrongSignalId);
+            }
+
             [TestMethod]
             public void GivenASignal_WhenGettingDataForSpecificSignal_RepositoryGetDataAndGetIsCalled()
             {
                 var existingSignal = ExistingSignal();
 
-                GivenASignal(existingSignal);
-
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal);
 
                 signalsWebService.GetData(existingSignal.Id.Value, new DateTime(), new DateTime());
 
                 signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+            }
+
+            private void SetupSignalsDataRepositoryAndSignalsRepository(Domain.Signal existingSignal)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
             [TestMethod]
@@ -353,8 +359,16 @@ namespace WebService.Tests
 
                 var existingDatum = ExistingDatum();
 
-                GivenASignal(existingSignal);
+                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
 
+                signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+
+                SetupVerifyOrAssert();
+                verifyOrAssert.VerifyRepositoryGetDataAndGetIsCalled(existingSignal, existingDatum, signalsDataRepositoryMock, signalsRepositoryMock);
+            }
+
+            private void SetupSignalsDataRepositoryAndSignalsRepository(Domain.Signal existingSignal, Datum[] existingDatum)
+            {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
                 signalsDataRepositoryMock
@@ -364,18 +378,11 @@ namespace WebService.Tests
                         existingDatum.Last().Timestamp))
                     .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>());
 
+                GivenASignal(existingSignal);
+
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(
-                    existingSignal,
-                    existingDatum.First().Timestamp,
-                    existingDatum.Last().Timestamp));
             }
 
             [TestMethod]
@@ -385,31 +392,12 @@ namespace WebService.Tests
 
                 var existingDatum = ExistingDatum();
 
-                GivenASignal(existingSignal);
-
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(
-                        existingSignal,
-                        existingDatum.First().Timestamp,
-                        existingDatum.Last().Timestamp))
-                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>());
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
+                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
+                
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
-                int index = 0;
-                foreach (var ed in existingDatum)
-                {
-                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
-                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
-                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
-                    index++;
-                }
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertGettingSpecificDataForSpecificSignalReturnsThisData(existingDatum, result);
             }
 
             [TestMethod]
@@ -419,32 +407,12 @@ namespace WebService.Tests
 
                 var existingSignal = ExistingSignal();
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal);
 
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(
-                        existingSignal,
-                        It.IsAny<DateTime>(),
-                        It.IsAny<DateTime>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                try
-                {
-                    signalsWebService.GetData(wrongSignalId, new DateTime(), new DateTime());
-                }
-                catch(KeyNotFoundException kne)
-                {
-                    Assert.IsNotNull(kne);
-                    return;
-                }
-                Assert.Fail();
+                SetupVerifyOrAssert();
+                verifyOrAssert.AssertGetDataExceptionIsThrownWhenInvalidKey(signalsWebService, wrongSignalId);
             }
-
+            
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -535,8 +503,8 @@ namespace WebService.Tests
                 return new Domain.Signal()
                 {
                     Id = 1,
-                    DataType = DataType.Boolean,
-                    Granularity = Granularity.Day,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Day,
                     Path = Domain.Path.FromString("root/signal1")
                 };
             }
@@ -546,7 +514,7 @@ namespace WebService.Tests
                 return new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
                 {
                     Id = 1,
-                    Quality = Quality.Bad,
+                    Quality = Domain.Quality.Bad,
                     Value = (double)1.5
                 };
             }
@@ -566,7 +534,7 @@ namespace WebService.Tests
                 verifyOrAssert = new VerifyOrAssertTestResults();
             }
 
-            private void SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(Signal existingSignal)
+            private void SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(Domain.Signal existingSignal)
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 missingValuePolicyRepositoryMock
@@ -583,7 +551,7 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(Signal existingSignal,
+            private void SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(Domain.Signal existingSignal,
                 SpecificValueMissingValuePolicyDouble existingPolicy)
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
@@ -601,7 +569,7 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(Signal existingSignal,
+            private void SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(Domain.Signal existingSignal,
                 SpecificValueMissingValuePolicyDouble existingPolicy, int signalId)
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
@@ -619,7 +587,7 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void SetupSettingData(Signal existingSignal)
+            private void SetupSettingData(Domain.Signal existingSignal)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsDataRepositoryMock

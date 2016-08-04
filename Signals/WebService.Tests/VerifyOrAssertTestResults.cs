@@ -162,7 +162,7 @@ namespace WebService.Tests
             Assert.Fail();
         }
 
-        internal void VerifyRepositoryGetDataAndGetIsCalled(
+        internal void VerifyRepositorySetDataAndGetIsCalled(
             Domain.Signal existingSignal,
             Datum[] existingDatum,
             Mock<ISignalsDataRepository> signalsDataRepositoryMock,
@@ -183,6 +183,41 @@ namespace WebService.Tests
                 ))));
                 index++;
             }
+        }
+
+        internal void AssertGetDataExceptionIsThrownWhenInvalidKey(ISignalsWebService signalsWebService, int wrongSignalId)
+        {
+            try
+            {
+                signalsWebService.GetData(wrongSignalId, new DateTime(), new DateTime());
+            }
+            catch (KeyNotFoundException kne)
+            {
+                Assert.IsNotNull(kne);
+                return;
+            }
+            Assert.Fail();
+        }
+
+        internal void AssertGettingSpecificDataForSpecificSignalReturnsThisData(Datum[] existingDatum, IEnumerable<Datum> result)
+        {
+            int index = 0;
+            foreach (var ed in existingDatum)
+            {
+                Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
+                Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
+                Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
+                index++;
+            }
+        }
+
+        internal void VerifyRepositoryGetDataAndGetIsCalled(Domain.Signal existingSignal, Datum[] existingDatum, Mock<ISignalsDataRepository> signalsDataRepositoryMock, Mock<ISignalsRepository> signalsRepositoryMock)
+        {
+            signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+            signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(
+                existingSignal,
+                existingDatum.First().Timestamp,
+                existingDatum.Last().Timestamp));
         }
     }
 }
