@@ -273,7 +273,7 @@ namespace WebService
             if (signal == null)
                 return null;
 
-            return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+            return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)

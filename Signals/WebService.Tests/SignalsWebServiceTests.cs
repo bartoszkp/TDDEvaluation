@@ -459,6 +459,30 @@ namespace WebService.Tests
 
                 return exampleSignal;
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingPolicy_ReturnsCorrectData()
+            {
+                var exampleSignal = SetupGetPolicyMock();
+
+                policyMock = new Mock<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+                policyMock.Object.Id = 1;
+                policyMock.Object.Signal = exampleSignal;
+
+                Mock<Domain.Services.ISignalsDomainService> signalDomainServiceMock = new Mock<Domain.Services.ISignalsDomainService>();
+                signalDomainServiceMock
+                    .Setup(sdsm => sdsm.GetMissingValuePolicy(It.IsAny<int>()))
+                    .Returns(policyMock.Object);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(It.IsAny<int>()))
+                    .Returns(exampleSignal);
+
+                var result = signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
+
+                Assert.AreEqual(policyMock.Object.Id, result.Id);
+                Assert.AreEqual(policyMock.Object.Signal, result.Signal);
+            }
         }
     }
 }
