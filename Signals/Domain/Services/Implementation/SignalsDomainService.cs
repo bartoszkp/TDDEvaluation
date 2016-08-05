@@ -79,5 +79,17 @@ namespace Domain.Services.Implementation
                     as MissingValuePolicy.MissingValuePolicyBase;
             }
         }
+
+        public void SetData(int signalId, IEnumerable<Datum<double>> dataDomain)
+        {
+            var signal = this.signalsRepository.Get(signalId);
+
+            foreach (var item in dataDomain)
+            {
+                item.Signal = signal;
+            }
+
+            this.signalsDataRepository.SetData<double>(dataDomain);
+        }
     }
 }

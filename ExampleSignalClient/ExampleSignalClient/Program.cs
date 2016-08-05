@@ -11,19 +11,23 @@ namespace ExampleSignalClient
 
             var newSignal = new Signal()
             {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "root", "dayDecimal4" } }
+                Id = null,
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
             };
 
             client.Add(newSignal);
 
-            var result = client.Get(new Path() { Components = new[] { "root", "dayDecimal4" } });
+            var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)2.0 };
 
-            Console.WriteLine(result.Id.Value);
+            client.SetMissingValuePolicy(1, mvp);
+
+            var result = client.GetMissingValuePolicy(1) as Signals.SpecificValueMissingValuePolicy;
+
+            Console.WriteLine(result.Signal.Id.Value);
             Console.WriteLine(result.DataType);
-            Console.WriteLine(result.Granularity);
-            Console.WriteLine(string.Join("/", result.Path.Components));
+            Console.WriteLine(result.Quality);
+            Console.WriteLine(result.Value);
             Console.ReadKey();
         }
     }
