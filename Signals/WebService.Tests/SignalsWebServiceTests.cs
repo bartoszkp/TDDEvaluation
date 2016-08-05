@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
@@ -16,6 +17,8 @@ namespace WebService.Tests
         public class SignalsWebServiceTests
         {
             private ISignalsWebService signalsWebService;
+
+            
 
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
@@ -278,6 +281,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingDataOfTheSignal_ReturnedIsTheData()
             {
                 var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1 });
                 var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalDataRepositoryMock
                     .Setup(sdr => sdr.GetData<double>(It.Is<Signal>(signal => signal.Id == 1), new DateTime(2015, 1, 1), new DateTime(2017, 1, 1)))
@@ -286,10 +290,12 @@ namespace WebService.Tests
                 var signalWebService = new SignalsWebService(signalDomainService);
                 signalWebService.Add(new Dto.Signal() { Id = 1 });
 
-                var result = signalWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1));
+                var expected = new Datum<double>[] { new Datum<double>() { } }.ToDto<IEnumerable<Dto.Datum>>().ToArray();
+                var actual = signalWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1)).ToArray();
 
-                CollectionAssert.AreEqual(new Datum<double>[] { new Datum<double>() { } }.ToArray(), result.ToArray());
-
+                Assert.AreEqual(expected[0].Quality, actual[0].Quality);
+                Assert.AreEqual(expected[0].Timestamp, actual[0].Timestamp);
+                Assert.AreEqual(expected[0].Value, actual[0].Value);
             }
 
             // --------------------------------------------------------------------------------------------

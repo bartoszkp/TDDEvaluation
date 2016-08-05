@@ -51,5 +51,12 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
 
         }
+
+        public IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc);
+        }
     }
 }
