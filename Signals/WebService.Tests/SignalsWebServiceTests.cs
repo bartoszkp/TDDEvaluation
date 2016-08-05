@@ -18,22 +18,7 @@ namespace WebService.Tests
         {
             private ISignalsWebService signalsWebService;
 
-            [TestMethod]
-            public void GivenASignal_WhenSettingDataOfTheSignalAndGettingTheData_GotIsNotNullData()
-            {
-                var signalRepositoryMock = new Mock<ISignalsRepository>();
-                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
-                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, signalDataRepositoryMock.Object, null);
-                var signalWebService = new SignalsWebService(signalDomainService);
-
-                signalDataRepositoryMock.Setup(sdr => sdr.GetData<double>(It.Is<Signal>(signal => signal.Id == 1), new DateTime(2015, 1, 1), new DateTime(2017, 1, 1)))
-                    .Returns(new Datum<double>[] { new Datum<double>() { Timestamp = new DateTime(2016, 1, 1), Value = 10.0, Quality = Quality.Fair } });
-                signalWebService.SetData(1, new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 10.0 } });
-                var result = signalWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1));
-
-                Assert.IsNotNull(result);
-            }
+            
 
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
@@ -217,40 +202,7 @@ namespace WebService.Tests
                 signalWebService.GetMissingValuePolicy(1);
             }
 
-            [TestMethod]
-            public void GivenASignalWithoutSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNull()
-            {
-                var signalRepositoryMock = new Mock<ISignalsRepository>();
-                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
-                var signalWebService = new SignalsWebService(signalDomainService);
-                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1 });
-                signalMissingValuePolicyRepositoryMock
-                    .Setup(smvpr => smvpr.Get(It.Is<Signal>(signal => signal.Id == 1)))
-                    .Returns<Domain.MissingValuePolicy.MissingValuePolicyBase>(null);
-
-                var result = signalWebService.GetMissingValuePolicy(1);
-
-                Assert.IsNull(result);
-                 
-            }
-
-            [TestMethod]
-            public void GivenASignalWithSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNotNullResult()
-            {
-                var signalRepositoryMock = new Mock<ISignalsRepository>();
-                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
-                var signalWebService = new SignalsWebService(signalDomainService);
-                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1 });
-                signalMissingValuePolicyRepositoryMock
-                    .Setup(smvpr => smvpr.Get(It.Is<Signal>(signal => signal.Id == 1)))
-                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>());
-
-                var result = signalWebService.GetMissingValuePolicy(1);
-
-                Assert.IsNotNull(result);
-            }
+            
 
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
@@ -299,6 +251,41 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalWithoutSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNull()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1 });
+                signalMissingValuePolicyRepositoryMock
+                    .Setup(smvpr => smvpr.Get(It.Is<Signal>(signal => signal.Id == 1)))
+                    .Returns<Domain.MissingValuePolicy.MissingValuePolicyBase>(null);
+
+                var result = signalWebService.GetMissingValuePolicy(1);
+
+                Assert.IsNull(result);
+
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataOfTheSignalAndGettingTheData_GotIsNotNullData()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
+                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalDataRepositoryMock.Setup(sdr => sdr.GetData<double>(It.Is<Signal>(signal => signal.Id == 1), new DateTime(2015, 1, 1), new DateTime(2017, 1, 1)))
+                    .Returns(new Datum<double>[] { new Datum<double>() { Timestamp = new DateTime(2016, 1, 1), Value = 10.0, Quality = Quality.Fair } });
+                signalWebService.SetData(1, new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 10.0 } });
+                var result = signalWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1));
+
+                Assert.IsNotNull(result);
+            }
+
+            [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignals_WhenSettingDataOfAnySignal_ThrowedIsArgumentException()
             {
@@ -323,9 +310,35 @@ namespace WebService.Tests
                 signalWebService.SetData(2, null);
             }
 
-            
-            // --------------------------------------------------------------------------------------------
+            [TestMethod]
+            public void GivenASignalWithSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNotNullResult()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1 });
+                signalMissingValuePolicyRepositoryMock
+                    .Setup(smvpr => smvpr.Get(It.Is<Signal>(signal => signal.Id == 1)))
+                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>());
 
+                var result = signalWebService.GetMissingValuePolicy(1);
+
+                Assert.IsNotNull(result);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenSettingMVPofAnySignal_ThrowedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signa
+            }
+
+            // --------------------------------------------------------------------------------------------
 
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

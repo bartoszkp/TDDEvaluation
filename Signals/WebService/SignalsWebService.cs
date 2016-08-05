@@ -83,7 +83,9 @@ namespace WebService
 
             else
             {
-                 return null;
+                if (signalsDomainService.GetMissingValuePolicy(signalId) == null) return null;
+
+                else return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
             }
         }
 
