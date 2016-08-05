@@ -287,6 +287,27 @@ namespace WebService.Tests
                     Value = 14,
                 });
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.GettingByPathSignalDoesntExistsException))]
+            public void GivenNoSignal_WhenGettingByPath_ThrowsException()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(Domain.Path.FromString("not/existing/path")))
+                    .Returns(new Domain.Signal()
+                    {
+                        Id = 1,
+                        DataType = Domain.DataType.Boolean,
+                        Granularity = Domain.Granularity.Day,
+                        Path = Domain.Path.FromString("not/existing/path"),
+                    });
+
+                var returndSignal = signalsWebService.Get(new Dto.Path()
+                {
+                    Components = new[] { "not/existing/path" },
+                });
+            }
         }
     }
 }
