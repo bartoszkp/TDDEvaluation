@@ -6,6 +6,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -227,13 +228,64 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingData_ReturnsCorrectData()
             {
                 MockSetup();
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                List<Domain.Datum<int>> data = new List<Domain.Datum<int>>();
+                SetupData(data);
+
+                Signal signal = new Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                var fromIncludedDate = new DateTime(2016, 8, 1);
+                var toExcludedDate = new DateTime(2016, 8, 4);
 
                 signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData(1, new DateTime(2016, 8, 1), new DateTime(2016, 8, 4)));
+                    .Setup(srm => srm.GetData<int>(signal, fromIncludedDate, toExcludedDate))
+                    .Returns(data);
 
-                signalsWebService.GetData(1, new DateTime(2016, 8, 1), new DateTime(2016, 8, 4));
-                signalsDataRepositoryMock.Verify(sr => sr.GetData(1, new DateTime(2016, 8, 1), new DateTime(2016, 8, 4)));
+                signalsRepositoryMock
+                    .Setup(srm => srm.Add(signal))
+                    .Returns(signal);
+                signalDomainService.Add(signal);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(signal.Id.Value))
+                    .Returns(signal);
+
+                signalDomainService.SetData(1, data.AsEnumerable());
+                data.RemoveAt(2);
+
+                var result = signalDomainService.GetData<int>(signal.Id.Value, fromIncludedDate, toExcludedDate);
+
+                CollectionAssert.AreEqual(data, result.ToList<Datum<int>>());
+            }
+
+            public void SetupData(List<Domain.Datum<int>> data)
+            {
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Fair,
+                    Timestamp = new DateTime(2000, 2, 2),
+                    Value = 12,
+                });
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Good,
+                    Timestamp = new DateTime(2000, 2, 3),
+                    Value = 10,
+                });
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Poor,
+                    Timestamp = new DateTime(2000, 2, 4),
+                    Value = 14,
+                });
             }
         }
     }
