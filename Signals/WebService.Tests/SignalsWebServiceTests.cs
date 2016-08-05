@@ -448,9 +448,9 @@ namespace WebService.Tests
 
                 signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
 
-                signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
+                var result = signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
 
-                missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Get(exampleSignal));
+                Assert.IsNull(result);
             }
         }
     }

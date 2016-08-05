@@ -117,5 +117,10 @@ namespace Domain.Services.Implementation
         {
             missingValuePolicyRepository.Set(exampleSignal, policy);
         }
+
+        public MissingValuePolicyBase GetMissingValuePolicy(int value)
+        {
+            return missingValuePolicyRepository.Get(GetById(value));
+        }
     }
 }
