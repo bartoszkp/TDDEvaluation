@@ -330,6 +330,21 @@ namespace WebService.Tests
                 signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
                 signalsWebService = new SignalsWebService(signalDomainService);
             }
+
+            [TestMethod]
+            public void WhenCallingSetPolicy_ProperMethodIsCalled()
+            { 
+                Mock<Dto.MissingValuePolicy.MissingValuePolicy> policyMock = new Mock<Dto.MissingValuePolicy.MissingValuePolicy>();
+
+                Mock<ISignalsWebService> signalWebServiceMock = new Mock<ISignalsWebService>();
+                signalWebServiceMock
+                    .Setup(swsm => swsm.SetMissingValuePolicy(1, policyMock.Object));
+
+                signalsWebService = new SignalsWebService(signalDomainService);
+                signalsWebService.SetMissingValuePolicy(1, policyMock.Object);
+
+                signalWebServiceMock.Verify(swsm => swsm.SetMissingValuePolicy(1, policyMock.Object));
+            }
         }
     }
 }
