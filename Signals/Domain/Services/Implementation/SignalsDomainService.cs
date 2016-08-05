@@ -94,5 +94,12 @@ namespace Domain.Services.Implementation
 
             signalsDataRepository.SetData(data);
         }
+
+        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = GetById(signalId);
+
+            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+        }
     }
 }

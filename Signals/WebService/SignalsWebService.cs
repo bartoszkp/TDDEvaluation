@@ -56,7 +56,112 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+            /*var signal = new Dto.Signal()
+            {
+                Id = 1,
+                DataType = Dto.DataType.Boolean,
+                Granularity = Dto.Granularity.Day,
+                Path = new Dto.Path() { Components = new[] { "example/path" } },
+            };*/
+
+            if(signal.DataType == Dto.DataType.Boolean)
+            {
+                IEnumerable<Domain.Datum<bool>> toConvertToReturn = signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                List<Dto.Datum> dtoDatumList = new List<Dto.Datum>();
+
+                foreach (var item in toConvertToReturn)
+                {
+                    Dto.Datum dtoDatum = new Dto.Datum();
+
+                    dtoDatum.Quality = item.Quality.ToDto<Dto.Quality>();
+                    dtoDatum.Timestamp = item.Timestamp;
+                    dtoDatum.Value = Convert.ToBoolean(item.Value);
+
+                    dtoDatumList.Add(dtoDatum);
+                }
+
+                return dtoDatumList.AsEnumerable<Dto.Datum>();
+            }
+            else if(signal.DataType == Dto.DataType.Decimal)
+            {
+                IEnumerable<Domain.Datum<decimal>> toConvertToReturn = signalsDomainService.GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                List<Dto.Datum> dtoDatumList = new List<Dto.Datum>();
+
+                foreach (var item in toConvertToReturn)
+                {
+                    Dto.Datum dtoDatum = new Dto.Datum();
+
+                    dtoDatum.Quality = item.Quality.ToDto<Dto.Quality>();
+                    dtoDatum.Timestamp = item.Timestamp;
+                    dtoDatum.Value = Convert.ToDecimal(item.Value);
+
+                    dtoDatumList.Add(dtoDatum);
+                }
+
+                return dtoDatumList.AsEnumerable<Dto.Datum>();
+            }
+            else if (signal.DataType == Dto.DataType.Double)
+            {
+                IEnumerable<Domain.Datum<double>> toConvertToReturn = signalsDomainService.GetData<double>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                List<Dto.Datum> dtoDatumList = new List<Dto.Datum>();
+
+                foreach (var item in toConvertToReturn)
+                {
+                    Dto.Datum dtoDatum = new Dto.Datum();
+
+                    dtoDatum.Quality = item.Quality.ToDto<Dto.Quality>();
+                    dtoDatum.Timestamp = item.Timestamp;
+                    dtoDatum.Value = Convert.ToDouble(item.Value);
+
+                    dtoDatumList.Add(dtoDatum);
+                }
+
+                return dtoDatumList.AsEnumerable<Dto.Datum>();
+            }
+            else if (signal.DataType == Dto.DataType.Integer)
+            {
+                IEnumerable<Domain.Datum<int>> toConvertToReturn = signalsDomainService.GetData<int>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                List<Dto.Datum> dtoDatumList = new List<Dto.Datum>();
+
+                foreach (var item in toConvertToReturn)
+                {
+                    Dto.Datum dtoDatum = new Dto.Datum();
+
+                    dtoDatum.Quality = item.Quality.ToDto<Dto.Quality>();
+                    dtoDatum.Timestamp = item.Timestamp;
+                    dtoDatum.Value = Convert.ToInt32(item.Value);
+
+                    dtoDatumList.Add(dtoDatum);
+                }
+
+                return dtoDatumList.AsEnumerable<Dto.Datum>();
+            }
+            else if (signal.DataType == Dto.DataType.String)
+            {
+                IEnumerable<Domain.Datum<string>> toConvertToReturn = signalsDomainService.GetData<string>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                List<Dto.Datum> dtoDatumList = new List<Dto.Datum>();
+
+                foreach (var item in toConvertToReturn)
+                {
+                    Dto.Datum dtoDatum = new Dto.Datum();
+
+                    dtoDatum.Quality = item.Quality.ToDto<Dto.Quality>();
+                    dtoDatum.Timestamp = item.Timestamp;
+                    dtoDatum.Value = Convert.ToString(item.Value);
+
+                    dtoDatumList.Add(dtoDatum);
+                }
+
+                return dtoDatumList.AsEnumerable<Dto.Datum>();
+            }
+
+            return null;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

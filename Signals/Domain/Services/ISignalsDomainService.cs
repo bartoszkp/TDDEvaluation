@@ -14,5 +14,7 @@ namespace Domain.Services
         void SetData(int signalId, IEnumerable<Datum<double>> data);
         void SetData(int signalId, IEnumerable<Datum<int>> data);
         void SetData(int signalId, IEnumerable<Datum<string>> data);
+
+        IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }
