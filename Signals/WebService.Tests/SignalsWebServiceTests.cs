@@ -292,17 +292,6 @@ namespace WebService.Tests
             [ExpectedException(typeof(Domain.Exceptions.GettingByPathSignalDoesntExistsException))]
             public void GivenNoSignal_WhenGettingByPath_ThrowsException()
             {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                    .Setup(srm => srm.Get(Domain.Path.FromString("not/existing/path")))
-                    .Returns(new Domain.Signal()
-                    {
-                        Id = 1,
-                        DataType = Domain.DataType.Boolean,
-                        Granularity = Domain.Granularity.Day,
-                        Path = Domain.Path.FromString("not/existing/path"),
-                    });
-
                 MockSetup();
                 signalsWebService = new SignalsWebService(signalDomainService);
                 var returndSignal = signalsWebService.Get(new Dto.Path()
