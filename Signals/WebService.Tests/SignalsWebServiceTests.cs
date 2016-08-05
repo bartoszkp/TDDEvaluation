@@ -429,6 +429,15 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignal_WhenGettingMissingValuePolicy_ReturnsNull()
             {
+                var exampleSignal = SetupGetPolicyMock();
+
+                var result = signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
+
+                Assert.IsNull(result);
+            }
+
+            private Signal SetupGetPolicyMock()
+            {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
                 var exampleSignal = new Domain.Signal()
@@ -448,9 +457,7 @@ namespace WebService.Tests
 
                 signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
 
-                var result = signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
-
-                Assert.IsNull(result);
+                return exampleSignal;
             }
         }
     }
