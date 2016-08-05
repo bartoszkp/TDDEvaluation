@@ -310,6 +310,19 @@ namespace WebService.Tests
                 signalWebService.SetData(1, null);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingDataOfOtherSignal_ReturnedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
+                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalWebService.SetData(2, null);
+            }
+
             // --------------------------------------------------------------------------------------------
 
 
