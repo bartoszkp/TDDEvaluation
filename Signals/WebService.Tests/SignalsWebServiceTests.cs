@@ -378,6 +378,33 @@ namespace WebService.Tests
                     Path = new Dto.Path() { Components = new[] { "aaa", "bbb" } },
                 };
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingAPolicy_CorrectRepositoryMethodIsCalled()
+            {
+                MockSetup();
+                Mock<Dto.MissingValuePolicy.MissingValuePolicy> dtoPolicyMock = new Mock<Dto.MissingValuePolicy.MissingValuePolicy>();
+                SetupMissingValuePolicy(dtoPolicyMock);
+
+                Mock<Domain.MissingValuePolicy.MissingValuePolicyBase> policyMock = new Mock<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+
+                Domain.Signal exampleSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                
+
+                Mock<IMissingValuePolicyRepository> missingValuePolicyMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyMock.Setup(m => m.Set(exampleSignal, policyMock.Object));
+
+                signalsWebService.SetMissingValuePolicy(1, dtoPolicyMock.Object);
+
+                signalsRepositoryMock.Verify(m => m.SetMissingValuePolicy(exampleSignal, policyMock.Object));
+            }
         }
     }
 }
