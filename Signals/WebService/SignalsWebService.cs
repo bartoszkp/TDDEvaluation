@@ -57,7 +57,16 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-           throw new NotImplementedException();
+            var signal = GetById(signalId).ToDomain<Domain.Signal>();
+            if (signal == null) throw new ArgumentException("no signal with this id");
+
+            if (signal.DataType == Domain.DataType.Integer) return signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
+            if (signal.DataType == Domain.DataType.Double) return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
+            if (signal.DataType == Domain.DataType.Decimal) return signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
+            if (signal.DataType == Domain.DataType.Boolean) return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
+            if (signal.DataType == Domain.DataType.String) return signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
+
+            return null;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

@@ -192,8 +192,7 @@ namespace WebService.Tests
             public void SetData_NoSignalsWithGivenId_ThrowException()
             {
                 GivenNoSignals();
-                Mock<ISignalsDataRepository> signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock.Setup(x => x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
+                SetupSignalsDataRepositoryMock<double>();
 
                 signalsWebService.SetData(1, new Dto.Datum[] { });
             }
@@ -271,8 +270,6 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-
-                missingValuePolicyMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
 
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositryMock.Object, missingValuePolicyMock.Object);
 
