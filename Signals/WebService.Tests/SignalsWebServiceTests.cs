@@ -353,15 +353,7 @@ namespace WebService.Tests
             public void GivenNoSignal_WhenSetPolicyIsCalled_ItThrowsException()
             {
                 Mock<Dto.MissingValuePolicy.MissingValuePolicy> policyMock = new Mock<Dto.MissingValuePolicy.MissingValuePolicy>();
-                policyMock.Object.DataType = Dto.DataType.Boolean;
-                policyMock.Object.Id = 1;
-                policyMock.Object.Signal = new Dto.Signal()
-                {
-                    Id = 1,
-                    DataType = Dto.DataType.Boolean,
-                    Granularity = Dto.Granularity.Day,
-                    Path = new Dto.Path() { Components = new[] { "aaa", "bbb" } },
-                };
+                SetupMissingValuePolicy(policyMock);
 
                 Mock<ISignalsWebService> signalWebServiceMock = new Mock<ISignalsWebService>();
                 signalWebServiceMock
@@ -372,6 +364,19 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(1, policyMock.Object);
 
                 signalWebServiceMock.Verify(swsm => swsm.SetMissingValuePolicy(1, policyMock.Object));
+            }
+
+            public void SetupMissingValuePolicy(Mock<Dto.MissingValuePolicy.MissingValuePolicy> policyMock)
+            {
+                policyMock.Object.DataType = Dto.DataType.Boolean;
+                policyMock.Object.Id = 1;
+                policyMock.Object.Signal = new Dto.Signal()
+                {
+                    Id = 1,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "aaa", "bbb" } },
+                };
             }
         }
     }
