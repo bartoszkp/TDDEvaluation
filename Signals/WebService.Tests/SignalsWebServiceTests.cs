@@ -328,6 +328,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignals_WhenSettingMVPofAnySignal_ThrowedIsArgumentException()
             {
                 var signalRepositoryMock = new Mock<ISignalsRepository>();
@@ -335,7 +336,7 @@ namespace WebService.Tests
                 var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
                 var signalWebService = new SignalsWebService(signalDomainService);
 
-                signa
+                signalWebService.SetMissingValuePolicy(1, null);
             }
 
             // --------------------------------------------------------------------------------------------
