@@ -88,21 +88,18 @@ namespace Domain.Services.Implementation
             Signal signal = GetById(signalId);
             if (signal == null)
                 throw new SignalWithThisIdNonExistException();
-            //dataDomain.Count();
-            //int rozmiar = dataDomain.Count();
-            //var datum = new Datum<T> [rozmiar];
-            //int i = 0;
-            var datums = new List<Datum<T>>();
 
+            var datums = new Datum<T> [dataDomain.Count()];
+            int i = 0;
             foreach (Datum<T> d in dataDomain)
             {
-                datums.Add( new Datum<T>
+                datums[i++] = new Datum<T>
                 {
                     Quality = d.Quality,
                     Timestamp = d.Timestamp,
                     Value = d.Value,
                     Signal = signal
-                });
+                };
             }
             signalsDataRepository.SetData<T>(datums);
         }
