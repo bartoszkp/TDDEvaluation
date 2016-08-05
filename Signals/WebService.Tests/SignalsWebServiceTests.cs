@@ -333,7 +333,7 @@ namespace WebService.Tests
                 var signalWebService = new SignalsWebService(signalDomainService);
 
                 signalWebService.SetData(1, new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp=new DateTime(2016,1,1), Value = 10.0} });
-                var result = signalsWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1));
+                var result = signalWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1));
 
                 Assert.IsNotNull(result);
             }

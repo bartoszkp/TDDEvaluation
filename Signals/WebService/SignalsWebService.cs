@@ -72,7 +72,9 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            throw new ArgumentException();
+            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
+
+            else signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
