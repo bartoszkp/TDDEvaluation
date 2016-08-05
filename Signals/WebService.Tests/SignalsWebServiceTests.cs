@@ -210,9 +210,62 @@ namespace WebService.Tests
                 signalsDataRepositryMock.Verify(x=>x.SetData(It.IsAny<IEnumerable<Domain.Datum<double>>>()));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GetData_NoSignalWithGivenId_ThrowException()
+            {
+                GivenNoSignals();
+                signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+            }
+
+            [TestMethod]
+            public void GetData_SignalWithGivenIdExist_GetDataCalled()
+            {
+                var signal = new Signal { Id = 1, DataType = DataType.Double, Granularity = Granularity.Year, Path = Path.FromString("x/y") };
+                GivenASignal(signal);
+                SetupSignalsDataRepositoryMock<double>();
+
+                signalsWebService.GetData(1, new DateTime(2001, 1, 1), new DateTime(2001, 1, 1));
+
+                signalsDataRepositryMock.Verify(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+            }
+            [TestMethod]
+            public void GetData_SignalWithGivenIdExist_ReturnData()
+            {
+                var signal = new Signal { Id = 1, DataType = DataType.Double, Granularity = Granularity.Year, Path = Path.FromString("x/y") };
+                GivenASignal(signal);
+
+                var datum = new Dto.Datum[] {
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } };
+
+                signalsDataRepositryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(datum.ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>());
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                Assert.IsTrue(CompareDatum(datum,result));
+            }
+
+            private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
+            {
+                if (datum1.Count() != datum2.Count()) return false;
+
+                for (int i = 0; i < datum1.Count(); i++)
+                {
+
+                    if (datum1.ToList()[i].Quality != datum2.ToList()[i].Quality || 
+                        DateTime.Equals(datum1.ToList()[i].Timestamp, datum2.ToList()[i].Timestamp) == false ||
+                        datum1.ToList()[i].Value.ToString() !=datum2.ToList()[i].Value.ToString()
+                     )
+                        return false;
+                }
+                return true;
+            }
 
             private void SetupSignalsDataRepositoryMock<T>(){
-                signalsDataRepositryMock.Setup(x=>x.SetData(It.IsAny<IEnumerable<Domain.Datum<T>>>())); 
+                signalsDataRepositryMock.Setup(x=>x.SetData<T>(It.IsAny<IEnumerable<Domain.Datum<T>>>()));
+                signalsDataRepositryMock.Setup(x => x.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
             }
 
 
