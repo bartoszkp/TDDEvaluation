@@ -274,6 +274,24 @@ namespace WebService.Tests
                 signalWebService.GetData(2, It.IsAny<DateTime>(), It.IsAny<DateTime>());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataOfTheSignal_ReturnedIsTheData()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<double>(It.Is<Signal>(signal => signal.Id == 1), new DateTime(2015, 1, 1), new DateTime(2017, 1, 1)))
+                    .Returns(new Datum<double>[] { new Datum<double>() { } });
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                signalWebService.Add(new Dto.Signal() { Id = 1 });
+
+                var result = signalWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1));
+
+                CollectionAssert.AreEqual(new Datum<double>[] { new Datum<double>() { } }.ToArray(), result.ToArray());
+
+            }
+
             // --------------------------------------------------------------------------------------------
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
