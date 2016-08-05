@@ -224,6 +224,7 @@ namespace WebService.Tests
                 var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
                 var signalWebService = new SignalsWebService(signalDomainService);
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1 });
                 signalMissingValuePolicyRepositoryMock
                     .Setup(smvpr => smvpr.Get(It.Is<Signal>(signal => signal.Id == 1)))
                     .Returns<Domain.MissingValuePolicy.MissingValuePolicyBase>(null);
