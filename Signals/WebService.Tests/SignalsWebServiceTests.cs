@@ -339,6 +339,21 @@ namespace WebService.Tests
                 signalWebService.SetMissingValuePolicy(1, null);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingMVPofOtherSignal_ThrowedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
+                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalWebService.SetMissingValuePolicy(2, null);
+
+
+            }
+
             // --------------------------------------------------------------------------------------------
 
 
