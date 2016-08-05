@@ -75,33 +75,36 @@ namespace Domain.Services.Implementation
             missingValuePolicyRepository.Set(signal, policy);
         }
 
-        public IEnumerable<Datum<object>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Signal signal = GetById(signalId);
             if (signal == null)
                 throw new SignalWithThisIdNonExistException();
-            return signalsDataRepository.GetData<object>(signal, fromIncludedUtc, toExcludedUtc);
+            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
         }
 
-        public void SetData(int signalId, IEnumerable<Datum<object>> dataDomain)
+        public void SetData<T>(int signalId, IEnumerable<Datum<T>> dataDomain)
         {
             Signal signal = GetById(signalId);
             if (signal == null)
                 throw new SignalWithThisIdNonExistException();
-            
-            Datum<object>[] datum = new Datum<object> [dataDomain.Count<Datum<object>>()];
-            int i = 0;
-            foreach (var d in dataDomain)
+            //dataDomain.Count();
+            //int rozmiar = dataDomain.Count();
+            //var datum = new Datum<T> [rozmiar];
+            //int i = 0;
+            var datums = new List<Datum<T>>();
+
+            foreach (Datum<T> d in dataDomain)
             {
-                datum[i++] = new Datum<object>
+                datums.Add( new Datum<T>
                 {
                     Quality = d.Quality,
                     Timestamp = d.Timestamp,
                     Value = d.Value,
                     Signal = signal
-                };
+                });
             }
-            signalsDataRepository.SetData<object>(datum);
+            signalsDataRepository.SetData<T>(datums);
         }
     }
 }

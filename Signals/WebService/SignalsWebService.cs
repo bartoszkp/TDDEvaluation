@@ -59,14 +59,84 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var result = signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc);
-            return result?.ToDto<IEnumerable<Datum>>();
+            Signal signal = GetById(signalId);
+            if (signal == null)
+                throw new Domain.Exceptions.SignalWithThisIdNonExistException();
+            switch (signal.DataType)
+            {
+                case (DataType.Boolean):
+                    return GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                case (DataType.Decimal):
+                    return GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                case (DataType.Double):
+                    return GetData<double>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                case (DataType.Integer):
+                    return GetData<int>(signalId, fromIncludedUtc, toExcludedUtc);
+
+                case (DataType.String):
+                    return GetData<string>(signalId, fromIncludedUtc, toExcludedUtc);
+            }
+            throw new NotSupportedException("Type is not supported");
+        }
+
+        public IEnumerable<Datum> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var enumerable = signalsDomainService.GetData<T>(signalId, fromIncludedUtc, toExcludedUtc);
+
+            var datums = new Datum[enumerable.Count()];
+            int i = 0;
+            foreach (var e in enumerable)
+                datums[i++] = e.ToDto<Datum>();
+            return datums;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var dataDomain = data?.ToDomain<IEnumerable<Domain.Datum<object>>>();
-            signalsDomainService.SetData(signalId, dataDomain);
+            Signal signal = GetById(signalId);
+            if (signal == null)
+                throw new Domain.Exceptions.SignalWithThisIdNonExistException();
+            switch (signal.DataType)
+            {
+                case (DataType.Boolean):
+                    SetData<bool>(signalId, data);
+                    return;
+
+                case (DataType.Decimal):
+                    SetData<decimal>(signalId, data);
+                    return;
+
+                case (DataType.Double):
+                    SetData<double>(signalId, data);
+                    return;
+
+                case (DataType.Integer):
+                    SetData<int>(signalId, data);
+                    return;
+
+                case (DataType.String):
+                    SetData<string>(signalId, data);
+                    return;
+            }
+            throw new NotSupportedException("Type is not supported");
+        }
+
+        public void SetData<T>(int signalId, IEnumerable<Datum> data)
+        {
+            var datums = new Domain.Datum<T>[data.Count()];
+            int i = 0;
+            foreach (var e in data)
+            {
+                datums[i++] = new Domain.Datum<T>()
+                {
+                    Quality = e.Quality.ToDomain<Domain.Quality>(),
+                    Timestamp = e.Timestamp,
+                    Value = e.Value.ToDomain<T>()
+                };
+            }
+             signalsDomainService.SetData(signalId, datums);
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)

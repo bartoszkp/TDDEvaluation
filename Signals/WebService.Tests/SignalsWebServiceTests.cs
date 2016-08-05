@@ -233,7 +233,7 @@ namespace WebService.Tests
                 var signal = new Domain.Signal()
                 {
                     Id = 978,
-                    DataType = DataType.Decimal,
+                    DataType = DataType.Double,
                     Granularity = Granularity.Week,
                     Path = Path.FromString("ghf/vbc")
                 };
@@ -248,13 +248,15 @@ namespace WebService.Tests
                         It.Is<System.DateTime>(dt => dt == System.DateTime.MinValue),
                         It.Is<System.DateTime>(dt => dt == System.DateTime.Today)))
                     .Returns(enumerable.ToDomain<System.Collections.Generic.IEnumerable<Datum<double>>>);
-
                 var result = signalsWebService.GetData(signal.Id.Value, System.DateTime.MinValue, System.DateTime.Today);
                 
                 int i = 0;
                 foreach (var d in result)
                 {
-                    Assert.AreEqual(enumerable[i++], d);
+                    Assert.AreEqual(enumerable[i].Quality, d.Quality);
+                    Assert.AreEqual(enumerable[i].Timestamp, d.Timestamp);
+                    Assert.AreEqual(enumerable[i].Value, d.Value);
+                    ++i;
                 }
             }
 
@@ -279,16 +281,16 @@ namespace WebService.Tests
                 };
                 prepareDataRepository(signal.Id.Value, signal);
                 signalsDataRepositoryMock
-                    .Setup(sdr => sdr.SetData<double>(It.IsAny<System.Collections.Generic.IEnumerable<Domain.Datum<double>>>()));
+                    .Setup(sdr => sdr.SetData<int>(It.IsAny<System.Collections.Generic.IEnumerable<Domain.Datum<int>>>()));
 
                 var enumerable = new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2016, 1, 16), Value = 7.0 },
-                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new System.DateTime(2020, 2, 21), Value = 2.5 },
-                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new System.DateTime(2003, 3, 18), Value = 78.4 } };
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2016, 1, 16), Value = 7 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new System.DateTime(2020, 2, 21), Value = 2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new System.DateTime(2003, 3, 18), Value = 78 } };
                 signalsWebService.SetData(signal.Id.Value, enumerable);
 
-                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<object>(
-                    It.Is<System.Collections.Generic.IEnumerable<Domain.Datum<object>>>(
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<int>(
+                    It.Is<System.Collections.Generic.IEnumerable<Domain.Datum<int>>>(
                         d => IEnumerableDatumAreEqual(enumerable, d, signal))));
             }
 
@@ -322,8 +324,8 @@ namespace WebService.Tests
                 };
             }
 
-            private bool IEnumerableDatumAreEqual(System.Collections.Generic.IEnumerable<Dto.Datum> datumDto,
-                System.Collections.Generic.IEnumerable<Domain.Datum<object>> datumDomain,
+            private bool IEnumerableDatumAreEqual<T>(System.Collections.Generic.IEnumerable<Dto.Datum> datumDto,
+                System.Collections.Generic.IEnumerable<Domain.Datum<T>> datumDomain,
                 Domain.Signal signal)
             {        
                 foreach (var dt in datumDto.Zip(datumDomain, System.Tuple.Create))
