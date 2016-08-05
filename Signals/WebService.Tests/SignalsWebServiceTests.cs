@@ -382,7 +382,11 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSettingAPolicy_CorrectRepositoryMethodIsCalled()
             {
-                MockSetup();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(It.IsAny<int>()))
+                    .Returns(new Signal());
+
                 Mock<Dto.MissingValuePolicy.MissingValuePolicy> dtoPolicyMock = new Mock<Dto.MissingValuePolicy.MissingValuePolicy>();
                 SetupMissingValuePolicy(dtoPolicyMock);
 
@@ -396,12 +400,20 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("example/path"),
                 };
 
-                Mock<IMissingValuePolicyRepository> missingValuePolicyMock = new Mock<IMissingValuePolicyRepository>();
-                missingValuePolicyMock.Setup(m => m.Set(exampleSignal, policyMock.Object));
+                Mock<Domain.Services.ISignalsDomainService> signalDomainServiceMock = new Mock<Domain.Services.ISignalsDomainService>();
+                signalDomainServiceMock
+                    .Setup(sdsm => sdsm.SetMissingValuePolicy(exampleSignal, policyMock.Object));
 
-                signalsWebService.SetMissingValuePolicy(1, dtoPolicyMock.Object);
+                Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
-                signalsRepositoryMock.Verify(m => m.SetMissingValuePolicy(exampleSignal, policyMock.Object));
+                missingValuePolicyRepositoryMock
+                   .Setup(sss => sss.Set(exampleSignal, policyMock.Object));
+
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                signalDomainService.SetMissingValuePolicy(exampleSignal, policyMock.Object);
+
+                missingValuePolicyRepositoryMock.Verify(sdsm => sdsm.Set(exampleSignal, policyMock.Object));
             }
         }
     }
