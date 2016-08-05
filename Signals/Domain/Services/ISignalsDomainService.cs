@@ -11,8 +11,6 @@ namespace Domain.Services
 
         Signal GetByPath(Path path);
 
-        IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
-
-        void SetData(int signalId, Datum<double>[] dataDomain);
+        Domain.MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(int signalId);
     }
 }

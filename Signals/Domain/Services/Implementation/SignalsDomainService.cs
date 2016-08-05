@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -40,25 +41,15 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(path);
         }
 
-
-
-        public IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
-            var signal = signalsRepository.Get(signalId);
+            var signal = this.signalsRepository.Get(signalId);
 
-            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc);
-        }
+            var mvp = this.missingValuePolicyRepository.Get(signal);
 
-        public void SetData(int signalId, Datum<double>[] dataDomain)
-        {
-            var signal = signalsRepository.Get(signalId);
+            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                as MissingValuePolicy.MissingValuePolicyBase;
 
-            foreach (var item in dataDomain)
-            {
-                item.Signal = signal;
-            }
-
-            signalsDataRepository.SetData<double>(dataDomain);
         }
     }
 }
