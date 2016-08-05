@@ -101,5 +101,15 @@ namespace Domain.Services.Implementation
 
             return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
         }
+
+        public Signal GetByPath(Path path)
+        {
+            var result = signalsRepository.Get(path);
+
+            if (result == null)
+                throw new Domain.Exceptions.GettingByPathSignalDoesntExistsException();
+
+            return result;
+        }
     }
 }

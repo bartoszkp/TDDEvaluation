@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class GettingByPathSignalDoesntExistsException
+    public class GettingByPathSignalDoesntExistsException : Exception
     {
+        public GettingByPathSignalDoesntExistsException()
+            : base("You cannot get by path signal that doesn't exists")
+        {
+        }
     }
 }

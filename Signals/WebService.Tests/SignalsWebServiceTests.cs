@@ -303,6 +303,8 @@ namespace WebService.Tests
                         Path = Domain.Path.FromString("not/existing/path"),
                     });
 
+                MockSetup();
+                signalsWebService = new SignalsWebService(signalDomainService);
                 var returndSignal = signalsWebService.Get(new Dto.Path()
                 {
                     Components = new[] { "not/existing/path" },
