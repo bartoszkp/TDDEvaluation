@@ -57,13 +57,9 @@ namespace WebService
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = GetById(signalId);
-            /*var signal = new Dto.Signal()
-            {
-                Id = 1,
-                DataType = Dto.DataType.Boolean,
-                Granularity = Dto.Granularity.Day,
-                Path = new Dto.Path() { Components = new[] { "example/path" } },
-            };*/
+
+            if (signal == null)
+                throw new Domain.Exceptions.GettingDataOfNotExistingSignal();
 
             if(signal.DataType == Dto.DataType.Boolean)
             {
