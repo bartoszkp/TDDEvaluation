@@ -261,6 +261,19 @@ namespace WebService.Tests
                 signalWebService.GetData(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGettingDataOfOtherSignal_ThrowedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                signalWebService.Add(new Dto.Signal() { Id = 1 });
+
+                signalWebService.GetData(2, It.IsAny<DateTime>(), It.IsAny<DateTime>());
+            }
+
             // --------------------------------------------------------------------------------------------
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
