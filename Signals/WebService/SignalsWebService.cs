@@ -62,12 +62,16 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var result = signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+
+            return result.ToDto<IEnumerable<Dto.Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            throw new NotImplementedException();
+            var dataDomain = data.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray();
+
+            signalsDomainService.SetData(signalId, dataDomain);
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
