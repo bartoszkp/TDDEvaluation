@@ -298,7 +298,21 @@ namespace WebService.Tests
                 Assert.AreEqual(expected[0].Value, actual[0].Value);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignals_WhenSettingDataOfAnySignal_ThrowedIsArgumentException()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalWebService.SetData(1, null);
+            }
+
             // --------------------------------------------------------------------------------------------
+
+
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
