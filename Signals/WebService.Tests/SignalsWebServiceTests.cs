@@ -303,33 +303,32 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGettingByPath_ReturnsCorrectSignal()
             {
-                MockSetup();
-
                 Dto.Path dtoPath = new Dto.Path() { Components = new[] { "example", "path" } };
-                Domain.Path domainPath = Domain.Path.FromString("example/path");
 
-                Signal signal = new Signal()
-                {
-                    Id = 1,
-                    DataType = Domain.DataType.Boolean,
-                    Granularity = Domain.Granularity.Day,
-                    Path = domainPath,
-                };
-
-                var signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                    .Setup(srm => srm.Get(domainPath))
-                    .Returns(signal);
-
-                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
-                signalsWebService = new SignalsWebService(signalDomainService);
-
+                GetByPathSetup();
                 var returndSignal = signalsWebService.Get(dtoPath);
 
                 Assert.AreEqual(1, returndSignal.Id.Value);
                 Assert.AreEqual(Dto.DataType.Boolean, returndSignal.DataType);
                 Assert.AreEqual(Dto.Granularity.Day, returndSignal.Granularity);
                 CollectionAssert.AreEqual(dtoPath.Components.ToArray(), returndSignal.Path.Components.ToArray());
+            }
+
+            public void GetByPathSetup()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(Domain.Path.FromString("example/path")))
+                    .Returns(new Signal()
+                    {
+                        Id = 1,
+                        DataType = Domain.DataType.Boolean,
+                        Granularity = Domain.Granularity.Day,
+                        Path = Domain.Path.FromString("example/path"),
+                    });
+
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                signalsWebService = new SignalsWebService(signalDomainService);
             }
         }
     }
