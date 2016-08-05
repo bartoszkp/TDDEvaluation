@@ -62,7 +62,56 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId).ToDomain<Domain.Signal>();
+            if (signal == null) throw new ArgumentException("no signals with this id");
+
+            if(signal.DataType == Domain.DataType.Integer)
+            {
+                var domainData= data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumInteger>>().ToArray();
+                foreach (var x in domainData)
+                {
+                    x.Signal = signal;
+                }
+                signalsDomainService.SetData<int>(domainData);
+            }
+
+            if (signal.DataType == Domain.DataType.Double)
+            {
+                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumDouble>>().ToArray();
+                foreach (var x in domainData)
+                {
+                    x.Signal = signal;
+                }
+                signalsDomainService.SetData<double>(domainData);
+            }
+            if (signal.DataType == Domain.DataType.Decimal)
+            {
+                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumDecimal>>().ToArray();
+                foreach (var x in domainData)
+                {
+                    x.Signal = signal;
+                }
+                signalsDomainService.SetData<decimal>(domainData);
+            }
+            if (signal.DataType == Domain.DataType.Boolean)
+            {
+                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumBoolean>>().ToArray();
+                foreach (var x in domainData)
+                {
+                    x.Signal = signal;
+                }
+                signalsDomainService.SetData<bool>(domainData);
+            }
+            if (signal.DataType == Domain.DataType.String)
+            {
+                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumString>>().ToArray();
+                foreach (var x in domainData)
+                {
+                    x.Signal = signal;
+                }
+                signalsDomainService.SetData<string>(domainData);
+            }
+
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)

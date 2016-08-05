@@ -76,6 +76,12 @@ namespace Domain.Services.Implementation
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
+
+        public void SetData<T>(IEnumerable<Datum<T>> domainData)
+        {
+            signalsDataRepository.SetData<T>(domainData);
+        }
+
        
     }
 }
