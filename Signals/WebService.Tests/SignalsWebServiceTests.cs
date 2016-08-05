@@ -323,6 +323,21 @@ namespace WebService.Tests
                 signalWebService.SetData(2, null);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataOfTheSignalAndGettingTheData_GotIsNotNullData()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
+                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalWebService.SetData(1, new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp=new DateTime(2016,1,1), Value = 10.0} });
+                var result = signalsWebService.GetData(1, new DateTime(2015, 1, 1), new DateTime(2017, 1, 1));
+
+                Assert.IsNotNull(result);
+            }
+
             // --------------------------------------------------------------------------------------------
 
 
