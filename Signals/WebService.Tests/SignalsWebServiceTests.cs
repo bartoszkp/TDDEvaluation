@@ -396,8 +396,6 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("example/path"),
                 };
 
-                
-
                 Mock<IMissingValuePolicyRepository> missingValuePolicyMock = new Mock<IMissingValuePolicyRepository>();
                 missingValuePolicyMock.Setup(m => m.Set(exampleSignal, policyMock.Object));
 

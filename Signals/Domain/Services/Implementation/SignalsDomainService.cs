@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -110,6 +111,11 @@ namespace Domain.Services.Implementation
                 throw new Domain.Exceptions.GettingByPathSignalDoesntExistsException();
 
             return result;
+        }
+
+        public void SetMissingValuePolicy(Signal exampleSignal, MissingValuePolicyBase policy)
+        {
+            missingValuePolicyRepository.Set(exampleSignal, policy);
         }
     }
 }

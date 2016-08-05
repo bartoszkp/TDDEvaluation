@@ -277,6 +277,8 @@ namespace WebService
 
             if (signal == null)
                 throw new Domain.Exceptions.SettingPolicyNotExistingSignalException();
+
+            signalsDomainService.SetMissingValuePolicy(signal.ToDomain<Domain.Signal>(), policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
         }
     }
 }
