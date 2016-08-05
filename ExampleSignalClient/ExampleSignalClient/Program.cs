@@ -11,7 +11,7 @@ namespace ExampleSignalClient
 
             var newSignal = new Signal()
             {
-                DataType = DataType.Double,
+                DataType = DataType.Integer,
                 Granularity = Granularity.Month,
                 Path = new Path() { Components = new[] { "", "" } }
             };

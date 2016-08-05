@@ -146,7 +146,7 @@ namespace WebService.Tests
             {
                 var signal = new Signal { Id = 1, DataType = DataType.Integer, Granularity = Granularity.Year, Path = Path.FromString("x/y") };
                 GivenASignal(signal);
-                SetupMissingValuePolicyMock(1, Quality.Fair, signal, true);
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
 
                 signalsWebService.GetMissingValuePolicy(1);
 
@@ -154,11 +154,29 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GettMissingValuePolicy_NewCreatedSignal_ReturnNull()
+            {
+                var signal = new Signal { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Path.FromString("x/y") };
+                GivenASignal(signal);
+                SetupMissingValuePolicyMock(null);
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+
+                Assert.AreEqual(null, result);
+            }
+
+            [TestMethod]
             public void GetMissingValuePolicy_SignalWithGivenIdExist_ReturnMissingValuePolicy()
             {
                 var signal = new Signal { Id = 1, DataType = DataType.Integer, Granularity = Granularity.Year, Path = Path.FromString("x/y") };
                 GivenASignal(signal);
-                SetupMissingValuePolicyMock(1, Quality.Fair,signal,true);
+
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDecimal() { 
+                 Id =1,
+                 Quality =Quality.Fair,
+                 Signal =signal,
+                 Value= 10
+                });
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
 
@@ -166,15 +184,10 @@ namespace WebService.Tests
                 Assert.AreEqual(result.DataType, Dto.DataType.Boolean);
                 Assert.AreEqual(CompareSignals(signal.ToDto<Dto.Signal>(), result.Signal.ToDto<Dto.Signal>()), true);
             }
-           
-            private void SetupMissingValuePolicyMock(int id, Quality quality, Signal signal, bool value)
+             
+            private void SetupMissingValuePolicyMock(Domain.MissingValuePolicy.MissingValuePolicyBase policy)
             {
-                missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean() {
-                    Id = id,
-                    Quality = quality,
-                    Signal = signal,
-                    Value = value
-                });
+                missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(policy);
             }
 
             private bool CompareSignals(Dto.Signal signal1, Dto.Signal signal2)

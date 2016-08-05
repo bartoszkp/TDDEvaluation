@@ -32,7 +32,7 @@ namespace WebService
 
         public Signal GetById(int signalId)
         {
-            return this.signalsDomainService.GetById(signalId)
+             return this.signalsDomainService.GetById(signalId)
                 ?.ToDto<Dto.Signal>();
         }
 
@@ -69,7 +69,7 @@ namespace WebService
         {
             var signal = GetById(signalId).ToDomain<Domain.Signal>();
             var result = signalsDomainService.GetMissingValuePolicy(signal);
-            return result.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+            return result?.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
