@@ -65,6 +65,7 @@
     <Compile Include="Exceptions\GettingDataOfNotExistingSignal.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\SettingNotExistingSignalDataException.cs" />
+    <Compile Include="Exceptions\SettingPolicyNotExistingSignalException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />

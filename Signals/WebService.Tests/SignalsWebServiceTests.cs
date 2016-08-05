@@ -332,6 +332,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SettingPolicyNotExistingSignalException))]
             public void WhenCallingSetPolicy_ProperMethodIsCalled()
             { 
                 Mock<Dto.MissingValuePolicy.MissingValuePolicy> policyMock = new Mock<Dto.MissingValuePolicy.MissingValuePolicy>();
@@ -340,6 +341,33 @@ namespace WebService.Tests
                 signalWebServiceMock
                     .Setup(swsm => swsm.SetMissingValuePolicy(1, policyMock.Object));
 
+                MockSetup();
+                signalsWebService = new SignalsWebService(signalDomainService);
+                signalsWebService.SetMissingValuePolicy(1, policyMock.Object);
+
+                signalWebServiceMock.Verify(swsm => swsm.SetMissingValuePolicy(1, policyMock.Object));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SettingPolicyNotExistingSignalException))]
+            public void GivenNoSignal_WhenSetPolicyIsCalled_ItThrowsException()
+            {
+                Mock<Dto.MissingValuePolicy.MissingValuePolicy> policyMock = new Mock<Dto.MissingValuePolicy.MissingValuePolicy>();
+                policyMock.Object.DataType = Dto.DataType.Boolean;
+                policyMock.Object.Id = 1;
+                policyMock.Object.Signal = new Dto.Signal()
+                {
+                    Id = 1,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "aaa", "bbb" } },
+                };
+
+                Mock<ISignalsWebService> signalWebServiceMock = new Mock<ISignalsWebService>();
+                signalWebServiceMock
+                    .Setup(swsm => swsm.SetMissingValuePolicy(1, policyMock.Object));
+
+                MockSetup();
                 signalsWebService = new SignalsWebService(signalDomainService);
                 signalsWebService.SetMissingValuePolicy(1, policyMock.Object);
 
