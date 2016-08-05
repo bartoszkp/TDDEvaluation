@@ -91,7 +91,9 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            throw new ArgumentException();
+            if(signalsDomainService.GetById(signalId)==null) throw new ArgumentException();
+
+            else signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>());
         }
     }
 }

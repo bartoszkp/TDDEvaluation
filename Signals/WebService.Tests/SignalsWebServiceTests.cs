@@ -366,7 +366,7 @@ namespace WebService.Tests
                 signalWebService.SetMissingValuePolicy(1
                     , new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy() { Id=1, DataType=Dto.DataType.Decimal, Quality = Dto.Quality.Fair});
                 var result = signalWebService.GetMissingValuePolicy(1);
-
+                
                 Assert.AreEqual(1, result.Id);
                 Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
 
