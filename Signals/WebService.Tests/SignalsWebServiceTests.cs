@@ -354,6 +354,25 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingMVPofTheSignalAndGettingMVPofTheSignal_ReturnedIsMVPofTheSignal()
+            {
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
+                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
+                var signalWebService = new SignalsWebService(signalDomainService);
+
+                signalWebService.SetMissingValuePolicy(1
+                    , new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy() { Id=1, DataType=Dto.DataType.Decimal, Quality = Dto.Quality.Fair});
+                var result = signalWebService.GetMissingValuePolicy(1);
+
+                Assert.AreEqual(1, result.Id);
+                Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
+
+
+            }
+
             // --------------------------------------------------------------------------------------------
 
 
