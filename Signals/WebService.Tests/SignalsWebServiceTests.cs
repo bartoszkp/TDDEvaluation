@@ -238,7 +238,18 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignalWithSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNotNullResult()
             {
-                
+                var signalRepositoryMock = new Mock<ISignalsRepository>();
+                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
+                var signalWebService = new SignalsWebService(signalDomainService);
+                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1 });
+                signalMissingValuePolicyRepositoryMock
+                    .Setup(smvpr => smvpr.Get(It.Is<Signal>(signal => signal.Id == 1)))
+                    .Returns(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>());
+
+                var result = signalWebService.GetMissingValuePolicy(1);
+
+                Assert.IsNotNull(result);
             }
 
             [TestMethod]
