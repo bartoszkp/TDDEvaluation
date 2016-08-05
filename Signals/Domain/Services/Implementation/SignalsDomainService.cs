@@ -56,7 +56,7 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
-            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc);
+            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
         }
 
         public void SetData(int signalId, IEnumerable<Datum<double>> enumerable)
