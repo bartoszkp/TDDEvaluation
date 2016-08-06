@@ -41,6 +41,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue8")]
         public void GivenNoData_ReturnsSpecificValueForTheWholeRange()
         {
             GivenNoData();
@@ -52,6 +53,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue8")]
         public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithSpecificValue()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp });
@@ -64,6 +66,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue8")]
         public void GivenSingleDatumBeforeTheBeginning_ReturnsSpecificValueForTheWholeRange()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp.AddDays(-1) });
@@ -75,6 +78,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue8")]
         public void GivenSingleDatumAtTheEnd_FillsRemainingRangeWithSpecificValue()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp.AddDays(-1) });
@@ -87,6 +91,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue8")]
         public void GivenSingleDatumAfterTheEnd_ReturnsSpecificValueForTheWholeRange()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp });
@@ -98,6 +103,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue8")]
         public void GivenSingleDatumInTheMiddle_FillsRemainingRangesWithNoneQuality()
         {
             var middleTimestamp = BeginTimestamp.AddDays(2);

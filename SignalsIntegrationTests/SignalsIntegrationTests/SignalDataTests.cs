@@ -23,6 +23,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveSecondData()
         {
             var path = SignalPathGenerator.Generate();
@@ -55,6 +56,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveSecondDataIgnoringOrder()
         {
             var path = SignalPathGenerator.Generate();
@@ -93,6 +95,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveMinuteData()
         {
             var path = SignalPathGenerator.Generate();
@@ -125,6 +128,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveMinuteDataIgnoringOrder()
         {
             var path = SignalPathGenerator.Generate();
@@ -163,6 +167,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveHourData()
         {
             var path = SignalPathGenerator.Generate();
@@ -195,6 +200,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveHourDataIgnoringOrder()
         {
             var path = SignalPathGenerator.Generate();
@@ -233,6 +239,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveDayData()
         {
             var path = SignalPathGenerator.Generate();
@@ -265,6 +272,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveDayDataIgnoringOrder()
         {
             var path = SignalPathGenerator.Generate();
@@ -303,6 +311,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveWeekData()
         {
             var path = SignalPathGenerator.Generate();
@@ -335,6 +344,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveWeekDataIgnoringOrder()
         {
             var path = SignalPathGenerator.Generate();
@@ -373,6 +383,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveMonthlyData()
         {
             var path = SignalPathGenerator.Generate();
@@ -405,6 +416,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveMonthlyDataIgnoringOrder()
         {
             var path = SignalPathGenerator.Generate();
@@ -443,6 +455,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveYearlyData()
         {
             var path = SignalPathGenerator.Generate();
@@ -475,6 +488,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void CanWriteAndRetrieveYearlyDataIgnoringOrder()
         {
             var path = SignalPathGenerator.Generate();
@@ -513,6 +527,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void GetDataUsingNonExistentSignalsThrows()
         {
             int dummySignalId = 0;
@@ -521,6 +536,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue6")]
         public void SignalWithoutDataReturnsNoneQualityDatumsForEachTimerangeStep()
         {
             var signal = AddNewIntegerSignal(Granularity.Day);
@@ -539,6 +555,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
         public void SetDataOverridesExistingData()
         {
             var timestamp = new DateTime(2019, 1, 1);

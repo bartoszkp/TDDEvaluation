@@ -35,6 +35,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenNoData_ReturnsNoneQualityForTheWholeRange()
         {
             GivenNoData();
@@ -46,6 +47,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenSingleDatumAtBegining_FillsRestOfRangeWithNone()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 1410, Timestamp = BeginTimestamp });
@@ -58,6 +60,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenSingleDatumAfterBegining_FillsRestOfRangeWithNone()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 1410, Timestamp = BeginTimestamp.AddDays(1) });
@@ -70,6 +73,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsAtBeginingAndBeforeEnd_InterpolatesValueForTheWholeRange()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp },
@@ -86,6 +90,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsAfterBeginingAndBeforeEnd_InterpolatesValueForGivenRangeAndInsertsNoneOutsideIt()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp.AddDays(1) },
@@ -101,6 +106,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsBeforeAndAfterBegining_InterpolatesValueForRangeBetweenBeginAndGivenDatumAndInsertsNoneAfterIt()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp.AddDays(-1) },
@@ -115,6 +121,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsAtBeginingAndAtEnd_InterpolatesForTheWholeRange()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp },
@@ -132,6 +139,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsAfterBeginingAndAfterEnd_InterpolatesForRangeBetweenGivenDatumAndEnd()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp.AddDays(1) },
@@ -148,6 +156,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsBeforeBeginingAndAfterEnd_InterpolatesForTheWholeRange()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp.AddDays(-1) },
@@ -165,6 +174,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenThreeDatums_ProperlyChangesInterpolation()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp },
@@ -183,6 +193,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithGoodAndFairQualities_InterpolatedValuesHaveFairQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp },
@@ -196,6 +207,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithFairAndGoodQualities_InterpolatedValuesHaveFairQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Fair, Value = 10, Timestamp = BeginTimestamp },
@@ -209,6 +221,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithGoodAndPoorQualities_InterpolatedValuesHavePoorQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp },
@@ -222,6 +235,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithPoorAndGoodQualities_InterpolatedValuesHavePoorQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Poor, Value = 10, Timestamp = BeginTimestamp },
@@ -235,6 +249,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithGoodAndBadQualities_InterpolatedValuesHaveBadQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Good, Value = 10, Timestamp = BeginTimestamp },
@@ -248,6 +263,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithBadAndGoodQualities_InterpolatedValuesHaveFairQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Bad, Value = 10, Timestamp = BeginTimestamp },
@@ -261,6 +277,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithFairAndPoorQualities_InterpolatedValuesHavePoorQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Fair, Value = 10, Timestamp = BeginTimestamp },
@@ -274,6 +291,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithPoorAndFairQualities_InterpolatedValuesHavePoorQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Poor, Value = 10, Timestamp = BeginTimestamp },
@@ -287,6 +305,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithFairAndBadQualities_InterpolatedValuesHaveBadQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Fair, Value = 10, Timestamp = BeginTimestamp },
@@ -300,6 +319,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithBadAndFairQualities_InterpolatedValuesHaveBadQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Bad, Value = 10, Timestamp = BeginTimestamp },
@@ -313,6 +333,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithPoorAndBadQualities_InterpolatedValuesHaveBadQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Poor, Value = 10, Timestamp = BeginTimestamp },
@@ -326,6 +347,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue11")]
         public void GivenDatumsWithBadAndPoorQualities_InterpolatedValuesHaveBadQuality()
         {
             GivenData(new Datum<int>() { Quality = Quality.Bad, Value = 10, Timestamp = BeginTimestamp },

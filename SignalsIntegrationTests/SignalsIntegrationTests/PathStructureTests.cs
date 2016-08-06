@@ -29,6 +29,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue7")]
         public void GivenRootPath_WhenNoSignalsPresent_ReturnsEmptyPathEntry()
         {
             var result = GetPathEntry(Path.Root + "emptyPath");
@@ -37,6 +38,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue7")]
         public void GivenOneSignal_WhenReadingItsParent_ReturnsPathEntryWithThisSignal()
         {
             var directory = Path.Root + "oneSignal";
@@ -49,6 +51,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue7")]
         public void GivenTwoPathLevels_WhenReadingTopLevel_ReturnsOnlyDirectDescendants()
         {
             var directory = Path.Root + "twoLevels";
@@ -64,6 +67,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue7")]
         public void GivenTwoPathLevels_WhenReadingTopLevel_ReturnsSubpaths()
         {
             var directory = Path.Root + "twoLevels2";
@@ -80,6 +84,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue7")]
         public void GivenTwoSignalsInOnePath_WhenReadingItsParent_ReturnsOneCommonSubpath()
         {
             var topLevelDirectory = Path.Root + "topLevelWithTwoSignals";
@@ -96,6 +101,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue7")]
         public void GivenPathsWithCommonPrefixInName_WhenReadingTheFirstOne_DoesntReturnTheOther()
         {
             var topLevelDirectory = Path.Root + "topLevelWithCommonPrefix";
