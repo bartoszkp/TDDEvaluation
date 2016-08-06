@@ -17,14 +17,15 @@ namespace SignalsIntegrationTests.Infrastructure
             }
             catch (FaultException e)
             {
-                AssertNotDefaultException(e);
+                AssertNotBuiltInException(e);
             }
         }
 
-        private static void AssertNotDefaultException(FaultException e)
+        private static void AssertNotBuiltInException(FaultException e)
         {
             var ex = e as FaultException<ExceptionDetail>;
             Assert.AreNotEqual(typeof(NotImplementedException).ToString(), ex?.Detail.Type);
+            Assert.AreNotEqual(typeof(InvalidCastException).ToString(), ex?.Detail.Type);
         }
 
         public static void AreEqual<T>(IEnumerable<Domain.Datum<T>> expected, IEnumerable<Domain.Datum<T>> actual)
