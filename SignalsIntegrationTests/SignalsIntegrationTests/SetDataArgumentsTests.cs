@@ -36,7 +36,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForSecondGranularityRequiresZerosMillisecondsInTimestamps()
+        public void SetDataForSecondGranularityRequiresZeroMillisecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Second);
 
@@ -47,7 +47,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForMinuteGranularityRequiresZerosMillisecondsInTimestamps()
+        public void SetDataForMinuteGranularityRequiresZeroMillisecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Minute);
 
@@ -58,7 +58,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForMinuteGranularityRequiresZerosSecondsInTimestamps()
+        public void SetDataForMinuteGranularityRequiresZeroSecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Minute);
 
@@ -69,7 +69,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForHourGranularityRequiresZerosMillisecondsInTimestamps()
+        public void SetDataForHourGranularityRequiresZeroMillisecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Hour);
 
@@ -80,7 +80,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForHourGranularityRequiresZerosSecondsInTimestamps()
+        public void SetDataForHourGranularityRequiresZeroSecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Hour);
 
@@ -91,7 +91,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForHourGranularityRequiresZerosMinutesInTimestamps()
+        public void SetDataForHourGranularityRequiresZeroMinutesInTimestamps()
         {
             GivenASignalWith(Granularity.Hour);
 
@@ -102,7 +102,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForDayGranularityRequiresZerosMillisecondsInTimestamps()
+        public void SetDataForDayGranularityRequiresZeroMillisecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Day);
 
@@ -113,7 +113,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForDayGranularityRequiresZerosSecondsInTimestamps()
+        public void SetDataForDayGranularityRequiresZeroSecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Day);
 
@@ -124,7 +124,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForDayGranularityRequiresZerosMinutesInTimestamps()
+        public void SetDataForDayGranularityRequiresZeroMinutesInTimestamps()
         {
             GivenASignalWith(Granularity.Day);
 
@@ -135,7 +135,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForDayGranularityRequiresZerosHoursInTimestamps()
+        public void SetDataForDayGranularityRequiresZeroHoursInTimestamps()
         {
             GivenASignalWith(Granularity.Day);
 
@@ -146,7 +146,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForWeekGranularityRequiresZerosMillisecondsInTimestamps()
+        public void SetDataForWeekGranularityRequiresZeroMillisecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Week);
 
@@ -157,7 +157,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForWeekGranularityRequiresZerosSecondsInTimestamps()
+        public void SetDataForWeekGranularityRequiresZeroSecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Week);
 
@@ -168,7 +168,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForWeekGranularityRequiresZerosMinutesInTimestamps()
+        public void SetDataForWeekGranularityRequiresZeroMinutesInTimestamps()
         {
             GivenASignalWith(Granularity.Week);
 
@@ -179,7 +179,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForWeekGranularityRequiresZerosHoursInTimestamps()
+        public void SetDataForWeekGranularityRequiresZeroHoursInTimestamps()
         {
             GivenASignalWith(Granularity.Week);
 
@@ -201,7 +201,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForMonthGranularityRequiresZerosMillisecondsInTimestamps()
+        public void SetDataForMonthGranularityRequiresZeroMillisecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Month);
 
@@ -212,7 +212,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForMonthGranularityRequiresZerosSecondsInTimestamps()
+        public void SetDataForMonthGranularityRequiresZeroSecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Month);
 
@@ -223,7 +223,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForMonthGranularityRequiresZerosMinutesInTimestamps()
+        public void SetDataForMonthGranularityRequiresZeroMinutesInTimestamps()
         {
             GivenASignalWith(Granularity.Month);
 
@@ -234,7 +234,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForMonthGranularityRequiresZerosHoursInTimestamps()
+        public void SetDataForMonthGranularityRequiresZeroHoursInTimestamps()
         {
             GivenASignalWith(Granularity.Month);
 
@@ -256,7 +256,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForYearGranularityRequiresZerosMillisecondsInTimestamps()
+        public void SetDataForYearGranularityRequiresZeroMillisecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Year);
 
@@ -267,7 +267,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForYearGranularityRequiresZerosSecondsInTimestamps()
+        public void SetDataForYearGranularityRequiresZeroSecondsInTimestamps()
         {
             GivenASignalWith(Granularity.Year);
 
@@ -278,7 +278,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForYearGranularityRequiresZerosMinutesInTimestamps()
+        public void SetDataForYearGranularityRequiresZeroMinutesInTimestamps()
         {
             GivenASignalWith(Granularity.Year);
 
@@ -289,7 +289,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void SetDataForYearGranularityRequiresZerosHoursInTimestamps()
+        public void SetDataForYearGranularityRequiresZeroHoursInTimestamps()
         {
             GivenASignalWith(Granularity.Year);
 
