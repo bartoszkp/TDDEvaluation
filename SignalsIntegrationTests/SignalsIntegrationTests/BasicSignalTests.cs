@@ -22,6 +22,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue1")]
         public void RequestForNonExistingSignalReturnsNull()
         {
             var path = Path.FromString("/non/existent/path");
@@ -30,6 +31,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("unassigned")]
         public void RequestForSettingFirstOrderMissingValuePolicyForStringThrows()
         {
             var signalId = AddNewStringSignal().Id.Value;
@@ -42,6 +44,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue1")]
         public void AddingSignalSetsItsId()
         {
             var signal = new Signal()
@@ -57,6 +60,8 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue1")]
+        [TestCategory("issue4")]
         public void AddedSignalCanBeRetrieved()
         {
             var newSignal = new Signal()
@@ -80,6 +85,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue4")]
         public void MultipleSignalsCanBeStoredSimultanously()
         {
             var newSignal1 = new Signal()
@@ -106,6 +112,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue1")]
         public void TryingToAddSignalWithExistingPathThrows()
         {
             var signal = new Signal()
@@ -121,6 +128,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue1")]
         public void TryingToAddSignalWithNotNullIdThrows()
         {
             var signal = new Signal()
@@ -135,6 +143,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue5")]
         public void NewSignalHasNoneQualityMissingValuePolicy()
         {
             var signal = AddNewIntegerSignal();
@@ -145,12 +154,14 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue3")]
         public void WhenGettingMissingValuePolicyForNonExistentSignal_Throws()
         {
             Assertions.AssertThrows(() => client.GetMissingValuePolicy(0));
         }
 
         [TestMethod]
+        [TestCategory("issue3")]
         public void WhenSettingsMissingValuePolicyForNonExistentSignal_Throws()
         {
             var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>()
@@ -160,6 +171,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue3")]
         public void MissingValuePolicyCanBeSetForSignal()
         {
             var signal1Id = AddNewIntegerSignal().Id.Value;
@@ -188,12 +200,14 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue12")]
         public void WhenDeletingNonExistentSignal_Throws()
         {
             Assertions.AssertThrows(() => client.Delete(0));
         }
 
         [TestMethod]
+        [TestCategory("issue12")]
         public void WhenDeletingExistingSignal_SignalDisappears()
         {
             var signalId = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
@@ -204,6 +218,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue12")]
         public void WhenDeletingExistingSignalWithData_BothSignalAndDataDisappear()
         {
             var signalId = AddNewIntegerSignal(granularity: Granularity.Year).Id.Value;
