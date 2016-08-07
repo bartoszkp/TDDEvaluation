@@ -23,11 +23,18 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue1")]
-        public void RequestForNonExistingSignalReturnsNull()
+        public void GivenBadPath_WhenGettingSignal_NullIsReturned()
         {
             var path = Path.FromString("/non/existent/path");
 
             Assert.IsNull(client.Get(path.ToDto<Dto.Path>()));
+        }
+
+        [TestMethod]
+        [TestCategory("issue1")]
+        public void GivenBadId_WhenGettingSignal_NullIsReturned()
+        {
+            Assert.IsNull(client.GetById(0));
         }
 
         [TestMethod]
