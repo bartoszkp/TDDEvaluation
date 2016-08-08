@@ -55,7 +55,9 @@ namespace Domain.Services.Implementation
         public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Signal signal = GetById(signalId);
-            return this.signalsDataRepository.GetData<T>(signal,fromIncludedUtc,toExcludedUtc);
+            return this.signalsDataRepository
+                .GetData<T>(signal,fromIncludedUtc,toExcludedUtc)
+                .OrderBy(d => d.Timestamp);
         }
 
         public void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
