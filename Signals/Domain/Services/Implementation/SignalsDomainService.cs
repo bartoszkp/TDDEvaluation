@@ -58,12 +58,51 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData<T>(dataList);
         }
 
+        private DateTime GetNextDateFromGranularity(DateTime current, Granularity granularity)
+        {
+            switch(granularity)
+            {
+                case Granularity.Second:
+                    return current.AddSeconds(1);
+                case Granularity.Minute:
+                    return current.AddMinutes(1);
+                case Granularity.Hour:
+                    return current.AddHours(1);
+                case Granularity.Day:
+                    return current.AddDays(1);
+                case Granularity.Week:
+                    return current.AddDays(7);
+                case Granularity.Month:
+                    return current.AddMonths(1);
+                case Granularity.Year:
+                    return current.AddYears(1);
+            }
+
+            return current;
+        }
+
         public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Signal signal = GetById(signalId);
-            return this.signalsDataRepository
-                .GetData<T>(signal,fromIncludedUtc,toExcludedUtc)
-                .OrderBy(d => d.Timestamp);
+
+            var data = this.signalsDataRepository
+                .GetData<T>(signal, fromIncludedUtc, toExcludedUtc)
+                .OrderBy(d => d.Timestamp).ToList();
+            DateTime current = fromIncludedUtc;
+
+            int i = 0;
+            while(current < toExcludedUtc)
+            {
+                if(i >= data.Count || data[i].Timestamp != current)
+                    data.Add(new Datum<T>());
+                else
+                    i++;
+
+                current = GetNextDateFromGranularity(current, signal.Granularity);
+            }
+
+            return data;
+
         }
 
         public void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
