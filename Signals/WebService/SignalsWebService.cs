@@ -70,6 +70,11 @@ namespace WebService
                 var quality = d.Quality.ToDto<Dto.Quality>();
                 dtoDatum.Add(new Datum() { Value = d.Value, Quality = quality, Timestamp = d.Timestamp });
             }
+            
+            dtoDatum.Sort(delegate (Datum a, Datum b) 
+            {
+                return a.Timestamp.CompareTo(b.Timestamp);
+            });
             return dtoDatum;
         }
 
