@@ -9,7 +9,7 @@ namespace Domain.MissingValuePolicy
     {
         public override Datum<T> GetMissingValue(Signal signal, DateTime timeStamp)
         {
-            return new Datum<T>();
+            return Datum<T>.CreateNone(signal, timeStamp);
         }
     }
 }
