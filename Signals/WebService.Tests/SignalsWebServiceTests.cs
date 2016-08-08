@@ -586,6 +586,29 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithMissingData_DataHasCorrectTimeStamp()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenData(signalId, GetDomainStringData());
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1)).ToArray();
+
+                Assert.AreEqual(new DateTime(2000, 1, 1), result[0].Timestamp);
+                Assert.AreEqual(new DateTime(2000, 2, 1), result[1].Timestamp);
+                Assert.AreEqual(new DateTime(2000, 3, 1), result[2].Timestamp);
+                Assert.AreEqual(new DateTime(2000, 4, 1), result[3].Timestamp);
+                Assert.AreEqual(new DateTime(2000, 5, 1), result[4].Timestamp);
+                Assert.AreEqual(new DateTime(2000, 6, 1), result[5].Timestamp);
+
+            }
+
         }
     }
 }
