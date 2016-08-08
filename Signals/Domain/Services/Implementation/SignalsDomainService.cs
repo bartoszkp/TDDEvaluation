@@ -79,11 +79,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.OrderBy(s => s.Timestamp).ToArray();
         }
-
-
-
-
     }
 }
