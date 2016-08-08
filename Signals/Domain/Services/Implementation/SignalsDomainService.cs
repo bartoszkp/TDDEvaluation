@@ -28,10 +28,7 @@ namespace Domain.Services.Implementation
 
         public Signal GetById(int signalId)
         {
-            var item = this.signalsRepository.Get(signalId);
-            if (item == null)
-                throw new NoSuchSignalException();
-            return item;
+            return this.signalsRepository.Get(signalId);
         }
 
         public Signal Add(Signal newSignal)
@@ -71,10 +68,7 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path pathDto)
         {
-            var item = this.signalsRepository.Get(pathDto);
-            if (item == null)
-                throw new NoSuchSignalException();
-            return item;
+            return this.signalsRepository.Get(pathDto);
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> data)

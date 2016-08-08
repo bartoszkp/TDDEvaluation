@@ -8,9 +8,10 @@ namespace Domain.Exceptions
 {
     public class NoSuchSignalException : Exception
     {
-        public NoSuchSignalException()
-            : base("Signal with given id does not exist in the database")
+        public NoSuchSignalException() : base("Signal with given id does not exist in the database")
         {
+
         }
+
     }
 }
