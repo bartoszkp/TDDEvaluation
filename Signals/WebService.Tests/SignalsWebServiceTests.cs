@@ -516,6 +516,23 @@ namespace WebService.Tests
 
                 Assert.IsNotNull(result);
             }
+
+            [TestMethod]
+            public void GivenNoneQualityMissingValuePolicy_WhenGettingMissingValue_ReturnsDatumWithNoneQualityAndDefaultValue()
+            {
+                int signalId = 2;
+                Signal signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>();
+
+                var result = mvp.GetMissingValue(signal, new DateTime(2000, 10, 2));
+
+                Assert.AreEqual(Quality.None, result.Quality);
+                Assert.AreEqual(default(double), result.Value);
+            }
         }
     }
 }
