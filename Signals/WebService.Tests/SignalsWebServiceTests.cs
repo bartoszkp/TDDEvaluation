@@ -89,23 +89,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void Get_IncorrectPath_ThrowException()
-            {
-
-                var path = new Dto.Path
-                {
-                    Components = new[] { "x", "y" }
-                };
-
-                GivenNoSignals();
-                signalsRepositoryMock.Setup(x=>x.Get(path.ToDomain<Domain.Path>())).Returns((Domain.Signal)null);
-
-                signalsWebService.Get(path); 
-
-            }
-
-            [TestMethod]
             public void Get_SignalWithThisPathExist_ReturnThisSignal()
             {
                 var signal =  SignalWith(null,Dto.DataType.Boolean, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y" } });
