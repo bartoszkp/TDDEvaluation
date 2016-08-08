@@ -38,7 +38,12 @@ namespace Domain.Services.Implementation
 
         public Signal GetById(int signalId)
         {
-            return this.signalsRepository.Get(signalId);
+            var result = signalsRepository.Get(signalId);
+            if (result == null)
+            {
+                return null;
+            }
+            return result;
         }
 
         public Signal Get(Path pathDomain)
@@ -46,7 +51,7 @@ namespace Domain.Services.Implementation
             var result = signalsRepository.Get(pathDomain);
             if (result == null)
             {
-                throw new SignalWithThisPathNonExistException();
+                return null;
             }
             return result;
         }
