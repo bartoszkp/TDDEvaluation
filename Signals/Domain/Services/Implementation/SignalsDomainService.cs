@@ -85,7 +85,12 @@ namespace Domain.Services.Implementation
             Signal signal = GetById(signalId);
             if (signal == null)
                 throw new SignalWithThisIdNonExistException();
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+            var datums = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+            IEnumerable<Datum<T>> sortedDatums = datums.OrderBy(datum => datum.Timestamp);
+
+            return sortedDatums;
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> dataDomain)

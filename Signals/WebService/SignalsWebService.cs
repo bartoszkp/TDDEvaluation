@@ -91,8 +91,7 @@ namespace WebService
             foreach (var e in enumerable)
                 datums[i++] = e.ToDto<Datum>();
 
-            IEnumerable<Datum> sortedDatums = datums.OrderBy(datum => datum.Timestamp);
-            return sortedDatums;
+            return datums;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
