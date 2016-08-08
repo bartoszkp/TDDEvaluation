@@ -126,18 +126,18 @@ namespace WebService.Tests
                 Domain.Signal domainSignal = new Domain.Signal()
                 {
                     Id = signalId,
-                    DataType = Domain.DataType.Double,
+                    DataType = Domain.DataType.Integer,
                     Granularity = Domain.Granularity.Hour,
                     Path = Domain.Path.FromString("root/signal44")
                 };
 
-                List<Domain.Datum<object>> addedCollection = new List<Datum<object>>(new Datum<object>[] {
-                new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
-                new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
+                List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
+                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
+                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
 
                 Setup_SignalsRepoAndSignalsDataRepo(domainSignal);         
 
-                GivenAColletionOfDatums(addedCollection, domainSignal, new DateTime(), new DateTime());
+                GivenAColletionOfDatums(addedCollection, domainSignal);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(), new DateTime()).ToList();
 
@@ -145,7 +145,7 @@ namespace WebService.Tests
                 new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5},
                 new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7 } });
 
-                Assert.IsTrue(expectedResult.Count == result.Count);
+                Assert.AreEqual(expectedResult.Count,result.Count);
                 Assert.IsTrue(AssertDtoLists(expectedResult, result));
             }
 
@@ -345,10 +345,15 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void GivenAColletionOfDatums(IEnumerable<Datum<object>> data, Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+            private void GivenAColletionOfDatums(IEnumerable<Datum<Int32>> data, Domain.Signal signal)
             {
                 signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData<object>(signal, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Setup(sdr => sdr.GetData<Int32>(
+                        It.Is<Domain.Signal>( s => s.DataType == signal.DataType &&
+                                                s.Granularity == signal.Granularity &&
+                                                s.Id == signal.Id),
+                        It.IsAny<DateTime>(), 
+                        It.IsAny<DateTime>()))
                     .Returns(data);
             }
             
