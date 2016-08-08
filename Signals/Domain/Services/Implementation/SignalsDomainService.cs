@@ -65,15 +65,20 @@ namespace Domain.Services.Implementation
                 return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void SetData(int signalId, IEnumerable<double> data)
+        public void SetData(Signal signal, IEnumerable<Datum<double>> data)
         {
-
-            var result = signalsRepository.Get(signalId);
-            if(result == null)
+            if(data == null)
             {
-                throw new IdNotNullException();
+                this.signalsDataRepository.SetData<double>(data);
+                return;
             }
-            
+
+            foreach(var d in data)
+            {
+                d.Signal = signal;
+            }
+
+            this.signalsDataRepository.SetData<double>(data);
         }
     }
 }

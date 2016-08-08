@@ -63,15 +63,14 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var signal = signalsDomainService.GetById(signalId);
+            var signal = this.signalsDomainService.GetById(signalId);
+
             if (signal == null)
             {
-                throw new IdNotNullException();
+                throw new KeyNotFoundException();
             }
             else
-                signalsDomainService.SetData(1, (IEnumerable<double>)(data));
-            
-              
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>());
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)

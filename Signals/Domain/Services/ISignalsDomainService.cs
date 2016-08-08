@@ -11,6 +11,7 @@ namespace Domain.Services
         Signal Get(Path path);
         void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainPolicyBase);
         MissingValuePolicyBase GetMissingValuePolicy(Signal signalDomain);
-        void SetData(int v, IEnumerable<double> data);
+
+        void SetData(Signal signal, IEnumerable<Datum<double>> data);
     }
 }
