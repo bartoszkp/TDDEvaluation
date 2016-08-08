@@ -101,7 +101,7 @@ namespace Domain.Services.Implementation
                 current = GetNextDateFromGranularity(current, signal.Granularity);
             }
 
-            return data;
+            return data.OrderBy(d => d.Timestamp);
 
         }
 
