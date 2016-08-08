@@ -485,22 +485,6 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            public void GivenNoSignals_WhenAddingSignal_MissingValuePolicyRepositoryAddIsCalled()
-            {
-                var signal = SignalWith(
-                    dataType: Dto.DataType.Double,
-                    granularity: Dto.Granularity.Month,
-                    path: new Dto.Path() { Components = new string[] { "root", "signal1" } });
-                GivenNoSignals();
-
-                var result = signalsWebService.Add(signal);
-
-                missingValuePolicyRepositoryMock
-                    .Verify(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
-            }
-
-
-            [TestMethod]
             public void GivenNoSignals_WhenAddingSignal_MissingValuePolicyRepositoryAddWithCorrectArgumentsIsCalled()
             {
                 var signal = SignalWith(
