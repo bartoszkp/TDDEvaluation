@@ -154,6 +154,37 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenData_WhenGettingSignalData_ReturnsSortedData()
+            {
+                var signalId = 1;
+                double firstValue = 1;
+                var firstTimestamp = new DateTime(2000, 1, 1);
+                double lastValue = 2;
+                var lastTimestamp = new DateTime(2000, 3, 1);
+
+                var testDatumData = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double> { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Domain.Datum<double> { Quality = Quality.Fair, Timestamp = firstTimestamp, Value = firstValue },
+                    new Domain.Datum<double> { Quality = Quality.Poor, Timestamp = lastTimestamp, Value = lastValue }
+                };
+
+                GivenData(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Double,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")), 
+                    testDatumData);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 3, 1));
+
+                Assert.AreEqual(firstValue, result.First().Value);
+                Assert.AreEqual(firstTimestamp, result.First().Timestamp);
+                Assert.AreEqual(lastValue, result.Last().Value);
+                Assert.AreEqual(lastTimestamp, result.Last().Timestamp);
+            }
+
+            [TestMethod]
             [ExpectedException(typeof(SignalNotFoundException))]
             public void GivenNoSignals_WhenSettingMissingValuePolicy_ThrowSignalNotFoundException()
             {
