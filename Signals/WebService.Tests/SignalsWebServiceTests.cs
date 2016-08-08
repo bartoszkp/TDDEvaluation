@@ -176,7 +176,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingByFalsePath_ThrowsException()
+            public void GivenASignal_WhenGettingByFalsePath_ReturnNull()
             {
                 string path = "root/signal1";
 
@@ -185,11 +185,8 @@ namespace WebService.Tests
                     dataType: Domain.DataType.Boolean,
                     granularity: Domain.Granularity.Day,
                     path: Domain.Path.FromString((path))));
-
-                var pathDto = new Dto.Path() { Components = new[] { "root", "signal3" } };
-
-                SetupVerifyOrAssert();
-                verifyOrAssert.GettingByFalsePathAssertion(pathDto, signalsWebService);
+                
+                Assert.IsNull(signalsWebService.Get(new Dto.Path() { Components = new[] { "bad", "path" } }));
             }
 
             [TestMethod]
@@ -205,6 +202,7 @@ namespace WebService.Tests
                 SetupVerifyOrAssert();
                 verifyOrAssert.VerifyRepositorySetAndGetIsCalled(signalsRepositoryMock, missingValuePolicyRepositoryMock);
             }
+
 
             [TestMethod]
             public void GivenASignal_WhenSettingMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
@@ -587,7 +585,7 @@ namespace WebService.Tests
                 var existingSignal = ExistingSignal();
 
                 SetupSignalsDataRepositoryAndSignalsRepository(existingSignal);
-
+                
                 SetupVerifyOrAssert();
                 verifyOrAssert.AssertGetDataExceptionIsThrownWhenInvalidKey(signalsWebService, wrongSignalId);
             }
@@ -649,7 +647,8 @@ namespace WebService.Tests
                 GivenNoSignals();
 
                 signalsRepositoryMock
-                    .Setup(srm => srm.Get(existingSignal.Path))
+                    .Setup(srm => srm
+                    .Get(existingSignal.Path))
                     .Returns(existingSignal);
             }
             
