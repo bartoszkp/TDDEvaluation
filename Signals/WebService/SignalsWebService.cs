@@ -69,8 +69,31 @@ namespace WebService
             {
                 throw new KeyNotFoundException();
             }
-            else
-                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>());
+            else if (signal.DataType.GetNativeType() == typeof(int))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray());
+                return;
+            }
+            else if (signal.DataType.GetNativeType() == typeof(double))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray());
+                return;
+            }
+            else if (signal.DataType.GetNativeType() == typeof(bool))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<bool>>>().ToArray());
+                return;
+            }
+            else if (signal.DataType.GetNativeType() == typeof(decimal))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<decimal>>>().ToArray());
+                return;
+            }
+            else if (signal.DataType.GetNativeType() == typeof(string))
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<string>>>().ToArray());
+                return;
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
