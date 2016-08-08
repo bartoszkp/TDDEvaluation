@@ -57,7 +57,7 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
-            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+            return   this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc).ToArray();           
         }
 
         public void SetData(int signalId, IEnumerable<Datum<double>> enumerable)
@@ -66,10 +66,11 @@ namespace Domain.Services.Implementation
 
             foreach (var item in enumerable)
             {
-                item.Signal = signal;
+                item.Id = signal.Id.Value;
+    
             }
 
-            signalsDataRepository.SetData<double>(enumerable);
+            signalsDataRepository.SetData<double>(enumerable.ToArray());
         }
 
         public void SetMissingValuePolicy(int signalId, SpecificValueMissingValuePolicy<double> specificValueMissingValuePolicy)

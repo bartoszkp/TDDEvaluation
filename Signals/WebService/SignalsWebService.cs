@@ -74,7 +74,14 @@ namespace WebService
         {
             if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
 
-            else signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
+            else
+            {
+                Type type = null;
+
+                foreach (var item in data) type = item.Value.GetType();
+
+                if (type == typeof(double)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
+            }
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
