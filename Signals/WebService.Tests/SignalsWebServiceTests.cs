@@ -61,6 +61,19 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingByOtherId_ReturnedIsNull()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
+                signalsRepositoryMock.Setup(sr => sr.Get(2)).Returns<Signal>(null);
+
+                var result = signalsWebService.GetById(2);
+
+                Assert.IsNull(result);
+            }
 
             // --------------------------------------------------------------------------------------------------------------------------
 
