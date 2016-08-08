@@ -19,7 +19,7 @@ namespace DataAccess.Repositories
             var policyTypes = Assembly
                 .GetExecutingAssembly()
                 .GetTypes()
-                .Where(t => t.BaseType != null)
+                .Where(t => t.BaseType != null) 
                 .Where(t => t.BaseType.BaseType != null)
                 .Where(t => t.BaseType.BaseType.IsGenericType)
                 .Where(t => t.BaseType.BaseType.GetGenericTypeDefinition().Equals(typeof(MissingValuePolicy<>)))
