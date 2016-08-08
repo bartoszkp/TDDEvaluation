@@ -632,6 +632,35 @@ namespace WebService.Tests
                     result.Select(d => d.Timestamp).ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataAndMVPByMonths_WhenGettingData_ReturnsSortedByDate()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    signalId,
+                    DataType.Boolean,
+                    Granularity.Month,
+                    Path.FromString("")));
+
+                GivenData(signalId, new[]
+                {
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
+                    new Datum<bool> {Quality = Quality.Bad, Timestamp = new System.DateTime().AddMonths(2) },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddMonths(1) }
+                });
+
+                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
+
+                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddMonths(3));
+
+                CollectionAssert.AreEqual(new[]
+                {
+                    new System.DateTime(),
+                    new System.DateTime().AddMonths(1),
+                    new System.DateTime().AddMonths(2)
+                }, result.Select(datum => datum.Timestamp).ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
