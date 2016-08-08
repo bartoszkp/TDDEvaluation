@@ -38,8 +38,7 @@ namespace Domain.Services.Implementation
         public Signal GetByPath(Path signalPath)
         {
             Signal signal = this.signalsRepository.Get(signalPath);
-            if (signal == null)
-                throw new CouldntGetASignalException();
+
             return signal;
         }
 
