@@ -118,9 +118,67 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var signal = this.signalsRepository.Get(signalId);
+            var signal = this.signalsRepository.Get(signalId);           
+            var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+
+            var sortedList = result.OrderBy(x => x.Timestamp).ToList();
+
+          
+            var r = GetMissingValuePolicy(signalId);
+            var datumToAdd = new Datum<T>();
+            int i = 0;
+            var time = fromIncludedUtc;
+
+
+            if (r.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
+            {
+                while (time != toExcludedUtc)
+                {
+                    if (sortedList[i].Timestamp == time)
+                    {
+                        i++;
+                    }
+                    else
+                    {
+                        sortedList.Add(new Datum<T>() { Quality = datumToAdd.Quality, Timestamp = time, Value = datumToAdd.Value });
+                    }
+                    time = AddTime(signal.Granularity, time);
+                }
+            }
+            return sortedList;
+        }
+
+        private  DateTime AddTime(Granularity granularity,DateTime time)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                   return time.AddSeconds(1);
+                    break;
+                case Granularity.Minute:
+                    return time.AddMinutes(1);
+                    break;
+                case Granularity.Hour:
+                    return time.AddHours(1);
+                    break;
+                case Granularity.Day:
+                    return time.AddDays(1);
+                    break;
+                case Granularity.Week:
+                    return time.AddDays(7);
+                    break;
+                case Granularity.Month:
+                    return time.AddMonths(1);
+                    break;
+                case Granularity.Year:
+                    return time.AddYears(1);
+                    break;
+                default:
+                    return new DateTime();
+                    break;
+            }
         }
 
         public Type GetDataTypeById(int signalId)
