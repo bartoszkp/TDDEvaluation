@@ -2,6 +2,7 @@
 using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
+using Domain.MissingValuePolicy;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -228,6 +229,31 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
                 Assert.IsTrue(CompareDatum(datum,result));
+            }
+
+            [TestMethod]
+            public void GetData_WithNoneQualityMissingValuePolicy_ReturnsIt()
+            {
+                var signal = new Signal { Id = 1, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") };
+                GivenASignal(signal);
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                var datum = new Datum<double>[] {
+                   new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                   new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = 2 } };
+                var expectedDatum = new Dto.Datum[] {
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = (double)0 },
+                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = (double)0 } };
+
+                signalsDataRepositryMock
+                    .Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datum);
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                Assert.IsTrue(CompareDatum(expectedDatum, result.ToArray()));
             }
 
             [TestMethod]
