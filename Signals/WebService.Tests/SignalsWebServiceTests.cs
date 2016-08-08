@@ -5,6 +5,7 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -14,6 +15,10 @@ namespace WebService.Tests
         public class SignalsWebServiceTests
         {
             private ISignalsWebService signalsWebService;
+
+            private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
@@ -281,7 +286,7 @@ namespace WebService.Tests
                 };
                 prepareDataRepository(signal.Id.Value, signal);
                 signalsDataRepositoryMock
-                    .Setup(sdr => sdr.SetData<int>(It.IsAny<System.Collections.Generic.IEnumerable<Domain.Datum<int>>>()));
+                    .Setup(sdr => sdr.SetData<int>(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
 
                 var enumerable = new Dto.Datum[] {
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2016, 1, 16), Value = 7 },
@@ -292,7 +297,7 @@ namespace WebService.Tests
                 var enumerableSorted = enumerable.OrderBy(dtoDatum => dtoDatum.Timestamp);
 
                 signalsDataRepositoryMock.Verify(sdr => sdr.SetData<int>(
-                    It.Is<System.Collections.Generic.IEnumerable<Domain.Datum<int>>>(
+                    It.Is<IEnumerable<Domain.Datum<int>>>(
                         d => IEnumerableDatumAreEqual(enumerableSorted, d, signal))));
             }
 
@@ -326,8 +331,8 @@ namespace WebService.Tests
                 };
             }
 
-            private bool IEnumerableDatumAreEqual<T>(System.Collections.Generic.IEnumerable<Dto.Datum> datumDto,
-                System.Collections.Generic.IEnumerable<Domain.Datum<T>> datumDomain,
+            private bool IEnumerableDatumAreEqual<T>(IEnumerable<Dto.Datum> datumDto,
+                IEnumerable<Domain.Datum<T>> datumDomain,
                 Domain.Signal signal)
             {        
                 foreach (var dt in datumDto.Zip(datumDomain, System.Tuple.Create))
@@ -386,9 +391,6 @@ namespace WebService.Tests
                     signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
-            private Mock<ISignalsRepository> signalsRepositoryMock;
-            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
-            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
         }
     }
 }
