@@ -289,9 +289,11 @@ namespace WebService.Tests
                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new System.DateTime(2003, 3, 18), Value = 78 } };
                 signalsWebService.SetData(signal.Id.Value, enumerable);
 
+                var enumerableSorted = enumerable.OrderBy(dtoDatum => dtoDatum.Timestamp);
+
                 signalsDataRepositoryMock.Verify(sdr => sdr.SetData<int>(
                     It.Is<System.Collections.Generic.IEnumerable<Domain.Datum<int>>>(
-                        d => IEnumerableDatumAreEqual(enumerable, d, signal))));
+                        d => IEnumerableDatumAreEqual(enumerableSorted, d, signal))));
             }
 
             private Dto.Signal SignalWith(
