@@ -51,27 +51,17 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(signalId);
         }
 
-        public void SetData(int signalId, IEnumerable<Datum<object>> data)
+        public void SetData<T>(Signal foundSignal, IEnumerable<Datum<T>> data)
         {
-            Signal foundSignal = GetById(signalId);
-            if (foundSignal == null)
-                throw new SignalNotExistException();
-
-            foreach (Datum<object> d in data)
-            {
+            foreach (var d in data)
                 d.Signal = foundSignal;
-            }
 
             signalsDataRepository.SetData(data);
         }
 
-        public IEnumerable<Datum<object>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            Signal foundSignal = GetById(signalId);
-            if (foundSignal == null)
-                throw new SignalNotExistException();
-
-            return signalsDataRepository.GetData<object>(foundSignal, fromIncludedUtc, toExcludedUtc);
+            return signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp)

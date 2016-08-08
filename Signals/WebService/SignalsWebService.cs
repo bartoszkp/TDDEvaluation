@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -60,26 +61,60 @@ namespace WebService
         {
             List<Dto.Datum> dtoDatum = new List<Dto.Datum>();
 
-            IEnumerable<Domain.Datum<object>> domainDatum = signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+            Signal foundSignal = GetById(signalId);
+            if (foundSignal == null)
+                throw new SignalNotExistException();
 
-            foreach (Domain.Datum<object> d in domainDatum)
+            Domain.Signal signal = foundSignal.ToDomain<Domain.Signal>();
+
+            switch (foundSignal.DataType)
             {
-                dtoDatum.Add(d.ToDto<Dto.Datum>());
+                case Dto.DataType.Double:
+                    return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
+                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Dto.DataType.Integer:
+                    return signalsDomainService.GetData<Int32>(signal, fromIncludedUtc, toExcludedUtc)
+                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Dto.DataType.Boolean:
+                    return signalsDomainService.GetData<Boolean>(signal, fromIncludedUtc, toExcludedUtc)
+                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Dto.DataType.Decimal:
+                    return signalsDomainService.GetData<Decimal>(signal, fromIncludedUtc, toExcludedUtc)
+                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Dto.DataType.String:
+                    return signalsDomainService.GetData<String>(signal, fromIncludedUtc, toExcludedUtc)
+                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
             }
-
-            return dtoDatum;
+            return null;
         }
 
         public void SetData(int signalId, IEnumerable<Dto.Datum> data)
         {
-            List<Domain.Datum<object>> domainData = new List<Domain.Datum<object>>();
-            
-            foreach (Dto.Datum dtoDatum in data)
+            Signal foundSignal = GetById(signalId);
+            if (foundSignal == null)
+                throw new SignalNotExistException();
+
+            Domain.Signal domainSignal = foundSignal.ToDomain<Domain.Signal>();
+
+            switch (foundSignal.DataType)
             {
-                domainData.Add(dtoDatum.ToDomain<Domain.Datum<object>>());
+                case Dto.DataType.Double:
+                    signalsDomainService.SetData(domainSignal,data.ToDomain<IEnumerable<Domain.Datum<Double>>>());
+                    break;
+                case Dto.DataType.Boolean:
+                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Boolean>>>());
+                    break;
+                case Dto.DataType.Decimal:
+                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Decimal>>>());
+                    break;
+                case Dto.DataType.Integer:
+                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Int32>>>());
+                    break;
+                case Dto.DataType.String:
+                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<String>>>());
+                    break;
             }
 
-            signalsDomainService.SetData(signalId, domainData);
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
