@@ -500,23 +500,6 @@ namespace WebService.Tests
                     It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
             }
 
-
-            [TestMethod]
-            public void GivenNoneQualityMissingValuePolicy_WhenGettingMissingValue_ReturnsNotNull()
-            {
-                int signalId = 2;
-                Signal signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>();
-
-                var result = mvp.GetMissingValue(signal, new DateTime(2000, 10, 2));
-
-                Assert.IsNotNull(result);
-            }
-
             [TestMethod]
             public void GivenNoneQualityMissingValuePolicy_WhenGettingMissingValue_ReturnsDatumWithNoneQualityAndDefaultValue()
             {
