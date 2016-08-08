@@ -264,6 +264,7 @@ namespace WebService.Tests
                     Granularity = Domain.Granularity.Month,
                     Path = Domain.Path.FromString("sfda/mko")
                 };
+                var signalDto = signal.ToDto<Dto.Signal>();
 
                 signalsRepositoryMock
                     .Setup(s => s.Get(It.IsAny<int>()))
@@ -272,11 +273,15 @@ namespace WebService.Tests
                     .Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
                     .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble()
                     {
-                        Signal = signal
+                        Id = 1,
+                        Signal = signal,
                     });
                 
                 var result = signalsWebService.GetMissingValuePolicy(1);
-                Assert.AreEqual(DataType.Double, result.DataType);
+                Assert.AreEqual(1, result.Id.Value);
+                Assert.AreEqual(signalDto.DataType, result.Signal.DataType);
+                Assert.AreEqual(signalDto.Granularity, result.Signal.Granularity);
+                Assert.AreEqual(signalDto.Path.ToString(), result.Signal.Path.ToString());
             }
             
             private void SetupWebServiceForMvpOperations()
