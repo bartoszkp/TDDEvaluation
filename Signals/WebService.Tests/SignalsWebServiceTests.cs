@@ -327,11 +327,7 @@ namespace WebService.Tests
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
                 var data = GetDomainDatumDouble();
-                signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signalId),
-                    It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns<Domain.Signal, DateTime, DateTime>(
-                    (s, from, to) => data.Where(d => (d.Timestamp >= from && d.Timestamp < to)));
+                GivenData(signalId, data);
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
@@ -360,6 +356,15 @@ namespace WebService.Tests
                     };
             }
 
+            private void GivenData<T>(int signalId, IEnumerable<Domain.Datum<T>> data)
+            {
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId),
+                    It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns<Domain.Signal, DateTime, DateTime>(
+                    (s, from, to) => data.Where(d => (d.Timestamp >= from && d.Timestamp < to)));
+            }
+
             [TestMethod]
             public void GivenASignal_WhenGettingData_VerifyDataRepositoryFunctions()
             {
@@ -373,12 +378,7 @@ namespace WebService.Tests
 
                 DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
 
-                signalsDataRepositoryMock.Setup(asd => asd.GetData<double>(
-                    It.IsAny<Signal>(),
-                    It.IsAny<DateTime>(),
-                    It.IsAny<DateTime>())).Returns((Signal p,DateTime d,DateTime e) => {
-                        return GetDomainDatumDouble();
-                    });
+                GivenData(signalId, GetDomainDatumDouble());
 
                 signalsWebService.GetData(signalId, from, to);
 
