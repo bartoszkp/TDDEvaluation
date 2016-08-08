@@ -82,6 +82,21 @@ namespace WebService.Tests
                 signalsWebService.GetById(0);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenIdIsNotExist_ReturnNull()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Year,
+                    path: Domain.Path.FromString("root/signal")));
+
+                var result = signalsWebService.GetById(999);
+                Assert.IsNull(result);
+            }
+
+
 
             [TestMethod]
             public void GivenASignal_WhenGettingByItsId_ReturnsIt()
