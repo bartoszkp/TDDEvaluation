@@ -399,6 +399,19 @@ namespace WebService.Tests
                 Assert.IsNotNull(result);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_SignalsMVPIsSetToNoneQualityMVP()
+            {
+                var signalId = 1;
+
+                GivenNoSignals();
+                GivenRepositoryThatAssigns(id: signalId);
+
+                var signal = signalsWebService.Add(new Dto.Signal() { DataType = Dto.DataType.Boolean });
+
+                mvpRepositoryMock.Verify(mvp => mvp.Set(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
