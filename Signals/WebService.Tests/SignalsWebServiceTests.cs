@@ -75,6 +75,23 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingByTheSignalsPath_ReturnedIsNotNullResult()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.Is<Path>(path => path.Equals(Path.FromString("root/signal1")))))
+                    .Returns(new Signal());
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new string[] { "root", "signal1" } });
+
+                Assert.IsNotNull(result);
+            }
+
+
+
             // --------------------------------------------------------------------------------------------------------------------------
 
 
