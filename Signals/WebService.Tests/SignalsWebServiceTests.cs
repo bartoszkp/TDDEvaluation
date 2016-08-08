@@ -315,12 +315,37 @@ namespace WebService.Tests
                     Assert.Fail();
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_ReturnsDataOrderedByDate()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                var data = GetDomainDatumDouble();
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signalId),
+                    It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns<Domain.Signal, DateTime, DateTime>(
+                    (s, from, to) => data.Where(d => (d.Timestamp >= from && d.Timestamp < to)));
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                Assert.AreEqual(2, result.Count());
+                Assert.AreEqual(new DateTime(2000, 1, 1), result.First().Timestamp);
+                Assert.AreEqual(new DateTime(2000, 2, 1), result.Skip(1).First().Timestamp);
+            }
+
             private Domain.Datum<double>[] GetDomainDatumDouble()
             {
                 return new Domain.Datum<double>[]
                     {
-                        new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
                         new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
                         new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
                     };
             }
