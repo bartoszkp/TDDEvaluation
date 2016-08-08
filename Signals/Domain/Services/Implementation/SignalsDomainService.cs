@@ -30,7 +30,7 @@ namespace Domain.Services.Implementation
         {
             var item = this.signalsRepository.Get(signalId);
             if (item == null)
-                throw new InvalidCastException("Signal dosen't exist");
+                throw new NoSuchSignalException();
             return item;
         }
 
@@ -46,8 +46,8 @@ namespace Domain.Services.Implementation
         public Signal Get(Path pathDto)
         {
             var item = this.signalsRepository.Get(pathDto);
-            if(item == null)
-                throw new InvalidCastException("Signal dosen't exist");
+            if (item == null)
+                throw new NoSuchSignalException();
             return item;
         }
 
@@ -65,12 +65,18 @@ namespace Domain.Services.Implementation
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domianPolicy)
         {
             var signal = this.GetById(signalId);
+            if (signal == null)
+                throw new NoSuchSignalException();
+
             this.missingValuePolicyRepository.Set(signal, domianPolicy);
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
             var signal = this.GetById(signalId);
+            if (signal == null)
+                throw new NoSuchSignalException();
+
             var mvp = this.missingValuePolicyRepository.Get(signal);
             if(mvp != null)
                 return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)

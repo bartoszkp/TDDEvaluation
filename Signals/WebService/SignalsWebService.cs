@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -30,7 +31,7 @@ namespace WebService
             if (pathDto != null)
                 return this.signalsDomainService.Get(pathDto.ToDomain<Domain.Path>())
                     ?.ToDto<Dto.Signal>();
-            else
+
                 return null;
         }
 
@@ -66,7 +67,7 @@ namespace WebService
             var signal = signalsDomainService.GetById(signalId);
 
             if (signal == null)
-                throw new InvalidCastException("Signal dosen't exist");
+                throw new NoSuchSignalException();
 
             switch(signal.DataType)
             {
@@ -110,6 +111,9 @@ namespace WebService
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var signal = signalsDomainService.GetById(signalId);
+
+            if (signal == null)
+                throw new NoSuchSignalException();
 
             switch (signal.DataType)
             {
