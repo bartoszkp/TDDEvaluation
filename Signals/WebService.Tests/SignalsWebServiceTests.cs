@@ -167,6 +167,13 @@ namespace WebService.Tests
                     .Returns(existingSignal);
             }
 
+            private void GivenMissingValuePolicy(int signalId, Domain.MissingValuePolicy.MissingValuePolicyBase mvp)
+            {
+                missingValuePolicyRepositoryMock
+                    .Setup(mvpr => mvpr.Get(It.Is<Domain.Signal>(s => s.Id == signalId)))
+                    .Returns(mvp);
+            }
+
             private void GivenRepositoryThatAssigns(int id)
             {
                 signalsRepositoryMock
@@ -309,7 +316,7 @@ namespace WebService.Tests
                     dataType: Domain.DataType.Integer,
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal")));
-
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
                 DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
 
                 if (!(signalsWebService.GetData(signalId, from, to) is IEnumerable<Dto.Datum>))
@@ -327,6 +334,7 @@ namespace WebService.Tests
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
                 var data = GetDomainDatumDouble();
                 GivenData(signalId, data);
 
@@ -376,6 +384,7 @@ namespace WebService.Tests
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
 
                 DateTime from = new DateTime(2000, 1, 1), to = new DateTime(2000, 3, 1);
 
@@ -557,6 +566,7 @@ namespace WebService.Tests
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
                 GivenData(signalId, GetDomainStringData());
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
@@ -575,6 +585,7 @@ namespace WebService.Tests
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
                 GivenData(signalId, GetDomainStringData());
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1)).ToArray();
@@ -596,6 +607,7 @@ namespace WebService.Tests
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
                 GivenData(signalId, GetDomainStringData());
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1)).ToArray();

@@ -88,13 +88,15 @@ namespace Domain.Services.Implementation
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc)
                 .OrderBy(d => d.Timestamp).ToList();
+
+            MissingValuePolicy.MissingValuePolicy<T> mvp = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
             DateTime current = fromIncludedUtc;
 
             int i = 0;
             while(current < toExcludedUtc)
             {
-                if(i >= data.Count || data[i].Timestamp != current)
-                    data.Add(new Datum<T>());
+                if (i >= data.Count || data[i].Timestamp != current)
+                    data.Add(mvp.GetMissingValue(signal, current));
                 else
                     i++;
 
