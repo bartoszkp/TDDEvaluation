@@ -33,7 +33,9 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            return this.signalsRepository.Add(newSignal);
+            var sig = this.signalsRepository.Add(newSignal);
+            this.missingValuePolicyRepository.Set(sig,new NoneQualityMissingValuePolicy<Int32>());
+            return sig;
         }
 
         public Signal GetByPath(Path domainPath)
