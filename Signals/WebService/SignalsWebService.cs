@@ -67,7 +67,7 @@ namespace WebService
 
             var datum = this.signalsDomainService?.GetData(signal, fromIncludedUtc, toExcludedUtc);
 
-            return datum?.ToDto<IEnumerable<Dto.Datum>>();
+            return datum?.ToDto<IEnumerable<Dto.Datum>>().OrderBy(x => x.Timestamp);
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
