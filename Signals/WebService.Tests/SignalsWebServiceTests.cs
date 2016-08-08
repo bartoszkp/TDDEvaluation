@@ -604,6 +604,18 @@ namespace WebService.Tests
                 SetupRepositoryMocks_CallGetData_CompareReturnedData<string>(signalString, expectedDataString, dataReturnedString, dateFrom, dateTo);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_ReturnsEmptySignal_ExpectedException()
+            {
+                int singnalId = 5;
+                SetupWebService();
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
+
+                var result = signalsWebService.GetMissingValuePolicy(singnalId);
+            }
+
             private void GivenASignalAndData_SetupSignalsRepositoryMockAndVerifySetDataCall<T>(Signal signal, IEnumerable<Dto.Datum> data, DateTime timeStamp, T value)
             {
                 signalsRepositoryMock.Setup(srm => srm.Get(signal.Id.Value)).Returns(signal);
