@@ -90,6 +90,19 @@ namespace WebService.Tests
                 Assert.IsNotNull(result);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingByTheSignalsId_ReturnedIsNotNullResult()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
+
+                var result = signalsWebService.GetById(1);
+
+                Assert.IsNotNull(result);
+            }
+
 
 
             // --------------------------------------------------------------------------------------------------------------------------
