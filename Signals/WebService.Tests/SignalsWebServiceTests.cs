@@ -304,6 +304,17 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(1, missingValuePolicy);
             }
 
+            [TestMethod]
+            public void GivenNoSignal_WhenGettingById_NullIsReturned()
+            {
+                GivenNoSignals();
+                int nonExistingId = 5;
+
+                var result = signalsWebService.GetById(nonExistingId);
+
+                Assert.IsNull(result);
+            }
+
             private void GivenMissingValuePolicy(Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
             {
                 missingValuePolicyRepositoryMock
