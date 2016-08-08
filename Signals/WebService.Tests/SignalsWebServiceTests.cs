@@ -300,6 +300,15 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void WhenGettingByPath_ReturnsNull()
+            {
+                GivenASignal(null, 1);
+                var result = signalsWebService.Get(new Dto.Path() {
+                    Components = new[] { "sfda" } });
+                Assert.IsNull(result);
+            }
+
             private void SetupWebServiceForMvpOperations()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
