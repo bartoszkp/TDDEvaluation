@@ -563,6 +563,29 @@ namespace WebService.Tests
 
                 Assert.AreEqual(6, result.Count());
             }
+
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithMissingValues_ReturnsSortedData()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenData(signalId, GetDomainStringData());
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1)).ToArray();
+
+                for (int i = 0; i < result.Length - 1; i++)
+                {
+                    if (result[i].Timestamp > result[i + 1].Timestamp)
+                        Assert.Fail();
+                }
+            }
+
         }
     }
 }
