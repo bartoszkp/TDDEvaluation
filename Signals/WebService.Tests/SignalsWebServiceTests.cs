@@ -303,6 +303,18 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GiveNoSignal_WhenGettingByPath_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                Dto.Path dtoPath = new Dto.Path() { Components = new[] { "not", "existing", "path" } };
+
+                var result = signalsWebService.Get(dtoPath);
+
+                Assert.IsNull(result);
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
