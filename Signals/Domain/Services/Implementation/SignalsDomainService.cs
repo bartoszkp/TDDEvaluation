@@ -43,13 +43,8 @@ namespace Domain.Services.Implementation
 
 
         public Signal Get(Path path)
-        {
-            var result =  this.signalsRepository.Get(path);
-
-            if (result == null)
-                throw new ArgumentException("A signal with the given path does not exist");
-
-            return result;
+        { 
+            return this.signalsRepository.Get(path);
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> data)

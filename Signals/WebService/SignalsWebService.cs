@@ -31,7 +31,7 @@ namespace WebService
 
             var result = signalsDomainService.Get(path);
 
-            return result.ToDto<Dto.Signal>();
+            return result?.ToDto<Dto.Signal>();
         }
 
         public Signal GetById(int signalId)
