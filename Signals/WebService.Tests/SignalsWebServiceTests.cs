@@ -223,13 +223,14 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(CouldntGetASignalException))]
-            public void GivenNoSignals_WhenGettingByPath_ThrowsCouldntGetASignalException()
+            public void GivenNoSignals_WhenGettingByPath_ReturnsNull()
             {
                 GivenNoSignals();
-
                 Dto.Path notExistingPath = new Dto.Path() { Components = new[] { "root" } };
+
                 var result = signalsWebService.Get(notExistingPath);
+
+                Assert.IsNull(result);
             }
 
             [TestMethod]
