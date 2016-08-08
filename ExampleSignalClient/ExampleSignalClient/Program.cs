@@ -9,20 +9,27 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            client.Add(new Signal() { DataType = DataType.Boolean, Granularity = Granularity.Day, Path = new Path() { Components = new[] { "root", "someSignal" } } });
+            /*
+            var signal1 = new Signal() {DataType = DataType.String, Path = new Path() { Components = new string[] { "A", "B" } }, Granularity = Granularity.Month };            
+            var signal2 = new Signal() {DataType = DataType.Double, Path = new Path() { Components = new string[] { "C", "D" } }, Granularity = Granularity.Month };
+            client.Add(signal1);
+            client.Add(signal2);
+            */
 
-            client.SetData(1, new Datum[] {
-            new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (bool)true },
-            new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (bool)false },
-            new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (bool)true } });
+            var mvp1 = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.String, Quality = Quality.Fair, Value = "x" };
+            var mvp2 = new Signals.NoneQualityMissingValuePolicy();
 
-            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+            client.SetMissingValuePolicy(1, mvp1);
+            client.SetMissingValuePolicy(2, mvp2);
 
-            foreach (var d in result)
-            {
-                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
-            }
+            var result1 = client.GetMissingValuePolicy(1) as Signals.SpecificValueMissingValuePolicy;
+            var result2 = client.GetMissingValuePolicy(2) as Signals.NoneQualityMissingValuePolicy;
 
+            Console.WriteLine(result1.Signal.Id.Value);
+            Console.WriteLine(result2.Signal.Id.Value);
+            Console.WriteLine(result1.DataType);
+            Console.WriteLine(result1.Quality);
+            Console.WriteLine(result1.Value);
             Console.ReadKey();
         }
     }

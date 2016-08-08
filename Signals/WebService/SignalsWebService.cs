@@ -91,7 +91,7 @@ namespace WebService
         {
             var domainSignal = this.signalsDomainService.GetById(signalId).ToDomain<Domain.Signal>();
             var result = this.signalsDomainService.GetMVP(domainSignal);
-            return result.ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
+            return result.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
