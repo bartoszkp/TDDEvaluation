@@ -101,7 +101,9 @@ namespace Domain.Services.Implementation
                     Signal = signal
                 };
             }
-            signalsDataRepository.SetData<T>(datums);
+
+            IEnumerable<Datum<T>> sortedDatums = datums.OrderBy(datum => datum.Timestamp);
+            signalsDataRepository.SetData<T>(sortedDatums);
         }
     }
 }

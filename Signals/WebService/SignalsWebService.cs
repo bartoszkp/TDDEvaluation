@@ -90,7 +90,9 @@ namespace WebService
             int i = 0;
             foreach (var e in enumerable)
                 datums[i++] = e.ToDto<Datum>();
-            return datums;
+
+            IEnumerable<Datum> sortedDatums = datums.OrderBy(datum => datum.Timestamp);
+            return sortedDatums;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
@@ -136,7 +138,7 @@ namespace WebService
                     Value = e.Value.ToDomain<T>()
                 };
             }
-             signalsDomainService.SetData(signalId, datums);
+            signalsDomainService.SetData(signalId, datums);
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
