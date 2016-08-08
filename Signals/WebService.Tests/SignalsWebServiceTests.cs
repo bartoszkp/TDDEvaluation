@@ -108,36 +108,7 @@ namespace WebService.Tests
             // --------------------------------------------------------------------------------------------------------------------------
 
 
-            [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignals_WhenGettingByAnyPath_ThrowedIsArgumentException()
-            {
-                var signalRepositoryMock = new Mock<ISignalsRepository>();
-                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
-                var signalWebService = new SignalsWebService(signalDomainService);
-                var dummyPath = Path.FromString("root/signal");
-
-                signalWebService.Get(dummyPath.ToDto<Dto.Path>());
-                
-            }
-
-            [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenASignal_WhenGettingByPathWhichDoesNotExistInRepository_ThrowedIsArgumentException()
-            {
-                var signalRepositoryMock = new Mock<ISignalsRepository>();
-                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, null);
-                var signalWebService = new SignalsWebService(signalDomainService);
-                signalWebService.Add(new Dto.Signal()
-                {
-                    DataType = Dto.DataType.Decimal,
-                    Granularity = Dto.Granularity.Hour,
-                    Path = new Dto.Path() { Components = new string[] { "root", "signal1" } }
-                });
-                var dummyPath = Path.FromString("root/signal2");
-
-                signalWebService.Get(dummyPath.ToDto<Dto.Path>());
-            }
+            
 
             [TestMethod]
             public void GivenASignal_WhenGettingByPathWhichExistsInRepository_ReturnedIsTheSignal()
