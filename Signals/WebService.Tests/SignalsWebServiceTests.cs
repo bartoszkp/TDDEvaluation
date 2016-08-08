@@ -346,6 +346,17 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareTwoDatum(result, expectedResult));
             }
 
+            [TestMethod]
+            public void GetByPath_SignalWithGivenPathDoesntExist_ReturnNull()
+            {
+                MakeMocks();
+                MakeASignalsWebService();
+                signalsRepositoryMock.Setup(x => x.Get(Domain.Path.FromString("bad/path"))).Returns((Domain.Signal)null);
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "bad", "path" }});
+
+                Assert.AreEqual(null, result);
+            }
            
 
 
