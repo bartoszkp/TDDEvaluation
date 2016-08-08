@@ -341,10 +341,12 @@ namespace WebService.Tests
                 dataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(datum.ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>());
 
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
-                var ExpectedResult = datum.OrderBy(x => x.Timestamp);
+                var expectedResult = datum.OrderBy(x => x.Timestamp);
 
-                Assert.IsTrue(ExpectedResult.SequenceEqual(result));
+                Assert.IsTrue(CompareTwoDatum(result, expectedResult));
             }
+
+           
 
 
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
@@ -725,6 +727,23 @@ namespace WebService.Tests
                     path: path));
 
             }
+
+            private bool CompareTwoDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
+            {
+                if (datum1.Count() != datum2.Count()) return false;
+
+                for (int i = 0; i < datum1.Count(); i++)
+                {
+
+                    if (datum1.ToList()[i].Quality != datum2.ToList()[i].Quality ||
+                        DateTime.Equals(datum1.ToList()[i].Timestamp, datum2.ToList()[i].Timestamp) == false ||
+                        datum1.ToList()[i].Value.ToString() != datum2.ToList()[i].Value.ToString()
+                     )
+                        return false;
+                }
+                return true;
+            }
+
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }
     }

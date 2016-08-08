@@ -43,7 +43,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x=>x.Timestamp);
         }
 
         public void Set(Signal signal, MissingValuePolicyBase missingValuePolicy)
