@@ -37,8 +37,33 @@ namespace Domain.Services.Implementation
             {
                 throw new IdNotNullException();
             }
+            
+            var result= this.signalsRepository.Add(newSignal);
 
-            return this.signalsRepository.Add(newSignal);
+            var dataType = result.DataType;       
+
+            switch (dataType)
+            {
+                case Domain.DataType.Boolean:
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<Boolean>());
+                    break;
+                case Domain.DataType.Integer:
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<int>());
+                    break;
+                case Domain.DataType.Double:
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<double>());
+                    break;
+                case Domain.DataType.Decimal:
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<decimal>());
+                    break;
+                case Domain.DataType.String:
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<string>());
+                    break;
+                default:
+                    break;
+            }
+
+            return result;
         }
 
         public Signal GetByPath(Path signalPath)
