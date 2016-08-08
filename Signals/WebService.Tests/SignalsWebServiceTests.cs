@@ -301,6 +301,16 @@ namespace WebService.Tests
                         d => IEnumerableDatumAreEqual(enumerableSorted, d, signal))));
             }
 
+            [TestMethod]
+            public void GivenNoSignal_WhenGettingById_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.GetById(42351);
+
+                Assert.IsNull(result);
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
