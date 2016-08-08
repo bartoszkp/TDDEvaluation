@@ -29,8 +29,7 @@ namespace Domain.Services.Implementation
         public Signal GetById(int signalId)
         {
             var result = this.signalsRepository.Get(signalId);
-            if (result == null) throw new InvalidSignalId();
-            else return result;
+            return result;
         }
 
         public Signal Add(Signal newSignal)
@@ -46,8 +45,7 @@ namespace Domain.Services.Implementation
         public Signal Get(Path pathDto)
         {
             var result = this.signalsRepository.Get(pathDto);
-            if (result == null) throw new InvalidPathArgument();
-            else return result;
+            return result;
         }
 
         public void SetData(IEnumerable<Datum<object>> newDomainDatum)
