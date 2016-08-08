@@ -130,17 +130,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(NoSuchSignalException))]
-            public void GettingSignalByPath_SignalDoesNotExist_ThrowsException()
-            {
-                GivenNoSignals();
-                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Path>())).Returns((Signal)null);
-                var path = new Dto.Path() { Components = new[] { "x", "y" } };
-
-                var result = signalsWebService.Get(path);
-            }
-
-            [TestMethod]
             public void GivenSignals_GettingSignalByPath_SignalIsReturned()
             {
                 var exsistingSignal = SignalWith(1,
