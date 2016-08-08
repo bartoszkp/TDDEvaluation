@@ -247,6 +247,26 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareDatum(datum,result));
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingSignalById_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.GetById(1337);
+
+                Assert.IsNull(result);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingSignalByPath_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "a", "b", "c" } });
+
+                Assert.IsNull(result);
+            }
+
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
             {
                 if (datum1.Count() != datum2.Count()) return false;
