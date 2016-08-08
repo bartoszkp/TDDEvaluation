@@ -32,7 +32,7 @@ namespace WebService
 
         public Signal GetById(int signalId)
         {
-            return signalsDomainService.GetById(signalId).ToDto<Dto.Signal>();
+            return signalsDomainService.GetById(signalId)?.ToDto<Dto.Signal>();
         }
 
         public Signal Add(Signal signalDto)
