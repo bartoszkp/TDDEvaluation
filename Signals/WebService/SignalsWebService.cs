@@ -90,7 +90,10 @@ namespace WebService
         private IEnumerable<Dto.Datum> GetDataWithType<T>(Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             IEnumerable<Domain.Datum<T>> result = signalsDomainService.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
-            return result.ToDto<IEnumerable<Dto.Datum>>();
+
+            IEnumerable< Domain.Datum < T >> sortRes = result.OrderBy(dat => dat.Timestamp).ToArray();
+
+            return sortRes.ToDto<IEnumerable<Dto.Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> dataDto)
@@ -108,7 +111,7 @@ namespace WebService
         }
         private void SetDataWithType<T>(Domain.Signal signal, IEnumerable<Datum> dataDto)
         {
-            var dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<T>>>();
+            IEnumerable<Domain.Datum<T>> dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<T>>>();
             dataDomain = FillDatum<T>(signal, dataDomain);
             this.signalsDomainService.SetData<T>(dataDomain);
         }
