@@ -147,7 +147,7 @@ namespace Domain.Services.Implementation
                     time = AddTime(signal.Granularity, time);
                 }
             }
-            return sortedList;
+            return sortedList.OrderBy(s=>s.Timestamp);
         }
 
         private  DateTime AddTime(Granularity granularity,DateTime time)
