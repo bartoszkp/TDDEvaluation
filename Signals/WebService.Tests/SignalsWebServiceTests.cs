@@ -250,6 +250,38 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalData_ReturnsItSorted()
+            {
+                GivenASignal(new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("c/b/a")
+                });
+                SetupSignalsDataRepositoryMock<double>();
+                
+                var datum = new Datum<double>[] {
+                         new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (double)1.5 },
+                         new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                         new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 3), Value = (double)2 }
+                };
+                var datumSorted = new Dto.Datum[]
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (double)1.5 },
+                    new Dto.Datum() {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 3), Value = (double)2 }
+                };
+                signalsDataRepositryMock
+                    .Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datum.ToDomain<IEnumerable<Domain.Datum<double>>>());
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 4));
+                
+                Assert.IsTrue(CompareDatum(datumSorted, result));
+            }
+
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
             {
                 if (datum1.Count() != datum2.Count()) return false;
