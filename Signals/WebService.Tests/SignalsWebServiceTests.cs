@@ -364,6 +364,53 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void GivenASignalAndDecimalDatum_WhenSettingData_RepositorySetIsCalled()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Decimal,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (decimal)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (decimal)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (decimal)2 }
+                };
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<decimal>(It.IsAny<IEnumerable<Datum<decimal>>>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, existingDatum);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+
+                var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<decimal>>>();
+                int index = 0;
+
+                foreach (var ed in datum)
+                {
+                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<decimal>(It.Is<IEnumerable<Datum<decimal>>>(d =>
+                    (
+                        d.ElementAt(index).Quality == ed.Quality
+                        && d.ElementAt(index).Timestamp == ed.Timestamp
+                        && d.ElementAt(index).Value == ed.Value
+                    ))));
+                    index++;
+                }
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
