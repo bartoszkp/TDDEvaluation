@@ -499,6 +499,23 @@ namespace WebService.Tests
                     .Verify(mvpr => mvpr.Set(It.Is<Domain.Signal>(s => s.Id == result.Id),
                     It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
             }
+
+
+            [TestMethod]
+            public void GivenNoneQualityMissingValuePolicy_WhenGettingMissingValue_ReturnsNotNull()
+            {
+                int signalId = 2;
+                Signal signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>();
+
+                var result = mvp.GetMissingValue(signal, new DateTime(2000, 10, 2));
+
+                Assert.IsNotNull(result);
+            }
         }
     }
 }
