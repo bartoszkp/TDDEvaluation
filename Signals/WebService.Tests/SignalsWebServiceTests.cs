@@ -107,11 +107,11 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignal_WhenGettingByNonExistentPath_ReturnException()
+            public void GivenNoSignal_WhenGettingByNonExistentPath_ReturnNull()
             {
                 GivenNoSignals();
-                signalsWebService.Get(null);
+                var result = signalsWebService.Get(null);
+                Assert.IsNull(result);
             }
 
             [TestMethod]

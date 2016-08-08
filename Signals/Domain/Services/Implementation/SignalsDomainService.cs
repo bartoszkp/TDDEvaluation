@@ -44,7 +44,6 @@ namespace Domain.Services.Implementation
         public Signal Get(Path pathDomain)
         {
             var result = signalsRepository.Get(pathDomain);
-            if (result == null) throw new ArgumentException();
             return result;
         }
 
