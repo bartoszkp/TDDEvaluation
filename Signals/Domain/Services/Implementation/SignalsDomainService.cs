@@ -39,7 +39,11 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            return this.signalsRepository.Add(newSignal);
+            var signal = this.signalsRepository.Add(newSignal);
+
+            SetDefaultMVPForSignal(signal);            
+
+            return signal;
         }
 
         public Signal Get(Path pathDto)
@@ -168,6 +172,35 @@ namespace Domain.Services.Implementation
             var result = this.missingValuePolicyRepository.Get(domainSignal);
             if (result == null) return null;
             else return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        private void SetDefaultMVPForSignal(Signal signal)
+        {
+            switch(signal.DataType)
+            {
+                case DataType.Boolean:
+                    SetMVP(signal, new NoneQualityMissingValuePolicy<bool>());
+                    break;
+
+                case DataType.Decimal:
+                    SetMVP(signal, new NoneQualityMissingValuePolicy<decimal>());
+                    break;
+
+                case DataType.Double:
+                    SetMVP(signal, new NoneQualityMissingValuePolicy<double>());
+                    break;
+
+                case DataType.Integer:
+                    SetMVP(signal, new NoneQualityMissingValuePolicy<int>());
+                    break;
+
+                case DataType.String:
+                    SetMVP(signal, new NoneQualityMissingValuePolicy<string>());
+                    break;
+
+                default:
+                    throw new UnsupportedTypeForMVP();                    
+            }            
         }
     }
 }

@@ -9,11 +9,19 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var result = client.Get(new Path() { Components = new[] { "bad", "path" } } );
-            var result2 = client.GetById(999543);
+            var newSignal = new Signal()
+            {
+                DataType = DataType.Integer,
+                Granularity = Granularity.Minute,
+                Path = new Path() { Components = new[] { "root", "defaultPolicy" } }
+            };
 
-            Console.WriteLine(result == null);
-            Console.WriteLine(result2 == null);
+            var result = client.Add(newSignal);
+
+            var mvp = client.GetMissingValuePolicy(result.Id.Value);
+
+            Console.WriteLine(mvp);
+
             Console.ReadKey();
         }
     }
