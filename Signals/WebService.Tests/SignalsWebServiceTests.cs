@@ -7,6 +7,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
 using DataAccess.GenericInstantiations;
+using Domain.MissingValuePolicy;
+using System;
 
 namespace WebService.Tests
 {
@@ -232,7 +234,7 @@ namespace WebService.Tests
                 GivenNoSignals();
 
                 int id = 5;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
+                DateTime dateFrom = new DateTime(2000, 1, 1), dateTo = new DateTime(2000, 3, 1);
 
                 signalsWebService.GetData(id, dateFrom, dateTo);
             }
@@ -241,7 +243,7 @@ namespace WebService.Tests
             public void GivenASignalAndDataOfIntegers_WhenGettingItsData_DataRepositoryGetDataIsCalled()
             {
                 int id = 1;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = new System.DateTime(2000, 3, 1);
+                DateTime dateFrom = new DateTime(2000, 1, 1), dateTo = new DateTime(2000, 3, 1);
 
                 var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Integer, 1, id);
 
@@ -255,9 +257,9 @@ namespace WebService.Tests
                 int id = 1;
                 int numberOfDatums = 3;
                 int numberOfDatumsFromPeriod = numberOfDatums - 1;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+                DateTime dateFrom = new DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatumsFromPeriod);
 
-                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Integer, 1, id, numberOfDatums);                
+                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Integer, 1, id, numberOfDatums);
 
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
 
@@ -275,9 +277,9 @@ namespace WebService.Tests
                 int id = 1;
                 int numberOfDatums = 3;
                 int numberOfDatumsFromPeriod = numberOfDatums - 1;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+                DateTime dateFrom = new DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatumsFromPeriod);
 
-                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Double, 1.0, id, numberOfDatums);                
+                var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Double, 1.0, id, numberOfDatums);
 
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
 
@@ -295,7 +297,7 @@ namespace WebService.Tests
                 int id = 1;
                 int numberOfDatums = 3;
                 int numberOfDatumsFromPeriod = numberOfDatums - 1;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+                DateTime dateFrom = new DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
 
                 var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Boolean, true, id, numberOfDatums);
 
@@ -308,7 +310,7 @@ namespace WebService.Tests
                 int id = 1;
                 int numberOfDatums = 3;
                 int numberOfDatumsFromPeriod = numberOfDatums - 1;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+                DateTime dateFrom = new DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
 
                 var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.Decimal, 99m, id, numberOfDatums);
 
@@ -321,7 +323,7 @@ namespace WebService.Tests
                 int id = 1;
                 int numberOfDatums = 3;
                 int numberOfDatumsFromPeriod = numberOfDatums - 1;
-                System.DateTime dateFrom = new System.DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
+                DateTime dateFrom = new DateTime(2000, 1, 1), dateTo = dateFrom.AddMonths(numberOfDatums);
 
                 var signal = GivenASignalAndDataRepositoryWithSetups(dateFrom, DataType.String, "str", id, numberOfDatums);
 
@@ -352,10 +354,10 @@ namespace WebService.Tests
 
                 mvpRepositoryMock.Verify(
                     m => m.Set(
-                        It.Is<Domain.Signal>(s => s.Id == signalId), 
+                        It.Is<Domain.Signal>(s => s.Id == signalId),
                         It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()
                     )
-                );                
+                );
             }
 
             [ExpectedException(typeof(SignalNotFoundException))]
@@ -376,9 +378,9 @@ namespace WebService.Tests
                 var signal = SignalWith(signalId, DataType.Integer, Granularity.Day, path.ToDomain<Domain.Path>());
 
                 GivenASignal(signal);
-                
+
                 signalsWebService.GetMissingValuePolicy(signalId);
-                mvpRepositoryMock.Verify(m => m.Get(It.IsAny<Signal>()));                
+                mvpRepositoryMock.Verify(m => m.Get(It.IsAny<Signal>()));
             }
 
             [TestMethod]
@@ -393,7 +395,7 @@ namespace WebService.Tests
                 mvpRepositoryMock
                     .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
                     .Returns(new SpecificValueMissingValuePolicyInteger());
-                
+
                 var result = signalsWebService.GetMissingValuePolicy(signalId);
 
                 Assert.IsNotNull(result);
@@ -424,22 +426,22 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddDays(2) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddDays(2) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddDays(3));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddDays(3));
 
                 Assert.IsTrue(result.Count() == 3);
                 Assert.IsTrue(result.Any(d => d.Quality == Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new System.DateTime(),
-                        new System.DateTime().AddDays(1),
-                        new System.DateTime().AddDays(2),
+                        new DateTime(),
+                        new DateTime().AddDays(1),
+                        new DateTime().AddDays(2),
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
@@ -456,23 +458,23 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddMonths(3) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddMonths(3) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddMonths(4));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddMonths(4));
 
                 Assert.IsTrue(result.Count() == 4);
                 Assert.IsTrue(result.Any(d => d.Quality == Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new System.DateTime(),
-                        new System.DateTime().AddMonths(1),
-                        new System.DateTime().AddMonths(2),
-                        new System.DateTime().AddMonths(3)
+                        new DateTime(),
+                        new DateTime().AddMonths(1),
+                        new DateTime().AddMonths(2),
+                        new DateTime().AddMonths(3)
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
@@ -489,21 +491,21 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddSeconds(1) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddSeconds(1) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddSeconds(2));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddSeconds(2));
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new System.DateTime(),
-                        new System.DateTime().AddSeconds(1)
+                        new DateTime(),
+                        new DateTime().AddSeconds(1)
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
@@ -520,21 +522,21 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddMinutes(1) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddMinutes(1) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddMinutes(2));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddMinutes(2));
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new System.DateTime(),
-                        new System.DateTime().AddMinutes(1)
+                        new DateTime(),
+                        new DateTime().AddMinutes(1)
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
@@ -551,21 +553,21 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddHours(1) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddHours(1) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddHours(2));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddHours(2));
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new System.DateTime(),
-                        new System.DateTime().AddHours(1)
+                        new DateTime(),
+                        new DateTime().AddHours(1)
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
@@ -582,21 +584,21 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddDays(7) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddDays(7) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddDays(14));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddDays(14));
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new System.DateTime(),
-                        new System.DateTime().AddDays(7)
+                        new DateTime(),
+                        new DateTime().AddDays(7)
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
@@ -613,27 +615,27 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddYears(1) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddYears(1) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddYears(2));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddYears(2));
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new System.DateTime(),
-                        new System.DateTime().AddYears(1)
+                        new DateTime(),
+                        new DateTime().AddYears(1)
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
 
             [TestMethod]
-            public void GivenASignalAndDataAndMVPByMonths_WhenGettingData_ReturnsSortedByDate()
+            public void GivenASignalAndData_WhenGettingData_ReturnsSortedByDate()
             {
                 int signalId = 1;
                 GivenASignal(SignalWith(
@@ -644,21 +646,20 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
-                    new Datum<bool> {Quality = Quality.Bad, Timestamp = new System.DateTime().AddMonths(2) },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddMonths(1) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
+                    new Datum<bool> {Quality = Quality.Bad, Timestamp = new DateTime().AddMonths(2) },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddMonths(1) }
                 });
 
-                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
-
-                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddMonths(3));
+                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddMonths(3));
 
                 CollectionAssert.AreEqual(new[]
                 {
-                    new System.DateTime(),
-                    new System.DateTime().AddMonths(1),
-                    new System.DateTime().AddMonths(2)
-                }, result.Select(datum => datum.Timestamp).ToArray());
+                    new DateTime(),
+                    new DateTime().AddMonths(1),
+                    new DateTime().AddMonths(2)
+                },
+                result.Select(datum => datum.Timestamp).ToArray());
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
@@ -682,7 +683,7 @@ namespace WebService.Tests
                 };
             }
 
-            private Dto.Datum[] DatumWith(object value, System.DateTime timestamp, int numberOfElements = 1, Dto.Quality quality = Dto.Quality.Fair)
+            private Dto.Datum[] DatumWith(object value, DateTime timestamp, int numberOfElements = 1, Dto.Quality quality = Dto.Quality.Fair)
             {
                 var dtoData = new Dto.Datum[numberOfElements];
                 for (int i = 0; i < numberOfElements; ++i)
@@ -697,28 +698,47 @@ namespace WebService.Tests
                 return dtoData;
             }
 
-            private Domain.Datum<T>[]DatumWith<T>(int size, System.DateTime fromDate)
-            {
-                var data = new Domain.Datum<T>[size];
-
-                for(int i = 0; i < size; ++i)                
-                    data[i] = new Datum<T>() { Timestamp = fromDate.AddMonths(i) };
-                
-                return data;
-            }
-
             private void GivenNoSignals()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
+
                 signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+
                 mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                mvpRepositoryMock
+                    .Setup(mvp => mvp.Get(It.IsAny<Signal>()))
+                    .Returns<Signal>(signal =>
+                    {
+                        var policy = NoneQualityMissingValuePolicy(signal.DataType);
+                        policy.Signal = signal;
+                        return policy;
+                    });
 
                 var signalsDomainService = new SignalsDomainService(
                     signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
+            private MissingValuePolicyBase NoneQualityMissingValuePolicy(DataType dataType)
+            {
+                switch (dataType)
+                {
+                    case DataType.Boolean:
+                        return new NoneQualityMissingValuePolicyBoolean();
+                    case DataType.Integer:
+                        return new NoneQualityMissingValuePolicyInteger();
+                    case DataType.Double:
+                        return new NoneQualityMissingValuePolicyDouble();
+                    case DataType.Decimal:
+                        return new NoneQualityMissingValuePolicyDecimal();
+                    case DataType.String:
+                        return new NoneQualityMissingValuePolicyString();
+                    default:
+                        return null;
+                }
             }
 
             private void GivenASignal(Domain.Signal existingSignal)
@@ -747,50 +767,49 @@ namespace WebService.Tests
             private void GivenData<T>(int signalId, IEnumerable<Datum<T>> data)
             {
                 signalsDataRepoMock
-                    .Setup(sd => sd.GetData<T>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
+                    .Setup(sd => sd.GetData<T>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(data);
             }
 
-            private void GivenDataRepositoryThatReturnsDatums<T>(int signalId, int numberOfDatums, System.DateTime date)
+            private void GivenData<T>(int signalId, int numberOfDatums, DateTime baseDate)
             {
-                signalsDataRepoMock
-                    .Setup(sd => sd.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId), date, date.AddMonths(numberOfDatums)))
-                    .Returns(DatumWith<T>(numberOfDatums - 1, date));
+                GivenData<T>(signalId, Enumerable.Range(0, numberOfDatums)
+                    .Select(i => new Datum<T> { Id = i, Timestamp = baseDate.AddMonths(i) }));
             }
 
             private void GivenASignalAndDataOf(DataType dataType, object datumValue, out Dto.Datum[] dtoData, int signalId = 1, int numberOfDatums = 1)
             {
-                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
-                var signal = SignalWith(signalId, dataType, Granularity.Day, path.ToDomain<Domain.Path>());
-                var date = new System.DateTime(2000, 1, 1);
+                var path = Path.FromString("root/signal");
+                var signal = SignalWith(signalId, dataType, Granularity.Month, path);
+                var date = new DateTime(2000, 1, 1);
 
                 GivenASignal(signal);
                 dtoData = DatumWith(datumValue, date, numberOfDatums);
             }
 
-            private Signal GivenASignalAndDataRepositoryWithSetups(System.DateTime date, DataType dataType, object datumValue, int signalId = 1, int numberOfDatums = 1)
+            private Signal GivenASignalAndDataRepositoryWithSetups(DateTime date, DataType dataType, object datumValue, int signalId = 1, int numberOfDatums = 1)
             {
-                var path = new Dto.Path() { Components = new[] { "root", "signal" } };
-                var signal = SignalWith(signalId, dataType, Granularity.Day, path.ToDomain<Domain.Path>());
+                var path = Path.FromString("root/signal");
+                var signal = SignalWith(signalId, dataType, Granularity.Month, path);
 
                 GivenASignal(signal);
 
                 switch (dataType)
                 {
                     case DataType.Boolean:
-                        GivenDataRepositoryThatReturnsDatums<bool>(signalId, numberOfDatums, date);
+                        GivenData<bool>(signalId, numberOfDatums, date);
                         break;
                     case DataType.Decimal:
-                        GivenDataRepositoryThatReturnsDatums<decimal>(signalId, numberOfDatums, date);
+                        GivenData<decimal>(signalId, numberOfDatums, date);
                         break;
                     case DataType.Double:
-                        GivenDataRepositoryThatReturnsDatums<double>(signalId, numberOfDatums, date);
+                        GivenData<double>(signalId, numberOfDatums, date);
                         break;
                     case DataType.Integer:
-                        GivenDataRepositoryThatReturnsDatums<int>(signalId, numberOfDatums, date);
+                        GivenData<int>(signalId, numberOfDatums, date);
                         break;
                     case DataType.String:
-                        GivenDataRepositoryThatReturnsDatums<string>(signalId, numberOfDatums, date);
+                        GivenData<string>(signalId, numberOfDatums, date);
                         break;
                 }
 
