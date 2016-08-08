@@ -536,6 +536,33 @@ namespace WebService.Tests
                 Assert.AreEqual("root/signal", result.Signal.Path.ToString());
                 Assert.AreEqual(new DateTime(2000, 10, 2), result.Timestamp);
             }
+
+            public IEnumerable<Datum<string>> GetDomainStringData()
+            {
+                return new Datum<string>[]
+                {
+                        new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = "test1" },
+                        new Domain.Datum<string>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = "test2" },
+                        new Domain.Datum<string>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 6, 1), Value = "test3" }
+                };
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_ReturnsCorrectAmount()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenData(signalId, GetDomainStringData());
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
+
+                Assert.AreEqual(6, result.Count());
+            }
         }
     }
 }
