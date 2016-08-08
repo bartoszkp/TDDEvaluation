@@ -71,8 +71,7 @@ namespace Domain.Services.Implementation
 
             return result;
         }
-
-
+        
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
             var signal = this.GetById(signalId);
@@ -99,7 +98,19 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            if (result == null)
+                return null;
+
+            for (int j = result.Length-1; j>0; --j)
+                for (int i=0; i<j; ++i)
+                    if (result[i].Timestamp > result[i+1].Timestamp)
+                    {
+                        var r = result[i];
+                        result[i] = result[i + 1];
+                        result[i + 1] = r;
+                    }
+            return result;
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> data, Signal signal)

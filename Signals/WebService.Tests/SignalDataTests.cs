@@ -127,6 +127,46 @@ namespace WebService.Tests
 
         }
 
+
+        [TestMethod]
+        public void WhenGettingSignalData_ReturnsItSortedByDate()
+        {
+            var datums = new[]
+            {
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new System.DateTime(2000, 2, 1), Value = 1.51 },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1), Value = 1.45 },
+                    new Datum<double>() { Quality = Quality.Poor, Timestamp = new System.DateTime(2000, 3, 1), Value = 2.47 }
+                };
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = Path.FromString("sfd/pk")
+            };
+
+            SetupWebService();
+            signalsRepoMock
+                .Setup(sr => sr.Get(It.IsAny<int>()))
+                .Returns(signal);
+            signalsDataRepoMock
+                .Setup(sdr => sdr.GetData<double>(It.IsAny<Domain.Signal>(),
+                It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
+                .Returns(datums);
+
+            var result = signalsWebService.GetData(1, System.DateTime.MinValue, System.DateTime.MaxValue);
+            var datum = datums[1];
+            datums[1] = datums[0];
+            datums[0] = datum;
+
+            int i = 0;
+            foreach (var d in result)
+            {
+                Assert.AreEqual(datums[i++].Timestamp, d.Timestamp);
+            }
+
+        }
+
         private void SetupWebService()
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
