@@ -66,20 +66,20 @@ namespace WebService
             switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
-                    return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                     return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                 case Domain.DataType.Integer:
                     return signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                 case Domain.DataType.Double:
                     return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                 case Domain.DataType.Decimal:
                     return signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                 case Domain.DataType.String:
                     return signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                 default:
                     throw new NotImplementedException();
             }
