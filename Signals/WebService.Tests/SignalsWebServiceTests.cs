@@ -283,7 +283,24 @@ namespace WebService.Tests
                 Assert.AreEqual(signalDto.Granularity, result.Signal.Granularity);
                 Assert.AreEqual(signalDto.Path.ToString(), result.Signal.Path.ToString());
             }
-            
+
+            [TestMethod]
+            public void WhenAddingNewSignal_SettingMissingValuePolicyTo_NoneQualityMissingValuePolicy()
+            {
+                SetupWebServiceForMvpOperations();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
+                missingValueRepoMock
+                    .Setup(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<NoneQualityMissingValuePolicy<string>>()));
+
+                signalsWebService.Add(new Dto.Signal()
+                {
+                    DataType = Dto.DataType.String
+                });
+                missingValueRepoMock.Verify(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<NoneQualityMissingValuePolicy<string>>()));
+            }
+
             private void SetupWebServiceForMvpOperations()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
