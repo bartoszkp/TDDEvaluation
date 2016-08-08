@@ -27,7 +27,11 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
-            return this.signalsRepository.Add(newSignal);
+            var result = this.signalsRepository.Add(newSignal);
+
+            SetDefaultMissingValuePolicy(result);
+
+            return result;
         }
 
         public Signal GetById(int signalId)
@@ -63,6 +67,20 @@ namespace Domain.Services.Implementation
 
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        private void SetDefaultMissingValuePolicy(Signal signal)
+        {
+            var policy = MissingPolicyValueFromType(signal.DataType, typeof(MissingValuePolicy.NoneQualityMissingValuePolicy<>));
+
+            SetMissingValuePolicy(signal, policy);
+        }
+
+        private MissingValuePolicy.MissingValuePolicyBase MissingPolicyValueFromType(DataType dataType, Type type)
+        {
+            var genericType = type.MakeGenericType(dataType.GetNativeType());
+
+            return (MissingValuePolicy.MissingValuePolicyBase)Activator.CreateInstance(genericType);
         }
     }
 }
