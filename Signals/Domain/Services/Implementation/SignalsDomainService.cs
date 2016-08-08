@@ -28,8 +28,11 @@ namespace Domain.Services.Implementation
         public Signal Add(Signal newSignal)
         {
             var result =  this.signalsRepository.Add(newSignal);
-            var mvp = new MissingValuePolicy.FirstOrderMissingValuePolicy<double>();
-            SetMissingValuePolicy(new Signal(), mvp);
+
+            Type mvpType = typeof(MissingValuePolicy.NoneQualityMissingValuePolicy<>);
+            mvpType = mvpType.MakeGenericType(result.DataType.GetNativeType());
+            MissingValuePolicy.MissingValuePolicyBase mvp  = Activator.CreateInstance(mvpType) as MissingValuePolicy.MissingValuePolicyBase;
+            SetMissingValuePolicy(result, mvp);
 
             return result;
         }
