@@ -41,9 +41,17 @@ namespace WebService
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
-            var result = this.signalsDomainService.Add(signal);
+            var result = this.signalsDomainService.Add(signal).ToDto<Dto.Signal>();
 
-            return result.ToDto<Dto.Signal>();
+            NoneQualityMissingValuePolicy mvp = new NoneQualityMissingValuePolicy()
+            {
+                DataType = result.DataType,
+                Signal = result
+            };
+            
+            this.SetMissingValuePolicy(mvp);
+
+            return result;
         }
 
         public void Delete(int signalId)
@@ -125,6 +133,11 @@ namespace WebService
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
             this.signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+        }
+
+        public void SetMissingValuePolicy(MissingValuePolicy policy)
+        {
+            this.signalsDomainService.SetMissingValuePolicy(policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
         }
     }
 }

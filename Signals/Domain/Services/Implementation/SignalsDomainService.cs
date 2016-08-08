@@ -47,9 +47,15 @@ namespace Domain.Services.Implementation
             return result;
         }
 
+        public void SetMissingValuePolicy(MissingValuePolicyBase policy)
+        {
+            if (policy.Signal == null) throw new ArgumentException();
+            missingValuePolicyRepository.Set(policy.Signal, policy);
+        }
+
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase policy)
         {
-            Signal signal = signalsRepository.Get(signalId);
+            Signal signal = this.signalsRepository.Get(signalId);
             if (signal == null) throw new ArgumentException();
             missingValuePolicyRepository.Set(signal, policy);
         }
