@@ -369,7 +369,22 @@ namespace WebService.Tests
 
                 Assert.AreEqual(null, result);
             }
-           
+
+            [TestMethod]
+            public void Add_NoneQualityMissingValuePolicyShouldBeTheDefault_SetMissingPolicyCalled()
+            {
+                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Double, Granularity = Domain.Granularity.Month, Path = Domain.Path.FromString("x/y") };
+                var noneQualiyMissingValuePolicyDouble = new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble();
+
+                MakeMocks();
+                MakeASignalsWebService();
+                signalsRepositoryMock.Setup(x => x.Add(It.IsAny<Domain.Signal>())).Returns((Domain.Signal s)=>s);
+                missingValuePolicyRepositoryMock.Setup(x => x.Set(signal, noneQualiyMissingValuePolicyDouble));
+
+                signalsWebService.Add(signal.ToDto<Dto.Signal>());
+
+                missingValuePolicyRepositoryMock.Verify(x=>x.Set(signal,noneQualiyMissingValuePolicyDouble));
+            }
 
 
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;

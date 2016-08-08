@@ -59,6 +59,7 @@ namespace WebService
             if (signalsDomainService != null)
             {
                 var sig = signalsDomainService.GetById(signalId);
+                var policy = GetMissingValuePolicy(signalId);
 
                 if (sig == null) throw new ArgumentException();
                 var k = sig.DataType;
@@ -148,8 +149,6 @@ namespace WebService
             if (sig == null) throw new ArgumentException();
 
              return    signalsDomainService.Get(sig.ToDomain<Domain.Signal>())?.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
-
-            
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
@@ -158,12 +157,9 @@ namespace WebService
             var sig= signalsDomainService.GetById(signalId);
             if (sig == null) throw new ArgumentException();
 
-
-
             policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
             signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
-
 
         }
     }
