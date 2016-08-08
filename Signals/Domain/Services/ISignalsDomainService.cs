@@ -13,5 +13,6 @@ namespace Domain.Services
         MissingValuePolicyBase GetMissingValuePolicy(Signal signalDomain);
 
         void SetData<T>(Signal signal, IEnumerable<Datum<T>> data);
+        IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUTC, DateTime toExcludedUTC);
     }
 }

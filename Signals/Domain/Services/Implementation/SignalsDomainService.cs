@@ -80,5 +80,11 @@ namespace Domain.Services.Implementation
 
             this.signalsDataRepository.SetData<T>(data);
         }
+
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUTC, DateTime toExcludedUTC)
+        {
+            return this.signalsDataRepository
+                .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToArray();
+        }
     }
 }
