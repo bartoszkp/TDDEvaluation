@@ -62,10 +62,7 @@ namespace Domain.Services.Implementation
 
         public Signal Get(Path path)
         {
-
-           var result= signalsRepository.Get(path);
-            if (result == null) throw new ArgumentException();
-            return result;
+            return signalsRepository.Get(path);
         }
     }
 }
