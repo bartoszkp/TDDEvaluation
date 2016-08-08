@@ -109,11 +109,13 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.PathNotExistException))]
-            public void WhenGetPathIsNotExistOrIsNullOrIsIsEmpty_ReportException()
+            public void WhenGetPathIsNotExistOrIsNullOrIsIsEmpty_ReturnsNull()
             {
                 GivenNoSignals();
-                signalsWebService.Get(null);
+
+                var result = signalsWebService.Get(null);
+
+                Assert.IsNull(result);
             }
 
 
