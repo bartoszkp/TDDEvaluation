@@ -253,7 +253,31 @@ namespace WebService.Tests
                 Assert.IsNotNull(result);
                 Assert.IsInstanceOfType(result,typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy));
             }
-            
+
+            [TestMethod]
+            public void WhenGettingNoneQualityMissingValuePolicy_ReturnsIt()
+            {
+                SetupWebServiceForMvpOperations();
+                var signal = new Domain.Signal()
+                {
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("sfda/mko")
+                };
+
+                signalsRepositoryMock
+                    .Setup(s => s.Get(It.IsAny<int>()))
+                    .Returns(signal);
+                missingValueRepoMock
+                    .Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble()
+                    {
+                        Signal = signal
+                    });
+                
+                var result = signalsWebService.GetMissingValuePolicy(1);
+                Assert.AreEqual(DataType.Double, result.DataType);
+            }
             
             private void SetupWebServiceForMvpOperations()
             {
