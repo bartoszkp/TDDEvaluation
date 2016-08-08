@@ -91,5 +91,16 @@ namespace Domain.Services.Implementation
 
             this.signalsDataRepository.SetData<double>(dataDomain);
         }
+
+        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = this.GetById(signalId);
+            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+        }
+
+        public void SetData<T>(List<Datum<T>> domianModel)
+        {
+            signalsDataRepository.SetData(domianModel);
+        }
     }
 }
