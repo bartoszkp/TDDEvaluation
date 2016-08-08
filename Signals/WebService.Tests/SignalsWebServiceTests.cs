@@ -482,6 +482,22 @@ namespace WebService.Tests
 
                 this.missingValuePolicyRepositoryMock.Verify(x => x.Get(It.IsAny<Domain.Signal>()));
             }
+
+
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingSignal_MissingValuePolicyRepositoryAddIsCalled()
+            {
+                var signal = SignalWith(
+                    dataType: Dto.DataType.Double,
+                    granularity: Dto.Granularity.Month,
+                    path: new Dto.Path() { Components = new string[] { "root", "signal1" } });
+                GivenNoSignals();
+
+                var result = signalsWebService.Add(signal);
+
+                missingValuePolicyRepositoryMock
+                    .Verify(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+            }
         }
     }
 }
