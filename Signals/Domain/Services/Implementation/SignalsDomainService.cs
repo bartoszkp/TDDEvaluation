@@ -79,7 +79,81 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.OrderBy(s => s.Timestamp).ToArray();
+            var getData = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.OrderBy(s => s.Timestamp).ToArray();
+            var getMissingValuePolicy = GetMissingValuePolicy(signal);
+
+            if (getMissingValuePolicy == null)
+                return getData;
+            
+            var result = new List<Datum<T>>();
+
+            for(DateTime i = fromIncludedUtc; i < toExcludedUtc; i = GetNextDate(i, signal.Granularity))
+            {
+                var datum = getData.FirstOrDefault(d => CompareDate(d.Timestamp, i, signal.Granularity));
+
+                if (datum == null)
+                    datum = GenerateDatumFromPolicy<T>(getMissingValuePolicy as MissingValuePolicy<T>, signal, i);
+
+                result.Add(datum);
+            }
+            return result;
+        }
+
+        private Datum<T> GenerateDatumFromPolicy<T>(MissingValuePolicy<T> mvp, Signal signal, DateTime timestamp)
+        {
+            var result = new Datum<T>()
+            {
+                Signal = signal,
+                Timestamp = timestamp
+            };
+
+            if(mvp is NoneQualityMissingValuePolicy<T>)
+            {
+                result.Quality = Quality.None;
+                result.Value = default(T);
+            }
+
+            return result;
+        }
+
+        private DateTime GetNextDate(DateTime dt, Granularity granularity)
+        {
+            if (granularity == Granularity.Year)
+                return dt.AddYears(1);
+            else if (granularity == Granularity.Month)
+                return dt.AddMonths(1);
+            else if (granularity == Granularity.Week)
+                return dt.AddDays(7);
+            else if (granularity == Granularity.Day)
+                return dt.AddDays(1);
+            else if (granularity == Granularity.Hour)
+                return dt.AddHours(1);
+            else if (granularity == Granularity.Minute)
+                return dt.AddMinutes(1);
+            else if (granularity == Granularity.Second)
+                return dt.AddSeconds(1);
+
+            throw new ArgumentException("Given granularity couldn't be recognized.");
+        }
+
+        private bool CompareDate(DateTime first, DateTime second, Granularity granularity)
+        {
+            if (granularity == 0)
+                if (first.Second != second.Second) return false;
+            if ((int)granularity <= 1)
+                if (first.Minute != second.Minute) return false;
+            if ((int)granularity <= 2)
+                if (first.Hour != second.Hour) return false;
+            if ((int)granularity <= 3)
+                if (first.Day != second.Day) return false;
+            if ((int)granularity <= 4)
+                if (first.Day > second.Day || first.AddDays(7) < second) return false;
+            if ((int)granularity <= 5)
+                if (first.Month != second.Month) return false;
+            if ((int)granularity <= 6)
+                if (first.Year != second.Year) return false;
+
+            return true;
         }
     }
 }
