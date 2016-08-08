@@ -592,7 +592,29 @@ namespace WebService.Tests
                 SetupVerifyOrAssert();
                 verifyOrAssert.AssertGetDataExceptionIsThrownWhenInvalidKey(signalsWebService, wrongSignalId);
             }
-            
+
+
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingNoSortedList_ReturnSortedList()
+            {
+
+                var existingSignal = ExistingSignal();
+
+                var existingDatum = ExistingDatum();
+
+                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+
+                var existingSortedDatum = existingDatum.OrderBy(x => x.Timestamp);
+                
+                for (int i=0;i<result.Count();i++)
+                {
+                    Assert.AreEqual(existingSortedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
+                }
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -703,8 +725,9 @@ namespace WebService.Tests
             {
                 return new Dto.Datum[]
                 {
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+
                         new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
                 };
             }
