@@ -115,14 +115,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisPathNonExistException))]
-            public void WhenGettingByPathWithEmptyPath_ThrowSignalWithThisPathNonExistException()
-            {
-                GivenNoSignals();
-                signalsWebService.Get(new Dto.Path() { Components = new[] { "fd", "fg" } });
-            }
-
-            [TestMethod]
             public void WhenGettingMissingValuePolicyForNewSignal_ReturnsNull()
             {
                 var signal = new Domain.Signal()
@@ -306,7 +298,7 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                var result = signalsWebService.GetById(42351);
+                var result = signalsWebService.GetById(1);
 
                 Assert.IsNull(result);
             }
