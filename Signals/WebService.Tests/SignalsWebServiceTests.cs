@@ -8,6 +8,7 @@ using Moq;
 using Dto;
 using System;
 using DataAccess.GenericInstantiations;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -325,6 +326,27 @@ namespace WebService.Tests
                 dataRepositoryMock.Verify(sr => sr.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
             }
+
+            [TestMethod]
+            public void GetData_SignalWithGivenIdExist_ReturnDatumOrderedByDate()
+            {
+                MakeMocks();
+                MakeASignalsRepositoryMock(1, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeASignalsWebService();
+                var datum = new Dto.Datum[] {
+                         new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                         new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                         new Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } };
+
+                dataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(datum.ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>());
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+                var ExpectedResult = datum.OrderBy(x => x.Timestamp);
+
+                Assert.IsTrue(ExpectedResult.SequenceEqual(result));
+            }
+
+
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
