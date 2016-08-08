@@ -220,23 +220,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void CreatedNewSignal_HasNoMvpByDefault()
-            {
-                SetupWebServiceForMvpOperations();
-                var newSignal = SignalWith(1,
-                                               dataType: DataType.Integer,
-                                               granularity: Granularity.Hour,
-                                               path: Path.FromString("x/y"));
-                signalsRepositoryMock.Setup(sr => sr.Add(newSignal)).Returns(newSignal);
-                var dtoSignal = signalsWebService.Add(newSignal.ToDto<Dto.Signal>());
-                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(id => id == 1))).Returns(newSignal);
-
-                missingValueRepoMock.Setup(mv => mv.Get(newSignal)).Returns((MissingValuePolicyBase)null);
-
-            }
-
-
-            [TestMethod]
             public void CreatedMvpForSignal_WhenGetting_IsReturned()
             {
                 SetupWebServiceForMvpOperations();
@@ -287,10 +270,18 @@ namespace WebService.Tests
             [TestMethod]
             public void WhenAddingNewSignal_SettingMissingValuePolicyTo_NoneQualityMissingValuePolicy()
             {
+                var signal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.String
+                };
                 SetupWebServiceForMvpOperations();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                    .Returns<Domain.Signal>(s => s);
+                    .Returns(signal);
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(signal);
                 missingValueRepoMock
                     .Setup(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<NoneQualityMissingValuePolicy<string>>()));
 
@@ -335,10 +326,11 @@ namespace WebService.Tests
             private void GivenNoSignals()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
+                missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                    .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                    .Returns<Domain.Signal>(s => AddId(s));
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValueRepoMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -358,11 +350,16 @@ namespace WebService.Tests
             {
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                    .Returns<Domain.Signal>(s =>
-                    {
-                        s.Id = id;
-                        return s;
-                    });
+                    .Returns<Domain.Signal>(s => AddId(s));
+            }
+
+            private Domain.Signal AddId(Domain.Signal signal, int id=1)
+            {
+                signal.Id = id;
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(signal);
+                return signal;
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
