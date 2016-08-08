@@ -618,7 +618,30 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2000, 4, 1), result[3].Timestamp);
                 Assert.AreEqual(new DateTime(2000, 5, 1), result[4].Timestamp);
                 Assert.AreEqual(new DateTime(2000, 6, 1), result[5].Timestamp);
+            }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithMissingData_DataHasCorrectValue()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
+                GivenData(signalId, GetDomainStringData());
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 8, 1)).ToArray();
+
+                Assert.AreEqual("test2", result[0].Value);
+                Assert.AreEqual(default(string), result[1].Value);
+                Assert.AreEqual("test1", result[2].Value);
+                Assert.AreEqual(default(string), result[3].Value);
+                Assert.AreEqual(default(string), result[4].Value);
+                Assert.AreEqual("test3", result[5].Value);
+                Assert.AreEqual(default(string), result[6].Value);
             }
 
         }
