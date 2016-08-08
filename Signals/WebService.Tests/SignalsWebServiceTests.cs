@@ -412,6 +412,30 @@ namespace WebService.Tests
                 mvpRepositoryMock.Verify(mvp => mvp.Set(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    signalId,
+                    DataType.Boolean,
+                    Granularity.Day,
+                    Path.FromString("")));
+
+                GivenData(signalId, new[]
+                {
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddDays(2) }
+                });
+
+                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
+
+                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddDays(3));
+
+                Assert.IsTrue(result.Count() == 3);
+                Assert.IsTrue(result.Any(d => d.Quality == Dto.Quality.None));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -495,6 +519,13 @@ namespace WebService.Tests
                     });
             }
 
+            private void GivenData<T>(int signalId, IEnumerable<Datum<T>> data)
+            {
+                signalsDataRepoMock
+                    .Setup(sd => sd.GetData<T>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
+                    .Returns(data);
+            }
+
             private void GivenDataRepositoryThatReturnsDatums<T>(int signalId, int numberOfDatums, System.DateTime date)
             {
                 signalsDataRepoMock
@@ -539,7 +570,14 @@ namespace WebService.Tests
                 }
 
                 return signal;
-            }            
+            }
+
+            private void GivenMissingValuePolicy(int signalId, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
+            {
+                mvpRepositoryMock
+                    .Setup(mvp => mvp.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(policy);
+            }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<ISignalsDataRepository> signalsDataRepoMock;
