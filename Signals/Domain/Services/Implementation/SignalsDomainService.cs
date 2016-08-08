@@ -27,7 +27,11 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
-            return this.signalsRepository.Add(newSignal);
+            var result =  this.signalsRepository.Add(newSignal);
+            var mvp = new MissingValuePolicy.FirstOrderMissingValuePolicy<double>();
+            SetMissingValuePolicy(new Signal(), mvp);
+
+            return result;
         }
 
         public Signal GetById(int signalId)
