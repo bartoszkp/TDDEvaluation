@@ -357,6 +357,18 @@ namespace WebService.Tests
 
                 Assert.AreEqual(null, result);
             }
+
+            [TestMethod]
+            public void GetById_SignalWithGivenIdDoesntExist_ReturnNull()
+            {
+                MakeMocks();
+                MakeASignalsWebService();
+                signalsRepositoryMock.Setup(x => x.Get(1)).Returns((Domain.Signal)null);
+
+                var result = signalsWebService.GetById(1);
+
+                Assert.AreEqual(null, result);
+            }
            
 
 
