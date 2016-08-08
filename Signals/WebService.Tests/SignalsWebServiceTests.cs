@@ -108,16 +108,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignals_WhenGettingByPath_ThrowsArgumentEcxeption()
-            {
-                GivenNoSignals();
-                var path = new Dto.Path() { Components = new string[] { "root", "signal" } };
-
-                var result = signalsWebService.Get(path);
-            }
-
-            [TestMethod]
             public void GivenASignal_WhenSettingData_CallsRepositorySetData()
             {
                 var signalId = 1;
@@ -311,6 +301,20 @@ namespace WebService.Tests
                 int nonExistingId = 5;
 
                 var result = signalsWebService.GetById(nonExistingId);
+
+                Assert.IsNull(result);
+            }
+
+            [TestMethod]
+            public void GivenNoSignal_WhenGettingByPath_NullIsReturned()
+            {
+                GivenNoSignals();
+                var nonExistingPathDto = new Dto.Path()
+                {
+                    Components = new[] { "non", "existing", "path" }
+                };
+
+                var result = signalsWebService.Get(nonExistingPathDto);
 
                 Assert.IsNull(result);
             }
