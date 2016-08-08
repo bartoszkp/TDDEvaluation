@@ -31,7 +31,7 @@ namespace WebService
 
             var result = signalsDomainService.GetByPath(path);
 
-            if (result == null) throw new ArgumentException();
+            if (result == null) return null;
 
             else return result.ToDto<Dto.Signal>();
         }
