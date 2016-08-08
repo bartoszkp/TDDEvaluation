@@ -33,7 +33,13 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            return this.signalsRepository.Add(newSignal);
+            var signal = this.signalsRepository.Add(newSignal);
+            var policyInstance = typeof(NoneQualityMissingValuePolicy<>)
+                .MakeGenericType(new Type[] { DataTypeUtils.GetNativeType(signal.DataType) });
+
+            SetMissingValuePolicy(signal, Activator.CreateInstance(policyInstance) as MissingValuePolicyBase);
+
+            return signal;
         }
 
         public Signal GetById(int signalId)
