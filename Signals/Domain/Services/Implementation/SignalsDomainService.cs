@@ -65,6 +65,9 @@ namespace Domain.Services.Implementation
 
             var mvp = this.missingValuePolicyRepository.Get(signal);
 
+            if (mvp == null)
+                throw new ArgumentException("Argument does not exist");
+
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
