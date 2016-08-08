@@ -53,15 +53,16 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal foundSignal, IEnumerable<Datum<T>> data)
         {
-            foreach (var d in data)
-                d.Signal = foundSignal;
+            List<Datum<T>> dataList = data.ToList();
+            for (int i = 0; i < dataList.Count; ++i)
+                dataList[i].Signal = foundSignal;
 
-            signalsDataRepository.SetData(data);
+            this.signalsDataRepository.SetData(dataList);
         }
 
         public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
+            return this.signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp)

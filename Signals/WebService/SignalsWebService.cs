@@ -59,8 +59,6 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            List<Dto.Datum> dtoDatum = new List<Dto.Datum>();
-
             Signal foundSignal = GetById(signalId);
             if (foundSignal == null)
                 throw new SignalNotExistException();
@@ -70,7 +68,7 @@ namespace WebService
             switch (foundSignal.DataType)
             {
                 case Dto.DataType.Double:
-                    return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
+                    return signalsDomainService.GetData<Double>(signal, fromIncludedUtc, toExcludedUtc)
                              .ToArray().ToDto<IEnumerable<Dto.Datum>>();
                 case Dto.DataType.Integer:
                     return signalsDomainService.GetData<Int32>(signal, fromIncludedUtc, toExcludedUtc)
@@ -99,7 +97,7 @@ namespace WebService
             switch (foundSignal.DataType)
             {
                 case Dto.DataType.Double:
-                    signalsDomainService.SetData(domainSignal,data.ToDomain<IEnumerable<Domain.Datum<Double>>>());
+                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Double>>>());
                     break;
                 case Dto.DataType.Boolean:
                     signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Boolean>>>());
