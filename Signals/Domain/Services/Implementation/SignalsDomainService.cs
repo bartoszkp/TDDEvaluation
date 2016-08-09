@@ -45,23 +45,28 @@ namespace Domain.Services.Implementation
             switch (typeName)
             {
                 case "Int32":
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
+                    GenericSetDataCall<int>(signal);
                     break;
                 case "Double":
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>());
+                    GenericSetDataCall<double>(signal);
                     break;
                 case "Decimal":
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>());
+                    GenericSetDataCall<decimal>(signal);
                     break;
                 case "Boolean":
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>());
+                    GenericSetDataCall<bool>(signal);
                     break;
                 case "String":
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>());
+                    GenericSetDataCall<string>(signal);
                     break;
             }
 
             return signal;
+        }
+
+        private void GenericSetDataCall<T>(Signal signal)
+        {
+            this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<T>());
         }
 
         public Signal GetById(int signalId)
