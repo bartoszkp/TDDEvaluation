@@ -6,6 +6,7 @@ using Domain.Infrastructure;
 using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
+using Domain.Services.Implementation.DataFillStrategy;
 
 namespace Domain.Services.Implementation
 {
@@ -82,7 +83,38 @@ namespace Domain.Services.Implementation
 
             var mvp = GetMissingValuePolicy(signal.Id.GetValueOrDefault());
 
-            FillMissingData(mvp, items, fromIncludedUtc, toExcludedUtc);
+            Domain.DataFillStrategy.DataFillStrategy strategy = null;
+
+            switch (signal.Granularity)
+            {
+                case Granularity.Second:
+                    
+                    break;
+                case Granularity.Minute:
+                    break;
+
+                case Granularity.Hour:
+                    break;
+
+                case Granularity.Day:
+                    break;
+
+                case Granularity.Week:
+                    break;
+
+                case Granularity.Month:
+                    strategy = new MonthFillDataStrategy(mvp);
+                    break;
+
+                case Granularity.Year:
+                    break;
+
+                default:
+                    break;
+            }
+
+            strategy.FillMissingData(items,fromIncludedUtc,toExcludedUtc);
+
 
             var result = from d in items
                          orderby d.Timestamp
@@ -115,25 +147,65 @@ namespace Domain.Services.Implementation
                 return null;
         }
 
-        private void FillMissingData<T>(MissingValuePolicyBase mvp, List<Datum<T>> datum, DateTime after, DateTime before)
+        private void FillMissingData<T>(Granularity granularity, MissingValuePolicyBase mvp, List<Datum<T>> datum, DateTime after, DateTime before)
         {
 
-            int currentMonth = after.Month + 1;
+            if (granularity == Granularity.Month)
+                FillMonthData(mvp, datum, after, before);
 
-            while (currentMonth < before.Month - 1)
-            {
-                Datum<T> missingDatum = new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Timestamp = new DateTime(after.Year, currentMonth, after.Day),
-                    Value = default(T)
-                };
-                datum.Add(missingDatum);
-                currentMonth++;
-            }
+            
         }
 
 
+        private void FillMonthData<T>(MissingValuePolicyBase mvp, List<Datum<T>> datum, DateTime after, DateTime before)
+        {
+            int currentMonth = after.Month + 1;
 
+            if (mvp is NoneQualityMissingValuePolicy<T>)
+            {
+                if (after.Year == before.Year)
+                {
+                    while (currentMonth < before.Month - 1)
+                    {
+                        datum.Add(new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = new DateTime(after.Year, after.Month + 1, after.Day)
+                        });
+
+                        currentMonth++;
+                    }
+                }
+
+                else
+                {
+                    int currentYear = after.Year;
+
+                    while (currentYear <= before.Year && currentMonth != before.Month - 1)
+                    {
+
+                        datum.Add(new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = new DateTime(currentYear, currentMonth, after.Day)
+                        });
+
+                        currentMonth++;
+
+                        if (currentMonth == 13)
+                        {
+                            currentMonth = 1;
+                            currentYear++;
+                        }
+                    }
+                }
+
+            }
+
+        }
     }
+
+
 }
