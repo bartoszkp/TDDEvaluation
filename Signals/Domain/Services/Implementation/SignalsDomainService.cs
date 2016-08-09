@@ -111,7 +111,10 @@ namespace Domain.Services.Implementation
             if (mvp != null && typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
             {
                 List<Datum<T>> datums = new List<Datum<T>>();
-                var date = fromIncludedUtc;
+                var date = DateTime.MinValue;
+                while (date < fromIncludedUtc)
+                    increaseDate(ref date, signal.Granularity);
+
                 for (int i = 0; date<toExcludedUtc && i<result.Length; increaseDate(ref date, signal.Granularity))
                 {
                     if (result[i].Timestamp == date)
