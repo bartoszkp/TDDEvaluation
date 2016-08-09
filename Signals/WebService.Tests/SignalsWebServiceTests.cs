@@ -135,7 +135,11 @@ namespace WebService.Tests
                 new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
                 new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
 
-                Setup_SignalsRepoAndSignalsDataRepo(domainSignal);         
+                Setup_AllRepos(domainSignal);
+
+                var returnedMvp = new NoneQualityMissingValuePolicyInteger();
+
+                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
 
                 GivenAColletionOfDatums(addedCollection, domainSignal);
 
@@ -157,7 +161,10 @@ namespace WebService.Tests
 
                 Setup_SignalsRepo(signalId);
 
-                var result = new SpecificValueMissingValuePolicy() { DataType = Dto.DataType.Boolean, Quality = Dto.Quality.Good, Value = (double)2.5 };
+                var result = new SpecificValueMissingValuePolicy() {
+                    DataType = Dto.DataType.Double,
+                    Quality = Dto.Quality.Good,
+                    Value = (double)2.5 };
 
                 signalsWebService.SetMissingValuePolicy(signalId, result);
             }
@@ -175,7 +182,10 @@ namespace WebService.Tests
 
                 Setup_SignalsRepoAndMissingValuePolicyRepo(signal);
 
-                var result = new SpecificValueMissingValuePolicy() { DataType = Dto.DataType.Boolean, Quality = Dto.Quality.Good, Value = (double)1 };
+                var result = new SpecificValueMissingValuePolicy() {
+                    DataType = Dto.DataType.Double,
+                    Quality = Dto.Quality.Good,
+                    Value = (double)1.2 };
 
                 signalsWebService.SetMissingValuePolicy(signalId, result);
 
@@ -268,12 +278,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignals_WhenAddingASignal_Throws()
-            {
-
-            }
-
-            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_CheckingDefaultMissingPolicy()
             {
                 Dto.Signal signalDto = SignalWith(
@@ -300,6 +304,71 @@ namespace WebService.Tests
                 if (!(policy.GetType() == typeof(NoneQualityMissingValuePolicy)))
                     Assert.Fail();
             }
+
+            [TestMethod]
+            public void GivenASignalWithNoDataSource_WhenGettingData_ChecksLengthOfArray()
+            {
+                var signalId = 2;
+
+                Domain.Signal domainSignal = new Domain.Signal()
+                {
+                    Id = signalId,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal44")
+                };
+
+                Setup_AllRepos(domainSignal);
+
+                var returnedMvp = new NoneQualityMissingValuePolicyDouble();
+
+                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
+
+                Dto.Datum[] result = signalsWebService.GetData(signalId,
+                    new DateTime(2005, 1, 1), new DateTime(2005, 1, 21)).ToArray();
+
+                int expectedLength = 20;
+                Assert.AreEqual(expectedLength, result.Length);
+            }
+
+            [TestMethod]
+            public void GivenASignalWithDataSource_WhenGettingData_ChecksContentAndLengthOfArray()
+            {
+                var signalId = 2;
+
+                Domain.Signal domainSignal = new Domain.Signal()
+                {
+                    Id = signalId,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal44")
+                };
+
+                List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
+                        Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good,
+                        Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
+
+                Setup_AllRepos(domainSignal);
+                GivenAColletionOfDatums(addedCollection, domainSignal);
+
+                var returnedMvp = new NoneQualityMissingValuePolicyInteger();
+
+                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
+
+                List<Dto.Datum> result = signalsWebService.GetData(signalId, 
+                    new DateTime(2005,1,1), new DateTime(2005,3,2)).ToList();
+
+                List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5},
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2005, 2, 1), Value = default(int)},
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7 } });
+
+                Assert.AreEqual(expectedResult.Count, result.Count);
+                Assert.IsTrue(AssertDtoLists(expectedResult, result));
+            }
+
 
             private Dto.Signal SignalWith(
                 int? id = null,
@@ -379,6 +448,22 @@ namespace WebService.Tests
                     .Returns(signal);
 
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
+            private void Setup_AllRepos(Domain.Signal signal)
+            {
+                this.signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                this.signalsRepositoryMock = new Mock<ISignalsRepository>();
+                this.missingValuePolicyRepoMock = new Mock<IMissingValuePolicyRepository>();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(signal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepoMock.Object);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }

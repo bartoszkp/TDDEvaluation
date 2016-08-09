@@ -117,7 +117,6 @@ namespace Domain.Services.Implementation
                 case Granularity.Year:
                     dateTime = dateTime.AddYears(1);
                     break;
-                default: return;
             }
         }
 
@@ -131,10 +130,10 @@ namespace Domain.Services.Implementation
             {
                 DateTime period = iterativeDateTime;
                 AddToDateTime(ref period, signal.Granularity);
-                if (!(list[i].Timestamp >= iterativeDateTime && list[i].Timestamp < period))
-                {
+                if(i == list.Count)
+                    list.Insert(i, Datum<T>.CreateNone(signal, iterativeDateTime));
+                else if (!(list[i].Timestamp >= iterativeDateTime && list[i].Timestamp < period))
                     list.Insert(i,Datum<T>.CreateNone(signal, iterativeDateTime));
-                }
             }
 
             array = list.ToArray();
@@ -173,7 +172,7 @@ namespace Domain.Services.Implementation
                 return null;
 
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy.MissingValuePolicyBase;
+                as MissingValuePolicyBase;
         }
     }
 }
