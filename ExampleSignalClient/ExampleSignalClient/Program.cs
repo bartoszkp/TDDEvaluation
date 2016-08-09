@@ -11,14 +11,29 @@ namespace ExampleSignalClient
 
             var newSignal = new Signal()
             {
-                DataType = DataType.Decimal,
+                DataType = DataType.Double,
                 Granularity = Granularity.Minute,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy222" } }
+                Path = new Path() { Components = new[] { "root", "defaultPolicy344" } }
             };
 
-            var result = client.Get(new Path() { Components = new[] { "root", "defaultPolicy2288" } } );
+            var addedSignal = client.Add(newSignal);
 
-            Console.WriteLine(result == null);
+            int id = addedSignal.Id.Value;
+
+            client.SetData(id, new Datum[] {
+                         new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 5, 1), Value = (double) 5.5},
+                         new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (double) 4.5},
+                         new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double) 2.5},
+                         new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double) 1.5},
+                         new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double) 3.5} });
+
+            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+
+            foreach (var d in result)
+            {
+                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
+            }
+
             Console.ReadKey();
         }
     }

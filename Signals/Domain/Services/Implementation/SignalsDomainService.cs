@@ -75,7 +75,7 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> dataDomain)
         {
-            this.signalsDataRepository.SetData<T>(dataDomain);
+            this.signalsDataRepository.SetData<T>(dataDomain.OrderBy(d => d.Timestamp));
         }
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
