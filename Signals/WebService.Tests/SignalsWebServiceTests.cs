@@ -77,15 +77,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignals_WhenGettingById_DoesNotThrow()
-            {
-                GivenNoSignals();
-
-                signalsWebService.GetById(0);
-            }
-
-
-            [TestMethod]
             public void GivenASignal_WhenGettingByItsId_ReturnsIt()
             {
                 var signalId = 1;
@@ -124,83 +115,6 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
-            private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
-            {
-                return new Dto.Signal()
-                {
-                    DataType = dataType,
-                    Granularity = granularity,
-                    Path = path
-                };
-            }
-
-            private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
-            {
-                return new Domain.Signal()
-                {
-                    Id = id,
-                    DataType = dataType,
-                    Granularity = granularity,
-                    Path = path
-                };
-            }
-
-            private void GivenNoSignals()
-            {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                    .Returns<Domain.Signal>(s => s);
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
-                    signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
-                signalsWebService = new SignalsWebService(signalsDomainService);
-            }
-
-            private void GivenASignal(Domain.Signal existingSignal)
-            {
-                GivenNoSignals();
-
-                signalsRepositoryMock
-                    .Setup(sr => sr.Get(existingSignal.Id.Value))
-                    .Returns(existingSignal);
-            }
-
-            private void GivenMissingValuePolicy(int signalId, Domain.MissingValuePolicy.MissingValuePolicyBase mvp)
-            {
-                missingValuePolicyRepositoryMock
-                    .Setup(mvpr => mvpr.Get(It.Is<Domain.Signal>(s => s.Id == signalId)))
-                    .Returns(mvp);
-            }
-
-            private void GivenRepositoryThatAssigns(int id)
-            {
-                signalsRepositoryMock
-                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                    .Returns<Domain.Signal>(s =>
-                    {
-                        s.Id = id;
-                        return s;
-                    });
-            }
-
-            private Mock<ISignalsRepository> signalsRepositoryMock;
-            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
-            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
-
-            private Dto.Path GivenASignalByPath()
-            {
-                GivenNoSignals();
-
-                Domain.Path path = Domain.Path.FromString("root/signal");
-                signalsRepositoryMock.Setup(x => x.Get(path)).Returns(new Domain.Signal()
-                {
-                    Path = path
-                });
-
-                return path.ToDto<Dto.Path>();
-            }
 
             [TestMethod]
             public void GivenASignalByPath_WhenGettingByPath_ReturnsNotNull()
@@ -345,34 +259,6 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2000, 2, 1), result.Skip(1).First().Timestamp);
             }
 
-            private Domain.Datum<double>[] GetDomainDatumDouble()
-            {
-                return new Domain.Datum<double>[]
-                    {
-                        new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
-                        new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
-                        new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
-                    };
-            }
-
-            private Dto.Datum[] GetDtoDatumDouble()
-            {
-                return new Dto.Datum[]
-                    {
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
-                    };
-            }
-
-            private void GivenData<T>(int signalId, IEnumerable<Domain.Datum<T>> data)
-            {
-                signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId),
-                    It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns<Domain.Signal, DateTime, DateTime>(
-                    (s, from, to) => data.Where(d => (d.Timestamp >= from && d.Timestamp < to)));
-            }
 
             [TestMethod]
             public void GivenASignal_WhenGettingData_VerifyDataRepositoryFunctions()
@@ -408,20 +294,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingMissingValuePolicy_DontThrows()
-            {
-                int signalId = 2;
-                GivenASignal(SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Integer,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal")));
-
-                this.signalsWebService.SetMissingValuePolicy(signalId, 
-                    new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
-            }
-
-            [TestMethod]
             public void GivenASignal_WhenSettingMissingValuePolicy_VaryfingCallRepositorySetFunctions()
             {
                 int signalId = 2;
@@ -447,19 +319,6 @@ namespace WebService.Tests
             }
 
 
-            private void GivenASignalForGettingMissingValuePolicy(int signalId)
-            {
-                Signal signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
-
-                this.missingValuePolicyRepositoryMock
-                    .Setup(x => x.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new SpecificValueMissingValuePolicyDouble());
-            }
 
             [TestMethod]
             [ExpectedException(typeof(CouldntGetASignalException))]
@@ -544,16 +403,6 @@ namespace WebService.Tests
                 Assert.AreEqual(Domain.Granularity.Month, result.Signal.Granularity);
                 Assert.AreEqual("root/signal", result.Signal.Path.ToString());
                 Assert.AreEqual(new DateTime(2000, 10, 2), result.Timestamp);
-            }
-
-            public IEnumerable<Datum<string>> GetDomainStringData()
-            {
-                return new Datum<string>[]
-                {
-                        new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = "test1" },
-                        new Domain.Datum<string>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = "test2" },
-                        new Domain.Datum<string>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 6, 1), Value = "test3" }
-                };
             }
 
             [TestMethod]
@@ -643,6 +492,138 @@ namespace WebService.Tests
                 Assert.AreEqual("test3", result[5].Value);
                 Assert.AreEqual(default(string), result[6].Value);
             }
+
+
+            private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
+            {
+                return new Dto.Signal()
+                {
+                    DataType = dataType,
+                    Granularity = granularity,
+                    Path = path
+                };
+            }
+
+            private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            {
+                return new Domain.Signal()
+                {
+                    Id = id,
+                    DataType = dataType,
+                    Granularity = granularity,
+                    Path = path
+                };
+            }
+
+            private void GivenNoSignals()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
+            private void GivenASignal(Domain.Signal existingSignal)
+            {
+                GivenNoSignals();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+            }
+
+            private void GivenMissingValuePolicy(int signalId, Domain.MissingValuePolicy.MissingValuePolicyBase mvp)
+            {
+                missingValuePolicyRepositoryMock
+                    .Setup(mvpr => mvpr.Get(It.Is<Domain.Signal>(s => s.Id == signalId)))
+                    .Returns(mvp);
+            }
+
+            private void GivenRepositoryThatAssigns(int id)
+            {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s =>
+                    {
+                        s.Id = id;
+                        return s;
+                    });
+            }
+
+            private Dto.Path GivenASignalByPath()
+            {
+                GivenNoSignals();
+
+                Domain.Path path = Domain.Path.FromString("root/signal");
+                signalsRepositoryMock.Setup(x => x.Get(path)).Returns(new Domain.Signal()
+                {
+                    Path = path
+                });
+
+                return path.ToDto<Dto.Path>();
+            }
+
+            private void GivenASignalForGettingMissingValuePolicy(int signalId)
+            {
+                Signal signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                this.missingValuePolicyRepositoryMock
+                    .Setup(x => x.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new SpecificValueMissingValuePolicyDouble());
+            }
+
+            private void GivenData<T>(int signalId, IEnumerable<Domain.Datum<T>> data)
+            {
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId),
+                    It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns<Domain.Signal, DateTime, DateTime>(
+                    (s, from, to) => data.Where(d => (d.Timestamp >= from && d.Timestamp < to)));
+            }
+
+            private Domain.Datum<double>[] GetDomainDatumDouble()
+            {
+                return new Domain.Datum<double>[]
+                    {
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
+                    };
+            }
+
+            private Dto.Datum[] GetDtoDatumDouble()
+            {
+                return new Dto.Datum[]
+                    {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                    };
+            }
+
+            public IEnumerable<Datum<string>> GetDomainStringData()
+            {
+                return new Datum<string>[]
+                {
+                        new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = "test1" },
+                        new Domain.Datum<string>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = "test2" },
+                        new Domain.Datum<string>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 6, 1), Value = "test3" }
+                };
+            }
+
+            private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
+            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
 
         }
     }
