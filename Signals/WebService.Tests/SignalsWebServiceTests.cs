@@ -459,6 +459,35 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenDataAndSignal_WhenSetData_VerifyDataIsSortedAscending()
+            {
+                int signalId = 3;
+
+                Dto.Datum[] settedData = new Dto.Datum[]{
+                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 5, 1), Value = (int) 5},
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (int) 4},
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int) 2},
+                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int) 1},
+                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int) 3} };
+
+                SetupWebService();
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.Is<int>(id => id == signalId)))
+                    .Returns(new Domain.Signal() { DataType = DataType.Integer });
+
+                signalsWebService.SetData(signalId, settedData);
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<int>(It.Is<IEnumerable<Datum<int>>>( d => DatumsAreAscending(d))));            
+            }
+
+            private bool DatumsAreAscending(IEnumerable<Datum<int>> datums)
+            {
+                var sortedDatums = datums.OrderBy(dat => dat.Timestamp);
+
+                return datums.SequenceEqual(sortedDatums);
+            }
+
+            [TestMethod]
             public void WhenGettingDataDoesNotThrow()
             {
                 SetupWebService();
