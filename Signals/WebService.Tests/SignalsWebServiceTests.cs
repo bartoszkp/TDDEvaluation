@@ -241,33 +241,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(1, existingDatum);
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-
+                SetupSettingData<double>(existingSignal, existingDatum);
+                
                 var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>();
-                int index = 0;
 
-                foreach (var ed in datum)
-                {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d =>
-                    (
-                        d.ElementAt(index).Quality == ed.Quality
-                        && d.ElementAt(index).Timestamp == ed.Timestamp
-                        && d.ElementAt(index).Value == ed.Value
-                    ))));
-                    index++;
-                }
+                VerifySettingGenericData<double>(datum);
             }
 
             [TestMethod]
@@ -288,33 +266,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(1, existingDatum);
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-
+                SetupSettingData<int>(existingSignal, existingDatum);
+                
                 var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<int>>>();
-                int index = 0;
 
-                foreach (var ed in datum)
-                {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<int>(It.Is<IEnumerable<Datum<int>>>(d =>
-                    (
-                        d.ElementAt(index).Quality == ed.Quality
-                        && d.ElementAt(index).Timestamp == ed.Timestamp
-                        && d.ElementAt(index).Value == ed.Value
-                    ))));
-                    index++;
-                }
+                VerifySettingGenericData<int>(datum);
             }
 
             [TestMethod]
@@ -335,33 +291,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (bool)false }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<bool>(It.IsAny<IEnumerable<Datum<bool>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(1, existingDatum);
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+                SetupSettingData<bool>(existingSignal, existingDatum);
 
                 var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<bool>>>();
-                int index = 0;
 
-                foreach (var ed in datum)
-                {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<bool>(It.Is<IEnumerable<Datum<bool>>>(d =>
-                    (
-                        d.ElementAt(index).Quality == ed.Quality
-                        && d.ElementAt(index).Timestamp == ed.Timestamp
-                        && d.ElementAt(index).Value == ed.Value
-                    ))));
-                    index++;
-                }
+                VerifySettingGenericData<bool>(datum);
             }
 
             [TestMethod]
@@ -374,7 +308,7 @@ namespace WebService.Tests
                     Granularity = Domain.Granularity.Day,
                     Path = Domain.Path.FromString("root/signal1")
                 };
-
+                
                 var existingDatum = new Dto.Datum[]
                 {
                         new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (decimal)1 },
@@ -382,33 +316,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (decimal)2 }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<decimal>(It.IsAny<IEnumerable<Datum<decimal>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(1, existingDatum);
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-
+                SetupSettingData<decimal>(existingSignal, existingDatum);
+                
                 var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<decimal>>>();
-                int index = 0;
 
-                foreach (var ed in datum)
-                {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<decimal>(It.Is<IEnumerable<Datum<decimal>>>(d =>
-                    (
-                        d.ElementAt(index).Quality == ed.Quality
-                        && d.ElementAt(index).Timestamp == ed.Timestamp
-                        && d.ElementAt(index).Value == ed.Value
-                    ))));
-                    index++;
-                }
+                VerifySettingGenericData<decimal>(datum);
             }
 
             [TestMethod]
@@ -429,33 +341,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (string)"nie" }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<string>(It.IsAny<IEnumerable<Datum<string>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(1, existingDatum);
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+                SetupSettingData<string>(existingSignal, existingDatum);
 
                 var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<string>>>();
-                int index = 0;
 
-                foreach (var ed in datum)
-                {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<string>(It.Is<IEnumerable<Datum<string>>>(d =>
-                    (
-                        d.ElementAt(index).Quality == ed.Quality
-                        && d.ElementAt(index).Timestamp == ed.Timestamp
-                        && d.ElementAt(index).Value == ed.Value
-                    ))));
-                    index++;
-                }
+                VerifySettingGenericData<string>(datum);
             }
 
             [TestMethod]
@@ -476,31 +366,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(
-                        existingSignal,
-                        existingDatum.First().Timestamp,
-                        existingDatum.Last().Timestamp))
-                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>());
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupGettingData<double>(existingSignal, existingDatum);
 
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
-                int index = 0;
-                foreach (var ed in existingDatum)
-                {
-                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
-                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
-                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
-                    index++;
-                }
+                AssertGettingGenericData(existingDatum, result);
             }
 
             [TestMethod]
@@ -521,31 +391,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<int>(
-                        existingSignal,
-                        existingDatum.First().Timestamp,
-                        existingDatum.Last().Timestamp))
-                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<int>>>());
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupGettingData<int>(existingSignal, existingDatum);
 
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
-                int index = 0;
-                foreach (var ed in existingDatum)
-                {
-                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
-                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
-                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
-                    index++;
-                }
+                AssertGettingGenericData(existingDatum, result);
             }
 
             [TestMethod]
@@ -566,31 +416,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (decimal)2 }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<decimal>(
-                        existingSignal,
-                        existingDatum.First().Timestamp,
-                        existingDatum.Last().Timestamp))
-                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<decimal>>>());
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupGettingData<decimal>(existingSignal, existingDatum);
 
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
-                int index = 0;
-                foreach (var ed in existingDatum)
-                {
-                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
-                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
-                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
-                    index++;
-                }
+                AssertGettingGenericData(existingDatum, result);
             }
 
             [TestMethod]
@@ -611,31 +441,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (bool)false }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<bool>(
-                        existingSignal,
-                        existingDatum.First().Timestamp,
-                        existingDatum.Last().Timestamp))
-                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<bool>>>());
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
+                SetupGettingData<bool>(existingSignal, existingDatum);
+                
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
-                int index = 0;
-                foreach (var ed in existingDatum)
-                {
-                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
-                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
-                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
-                    index++;
-                }
+                AssertGettingGenericData(existingDatum, result);
             }
 
             [TestMethod]
@@ -656,23 +466,33 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (string)"nie" }
                 };
 
+                SetupGettingData<string>(existingSignal, existingDatum);
+                
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+
+                AssertGettingGenericData(existingDatum, result);
+            }
+
+            private void SetupGettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
+            {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
                 signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<string>(
+                    .Setup(sdrm => sdrm.GetData<T>(
                         existingSignal,
                         existingDatum.First().Timestamp,
                         existingDatum.Last().Timestamp))
-                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<string>>>());
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<T>>>());
 
                 GivenASignal(existingSignal);
 
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
+            }
 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
+            private void AssertGettingGenericData(Dto.Datum[] existingDatum, IEnumerable<Dto.Datum> result)
+            {
                 int index = 0;
                 foreach (var ed in existingDatum)
                 {
@@ -701,33 +521,11 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = (double)2 }
                 };
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.SetData(1, existingDatum);
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-
-                var datum = existingDatum.OrderBy(ed => ed.Timestamp).ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>();
-                int index = 0;
+                SetupSettingData<double>(existingSignal, existingDatum);
                 
-                foreach (var ed in datum)
-                {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d =>
-                    (
-                        d.ElementAt(index).Quality == ed.Quality
-                        && d.ElementAt(index).Timestamp == ed.Timestamp
-                        && d.ElementAt(index).Value == ed.Value
-                    ))));
-                    index++;
-                }
+                var datum = existingDatum.OrderBy(ed => ed.Timestamp).ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>();
+                
+                VerifySettingGenericData<double>(datum);
             }
             
             [TestMethod]
@@ -850,7 +648,37 @@ namespace WebService.Tests
                 }
                 return true;
             }
+            
+            private void SetupSettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<T>(It.IsAny<IEnumerable<Datum<T>>>()));
 
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, existingDatum);
+            }
+
+            private void VerifySettingGenericData<T>(IEnumerable<Datum<T>> datum)
+            {
+                int index = 0;
+                foreach (var ed in datum)
+                {
+                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(d =>
+                    (
+                        d.ElementAt(index).Quality == ed.Quality
+                        && d.ElementAt(index).Timestamp == ed.Timestamp
+                        && d.ElementAt(index).Value.Equals(ed.Value)
+                    ))));
+                    index++;
+                }
+            }
+            
             private void SetupSignalsWebServiceAndMissingValue()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -859,6 +687,7 @@ namespace WebService.Tests
                     signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
+
             private void prepareDataRepository()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -867,10 +696,10 @@ namespace WebService.Tests
                     signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
+
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
             private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
-
         }
     }
 }
