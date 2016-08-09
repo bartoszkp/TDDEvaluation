@@ -26,7 +26,7 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
-        private void SetDefaultMissingPolicy(Signal signal)
+        private MissingValuePolicyBase ReturnMissingValuePolicy(Signal signal)
         {
             MissingValuePolicyBase policy;
 
@@ -47,10 +47,10 @@ namespace Domain.Services.Implementation
                 case Domain.DataType.String:
                         policy = new NoneQualityMissingValuePolicy<String>();
                     break;
-                default: return;
+                default: return null;
             }
 
-            this.missingValuePolicyRepository.Set(signal, policy);
+            return policy;
         }
 
         public Signal Add(Signal newSignal)
@@ -62,7 +62,8 @@ namespace Domain.Services.Implementation
 
             var signal = this.signalsRepository.Add(newSignal);
 
-            SetDefaultMissingPolicy(signal);
+            var policy = ReturnMissingValuePolicy(signal);
+            this.missingValuePolicyRepository.Set(signal, policy);
 
             return signal;
         }
@@ -91,9 +92,64 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData(dataList);
         }
 
+        private void AddToDateTime(ref DateTime dateTime, Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    dateTime = dateTime.AddSeconds(1);
+                    break;
+                case Granularity.Minute:
+                    dateTime = dateTime.AddMinutes(1);
+                    break;
+                case Granularity.Hour:
+                    dateTime = dateTime.AddHours(1);
+                    break;
+                case Granularity.Day:
+                    dateTime = dateTime.AddDays(1);
+                    break;
+                case Granularity.Week:
+                    dateTime = dateTime.AddDays(7);
+                    break;
+                case Granularity.Month:
+                    dateTime = dateTime.AddMonths(1);
+                    break;
+                case Granularity.Year:
+                    dateTime = dateTime.AddYears(1);
+                    break;
+                default: return;
+            }
+        }
+
+        private void FillDatumArray<T>(ref IEnumerable<Datum<T>> array, Signal signal, 
+            DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            List<Datum<T>> list = array.ToList();
+            int i = 0;
+            for (DateTime iterativeDateTime = fromIncludedUtc; iterativeDateTime < toExcludedUtc; 
+                AddToDateTime(ref iterativeDateTime,signal.Granularity),++i)
+            {
+                DateTime period = iterativeDateTime;
+                AddToDateTime(ref period, signal.Granularity);
+                if (!(list[i].Timestamp >= iterativeDateTime && list[i].Timestamp < period))
+                {
+                    list.Insert(i,Datum<T>.CreateNone(signal, iterativeDateTime));
+                }
+            }
+
+            array = list.ToArray();
+        }
+
         public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return this.signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
+            IEnumerable<Datum<T>> toReturn =
+                this.signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
+
+            var policy = ReturnMissingValuePolicy(foundSignal);
+            if(GetMissingValuePolicy(foundSignal.Id.Value).GetType() == policy.GetType())
+                FillDatumArray<T>(ref toReturn, foundSignal, fromIncludedUtc, toExcludedUtc);
+
+            return toReturn;
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp)
