@@ -26,6 +26,33 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
+        private void SetDefaultMissingPolicy(Signal signal)
+        {
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    this.missingValuePolicyRepository.Set(signal,
+                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Boolean>());
+                    break;
+                case Domain.DataType.Decimal:
+                    this.missingValuePolicyRepository.Set(signal,
+                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Decimal>());
+                    break;
+                case Domain.DataType.Double:
+                    this.missingValuePolicyRepository.Set(signal,
+                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Double>());
+                    break;
+                case Domain.DataType.Integer:
+                    this.missingValuePolicyRepository.Set(signal,
+                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Int32>());
+                    break;
+                case Domain.DataType.String:
+                    this.missingValuePolicyRepository.Set(signal,
+                        new MissingValuePolicy.NoneQualityMissingValuePolicy<String>());
+                    break;
+            }
+        }
+
         public Signal Add(Signal newSignal)
         {
             if (newSignal.Id.HasValue)
@@ -33,9 +60,11 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            var sig = this.signalsRepository.Add(newSignal);
-            this.missingValuePolicyRepository.Set(sig,new NoneQualityMissingValuePolicy<Int32>());
-            return sig;
+            var signal = this.signalsRepository.Add(newSignal);
+
+            SetDefaultMissingPolicy(signal);
+
+            return signal;
         }
 
         public Signal GetByPath(Path domainPath)
