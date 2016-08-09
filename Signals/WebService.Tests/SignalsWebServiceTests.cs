@@ -199,6 +199,16 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenANonExistingPath_WhenGettingByPath_ReturnsNull()
+            {
+                GivenNoSignals_SetupSignalsRepositoryMock();
+
+                var pathDto = new Dto.Path() { Components = new[] { "root1", "signal88" } };
+
+                Assert.IsNull(signalsWebService.Get(pathDto));
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenSettingMissingValuePolicy_DoesNotThrow()
             {
                 SetupWebService();
