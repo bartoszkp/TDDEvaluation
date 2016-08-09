@@ -637,14 +637,21 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenAnySignal_WhenSetsMissingValuePolicy_VerifyRepo()
+            public void GivenASignal_WhenSetsMissingValuePolicy_VerifyRepo_CheckIfWorksForAllTypes()
             {
+                int signalId = 3;
                 GivenNoSignals_SetupSignalsRepositoryMock();
 
-                signalsWebService.Add(new Dto.Signal());
+                signalsWebService.Add(new Dto.Signal()
+                {
+                    Id = signalId,
+                    DataType = Dto.DataType.Double,
+                    Granularity = Dto.Granularity.Hour,
+                    Path = new Dto.Path() { Components = new[] { "root", "signal5" } }
+                });
 
                 missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(),
-                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
+                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
             }
 
             private void GivenASignalAndData_SetupSignalsRepositoryMockAndVerifySetDataCall<T>(Signal signal, IEnumerable<Dto.Datum> data, DateTime timeStamp, T value)
