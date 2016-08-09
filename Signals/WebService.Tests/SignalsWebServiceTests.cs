@@ -480,13 +480,6 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdr => sdr.SetData<int>(It.Is<IEnumerable<Datum<int>>>( d => DatumsAreAscending(d))));            
             }
 
-            private bool DatumsAreAscending(IEnumerable<Datum<int>> datums)
-            {
-                var sortedDatums = datums.OrderBy(dat => dat.Timestamp);
-
-                return datums.SequenceEqual(sortedDatums);
-            }
-
             [TestMethod]
             public void WhenGettingDataDoesNotThrow()
             {
@@ -813,6 +806,13 @@ namespace WebService.Tests
                 Assert.AreEqual(signal1.DataType, signal2.DataType);
                 Assert.AreEqual(signal1.Granularity, signal2.Granularity);
                 CollectionAssert.AreEqual(signal1.Path.Components.ToArray(), signal2.Path.Components.ToArray());
+            }
+
+            private bool DatumsAreAscending(IEnumerable<Datum<int>> datums)
+            {
+                var sortedDatums = datums.OrderBy(dat => dat.Timestamp);
+
+                return datums.SequenceEqual(sortedDatums);
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock = new Mock<ISignalsRepository>();
