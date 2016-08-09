@@ -44,9 +44,6 @@ namespace WebService
 
             var result = this.signalsDomainService.Add(signal);
 
-            //this.signalsDomainService.SetMissingValuePolicy(result.Id.Value,
-            //    new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<object>());
-
             return result.ToDto<Dto.Signal>();
         }
 
