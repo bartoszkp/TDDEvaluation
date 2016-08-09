@@ -33,7 +33,11 @@ namespace Domain.Services.Implementation
             if (newSignal.Id.HasValue)
                 throw new IdNotNullException();
             var signal = this.signalsRepository.Add(newSignal);
-            if (signal.DataType.GetNativeType() == typeof(int))
+            if(missingValuePolicyRepository == null)
+            {
+                return this.signalsRepository.Add(newSignal);
+            }
+            else if (signal.DataType.GetNativeType() == typeof(int))
             {
                 this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
             }
