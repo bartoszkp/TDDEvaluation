@@ -434,6 +434,14 @@ namespace WebService.Tests
 
                 Assert.IsTrue(result.Count() == 3);
                 Assert.IsTrue(result.Any(d => d.Quality == Dto.Quality.None));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        new System.DateTime(),
+                        new System.DateTime().AddDays(1),
+                        new System.DateTime().AddDays(2),
+                    },
+                    result.Select(d => d.Timestamp).ToArray());
             }
 
             [TestMethod]
@@ -458,6 +466,15 @@ namespace WebService.Tests
 
                 Assert.IsTrue(result.Count() == 4);
                 Assert.IsTrue(result.Any(d => d.Quality == Dto.Quality.None));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        new System.DateTime(),
+                        new System.DateTime().AddMonths(1),
+                        new System.DateTime().AddMonths(2),
+                        new System.DateTime().AddMonths(3)
+                    },
+                    result.Select(d => d.Timestamp).ToArray());
             }
 
             [TestMethod]
@@ -482,6 +499,13 @@ namespace WebService.Tests
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        new System.DateTime(),
+                        new System.DateTime().AddSeconds(1)
+                    },
+                    result.Select(d => d.Timestamp).ToArray());
             }
 
             [TestMethod]
@@ -506,6 +530,13 @@ namespace WebService.Tests
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        new System.DateTime(),
+                        new System.DateTime().AddMinutes(1)
+                    },
+                    result.Select(d => d.Timestamp).ToArray());
             }
 
             [TestMethod]
@@ -530,6 +561,13 @@ namespace WebService.Tests
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        new System.DateTime(),
+                        new System.DateTime().AddHours(1)
+                    },
+                    result.Select(d => d.Timestamp).ToArray());
             }
 
             [TestMethod]
@@ -554,6 +592,13 @@ namespace WebService.Tests
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        new System.DateTime(),
+                        new System.DateTime().AddDays(7)
+                    },
+                    result.Select(d => d.Timestamp).ToArray());
             }
 
             [TestMethod]
@@ -578,6 +623,13 @@ namespace WebService.Tests
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        new System.DateTime(),
+                        new System.DateTime().AddYears(1)
+                    },
+                    result.Select(d => d.Timestamp).ToArray());
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
