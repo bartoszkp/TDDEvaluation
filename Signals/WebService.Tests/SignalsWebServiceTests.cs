@@ -234,7 +234,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GetData_WithNoneQualityMissingValuePolicy_ReturnsIt()
             {
-                var signal = new Signal { Id = 1, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") };
+                var signal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x/y"));
                 GivenASignal(signal);
                 SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
 
@@ -279,13 +279,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGettingSignalData_ReturnsItSorted()
             {
-                GivenASignal(new Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Double,
-                    Granularity = Granularity.Day,
-                    Path = Path.FromString("c/b/a")
-                });
+                GivenASignal(SignalWith(1, DataType.Double, Granularity.Day, Path.FromString("c/b/a")));
                 SetupSignalsDataRepositoryMock<double>();
                 
                 var datum = new Datum<double>[] {
@@ -313,12 +307,8 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                signalsWebService.Add(new Dto.Signal()
-                {
-                    DataType = Dto.DataType.Double,
-                    Granularity = Dto.Granularity.Month,
-                    Path = new Dto.Path() { Components = new[] { "m", "v", "p" } }
-                });
+                signalsWebService.Add(SignalWith(null, Dto.DataType.Double, 
+                    Dto.Granularity.Month, new Dto.Path() { Components = new[] { "m", "v", "p" } }));
 
                 missingValuePolicyMock.Verify(f => f.Set(It.IsAny<Signal>(), It.IsAny<MissingValuePolicyBase>()), Times.Once);
             }
@@ -328,12 +318,8 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                signalsWebService.Add(new Dto.Signal()
-                {
-                    DataType = Dto.DataType.Double,
-                    Granularity = Dto.Granularity.Month,
-                    Path = new Dto.Path() { Components = new[] { "m", "v", "p" } }
-                });
+                signalsWebService.Add(SignalWith(null, Dto.DataType.Double,
+                    Dto.Granularity.Month, new Dto.Path() { Components = new[] { "m", "v", "p" } }));
 
                 missingValuePolicyMock.Verify(f => f.Set(It.IsAny<Signal>(), It.Is<MissingValuePolicyBase>(mvp => mvp is NoneQualityMissingValuePolicy<double>)), Times.Once);
             }
@@ -342,13 +328,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingNewSignal_ReturnsDefaultMissingValuePolicy()
             {
                 var id = 1;
-                var signal = new Signal()
-                {
-                    DataType = DataType.String,
-                    Granularity = Granularity.Hour,
-                    Path = Path.FromString("x/y/z"),
-                    Id = id
-                };
+                var signal = SignalWith(id, DataType.String, Granularity.Hour, Path.FromString("x/y/z"));
                 GivenASignal(signal);
                 SetupMissingValuePolicyMock(signal, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
 
