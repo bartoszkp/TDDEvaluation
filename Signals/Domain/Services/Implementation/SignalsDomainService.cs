@@ -61,6 +61,8 @@ namespace Domain.Services.Implementation
                 int remaining;
                 if (signal.Granularity == Granularity.Day)
                     remaining = (int)(timediff.Ticks / (new TimeSpan(1, 0, 0, 0).Ticks));
+                else if (signal.Granularity == Granularity.Second)
+                    remaining = (int)(timediff.Ticks / (new TimeSpan(0, 0, 1).Ticks));
                 else
                     remaining = (int)(timediff.Ticks / (new TimeSpan(30, 0, 0, 0).Ticks));
                 remaining -= result.Count();
