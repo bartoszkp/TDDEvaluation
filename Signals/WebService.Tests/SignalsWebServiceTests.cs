@@ -729,7 +729,35 @@ namespace WebService.Tests
                     index++;
                 }
             }
+            
+            [TestMethod]
+            public void GivenASignal_WhenAddingASignal_NoneQualityMissingValuePolicyIsSet()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
+                signalsRepositoryMock
+                    .Setup(srm => srm.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s =>
+                    {
+                        s.DataType = DataType.Double;
+                        return s;
+                    });
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Add(new Dto.Signal());
+
+                missingValuePolicyRepositoryMock
+                    .Verify(mvrpm => mvrpm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
+            }
+            
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
