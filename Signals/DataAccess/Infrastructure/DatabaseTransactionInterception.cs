@@ -15,6 +15,7 @@ namespace DataAccess.Infrastructure
         }
 
         public IEnumerable<Type> GetRequiredInterfaces()
+
         {
             return Enumerable.Empty<Type>();
         }

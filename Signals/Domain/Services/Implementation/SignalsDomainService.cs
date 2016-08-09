@@ -26,9 +26,16 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
-        public Signal Add(Signal newSignal)
+
+        public Signal Add(Signal newSignal, MissingValuePolicyBase policy)
         {
-            return this.signalsRepository.Add(newSignal);
+            var res = this.signalsRepository.Add(newSignal);
+            try
+            {
+                missingValuePolicyRepository.Set(newSignal, policy);
+            }
+            catch { }
+            return res;
         }
 
         public Signal GetById(int signalId)
@@ -63,5 +70,6 @@ namespace Domain.Services.Implementation
         {
             return signalsRepository.Get(path);
         }
+      
     }
 }

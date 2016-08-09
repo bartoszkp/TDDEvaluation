@@ -5,7 +5,7 @@ namespace Domain.Services
 {
     public interface ISignalsDomainService
     {
-        Signal Add(Signal newSignal);
+        Signal Add(Signal newSignal, MissingValuePolicy.MissingValuePolicyBase policy);
 
         Signal GetById(int signalId);
 
