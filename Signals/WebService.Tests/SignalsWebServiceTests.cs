@@ -33,6 +33,16 @@ namespace WebService.Tests
             public void GivenNoSignals_WhenAddingASignal_ReturnsIt()
             {
                 GivenNoSignals();
+                prepareMissingValuePolicy(1, new Signal()
+                {
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal"),
+                });
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
 
                 var result = signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Double,
@@ -49,6 +59,13 @@ namespace WebService.Tests
             public void GivenNoSignals_WhenAddingASignal_CallsRepositoryAdd()
             {
                 GivenNoSignals();
+
+                prepareMissingValuePolicy(1, new Signal()
+                {
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                });
 
                 signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Double,
