@@ -617,7 +617,6 @@ namespace WebService.Tests
                 var result = signalsWebService.GetMissingValuePolicy(singnalId);
             }
 
-
             [TestMethod]
             public void GivenASignal_WhenGetsMissingValuePolicy_ReturnsSignalWithPolicy()
             {
@@ -635,8 +634,19 @@ namespace WebService.Tests
                 Dto.Signal returnedSignal = signalsWebService.Add(addedSignal);
 
                 var result = signalsWebService.GetMissingValuePolicy(returnedSignal.Id.Value);
-
             }
+
+            [TestMethod]
+            public void GivenAnySignal_WhenSetsMissingValuePolicy_VerifyRepo()
+            {
+                GivenNoSignals_SetupSignalsRepositoryMock();
+
+                signalsWebService.Add(new Dto.Signal());
+
+                missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(),
+                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
+            }
+
             private void GivenASignalAndData_SetupSignalsRepositoryMockAndVerifySetDataCall<T>(Signal signal, IEnumerable<Dto.Datum> data, DateTime timeStamp, T value)
             {
                 signalsRepositoryMock.Setup(srm => srm.Get(signal.Id.Value)).Returns(signal);
