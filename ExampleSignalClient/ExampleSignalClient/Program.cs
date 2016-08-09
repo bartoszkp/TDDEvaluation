@@ -13,7 +13,7 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Integer,
                 Granularity = Granularity.Minute,
-                Path = new Path() { Components = new[] { "root17", "defaultPolicy" } }
+                Path = new Path() { Components = new[] { "root20", "defaultPolicy" } }
             };
 
             var result = client.Add(newSignal);

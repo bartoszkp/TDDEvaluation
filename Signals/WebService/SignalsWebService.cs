@@ -38,24 +38,12 @@ namespace WebService
         public Signal Add(Signal signalDto)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
-            var result = signalsDomainService.Add(signal,DetermineTypeOfMissingValuePolicy(signal));
+
+            var policy = new NoneQualityMissingValuePolicy();
+            policy.DataType = signal.ToDto<Dto.Signal>().DataType;
+
+            var result = signalsDomainService.Add(signal,policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
             return result.ToDto<Dto.Signal>();
-        }
-
-        private Domain.MissingValuePolicy.MissingValuePolicyBase DetermineTypeOfMissingValuePolicy(Domain.Signal signal)
-        {
-            switch (signal.DataType)
-            {
-                case Domain.DataType.Double: return new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>();
-
-                case Domain.DataType.Integer: return new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>();
-
-                case Domain.DataType.Decimal: return new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<decimal>();
-
-                case Domain.DataType.String: return new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<string>();
-
-                default: return new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>();
-            }
         }
 
         public void Delete(int signalId)
