@@ -30,8 +30,7 @@ namespace Domain.Services.Implementation
         {
             Signal addedSignal = this.signalsRepository.Add(newSignal);
 
-            //writed (int) in angle brackets, because object throws exception. Can be any other type
-            this.missingValuePolicyRepository.Set(addedSignal, new NoneQualityMissingValuePolicy<int>());
+            SetMissingValuePolicyDependsOnSignalDatatype(newSignal);
 
             return newSignal;
         }
@@ -85,6 +84,30 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+        }
+        
+        private void SetMissingValuePolicyDependsOnSignalDatatype(Signal signal)
+        {
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>());
+                    break;
+                case DataType.Decimal:
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>());
+                    break;
+                case DataType.Double:
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>());
+                    break;
+                case DataType.Integer:
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
+                    break;
+                case DataType.String:
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>());
+                    break;
+                default:
+                    throw new TypeUnsupportedException();
+            }
         }
     }
 }

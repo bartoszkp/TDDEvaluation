@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\IdNotNullException.cs" />
+    <Compile Include="Exceptions\TypeUnsupportedException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    class TypeUnsupportedException : Exception
+    public class TypeUnsupportedException : Exception
     {
-        public TypeUnsupportedException() : base("This type is unsupported, supported types: int, decimal, double, string, bool") { }
+        public TypeUnsupportedException() : base("This DataType is unsupported, supported types: int, decimal, double, string, bool") { }
     }
 }
