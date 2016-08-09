@@ -75,6 +75,9 @@ namespace WebService
                     {
                         var item = signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
                             .ToList();
+                        
+
+
                         return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.Decimal:

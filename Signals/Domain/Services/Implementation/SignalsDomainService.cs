@@ -17,8 +17,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -78,8 +78,11 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var items = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-            items.OrderBy(d => d.Timestamp);
+            var items = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToList();
+
+            var mvp = GetMissingValuePolicy(signal.Id.GetValueOrDefault());
+
+            FillMissingData(mvp, items, fromIncludedUtc, toExcludedUtc);
 
             var result = from d in items
                          orderby d.Timestamp
@@ -89,13 +92,13 @@ namespace Domain.Services.Implementation
 
         }
 
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domianPolicy)
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainPolicy)
         {
             var signal = this.GetById(signalId);
             if (signal == null)
                 throw new NoSuchSignalException();
 
-            this.missingValuePolicyRepository.Set(signal, domianPolicy);
+            this.missingValuePolicyRepository.Set(signal, domainPolicy);
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
@@ -105,12 +108,32 @@ namespace Domain.Services.Implementation
                 throw new NoSuchSignalException();
 
             var mvp = this.missingValuePolicyRepository.Get(signal);
-            if(mvp != null)
+            if (mvp != null)
                 return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
             else
                 return null;
         }
+
+        private void FillMissingData<T>(MissingValuePolicyBase mvp, List<Datum<T>> datum, DateTime after, DateTime before)
+        {
+
+            int currentMonth = after.Month + 1;
+
+            while (currentMonth < before.Month - 1)
+            {
+                Datum<T> missingDatum = new Datum<T>()
+                {
+                    Quality = Quality.None,
+                    Timestamp = new DateTime(after.Year, currentMonth, after.Day),
+                    Value = default(T)
+                };
+                datum.Add(missingDatum);
+                currentMonth++;
+            }
+        }
+
+
 
     }
 }
