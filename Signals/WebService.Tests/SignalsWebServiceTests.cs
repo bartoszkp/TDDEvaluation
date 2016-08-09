@@ -247,13 +247,11 @@ namespace WebService.Tests
                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = (double)0 } };
 
-                signalsDataRepositryMock
-                    .Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(datum);
+                SetupGetData(datum);
 
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
 
-                Assert.IsTrue(CompareDatum(expectedDatum, result.ToArray()));
+                Assert.IsTrue(CompareDatum(expectedDatum, result));
             }
 
             [TestMethod]
@@ -283,9 +281,9 @@ namespace WebService.Tests
                 SetupSignalsDataRepositoryMock<double>();
                 
                 var datum = new Datum<double>[] {
-                         new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (double)1.5 },
-                         new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                         new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 3), Value = (double)2 }
+                         new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = 1.5 },
+                         new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                         new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 3), Value = 2 }
                 };
                 var datumSorted = new Dto.Datum[]
                 {
@@ -293,9 +291,8 @@ namespace WebService.Tests
                     new Dto.Datum() {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (double)1.5 },
                     new Dto.Datum() {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 3), Value = (double)2 }
                 };
-                signalsDataRepositryMock
-                    .Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(datum);
+
+                SetupGetData(datum);
 
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 4));
                 
@@ -335,6 +332,13 @@ namespace WebService.Tests
                 var mvp = signalsWebService.GetMissingValuePolicy(id);
 
                 Assert.IsInstanceOfType(mvp, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
+            }
+
+            private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
+            {
+                signalsDataRepositryMock
+                    .Setup(x => x.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datum);
             }
 
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
