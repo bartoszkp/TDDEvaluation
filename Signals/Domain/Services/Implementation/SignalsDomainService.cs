@@ -57,27 +57,20 @@ namespace Domain.Services.Implementation
 
             if (policy != null)
             {
-                var timediff = toExcluded - fromIncluded;
-                TimeSpan span;
-                int remaining;
-                if (signal.Granularity == Granularity.Day)
-                    span = new TimeSpan(1, 0, 0, 0);
-                else if (signal.Granularity == Granularity.Second)
-                    span = new TimeSpan(0, 0, 1);
-                else if (signal.Granularity == Granularity.Minute)
-                    span = new TimeSpan(0, 1, 0);
-                else if (signal.Granularity == Granularity.Hour)
-                    span = new TimeSpan(1, 0, 0);
-                else if (signal.Granularity == Granularity.Week)
-                    span = new TimeSpan(7, 0, 0, 0);
-                else if (signal.Granularity == Granularity.Month)
-                    span = new TimeSpan(30, 0, 0, 0);
-                else
-                    span = new TimeSpan(365, 0, 0, 0);
-                remaining = (int)(timediff.Ticks / span.Ticks);
-                var dates = Enumerable.Range(0, remaining).Select(i => fromIncluded + new TimeSpan(span.Ticks * i));
-                dates = dates.Except(dates.Intersect(result.Select(d => d.Timestamp)));
-                return result.Union(dates.Select(date => Datum<T>.CreateNone(signal, date)));
+                var timeNextMethod = GetTimeNextMethod(signal.Granularity);
+                var date = fromIncluded;
+                var newData = new List<Datum<T>>();
+
+                while (date < toExcluded)
+                {
+                    var datum = result.FirstOrDefault(d => d.Timestamp == date);
+
+                    newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
+
+                    date = timeNextMethod(date);
+                }
+
+                return newData;
             }
             return result;
         }
@@ -109,6 +102,29 @@ namespace Domain.Services.Implementation
             var genericType = type.MakeGenericType(dataType.GetNativeType());
 
             return (MissingValuePolicy.MissingValuePolicyBase)Activator.CreateInstance(genericType);
+        }
+
+        private Func<DateTime, DateTime> GetTimeNextMethod(Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return (date) => date.AddSeconds(1);
+                case Granularity.Minute:
+                    return (date) => date.AddMinutes(1);
+                case Granularity.Hour:
+                    return (date) => date.AddHours(1);
+                case Granularity.Day:
+                    return (date) => date.AddDays(1);
+                case Granularity.Week:
+                    return (date) => date.AddDays(7);
+                case Granularity.Month:
+                    return (date) => date.AddMonths(1);
+                case Granularity.Year:
+                    return (date) => date.AddYears(1);
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }
