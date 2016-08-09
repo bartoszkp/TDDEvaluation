@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
 using System;
+using DataAccess.GenericInstantiations;
 
 namespace WebService.Tests
 {
@@ -616,6 +617,30 @@ namespace WebService.Tests
                 var result = signalsWebService.GetMissingValuePolicy(singnalId);
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenGetsMissingValuePolicy_ReturnsSignalWithPolicy()
+            {
+                int signalId = 5;
+                Dto.Signal addedSignal = new Dto.Signal()
+                {
+                    Id = signalId,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Month,
+                    Path = new Dto.Path() { Components = new[] { "root", "signal" } }
+                };
+
+                GivenNoSignals_SetupSignalsRepositoryMock();
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new NoneQualityMissingValuePolicyBoolean());
+
+                Dto.Signal returnedSignal = signalsWebService.Add(addedSignal);
+
+                var result = signalsWebService.GetMissingValuePolicy(returnedSignal.Id.Value);
+
+            }
             private void GivenASignalAndData_SetupSignalsRepositoryMockAndVerifySetDataCall<T>(Signal signal, IEnumerable<Dto.Datum> data, DateTime timeStamp, T value)
             {
                 signalsRepositoryMock.Setup(srm => srm.Get(signal.Id.Value)).Returns(signal);
