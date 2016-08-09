@@ -97,11 +97,11 @@ namespace WebService
 
         }
 
-        public void SetData(int signalId, IEnumerable<Datum> data)
+        public void SetData(int signalId, IEnumerable<Datum> datum)
         {
             var signal = this.signalsDomainService.GetById(signalId);
 
-            data?.OrderBy(dt => dt.Timestamp).ToArray();
+            var data = datum?.OrderBy(dt => dt.Timestamp).ToArray();
 
             if (signal == null)
             {
