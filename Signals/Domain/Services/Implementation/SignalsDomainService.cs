@@ -107,6 +107,7 @@ namespace Domain.Services.Implementation
                     break;
 
                 case Granularity.Year:
+                    strategy = new YearFillDataStrategy(mvp);
                     break;
 
                 default:

@@ -16,14 +16,17 @@ namespace Domain.Services.Implementation.DataFillStrategy.Helpers
 
             if (after.Year == before.Year)
             {
-                while (currentMonth < before.Month - 1)
+                while (currentMonth < before.Month)
                 {
-                    datum.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = new DateTime(after.Year, currentMonth, after.Day)
-                    });
+                    var missingTimestamp = new DateTime(after.Year, currentMonth, after.Day);
+
+                    if (datum.Find(d => DateTime.Compare(d.Timestamp, missingTimestamp) == 0) == null)
+                        datum.Add(new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = new DateTime(after.Year, currentMonth, after.Day)
+                        });
 
                     currentMonth++;
 
@@ -34,27 +37,29 @@ namespace Domain.Services.Implementation.DataFillStrategy.Helpers
             {
                 int currentYear = after.Year;
 
-                while (currentYear <= before.Year)
+                while (currentYear < before.Year)
                 {
-
                     while (currentMonth <= 12)
                     {
-                        datum.Add(new Datum<T>()
-                        {
-                            Quality = Quality.None,
-                            Value = default(T),
-                            Timestamp = new DateTime(currentYear, currentMonth, after.Day)
-                        });
+                        var missingTimestamp = new DateTime(currentYear, currentMonth, after.Day);
+
+                        if (datum.Find(d => DateTime.Compare(d.Timestamp, missingTimestamp) == 0) == null)
+                            datum.Add(new Datum<T>()
+                            {
+                                Quality = Quality.None,
+                                Value = default(T),
+                                Timestamp = missingTimestamp
+                            });
                         currentMonth++;
 
                         if (currentMonth == before.Month - 1 && currentYear == before.Year)
                             return;
-                        
+
                     }
                     currentMonth = 1;
                     currentYear++;
 
-                    
+
 
                 }
             }
