@@ -58,23 +58,26 @@ namespace Domain.Services.Implementation
             if (policy != null)
             {
                 var timediff = toExcluded - fromIncluded;
+                TimeSpan span;
                 int remaining;
                 if (signal.Granularity == Granularity.Day)
-                    remaining = (int)(timediff.Ticks / (new TimeSpan(1, 0, 0, 0).Ticks));
+                    span = new TimeSpan(1, 0, 0, 0);
                 else if (signal.Granularity == Granularity.Second)
-                    remaining = (int)(timediff.Ticks / (new TimeSpan(0, 0, 1).Ticks));
+                    span = new TimeSpan(0, 0, 1);
                 else if (signal.Granularity == Granularity.Minute)
-                    remaining = (int)(timediff.Ticks / (new TimeSpan(0, 1, 0).Ticks));
+                    span = new TimeSpan(0, 1, 0);
                 else if (signal.Granularity == Granularity.Hour)
-                    remaining = (int)(timediff.Ticks / (new TimeSpan(1, 0, 0).Ticks));
+                    span = new TimeSpan(1, 0, 0);
                 else if (signal.Granularity == Granularity.Week)
-                    remaining = (int)(timediff.Ticks / (new TimeSpan(7, 0, 0, 0).Ticks));
+                    span = new TimeSpan(7, 0, 0, 0);
                 else if (signal.Granularity == Granularity.Month)
-                    remaining = (int)(timediff.Ticks / (new TimeSpan(30, 0, 0, 0).Ticks));
+                    span = new TimeSpan(30, 0, 0, 0);
                 else
-                    remaining = (int)(timediff.Ticks / (new TimeSpan(365, 0, 0, 0).Ticks));
-                remaining -= result.Count();
-                return result.Concat(Enumerable.Repeat(Datum<T>.CreateNone(signal, new DateTime()), remaining));
+                    span = new TimeSpan(365, 0, 0, 0);
+                remaining = (int)(timediff.Ticks / span.Ticks);
+                var dates = Enumerable.Range(0, remaining).Select(i => fromIncluded + new TimeSpan(span.Ticks * i));
+                dates = dates.Except(dates.Intersect(result.Select(d => d.Timestamp)));
+                return result.Union(dates.Select(date => Datum<T>.CreateNone(signal, date)));
             }
             return result;
         }
