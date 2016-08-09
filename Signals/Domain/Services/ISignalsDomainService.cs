@@ -12,12 +12,12 @@ namespace Domain.Services
 
         Signal GetByPath(Path path);
 
-        Domain.MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(int signalId);
+        IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
-        IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+        void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable);
 
-        void SetData(int signalId, IEnumerable<Datum<double>> enumerable);
+        MissingValuePolicy<double> GetMissingValuePolicy(int signalId);
 
-        void SetMissingValuePolicy(int signalId, SpecificValueMissingValuePolicy<double> specificValueMissingValuePolicy);
+        void SetMissingValuePolicy(int signalId, MissingValuePolicy<double> missingValuePolicy);
     }
 }

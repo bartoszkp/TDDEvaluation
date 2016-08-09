@@ -60,16 +60,6 @@ namespace WebService
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
-        {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
-
-            else
-            {
-                return signalsDomainService.GetData(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
-            }
-        }
-
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
@@ -78,9 +68,18 @@ namespace WebService
             {
                 Type type = null;
 
-                foreach (var item in data) type = item.Value.GetType();
+                foreach (var item in data)
+                {
+                    type = item.Value.GetType();
+                }
+                
+                if (type == typeof(bool)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<bool>>>().ToArray());
+                else if (type == typeof(int)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray());
+                else if (type == typeof(double)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray());
+                else if (type == typeof(decimal)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<decimal>>>().ToArray());
+                else if (type == typeof(string)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<string>>>().ToArray());
+                else throw new ArgumentException("Type of the 'data' parameter's signals must be bool, int, double, decimal or string.");
 
-                if (type == typeof(double)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
             }
         }
 
@@ -92,15 +91,34 @@ namespace WebService
             {
                 if (signalsDomainService.GetMissingValuePolicy(signalId) == null) return null;
 
-                else return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+                else return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<SpecificValueMissingValuePolicy>();
             }
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            if(signalsDomainService.GetById(signalId)==null) throw new ArgumentException();
+            if (signalsDomainService.GetById(signalId)==null) throw new ArgumentException();
 
             else signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>());
+        }
+
+        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
+
+            else
+            {
+                var signal = signalsDomainService.GetById(signalId);
+
+                var type = signal.DataType.ToString();
+
+                if (type == "Boolean") return signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "Integer") return signalsDomainService.GetData<int>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "Double") return signalsDomainService.GetData<double>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "Decimal") return signalsDomainService.GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "String") return signalsDomainService.GetData<string>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else throw new ArgumentException("Type of the signal must be bool, int, double, decimal or string.");
+            }
         }
     }
 }
