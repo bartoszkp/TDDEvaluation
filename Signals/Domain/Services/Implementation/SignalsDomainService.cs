@@ -28,7 +28,12 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
-            return this.signalsRepository.Add(newSignal);
+            Signal addedSignal = this.signalsRepository.Add(newSignal);
+
+            //writed (int) in angle brackets, because object throws exception. Can be any other type
+            this.missingValuePolicyRepository.Set(addedSignal, new NoneQualityMissingValuePolicy<int>());
+
+            return newSignal;
         }
 
         public Signal GetById(int signalId)
