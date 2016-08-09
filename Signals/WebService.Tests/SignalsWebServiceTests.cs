@@ -413,7 +413,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
+            public void GivenASignalAndDataAndMVPByDay_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
             {
                 int signalId = 1;
                 GivenASignal(SignalWith(
@@ -433,6 +433,30 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddDays(3));
 
                 Assert.IsTrue(result.Count() == 3);
+                Assert.IsTrue(result.Any(d => d.Quality == Dto.Quality.None));
+            }
+
+            [TestMethod]
+            public void GivenASignalAndDataAndMVPByMonth_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    signalId,
+                    DataType.Boolean,
+                    Granularity.Month,
+                    Path.FromString("")));
+
+                GivenData(signalId, new[]
+                {
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddMonths(3) }
+                });
+
+                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
+
+                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddMonths(4));
+
+                Assert.IsTrue(result.Count() == 4);
                 Assert.IsTrue(result.Any(d => d.Quality == Dto.Quality.None));
             }
 
