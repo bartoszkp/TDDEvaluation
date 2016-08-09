@@ -121,7 +121,7 @@ namespace Domain.Services.Implementation
 
 
 
-            var sortedList = result.OrderBy(x => x.Timestamp).ToList();
+            var sortedList = result.OrderBy(x => x.Timestamp).Where(x=>x.Timestamp>=fromIncludedUtc&&x.Timestamp<toExcludedUtc).ToList();
 
           
             var r = GetMissingValuePolicy(signalId);
@@ -134,12 +134,9 @@ namespace Domain.Services.Implementation
             {
                 while (time != toExcludedUtc)
                 {
-                    if (sortedList[i].Timestamp == time)
+                    if (sortedList.FindIndex(x=>x.Timestamp==time)<0)
                     {
-                        i++;
-                    }
-                    else
-                    {
+                     
                         sortedList.Add(new Datum<T>() { Quality = datumToAdd.Quality, Timestamp = time, Value = datumToAdd.Value });
                     }
                     time = AddTime(signal.Granularity, time);
