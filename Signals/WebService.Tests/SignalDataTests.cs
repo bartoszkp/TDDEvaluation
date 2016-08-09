@@ -84,7 +84,6 @@ namespace WebService.Tests
         public void SignalNotExists_SetSignalData_ThrowsException()
         {
             SetupWebService();
-            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns((Signal)null);
 
             Mock<IEnumerable<Dto.Datum>> signalDataMock = new Mock<IEnumerable<Dto.Datum>>();
 
@@ -96,8 +95,7 @@ namespace WebService.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public void GivenNullData_SetSignalData_ThrowsException()
         {
-            SetupWebService();
-            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(new Signal() { Id = 1 });
+            SetupWebService(new Signal() { Id = 1 });
             signalsWebService.SetData(1, null);
         }
 
@@ -105,9 +103,8 @@ namespace WebService.Tests
         [TestMethod]
         public void SignalExists_SetSignalData_WithNonNullData()
         {
-            SetupWebService();
             var returnedSignal = new Signal() { Id = 1, DataType = DataType.Integer };
-            signalsRepoMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns(returnedSignal);
+            SetupWebService(returnedSignal);
 
             IEnumerable<Dto.Datum> dtoSignalData = new[] { new Dto.Datum() { Quality = Dto.Quality.Fair,
                                                                  Timestamp = new DateTime(2000, 1, 1),
