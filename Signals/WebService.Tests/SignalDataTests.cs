@@ -192,6 +192,30 @@ namespace WebService.Tests
             Assert.Fail();
         }
 
+        [TestMethod]
+        public void WhenFromIncludedUtcIsNotFirstDayOfYear_GetDataReturnedTrueData()
+        {
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Year
+            };
+            var datums = new Datum<bool>[]{};
+
+            SetupWebService(signal);
+            missingValueRepoMock
+                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
+            signalsDataRepoMock
+                .Setup(dr => dr.GetData<bool>(It.IsAny<Signal>(), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
+                .Returns(datums);
+
+            var result = signalsWebService.GetData(signal.Id.Value, new DateTime(1999, 5, 1), new DateTime(2000, 4, 1));
+            foreach (var d in result)
+                Assert.AreEqual(d.Timestamp, new DateTime(2000, 1, 1));
+        }
+
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
