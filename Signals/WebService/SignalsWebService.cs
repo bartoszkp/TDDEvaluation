@@ -70,19 +70,19 @@ namespace WebService
             {
                 case Domain.DataType.Boolean:
                     return signalsDomainService.GetData<bool>(domainSignal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).OrderBy(d => d.Timestamp);
+                        .Select(d => d.ToDto<Dto.Datum>());
                 case Domain.DataType.Decimal:
                     return signalsDomainService.GetData<decimal>(domainSignal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).OrderBy(d => d.Timestamp);
+                        .Select(d => d.ToDto<Dto.Datum>());
                 case Domain.DataType.Double:
                     return signalsDomainService.GetData<double>(domainSignal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).OrderBy(d => d.Timestamp);
+                        .Select(d => d.ToDto<Dto.Datum>());
                 case Domain.DataType.Integer:
                     return signalsDomainService.GetData<int>(domainSignal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).OrderBy(d => d.Timestamp);
+                        .Select(d => d.ToDto<Dto.Datum>());
                 case Domain.DataType.String:
                     return signalsDomainService.GetData<string>(domainSignal, fromIncludedUtc, toExcludedUtc)
-                        .Select(d => d.ToDto<Dto.Datum>()).OrderBy(d => d.Timestamp);
+                        .Select(d => d.ToDto<Dto.Datum>());
             }
 
             return null;
