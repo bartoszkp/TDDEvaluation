@@ -64,18 +64,20 @@ namespace WebService
             var getSignal = this.signalsDomainService.GetById(signalId);
             var result = this.signalsDomainService.GetData(getSignal, fromIncludedUtc, toExcludedUtc);
 
-            var dtoDatum = new List<Dto.Datum>();
-            foreach (Domain.Datum<object> d in result)
-            {
-                var quality = d.Quality.ToDto<Dto.Quality>();
-                dtoDatum.Add(new Datum() { Value = d.Value, Quality = quality, Timestamp = d.Timestamp });
-            }
-            
-            dtoDatum.Sort(delegate (Datum a, Datum b) 
-            {
-                return a.Timestamp.CompareTo(b.Timestamp);
-            });
-            return dtoDatum;
+            result.OrderBy(d => d.Timestamp);
+
+            if (getSignal.DataType == Domain.DataType.Double)
+                return ExecuteMVPAndConvertToDto<double>(getSignal, result, toExcludedUtc);
+            else if (getSignal.DataType == Domain.DataType.Integer)
+                return ExecuteMVPAndConvertToDto<int>(getSignal, result, toExcludedUtc);
+            else if (getSignal.DataType == Domain.DataType.Decimal)
+                return ExecuteMVPAndConvertToDto<decimal>(getSignal, result, toExcludedUtc);
+            else if (getSignal.DataType == Domain.DataType.String)
+                return ExecuteMVPAndConvertToDto<string>(getSignal, result, toExcludedUtc);
+            else if (getSignal.DataType == Domain.DataType.Boolean)
+                return ExecuteMVPAndConvertToDto<bool>(getSignal, result, toExcludedUtc);
+            else
+                throw new NotImplementedException();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
@@ -105,5 +107,123 @@ namespace WebService
             var domainPolicyBase = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             this.signalsDomainService.SetMVP(domainSetMVPSignal, domainPolicyBase);
         }
+
+        private IEnumerable<Domain.Datum<T>> ExecuteMVP<T>(
+            Domain.Signal signal, MissingValuePolicy mvp, IEnumerable<Domain.Datum<object>> datum, DateTime toExcludedDate)
+        {
+            if (!(mvp is NoneQualityMissingValuePolicy))
+                throw new NotImplementedException();
+
+            var domain_datum = datum.ToArray();            
+            if (domain_datum.Length == 0)
+                return datum as IEnumerable<Domain.Datum<T>>;
+
+            int expected_number_of_dates =
+                DateDifferenceByGranularity(domain_datum.First().Timestamp, toExcludedDate, signal.Granularity);            
+            if (domain_datum.Length == expected_number_of_dates)
+                return datum as IEnumerable<Domain.Datum<T>>;
+
+            var filledDatum = new Domain.Datum<T>[expected_number_of_dates];
+            filledDatum[0] = domain_datum.First().ToDomain<Domain.Datum<T>>();
+            filledDatum[filledDatum.Length - 1] = 
+                (domain_datum.Last().Timestamp == DatePlusValueByGranularity(toExcludedDate, signal.Granularity, -1)) ? 
+                domain_datum.Last().ToDomain<Domain.Datum<T>>() : 
+                Domain.Datum<T>.CreateNone(signal, DatePlusValueByGranularity(toExcludedDate, signal.Granularity, -1));
+
+            if (domain_datum.Length == 1)
+            {
+                for(int i = 1; i < filledDatum.Length - 1; ++i)
+                    filledDatum[i] = Domain.Datum<T>.CreateNone(signal, DatePlusValueByGranularity(filledDatum[0].Timestamp, signal.Granularity,i));
+
+                return filledDatum;
+            }
+
+            int domain_datum_iterator = 1;
+            for(int i = 1; i < filledDatum.Length - 1; ++i)
+            {
+                if (domain_datum_iterator < domain_datum.Length &&
+                    DatePlusValueByGranularity(filledDatum[i - 1].Timestamp, signal.Granularity) == domain_datum[domain_datum_iterator].Timestamp)
+                    filledDatum[i] = domain_datum[domain_datum_iterator++].ToDomain<Domain.Datum<T>>();
+                else
+                {
+                    filledDatum[i] = Domain.Datum<T>.CreateNone(
+                        signal,
+                        DatePlusValueByGranularity(filledDatum[i - 1].Timestamp, signal.Granularity)
+                        );
+                }
+            }
+            
+            return filledDatum;            
+        }
+
+        private IEnumerable<Datum> ExecuteMVPAndConvertToDto<T>(Domain.Signal signal, 
+            IEnumerable<Domain.Datum<object>> object_datum, DateTime toExcludedDate)
+        {
+            var mvpDatum = ExecuteMVP<T>(signal, GetMissingValuePolicy((int)signal.Id), object_datum, toExcludedDate);
+
+            var dtoDatum = new List<Dto.Datum>();
+            foreach (Domain.Datum<T> d in mvpDatum)
+            {
+                var quality = d.Quality.ToDto<Dto.Quality>();
+                dtoDatum.Add(new Datum() { Value = d.Value, Quality = quality, Timestamp = d.Timestamp });
+            }
+
+            return dtoDatum;
+        }
+                
+        private int DateDifferenceByGranularity(DateTime earlier, DateTime later, Domain.Granularity granularity)
+        {
+            int i = 1;            
+
+            switch(granularity)
+            {
+                case Domain.Granularity.Year:
+                    while (earlier.AddYears(i) != later) ++i;
+                    break;
+                case Domain.Granularity.Month:
+                    while (earlier.AddMonths(i) != later) ++i;
+                    break;
+                case Domain.Granularity.Week:
+                    while (earlier.AddDays(i * 7) != later) ++i;
+                    break;
+                case Domain.Granularity.Day:
+                    while (earlier.AddDays(i) != later) ++i;
+                    break;                
+                case Domain.Granularity.Hour:
+                    while (earlier.AddHours(i) != later) ++i;
+                    break;
+                case Domain.Granularity.Minute:
+                    while (earlier.AddMinutes(i) != later) ++i;
+                    break;
+                case Domain.Granularity.Second:
+                    while (earlier.AddSeconds(i) != later) ++i;
+                    break;
+            }
+
+            return i;
+        }
+        private DateTime DatePlusValueByGranularity(DateTime date, Domain.Granularity granularity, int value = 1)
+        {
+            switch (granularity)
+            {
+                case Domain.Granularity.Year:
+                    return date.AddYears(value);
+                case Domain.Granularity.Month:
+                    return date.AddMonths(value);
+                case Domain.Granularity.Week:
+                    return date.AddDays(7*value);
+                case Domain.Granularity.Day:
+                    return date.AddDays(value);
+                case Domain.Granularity.Hour:
+                    return date.AddHours(value);
+                case Domain.Granularity.Minute:
+                    return date.AddMinutes(value);
+                case Domain.Granularity.Second:
+                    return date.AddSeconds(value);
+
+                default: return date;
+            }
+        }
     }
+
 }
