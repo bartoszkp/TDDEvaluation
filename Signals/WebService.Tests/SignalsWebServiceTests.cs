@@ -611,7 +611,7 @@ namespace WebService.Tests
             {
                 int singnalId = 5;
                 SetupWebService();
-
+        
                 signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
 
                 var result = signalsWebService.GetMissingValuePolicy(singnalId);
@@ -630,11 +630,7 @@ namespace WebService.Tests
                     Path = new Dto.Path() { Components = new[] { "root", "signal" } }
                 };
 
-                GivenNoSignals_SetupSignalsRepositoryMock();
-                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
-
-                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new NoneQualityMissingValuePolicyBoolean());
+                GivenAnySignal_SetupSignalsRepositoryMock();
 
                 Dto.Signal returnedSignal = signalsWebService.Add(addedSignal);
 
@@ -747,6 +743,15 @@ namespace WebService.Tests
                     .Returns(existingSignal);
 
                 signalsRepositoryMock.Setup(sr => sr.Get(existingSignal.Path)).Returns(existingSignal);
+            }
+
+            private void GivenAnySignal_SetupSignalsRepositoryMock()
+            {
+                GivenNoSignals_SetupSignalsRepositoryMock();
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new NoneQualityMissingValuePolicyBoolean());
             }
 
             private void GivenRepositoryThatAssigns(int id)
