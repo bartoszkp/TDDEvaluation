@@ -32,6 +32,27 @@ namespace Domain.Services.Implementation
         {
             if (newSignal.Id.HasValue)
                 throw new IdNotNullException();
+            var signal = this.signalsRepository.Add(newSignal);
+            if (signal.DataType.GetNativeType() == typeof(int))
+            {
+                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
+            }
+            else if(signal.DataType.GetNativeType() == typeof(double))
+            {
+                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>());
+            }
+            else if (signal.DataType.GetNativeType() == typeof(decimal))
+            {
+                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>());
+            }
+            else if (signal.DataType.GetNativeType() == typeof(bool))
+            {
+                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>());
+            }
+            else if (signal.DataType.GetNativeType() == typeof(string))
+            {
+                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>());
+            }
             return this.signalsRepository.Add(newSignal);
         }
 
