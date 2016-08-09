@@ -185,20 +185,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(System.ArgumentException))]
-            public void GivenANonExistingPath_WhenGettingByPath_ThrowsArgumentException()
-            {
-                GivenNoSignals_SetupSignalsRepositoryMock();
-
-                var pathDto = new Dto.Path()
-                {
-                    Components = new[] { "root", "signal" }
-                };
-
-                signalsWebService.Get(pathDto);
-            }
-
-            [TestMethod]
             public void GivenANonExistingPath_WhenGettingByPath_ReturnsNull()
             {
                 GivenNoSignals_SetupSignalsRepositoryMock();
