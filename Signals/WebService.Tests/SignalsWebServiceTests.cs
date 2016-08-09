@@ -148,16 +148,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGetMissingValuePolicyWithNewSignal_ReturnNull()
-            {
-                GivenASignal(SignalWith());
-
-                var res = signalsWebService.GetMissingValuePolicy(1);
-
-                Assert.IsNull(res);
-            }
-
-            [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GivenASignal_WhenGetMissingValuePolicyWithInvalidID_ReturnException()
             {
@@ -246,11 +236,20 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGetData_ReturnDatums()
+            public void GivenASignal_WhenGetData_ReturnSortedByDateDatums()
             {
                 GivenASignal(SignalWith(DataType.Boolean));
                 SetupDataRepository<bool>();
-                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray<Dto.Datum>();
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray<Dto.Datum>().ToArray();
+
+                bool sortedStatus = true;
+
+                for (int i = 0; i < result.Length-1; i++)
+                {
+                    int compareResult = DateTime.Compare(result[i].Timestamp, result[i + 1].Timestamp);
+                    if (compareResult > 0) sortedStatus = false;
+                }
+                Assert.IsTrue(sortedStatus);
 
                 Assert.IsNotNull(result[0].Value);
             }
@@ -289,16 +288,16 @@ namespace WebService.Tests
             private IEnumerable<Dto.Datum> GetDtoDatum<T>()
             {
                 return new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = default(T) },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = default(T) },
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = default(T) },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = default(T) } };
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = default(T) } };
             }
             private IEnumerable<Domain.Datum<T>> GetDomainDatum<T>()
             {
                 return new Domain.Datum<T>[] {
-                    new Domain.Datum<T>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = default(T) },
+                    new Domain.Datum<T>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = default(T) },
                     new Domain.Datum<T>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = default(T) },
-                    new Domain.Datum<T>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = default(T) } };
+                    new Domain.Datum<T>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = default(T) } };
             }
             private bool EqualsSignal(Signal a, Signal b)
             {
