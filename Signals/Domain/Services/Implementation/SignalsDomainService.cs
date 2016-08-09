@@ -33,7 +33,30 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            return this.signalsRepository.Add(newSignal);
+            var result = this.signalsRepository.Add(newSignal);
+
+            switch (result.DataType)
+            {
+                case DataType.Boolean:
+                    this.SetMissingValuePolicy(result, new NoneQualityMissingValuePolicy<bool>());
+                    break;
+                case DataType.Integer:
+                    this.SetMissingValuePolicy(result, new NoneQualityMissingValuePolicy<int>());
+                    break;
+                case DataType.Double:
+                    this.SetMissingValuePolicy(result, new NoneQualityMissingValuePolicy<double>());
+                    break;
+                case DataType.Decimal:
+                    this.SetMissingValuePolicy(result, new NoneQualityMissingValuePolicy<decimal>());
+                    break;
+                case DataType.String:
+                    this.SetMissingValuePolicy(result, new NoneQualityMissingValuePolicy<string>());
+                    break;
+                default:
+                    break;
+            }
+
+            return result;
         }
 
         public Signal GetById(int signalId)
