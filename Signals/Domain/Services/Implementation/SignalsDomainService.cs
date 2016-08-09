@@ -52,10 +52,20 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
-            
-            if(GetMissingValuePolicy(signal)!=null)
-                return result.Concat(new[] { Datum<T>.CreateNone(signal, new DateTime()) });
 
+            var policy = GetMissingValuePolicy(signal);
+
+            if (policy != null)
+            {
+                var timediff = toExcluded - fromIncluded;
+                int remaining;
+                if (signal.Granularity == Granularity.Day)
+                    remaining = (int)(timediff.Ticks / (new TimeSpan(1, 0, 0, 0).Ticks));
+                else
+                    remaining = (int)(timediff.Ticks / (new TimeSpan(30, 0, 0, 0).Ticks));
+                remaining -= result.Count();
+                return result.Concat(Enumerable.Repeat(Datum<T>.CreateNone(signal, new DateTime()), remaining));
+            }
             return result;
         }
 
