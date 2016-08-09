@@ -484,6 +484,30 @@ namespace WebService.Tests
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataAndMVPByMinute_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    signalId,
+                    DataType.Boolean,
+                    Granularity.Minute,
+                    Path.FromString("")));
+
+                GivenData(signalId, new[]
+                {
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new System.DateTime() },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = new System.DateTime().AddMinutes(1) }
+                });
+
+                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
+
+                var result = signalsWebService.GetData(signalId, new System.DateTime(), new System.DateTime().AddMinutes(2));
+
+                Assert.IsTrue(result.Count() == 2);
+                Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
