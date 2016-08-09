@@ -26,14 +26,18 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
-        public Signal Add(Signal newSignal)
+        public Signal Add<T>(Signal newSignal, NoneQualityMissingValuePolicy<T> nonePolicy)
         {
             if (newSignal.Id.HasValue)
             {
                 throw new IdNotNullException();
             }
 
-            return this.signalsRepository.Add(newSignal);
+            var toReturn = this.signalsRepository.Add(newSignal);
+
+            missingValuePolicyRepository.Set(newSignal, nonePolicy);
+
+            return toReturn;
         }
 
         public Signal GetById(int signalId)

@@ -42,7 +42,10 @@ namespace WebService
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
 
-            var result = this.signalsDomainService.Add(signal);
+            NoneQualityMissingValuePolicy dtoNonePolicy = new NoneQualityMissingValuePolicy();
+            var domainNonePolicy = dtoNonePolicy.ToDomain<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>();
+
+            var result = this.signalsDomainService.Add<double>(signal, domainNonePolicy);
 
             return result.ToDto<Dto.Signal>();
         }
