@@ -54,7 +54,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp);
 
             TimeSpan span = toExcludedUtc.Subtract(fromIncludedUtc);
 

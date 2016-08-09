@@ -344,6 +344,149 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void GivenData_WhenGettingData_GetMissingValuePolicyIsCalled()
+            {
+                int signalId = 1;
+                var signal = SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("x/y"));
+
+                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day, Domain.Path.FromString("x/y")));
+                GivenData(signalId, new Domain.Datum<double>[] {
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 }
+                });
+
+                signalsWebService.GetData(signalId, DateTime.MinValue, DateTime.MaxValue);
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Get(It.Is<Domain.Signal>(s => s.Id == signalId)), Times.Once);
+            }
+
+            [TestMethod]
+            public void GivenDataMissingSingleElement_WhenGettingData_SetDataIsCalledWithDataFromNoneQualityMVP()
+            {
+                int signalId = 1;
+                var signal = SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("x/y"));
+                DateTime dateFrom = new DateTime(2000, 1, 1);
+                DateTime dateTo = new DateTime(2000, 4, 1);
+
+                var dataToReturnInFirstIter = new Domain.Datum<double>[] {
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                };
+                var dataToReturnInSecondIter = new Domain.Datum<double>[] {
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
+                    new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                    new Domain.Datum<double>() { Quality = Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = default(double) }
+                };
+
+                GivenASignal(signal);
+                signalsDataRepositoryMock.SetupSequence(sdr => sdr.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signalId), dateFrom, dateTo)).
+                    Returns(dataToReturnInFirstIter).
+                    Returns(dataToReturnInSecondIter);
+                GivenMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>()
+                {
+                    Signal = signal,
+                    Id = signalId
+                });
+
+                signalsWebService.GetData(signalId, dateFrom, dateTo);
+
+                VerifySetDataCallToFillSingleMissingData<double>(signalId, new DateTime(2000, 2, 1));
+            }
+
+            [TestMethod]
+            public void GivenDataMissingMultipleElements_WhenGettingData_SetDataIsCalledWithDataFromNoneQualityMVP()
+            {
+                int signalId = 7;
+                var signal = SignalWith(signalId, DataType.Decimal, Granularity.Year, Path.FromString("x/y"));
+                DateTime dateFrom = new DateTime(2000, 1, 1);
+                DateTime dateTo = new DateTime(2005, 1, 1);
+
+                var dataToReturnInFirstIter = new Domain.Datum<decimal>[] {
+                    new Domain.Datum<decimal>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2001, 1, 1), Value = (decimal)2 },
+                    new Domain.Datum<decimal>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2003, 1, 1), Value = (decimal)1 },
+                };
+                var dataToReturnInSecondIter = new Domain.Datum<decimal>[] {
+                    new Domain.Datum<decimal>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2001, 1, 1), Value = (decimal)2 },
+                    new Domain.Datum<decimal>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2003, 1, 1), Value = (decimal)1 },
+                    new Domain.Datum<decimal>() { Quality = Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(decimal) },
+                    new Domain.Datum<decimal>() { Quality = Quality.None, Timestamp = new DateTime(2004, 1, 1), Value = default(decimal) },
+                    new Domain.Datum<decimal>() { Quality = Quality.None, Timestamp = new DateTime(2002, 1, 1), Value = default(decimal) },
+                };
+
+                GivenASignal(signal);
+                signalsDataRepositoryMock.SetupSequence(sdr => sdr.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == signalId), dateFrom, dateTo)).
+                    Returns(dataToReturnInFirstIter).
+                    Returns(dataToReturnInSecondIter);
+                GivenMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<decimal>()
+                {
+                    Signal = signal,
+                    Id = signalId
+                });
+
+                signalsWebService.GetData(signalId, dateFrom, dateTo);
+
+                VerifySetDataCallToFillSingleMissingData<decimal>(signalId, new DateTime(2000, 1, 1));
+                VerifySetDataCallToFillSingleMissingData<decimal>(signalId, new DateTime(2004, 1, 1));
+                VerifySetDataCallToFillSingleMissingData<decimal>(signalId, new DateTime(2002, 1, 1));
+            }
+
+            [TestMethod]
+            public void GivenDataMissingMultipleElements_WhenGettingData_DataWithFilledMissingValuesIsReturned()
+            {
+                int signalId = 5;
+                var signal = SignalWith(signalId, DataType.Integer, Granularity.Day, Path.FromString("x/y"));
+                DateTime dateFrom = new DateTime(2000, 1, 1);
+                DateTime dateTo = new DateTime(2000, 1, 6);
+
+                var dataToReturnInFirstIter = new Domain.Datum<int>[] {
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 2), Value = (int)2 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 4), Value = (int)1 },
+                };
+                var dataToReturnInSecondIter = new Domain.Datum<int>[] {
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 2), Value = (int)2 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 4), Value = (int)1 },
+                    new Domain.Datum<int>() { Quality = Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(int) },
+                    new Domain.Datum<int>() { Quality = Quality.None, Timestamp = new DateTime(2000, 1, 5), Value = default(int) },
+                    new Domain.Datum<int>() { Quality = Quality.None, Timestamp = new DateTime(2000, 1, 3), Value = default(int) },
+                };
+
+                GivenASignal(signal);
+                signalsDataRepositoryMock.SetupSequence(sdr => sdr.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signalId), dateFrom, dateTo)).
+                    Returns(dataToReturnInFirstIter).
+                    Returns(dataToReturnInSecondIter);
+                GivenMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>()
+                {
+                    Signal = signal,
+                    Id = signalId
+                });
+
+                var expectedResult = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 2), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 3), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 4), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 5), Value = default(int) }
+                };
+
+                var result = signalsWebService.GetData(signalId, dateFrom, dateTo);
+
+                for (int i = 0; i < result.Count(); i++)
+                {
+                    AssertDatumDtoEquals(expectedResult.ElementAt(i), result.ElementAt(i));
+                }
+            }
+
+            private void VerifySetDataCallToFillSingleMissingData<T>(int signalId, DateTime timeStamp, Quality quality = Quality.None, T value = default(T))
+            {
+                signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data => data.Count().Equals(1) &&
+                    data.ElementAt(0).Signal.Id == signalId &&
+                    data.ElementAt(0).Quality == quality &&
+                    data.ElementAt(0).Timestamp == timeStamp &&
+                    data.ElementAt(0).Value.Equals(value))), Times.Once);
+            }
+
             private void GivenMissingValuePolicy(Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
             {
                 missingValuePolicyRepositoryMock
