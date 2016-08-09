@@ -338,10 +338,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
-                for (int i = 0; i < result.Count(); i++)
-                {
-                    AssertDatumDtoEquals(expectedDataDto.ElementAt(i), result.ElementAt(i));
-                }
+                AssertDataDtoEquals(expectedDataDto, result);
             }
 
             [TestMethod]
@@ -472,10 +469,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(signalId, dateFrom, dateTo);
 
-                for (int i = 0; i < result.Count(); i++)
-                {
-                    AssertDatumDtoEquals(expectedResult.ElementAt(i), result.ElementAt(i));
-                }
+                AssertDataDtoEquals(expectedResult, result);
             }
 
             private void VerifySetDataCallToFillSingleMissingData<T>(int signalId, DateTime timeStamp, Quality quality = Quality.None, T value = default(T))
@@ -494,11 +488,21 @@ namespace WebService.Tests
                     .Returns<Domain.Signal>(s => missingValuePolicy);
             }
 
-            private void AssertDatumDtoEquals(Dto.Datum data1, Dto.Datum data2)
+            private void AssertDataDtoEquals(IEnumerable<Dto.Datum> data1, IEnumerable<Dto.Datum> data2)
             {
-                Assert.AreEqual(data1.Quality, data2.Quality);
-                Assert.AreEqual(data1.Timestamp, data2.Timestamp);
-                Assert.AreEqual(data1.Value, data2.Value);
+                bool countsAreEqual = data1.Count() == data2.Count();
+
+                Assert.IsTrue(countsAreEqual);
+
+                if (countsAreEqual)
+                {
+                    for (int i = 0; i < data1.Count(); i++)
+                    {
+                        Assert.AreEqual(data1.ElementAt(i).Quality, data2.ElementAt(i).Quality);
+                        Assert.AreEqual(data1.ElementAt(i).Timestamp, data2.ElementAt(i).Timestamp);
+                        Assert.AreEqual(data1.ElementAt(i).Value, data2.ElementAt(i).Value);
+                    }
+                }
             }
 
             private bool DatumDomainEquals<T>(Domain.Datum<T> datum, Domain.Quality quality, DateTime timeStamp, T value, int signalId)
