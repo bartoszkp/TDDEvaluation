@@ -7,5 +7,9 @@ namespace Domain.MissingValuePolicy
 {
     public class FirstOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
+        public override Datum<T> FillMissingValue(Datum<T> datum)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -65,6 +65,7 @@
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />
+    <Compile Include="Infrastructure\SignalUtils.cs" />
     <Compile Include="Infrastructure\UnityRegisterAttribute.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\FirstOrderMissingValuePolicy.cs" />

@@ -19,5 +19,7 @@ namespace Domain.MissingValuePolicy
     {
         [NHibernateIgnore]
         public override Type NativeDataType { get { return typeof(T); } }
+
+        public abstract Datum<T> FillMissingValue(Datum<T> datum); 
     }
 }
