@@ -28,29 +28,29 @@ namespace Domain.Services.Implementation
 
         private void SetDefaultMissingPolicy(Signal signal)
         {
+            MissingValuePolicyBase policy;
+
             switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
-                    this.missingValuePolicyRepository.Set(signal,
-                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Boolean>());
+                        policy = new NoneQualityMissingValuePolicy<Boolean>();
                     break;
                 case Domain.DataType.Decimal:
-                    this.missingValuePolicyRepository.Set(signal,
-                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Decimal>());
+                        policy = new NoneQualityMissingValuePolicy<Decimal>();
                     break;
                 case Domain.DataType.Double:
-                    this.missingValuePolicyRepository.Set(signal,
-                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Double>());
+                         policy = new NoneQualityMissingValuePolicy<Double>();
                     break;
                 case Domain.DataType.Integer:
-                    this.missingValuePolicyRepository.Set(signal,
-                        new MissingValuePolicy.NoneQualityMissingValuePolicy<Int32>());
+                        policy = new NoneQualityMissingValuePolicy<Int32>();
                     break;
                 case Domain.DataType.String:
-                    this.missingValuePolicyRepository.Set(signal,
-                        new MissingValuePolicy.NoneQualityMissingValuePolicy<String>());
+                        policy = new NoneQualityMissingValuePolicy<String>();
                     break;
+                default: return;
             }
+
+            this.missingValuePolicyRepository.Set(signal, policy);
         }
 
         public Signal Add(Signal newSignal)
