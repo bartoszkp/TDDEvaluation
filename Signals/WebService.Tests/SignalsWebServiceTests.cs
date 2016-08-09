@@ -295,7 +295,7 @@ namespace WebService.Tests
                 };
                 signalsDataRepositryMock
                     .Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(datum.ToDomain<IEnumerable<Domain.Datum<double>>>());
+                    .Returns(datum);
 
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 4));
                 
