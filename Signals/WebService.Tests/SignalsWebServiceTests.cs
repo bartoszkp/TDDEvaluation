@@ -690,7 +690,7 @@ namespace WebService.Tests
                 {
                     Id = 1,
                     DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Day,
+                    Granularity = Domain.Granularity.Month,
                     Path = Domain.Path.FromString("root/signal1")
                 };
 
@@ -703,7 +703,7 @@ namespace WebService.Tests
 
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<string>(It.IsAny<IEnumerable<Datum<string>>>()));
+                    .Setup(sdrm => sdrm.SetData<double>(It.IsAny<IEnumerable<Datum<double>>>()));
 
                 GivenASignal(existingSignal);
 
@@ -715,14 +715,12 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
 
-                var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<string>>>();
+                var datum = existingDatum.OrderBy(ed => ed.Timestamp).ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>();
                 int index = 0;
-
-                existingDatum.OrderBy(ed => ed.Timestamp);
-
+                
                 foreach (var ed in datum)
                 {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<string>(It.Is<IEnumerable<Datum<string>>>(d =>
+                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d =>
                     (
                         d.ElementAt(index).Quality == ed.Quality
                         && d.ElementAt(index).Timestamp == ed.Timestamp
