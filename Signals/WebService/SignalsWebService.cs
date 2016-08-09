@@ -66,8 +66,8 @@ namespace WebService
             else if (signal.DataType.GetNativeType() == typeof(int))
             {
                 return this.signalsDomainService?
-                    .GetData<int>(signal, fromIncludedUtc, toExcludedUtc)?.
-                    ToDto<IEnumerable<Dto.Datum>>();
+                    .GetData<int>(signal, fromIncludedUtc, toExcludedUtc)?
+                    .ToDto<IEnumerable<Dto.Datum>>();
             }
             else if (signal.DataType.GetNativeType() == typeof(double))
             {
@@ -100,6 +100,8 @@ namespace WebService
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var signal = this.signalsDomainService.GetById(signalId);
+
+            data.OrderBy(dt => dt.Timestamp).ToArray();
 
             if (signal == null)
             {
