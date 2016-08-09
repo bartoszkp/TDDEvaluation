@@ -472,6 +472,23 @@ namespace WebService.Tests
                 AssertDataDtoEquals(expectedResult, result);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingASignal_SetMissingValuePolicyIsCalled()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Add(SignalWith(null, Dto.DataType.Integer, Dto.Granularity.Minute, new Dto.Path()
+                {
+                    Components = new[] { "root", "signal1" }
+                }));
+
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.Is<Domain.Signal>(s => s.DataType == DataType.Integer &&
+                    s.Granularity == Granularity.Minute &&
+                    s.Path.ToString().Equals("root/signal1")), 
+                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()), 
+                    Times.Once);
+            }
+
             private void VerifySetDataCallToFillSingleMissingData<T>(int signalId, DateTime timeStamp, Quality quality = Quality.None, T value = default(T))
             {
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<T>(It.Is<IEnumerable<Datum<T>>>(data => data.Count().Equals(1) &&
