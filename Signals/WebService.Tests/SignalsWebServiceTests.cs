@@ -338,6 +338,25 @@ namespace WebService.Tests
                 missingValuePolicyMock.Verify(f => f.Set(It.IsAny<Signal>(), It.Is<MissingValuePolicyBase>(mvp => mvp is NoneQualityMissingValuePolicy<double>)), Times.Once);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingNewSignal_ReturnsDefaultMissingValuePolicy()
+            {
+                var id = 1;
+                var signal = new Signal()
+                {
+                    DataType = DataType.String,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("x/y/z"),
+                    Id = id
+                };
+                GivenASignal(signal);
+                SetupMissingValuePolicyMock(signal, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
+
+                var mvp = signalsWebService.GetMissingValuePolicy(id);
+
+                Assert.IsInstanceOfType(mvp, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
+            }
+
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
             {
                 if (datum1.Count() != datum2.Count()) return false;
@@ -354,11 +373,25 @@ namespace WebService.Tests
                 return true;
             }
 
+            private bool CompareSignal(Signal sig1, Signal sig2)
+            {
+                return sig1.Id == sig2.Id &&
+                    sig1.Granularity == sig2.Granularity &&
+                    sig1.DataType == sig2.DataType &&
+                    sig1.Path.ToString() == sig1.Path.ToString(); 
+            }
+
             private void SetupSignalsDataRepositoryMock<T>(){
                 signalsDataRepositryMock.Setup(x=>x.SetData<T>(It.IsAny<IEnumerable<Domain.Datum<T>>>()));
                 signalsDataRepositryMock.Setup(x => x.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
             }
 
+            private void SetupMissingValuePolicyMock(Signal signal, MissingValuePolicyBase mvp)
+            {
+                missingValuePolicyMock
+                    .Setup(f => f.Get(It.Is<Signal>(sig => CompareSignal(sig, signal))))
+                    .Returns(mvp as MissingValuePolicyBase);
+            }
 
             private void SetupMissingValuePolicyMock(Domain.MissingValuePolicy.MissingValuePolicyBase policy)
             {
