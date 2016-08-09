@@ -145,10 +145,7 @@ namespace WebService.Tests
                 Path = Path.FromString("sfd/pk")
             };
 
-            SetupWebService();
-            signalsRepoMock
-                .Setup(sr => sr.Get(It.IsAny<int>()))
-                .Returns(signal);
+            SetupWebService(signal);
             signalsDataRepoMock
                 .Setup(sdr => sdr.GetData<double>(It.IsAny<Domain.Signal>(),
                 It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
@@ -178,46 +175,45 @@ namespace WebService.Tests
             };
             var datums = new Datum<int>[]
             {
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = 1 },
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new System.DateTime(2000, 3, 1), Value = 2 }
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2 }
             };
 
-            signalsRepoMock = new Mock<ISignalsRepository>();
-            signalsRepoMock
-                .Setup(sr => sr.Get(It.IsAny<int>()))
-                .Returns(signal);
-            var missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
+            SetupWebService(signal);
             missingValueRepoMock
                 .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
                 .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
-            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
             signalsDataRepoMock
                 .Setup(dr => dr.GetData<int>(It.IsAny<Signal>(), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
                 .Returns(datums);
 
-            var signalsDomainService = new SignalsDomainService(
-                signalsRepoMock.Object, signalsDataRepoMock.Object, missingValueRepoMock.Object);
-            signalsWebService = new SignalsWebService(signalsDomainService);
-
-            var result = signalsWebService.GetData(signal.Id.Value, System.DateTime.MinValue, System.DateTime.MaxValue);
+            var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
             foreach (var d in result)
-                if (d.Timestamp == new System.DateTime(2000, 2, 1))
+                if (d.Timestamp == new DateTime(2000, 2, 1))
                     return;
 
             Assert.Fail();
         }
 
-        private void SetupWebService()
+        private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
             signalsRepoMock = new Mock<ISignalsRepository>();
-            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, null);
+            missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
+            SignalsDomainService domainService = new SignalsDomainService(
+                signalsRepoMock.Object, signalsDataRepoMock.Object, missingValueRepoMock.Object);
             signalsWebService = new SignalsWebService(domainService);
+
+
+            signalsRepoMock
+                .Setup(sr => sr.Get(It.IsAny<int>()))
+                .Returns(signal);
         }
 
 
         private Mock<ISignalsDataRepository> signalsDataRepoMock;
         private Mock<ISignalsRepository> signalsRepoMock;
+        private Mock<IMissingValuePolicyRepository> missingValueRepoMock;
 
     }
 }

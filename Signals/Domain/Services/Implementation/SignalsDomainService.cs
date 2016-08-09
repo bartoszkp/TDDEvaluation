@@ -106,6 +106,25 @@ namespace Domain.Services.Implementation
                         result[i] = result[i + 1];
                         result[i + 1] = r;
                     }
+
+            var mvp = GetMissingValuePolicy(signal.Id.Value);
+            if (mvp != null && typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
+            {
+                List<Datum<T>> datums = new List<Datum<T>>();
+                var date = fromIncludedUtc;
+                for (int i = 0; date<toExcludedUtc && i<result.Length; increaseDate(ref date, signal.Granularity))
+                {
+                    if (result[i].Timestamp == date)
+                        datums.Add(result[i++]);
+                    else
+                        datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+                }
+                for (; date < toExcludedUtc; increaseDate(ref date, signal.Granularity))
+                    datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+
+                return datums?.ToArray();
+            }
+
             return result;
         }
 
@@ -130,6 +149,40 @@ namespace Domain.Services.Implementation
             }
         }
 
+        private void increaseDate(ref DateTime date, Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    date = date.AddSeconds(1);
+                    return;
+
+                case Granularity.Minute:
+                    date = date.AddMinutes(1);
+                    return;
+
+                case Granularity.Hour:
+                    date = date.AddHours(1);
+                    return;
+
+                case Granularity.Day:
+                    date = date.AddDays(1);
+                    return;
+
+                case Granularity.Week:
+                    date = date.AddDays(7);
+                    return;
+
+                case Granularity.Month:
+                    date = date.AddMonths(1);
+                    return;
+
+                case Granularity.Year:
+                    date = date.AddYears(1);
+                    return;
+            }
+            throw new NotSupportedException("Granularity: " + granularity.ToString() + " is not supported");
+        }
 
     }
 }
