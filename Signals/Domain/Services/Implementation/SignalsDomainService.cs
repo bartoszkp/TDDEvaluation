@@ -70,8 +70,6 @@ namespace Domain.Services.Implementation
         {
             var result = this.signalsRepository.Get(signalPath);
 
-            if (result == null)
-                throw new PathDoesntExistException();
 
             return result;
         }
