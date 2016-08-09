@@ -69,8 +69,10 @@ namespace Domain.Services.Implementation
                     remaining = (int)(timediff.Ticks / (new TimeSpan(1, 0, 0).Ticks));
                 else if (signal.Granularity == Granularity.Week)
                     remaining = (int)(timediff.Ticks / (new TimeSpan(7, 0, 0, 0).Ticks));
-                else
+                else if (signal.Granularity == Granularity.Month)
                     remaining = (int)(timediff.Ticks / (new TimeSpan(30, 0, 0, 0).Ticks));
+                else
+                    remaining = (int)(timediff.Ticks / (new TimeSpan(365, 0, 0, 0).Ticks));
                 remaining -= result.Count();
                 return result.Concat(Enumerable.Repeat(Datum<T>.CreateNone(signal, new DateTime()), remaining));
             }
