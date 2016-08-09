@@ -166,6 +166,46 @@ namespace WebService.Tests
             }
 
         }
+        
+        [TestMethod]
+        public void NoneQualityMissingValuePolicy_ShouldFillMissingData()
+        {
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Month
+            };
+            var datums = new Datum<int>[]
+            {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new System.DateTime(2000, 3, 1), Value = 2 }
+            };
+
+            signalsRepoMock = new Mock<ISignalsRepository>();
+            signalsRepoMock
+                .Setup(sr => sr.Get(It.IsAny<int>()))
+                .Returns(signal);
+            var missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
+            missingValueRepoMock
+                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
+            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+            signalsDataRepoMock
+                .Setup(dr => dr.GetData<int>(It.IsAny<Signal>(), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
+                .Returns(datums);
+
+            var signalsDomainService = new SignalsDomainService(
+                signalsRepoMock.Object, signalsDataRepoMock.Object, missingValueRepoMock.Object);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+            var result = signalsWebService.GetData(signal.Id.Value, System.DateTime.MinValue, System.DateTime.MaxValue);
+            foreach (var d in result)
+                if (d.Timestamp == new System.DateTime(2000, 2, 1))
+                    return;
+
+            Assert.Fail();
+        }
 
         private void SetupWebService()
         {
