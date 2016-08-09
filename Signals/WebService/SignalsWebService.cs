@@ -101,7 +101,7 @@ namespace WebService
         {
             var signal = this.signalsDomainService.GetById(signalId);
 
-            data.OrderBy(dt => dt.Timestamp).ToArray();
+            data?.OrderBy(dt => dt.Timestamp).ToArray();
 
             if (signal == null)
             {
