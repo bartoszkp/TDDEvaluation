@@ -32,32 +32,36 @@ namespace Domain.Services.Implementation
         {
             if (newSignal.Id.HasValue)
                 throw new IdNotNullException();
+
             var signal = this.signalsRepository.Add(newSignal);
-            if(missingValuePolicyRepository == null)
+
+            if (missingValuePolicyRepository == null)
             {
-                return this.signalsRepository.Add(newSignal);
+                return signal;
             }
-            else if (signal.DataType.GetNativeType() == typeof(int))
+            
+            string typeName = signal.DataType.GetNativeType().Name;
+
+            switch (typeName)
             {
-                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
+                case "Int32":
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
+                    break;
+                case "Double":
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>());
+                    break;
+                case "Decimal":
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>());
+                    break;
+                case "Boolean":
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>());
+                    break;
+                case "String":
+                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>());
+                    break;
             }
-            else if(signal.DataType.GetNativeType() == typeof(double))
-            {
-                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>());
-            }
-            else if (signal.DataType.GetNativeType() == typeof(decimal))
-            {
-                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>());
-            }
-            else if (signal.DataType.GetNativeType() == typeof(bool))
-            {
-                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>());
-            }
-            else if (signal.DataType.GetNativeType() == typeof(string))
-            {
-                this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>());
-            }
-            return this.signalsRepository.Add(newSignal);
+
+            return signal;
         }
 
         public Signal GetById(int signalId)

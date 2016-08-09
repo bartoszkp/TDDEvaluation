@@ -63,75 +63,68 @@ namespace WebService
             {
                 throw new KeyNotFoundException();
             }
-            else if (signal.DataType.GetNativeType() == typeof(int))
-            {
-                return this.signalsDomainService?
-                    .GetData<int>(signal, fromIncludedUtc, toExcludedUtc)?
-                    .ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType.GetNativeType() == typeof(double))
-            {
-                return this.signalsDomainService?
-                    .GetData<double>(signal, fromIncludedUtc, toExcludedUtc)?.
-                    ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType.GetNativeType() == typeof(bool))
-            {
-                return this.signalsDomainService?
-                    .GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)?.
-                    ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType.GetNativeType() == typeof(decimal))
-            {
-                return this.signalsDomainService?
-                    .GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)?.
-                    ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType.GetNativeType() == typeof(string))
-            {
-                return this.signalsDomainService?
-                    .GetData<string>(signal, fromIncludedUtc, toExcludedUtc)?.
-                    ToDto<IEnumerable<Dto.Datum>>();
-            }
-            return null;
 
+            string typeName = signal.DataType.GetNativeType().Name;
+
+            switch (typeName)
+            {
+                case "Int32":
+                    return GenericGetDataCall<int>(signal, fromIncludedUtc, toExcludedUtc);
+                case "Double":
+                    return GenericGetDataCall<double>(signal, fromIncludedUtc, toExcludedUtc);
+                case "Decimal":
+                    return GenericGetDataCall<decimal>(signal, fromIncludedUtc, toExcludedUtc);
+                case "Boolean":
+                    return GenericGetDataCall<bool>(signal, fromIncludedUtc, toExcludedUtc);
+                case "String":
+                    return GenericGetDataCall<string>(signal, fromIncludedUtc, toExcludedUtc);
+            }
+            
+            return null;
+        }
+
+        private IEnumerable<Datum> GenericGetDataCall<T>(Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            return this.signalsDomainService?
+                    .GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?
+                    .ToDto<IEnumerable<Dto.Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> datum)
         {
             var signal = this.signalsDomainService.GetById(signalId);
-
-            var data = datum?.OrderBy(dt => dt.Timestamp).ToArray();
-
+            
             if (signal == null)
             {
                 throw new KeyNotFoundException();
             }
-            else if (signal.DataType.GetNativeType() == typeof(int))
+
+            var data = datum?.OrderBy(dt => dt.Timestamp).ToArray();
+            string typeName = signal.DataType.GetNativeType().Name;
+
+            switch (typeName)
             {
-                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray());
-                return;
+                case "Int32":
+                    GenericSetDataCall<int>(signal, data);
+                    break;
+                case "Double":
+                    GenericSetDataCall<double>(signal, data);
+                    break;
+                case "Decimal":
+                    GenericSetDataCall<decimal>(signal, data);
+                    break;
+                case "Boolean":
+                    GenericSetDataCall<bool>(signal, data);
+                    break;
+                case "String":
+                    GenericSetDataCall<string>(signal, data);
+                    break;
             }
-            else if (signal.DataType.GetNativeType() == typeof(double))
-            {
-                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray());
-                return;
-            }
-            else if (signal.DataType.GetNativeType() == typeof(bool))
-            {
-                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<bool>>>().ToArray());
-                return;
-            }
-            else if (signal.DataType.GetNativeType() == typeof(decimal))
-            {
-                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<decimal>>>().ToArray());
-                return;
-            }
-            else if (signal.DataType.GetNativeType() == typeof(string))
-            {
-                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<string>>>().ToArray());
-                return;
-            }
+        }
+
+        private void GenericSetDataCall<T>(Domain.Signal signal, Datum[] data)
+        {
+            this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<T>>>().ToArray());
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
