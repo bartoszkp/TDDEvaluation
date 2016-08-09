@@ -11,19 +11,14 @@ namespace ExampleSignalClient
 
             var newSignal = new Signal()
             {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "signal1" } }
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Minute,
+                Path = new Path() { Components = new[] { "root", "defaultPolicy222" } }
             };
 
-            var id = client.Add(newSignal).Id.Value;
+            var result = client.Get(new Path() { Components = new[] { "root", "defaultPolicy2288" } } );
 
-            var result = client.GetById(id);
-
-            Console.WriteLine(result.Id);
-            Console.WriteLine(result.DataType);
-            Console.WriteLine(result.Granularity);
-            Console.WriteLine(string.Join("/", result.Path.Components));
+            Console.WriteLine(result == null);
             Console.ReadKey();
         }
     }

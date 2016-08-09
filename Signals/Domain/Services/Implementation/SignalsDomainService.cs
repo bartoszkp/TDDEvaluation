@@ -44,9 +44,6 @@ namespace Domain.Services.Implementation
         {
             var signal = this.signalsRepository.Get(pathDomain);
 
-            if (signal == null)
-                throw new ArgumentException("Path not found.");
-
             return signal;
         }
 
