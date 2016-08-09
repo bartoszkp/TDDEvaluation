@@ -133,7 +133,7 @@ namespace WebService.Tests
                     new Datum<double>() { Quality = Quality.Good, Timestamp = new System.DateTime(2000, 2, 1), Value = 1.51 },
                     new Datum<double>() { Quality = Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1), Value = 1.45 },
                     new Datum<double>() { Quality = Quality.Poor, Timestamp = new System.DateTime(2000, 3, 1), Value = 2.47 }
-                };
+            };
             var signal = new Signal()
             {
                 Id = 1,
@@ -141,13 +141,8 @@ namespace WebService.Tests
                 Granularity = Granularity.Month,
                 Path = Path.FromString("sfd/pk")
             };
-
-            SetupWebService(signal);
-            signalsDataRepoMock
-                .Setup(sdr => sdr.GetData<double>(It.IsAny<Domain.Signal>(),
-                It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
-                .Returns(datums);
-
+            SetupMocks(datums, signal);
+            
             var result = signalsWebService.GetData(1, System.DateTime.MinValue, System.DateTime.MaxValue);
             var datum = datums[1];
             datums[1] = datums[0];
@@ -175,14 +170,7 @@ namespace WebService.Tests
                     new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
                     new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2 }
             };
-
-            SetupWebService(signal);
-            missingValueRepoMock
-                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
-                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
-            signalsDataRepoMock
-                .Setup(dr => dr.GetData<int>(It.IsAny<Signal>(), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
-                .Returns(datums);
+            SetupMocks(datums, signal);
 
             var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
             foreach (var d in result)
@@ -202,14 +190,7 @@ namespace WebService.Tests
                 Granularity = Granularity.Year
             };
             var datums = new Datum<bool>[]{};
-
-            SetupWebService(signal);
-            missingValueRepoMock
-                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
-                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
-            signalsDataRepoMock
-                .Setup(dr => dr.GetData<bool>(It.IsAny<Signal>(), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
-                .Returns(datums);
+            SetupMocks(datums, signal);
 
             var result = signalsWebService.GetData(signal.Id.Value, new DateTime(1999, 5, 1), new DateTime(2000, 4, 1));
             foreach (var d in result)
@@ -224,13 +205,22 @@ namespace WebService.Tests
             SignalsDomainService domainService = new SignalsDomainService(
                 signalsRepoMock.Object, signalsDataRepoMock.Object, missingValueRepoMock.Object);
             signalsWebService = new SignalsWebService(domainService);
-
-
+            
             signalsRepoMock
                 .Setup(sr => sr.Get(It.IsAny<int>()))
                 .Returns(signal);
         }
 
+        private void SetupMocks<T>(Datum<T>[] datums, Signal signal)
+        {
+            SetupWebService(signal);
+            missingValueRepoMock
+                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
+            signalsDataRepoMock
+                .Setup(dr => dr.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(datums);
+        }
 
         private Mock<ISignalsDataRepository> signalsDataRepoMock;
         private Mock<ISignalsRepository> signalsRepoMock;
