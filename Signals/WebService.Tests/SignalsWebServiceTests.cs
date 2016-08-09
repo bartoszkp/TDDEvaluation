@@ -323,6 +323,21 @@ namespace WebService.Tests
                 missingValuePolicyMock.Verify(f => f.Set(It.IsAny<Signal>(), It.IsAny<MissingValuePolicyBase>()), Times.Once);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenAddingNewSignal_DefaultMissingValuePolicyIsSet()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Add(new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Double,
+                    Granularity = Dto.Granularity.Month,
+                    Path = new Dto.Path() { Components = new[] { "m", "v", "p" } }
+                });
+
+                missingValuePolicyMock.Verify(f => f.Set(It.IsAny<Signal>(), It.Is<MissingValuePolicyBase>(mvp => mvp is NoneQualityMissingValuePolicy<double>)), Times.Once);
+            }
+
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
             {
                 if (datum1.Count() != datum2.Count()) return false;
