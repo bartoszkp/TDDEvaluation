@@ -1,21 +1,26 @@
-﻿using Domain.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Domain.Services.Implementation.DataFillStrategy.Helpers
 {
-    [NHibernateIgnore]
-    public static class NoneQualityMonthDataFill
+    public static class NoneQualityWeekDataFill
     {
         public static void FillData<T>(List<Domain.Datum<T>> datum, DateTime after, DateTime before)
         {
+            int currentYear = after.Year;
+            int currentMonth = after.Month;
+            int currentDay = after.Day;
+            int afterSevenDays = currentDay + 7;
+
             var currentDate = new DateTime(after.Ticks);
 
             while (currentDate < before)
             {
+
                 if (datum.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
                     datum.Add(new Datum<T>()
@@ -25,12 +30,18 @@ namespace Domain.Services.Implementation.DataFillStrategy.Helpers
                         Timestamp = currentDate
                     });
                 }
-
-                currentDate = currentDate.AddMonths(1);
-
+                    
+                
+                currentDate = currentDate.AddDays(7);
+                Debug.WriteLine(currentDate);
             }
 
+
+      
+
         }
+
     }
 
 }
+

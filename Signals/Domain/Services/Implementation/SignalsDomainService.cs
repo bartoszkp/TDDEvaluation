@@ -7,6 +7,7 @@ using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 using Domain.Services.Implementation.DataFillStrategy;
+using Domain.DataFillStrategy;
 
 namespace Domain.Services.Implementation
 {
@@ -83,36 +84,9 @@ namespace Domain.Services.Implementation
 
             var mvp = GetMissingValuePolicy(signal.Id.GetValueOrDefault());
 
-            Domain.DataFillStrategy.DataFillStrategy strategy = null;
+            Domain.DataFillStrategy.DataFillStrategy strategy = DataFillStrategyProvider.GetStrategy(signal.Granularity,mvp);
 
-            switch (signal.Granularity)
-            {
-                case Granularity.Second:
-                    
-                    break;
-                case Granularity.Minute:
-                    break;
-
-                case Granularity.Hour:
-                    break;
-
-                case Granularity.Day:
-                    break;
-
-                case Granularity.Week:
-                    break;
-
-                case Granularity.Month:
-                    strategy = new MonthFillDataStrategy(mvp);
-                    break;
-
-                case Granularity.Year:
-                    strategy = new YearFillDataStrategy(mvp);
-                    break;
-
-                default:
-                    break;
-            }
+           
 
             strategy.FillMissingData(items,fromIncludedUtc,toExcludedUtc);
 

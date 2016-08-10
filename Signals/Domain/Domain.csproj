@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataFillStrategy\DataFillStrategy.cs" />
+    <Compile Include="DataFillStrategy\DataFillStrategyProvider.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\NoSuchSignalException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
@@ -87,8 +88,10 @@
     <Compile Include="Repositories\ISignalsDataRepository.cs" />
     <Compile Include="Repositories\ISignalsRepository.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityMonthDataFill.cs" />
+    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityWeekDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityYearDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\MonthFillDataStrategy.cs" />
+    <Compile Include="Services\Implementation\DataFillStrategy\WeekFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\YearFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />
     <Compile Include="Services\ISignalsDomainService.cs" />
