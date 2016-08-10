@@ -44,7 +44,7 @@ namespace Domain.Services.Implementation
             switch (result.DataType)
             {
                 case DataType.Boolean:
-                    this.missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<bool>()); 
+                    this.missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<bool>());
                     break;
 
                 case DataType.Integer:
@@ -63,9 +63,8 @@ namespace Domain.Services.Implementation
                     this.missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<string>());
                     break;
             }
-            
-            return result;
 
+            return result;
         }
 
         public Signal Get(Path pathDto)

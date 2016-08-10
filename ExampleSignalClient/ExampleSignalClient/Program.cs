@@ -11,7 +11,7 @@ namespace ExampleSignalClient
 
             Random random = new Random();
              
-            Signal signal = new Signal()
+            Signal newSignal = new Signal()
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Second,
@@ -19,25 +19,11 @@ namespace ExampleSignalClient
             };
 
 
-            var fetchedSignal = client.Add(signal);
-            client.SetMissingValuePolicy(fetchedSignal.Id.GetValueOrDefault(), new NoneQualityMissingValuePolicy() { DataType = DataType.Double });
+            var result = client.Add(newSignal);
 
-            client.SetData(fetchedSignal.Id.GetValueOrDefault(), new Datum[]
-            {
-               new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1,1,1,1), Value = (double)1.5 },
-               new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1,1,1,6), Value = (double)2.5 }
-            });
+            var mvp = client.GetMissingValuePolicy(result.Id.Value);
 
-
-
-
-            var result = client.GetData(fetchedSignal.Id.GetValueOrDefault(), new DateTime(2000, 1, 1,1,1,1), new DateTime(2000, 1, 1,1,2,7));
-
-            foreach (var d in result)
-            {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
-            }
-
+            Console.WriteLine(mvp);
 
             Console.ReadKey();
 
