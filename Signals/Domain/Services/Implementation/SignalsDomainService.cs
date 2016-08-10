@@ -75,8 +75,31 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> dataDomain)
         {
-            this.signalsDataRepository.SetData<T>(dataDomain.OrderBy(d => d.Timestamp));
+            List<Datum<T>> dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToList();
+
+            List<Datum<T>> missingDatas = new List<Datum<T>>();
+
+            if (dataDomain.First().Signal.Granularity == Granularity.Month)
+            {
+                for (int i = 0; i < dataDomainOrderedList.Count - 1; i++)
+                {
+                    if (dataDomainOrderedList[i].Timestamp.CompareTo(dataDomainOrderedList[i + 1].Timestamp.AddMonths(-1)) != 0)
+                    {
+                        missingDatas.Add(new Datum<T>()
+                        {
+                            Id = 0,
+                            Quality = Quality.None,
+                            Timestamp = dataDomainOrderedList[i].Timestamp.AddMonths(1),
+                            Signal = dataDomainOrderedList[i].Signal,
+                            Value = default(T)
+                        });
+                    }
+                }
+            }
+            dataDomainOrderedList.AddRange(missingDatas);
+            this.signalsDataRepository.SetData<T>(dataDomainOrderedList.OrderBy(d => d.Timestamp));
         }
+
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {

@@ -13,20 +13,26 @@ namespace ExampleSignalClient
             var newSignal = new Signal()
             {
                 DataType = DataType.Double,
-                Granularity = Granularity.Minute,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy354" } }
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "defaultPolicy362" } }
             };
 
             int signalId = client.Add(newSignal).Id.Value;
 
-            client.SetData(signalId, new Datum[] {
-                         new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                         new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                         new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+            client.SetMissingValuePolicy(signalId, new NoneQualityMissingValuePolicy() { DataType = DataType.Double });
 
-            var result = client.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 8, 1));
+            client.SetData(signalId, new Datum[]
+            {
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+            });
 
-            Console.WriteLine(result.Count());
+            var result = client.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+            foreach (var d in result)
+            {
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+            }
             Console.ReadKey();
         }
     }
