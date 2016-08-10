@@ -70,12 +70,7 @@ namespace Domain.Services.Implementation
 
         public Signal GetByPath(Path domainPath)
         {
-            Signal foundSignal = signalsRepository.Get(domainPath);
-
-            if (foundSignal == null)
-                throw new SignalNotExistException();
-
-            return foundSignal;
+            return signalsRepository.Get(domainPath);
         }
 
         public Signal GetById(int signalId)
