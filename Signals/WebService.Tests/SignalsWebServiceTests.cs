@@ -317,6 +317,23 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenNoSignal_WhenGettingByPath_ReturnsNull()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalDomainService);
+                var result = signalsWebService.Get(new Dto.Path()
+                {
+                    Components = new[] { "not/existing/path" },
+                });
+
+                Assert.IsNotNull(result);
+            }
+
+            [TestMethod]
             public void GivenASignal_WhenGettingByPath_ReturnsCorrectSignal()
             {
                 Dto.Path dtoPath = new Dto.Path() { Components = new[] { "example", "path" } };
