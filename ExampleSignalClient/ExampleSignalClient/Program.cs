@@ -12,7 +12,7 @@ namespace ExampleSignalClient
             var mvp1 = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.String, Quality = Quality.Fair, Value = "x" };
             var mvp2 = new Signals.NoneQualityMissingValuePolicy();
 
-            /*client.Add(new Signals.Signal()
+            client.Add(new Signals.Signal()
             {
                 DataType = DataType.String,
                 Granularity = Granularity.Month,
@@ -23,7 +23,7 @@ namespace ExampleSignalClient
                 DataType = DataType.Double,
                 Granularity = Granularity.Month,
                 Path = new Path() { Components = new[] { "zxbcv", "zxvc" } }
-            });*/
+            });
 
             client.SetMissingValuePolicy(1, mvp1);
             client.SetMissingValuePolicy(2, mvp2);

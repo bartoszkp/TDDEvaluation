@@ -32,23 +32,23 @@ namespace Domain.Services.Implementation
             switch(result.DataType)
             {
                 case (DataType.Boolean):
-                    SetMissingValuePolicy(result.Id.Value, new NoneQualityMissingValuePolicy<bool>());
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<bool>());
                     break;
 
                 case (DataType.Decimal):
-                    SetMissingValuePolicy(result.Id.Value, new NoneQualityMissingValuePolicy<decimal>());
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<decimal>());
                     break;
 
                 case (DataType.Double):
-                    SetMissingValuePolicy(result.Id.Value, new NoneQualityMissingValuePolicy<double>());
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<double>());
                     break;
 
                 case (DataType.Integer):
-                    SetMissingValuePolicy(result.Id.Value, new NoneQualityMissingValuePolicy<int>());
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<int>());
                     break;
 
                 case (DataType.String):
-                    SetMissingValuePolicy(result.Id.Value, new NoneQualityMissingValuePolicy<string>());
+                    missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<string>());
                     break;
             }
             return result;
