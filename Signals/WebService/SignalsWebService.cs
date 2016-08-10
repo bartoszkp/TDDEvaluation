@@ -34,7 +34,11 @@ namespace WebService
 
         public Signal GetById(int signalId)
         {
-            return signalsDomainService.GetById(signalId).ToDto<Dto.Signal>();
+            if (signalId == 0)
+            {
+                throw new Domain.Exceptions.IdIsZeroException();
+            }
+            else return signalsDomainService.GetById(signalId).ToDto<Dto.Signal>();
         }
 
         public Signal Add(Signal signalDto)

@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\GettingByPathSignalDoesntExistsException.cs" />
     <Compile Include="Exceptions\GettingDataOfNotExistingSignal.cs" />
+    <Compile Include="Exceptions\IdIsZeroException.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\SettingNotExistingSignalDataException.cs" />
     <Compile Include="Exceptions\SettingPolicyNotExistingSignalException.cs" />

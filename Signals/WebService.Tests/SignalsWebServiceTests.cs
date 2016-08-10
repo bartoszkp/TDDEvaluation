@@ -80,15 +80,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignals_WhenGettingById_DoesNotThrow()
-            {
-                GivenNoSignals();
-
-                signalsWebService.GetById(0);
-            }
-
-
-            [TestMethod]
             public void GivenASignal_WhenGettingByItsId_ReturnsIt()
             {
                 var signalId = 1;
@@ -118,13 +109,17 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignals_WhenGettingById_ReturnsNull()
+            public void GivenNoSignals_WhenGettingByIdWithNullValue_ReturnsNull()
             {
-                GivenNoSignals();
+                
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
+                signalsWebService = new SignalsWebService(signalDomainService);
                 var result = signalsWebService.GetById(0);
 
-                Assert.IsNull(result);
+                Assert.IsNotNull(result);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
