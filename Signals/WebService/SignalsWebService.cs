@@ -118,7 +118,7 @@ namespace WebService
         {
             if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
 
-            else return;
+            else signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
         }
 
     }
