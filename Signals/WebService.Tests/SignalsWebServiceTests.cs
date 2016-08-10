@@ -527,6 +527,22 @@ namespace WebService.Tests
 
                 signalsWebService.GetData(1, invalidFromDate, invalidToDate);
             }
+    
+            [TestMethod]
+            public void GivenFromDateLaterThanToDate_WhenGettingData_ReturnsEmtptyDataScope()
+            {
+                int signalId = 5;
+
+                SetupWebService();
+                DateTime invalidFromDate = new DateTime(2001, 2, 1);
+                DateTime invalidToDate = new DateTime(2000, 1, 1);
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
+
+                var result = signalsWebService.GetData(signalId, invalidFromDate, invalidToDate);
+
+                Assert.IsTrue(result.Count() == 0);
+            }
 
             [TestMethod]
             public void GivenIdMatchingSignalOfDataTypeInteger_WhenGettingData_RepositoryGetDataIsCalledWithCorrectDataType()
