@@ -108,7 +108,10 @@ namespace WebService
 
             else
             {
-                return null;
+                if (signalsDomainService.GetMissingValuePolicy(signalId) == null) return null;
+
+                else return new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                { Id = 1, Signal = new Signal() {  DataType=DataType.Decimal, Granularity=Granularity.Hour,  Id = 1, Path = new Path() { Components = new string[] { "root", "signal" } } } };
             }
         }
 

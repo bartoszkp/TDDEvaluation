@@ -396,7 +396,8 @@ namespace WebService.Tests
                 var result = signalsWebService.GetMissingValuePolicy(1);
 
                 Assert.AreEqual(dummyMissingValuePolicy.Id, result.Id);
-                Assert.AreEqual(dummyMissingValuePolicy.Signal, result.Signal);
+                Assert.AreEqual(dummyMissingValuePolicy.Signal.Id, result.Signal.Id);
+                CollectionAssert.AreEqual(dummyMissingValuePolicy.Signal.Path.Components.ToArray(), result.Signal.Path.Components.ToArray());
             }
 
             // -------------------------------------------------------------------------------------------

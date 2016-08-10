@@ -75,5 +75,17 @@ namespace Domain.Services.Implementation
             else if (type == typeof(string)) signalsDataRepository.SetData<string>(enumerable as IEnumerable<Datum<string>>);
             else throw new ArgumentException("Type of the 'data' parameter's signals must be bool, int, double, decimal or string.");
         }
+
+        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            var mvp = missingValuePolicyRepository.Get(signal);
+
+            if (mvp == null) return null;
+
+            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType())
+                as MissingValuePolicy.MissingValuePolicyBase;
+        }
     }
 }
