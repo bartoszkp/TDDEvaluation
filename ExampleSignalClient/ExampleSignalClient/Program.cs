@@ -1,5 +1,6 @@
 ﻿using System;
 using ExampleSignalClient.Signals;
+using System.Linq;
 
 namespace ExampleSignalClient
 {
@@ -13,27 +14,19 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Minute,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy370" } }
+                Path = new Path() { Components = new[] { "root", "defaultPolicy354" } }
             };
 
-            var addedSignal = client.Add(newSignal);
+            int signalId = client.Add(newSignal).Id.Value;
 
-            int id = addedSignal.Id.Value;
+            client.SetData(signalId, new Datum[] {
+                         new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                         new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                         new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
 
-            client.SetData(id, new Datum[] {
-                         new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 5, 1), Value = (double) 5.5},
-                         new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (double) 4.5},
-                         new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double) 2.5},
-                         new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double) 1.5},
-                         new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double) 3.5} });
+            var result = client.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 8, 1));
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
-
-            foreach (var d in result)
-            {
-                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
-            }
-
+            Console.WriteLine(result.Count());
             Console.ReadKey();
         }
     }

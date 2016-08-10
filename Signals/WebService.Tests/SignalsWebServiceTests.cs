@@ -481,6 +481,26 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenDataAndSignal_WhenSetData_VerifyItIsMissingSignal_ForMonthGranularity()
+            {
+                int signalId = 6;
+
+                Dto.Datum[] settedData = new Dto.Datum[]{
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (decimal) 1},
+                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (decimal) 3}};
+
+                SetupWebService();
+
+                signalsRepositoryMock.Setup(srm => srm.Get(It.Is<int>(id => id == signalId)))
+                    .Returns(new Domain.Signal() { DataType = DataType.Decimal, Granularity = Granularity.Month });
+
+                signalsWebService.SetData(signalId, settedData);
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<decimal>(It.Is<IEnumerable<Datum<decimal>>>(d => 
+                d.ElementAt(1).Timestamp == new DateTime(2000, 2, 1))));
+            }
+
+            [TestMethod]
             public void WhenGettingDataDoesNotThrow()
             {
                 SetupWebService();
