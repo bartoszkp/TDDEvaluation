@@ -304,22 +304,19 @@ namespace WebService.Tests
 
             // -------------------------------------------------------------------------------------------
 
-           
-
             [TestMethod]
-            public void GivenASignal_WhenSettingMVPofTheSignalAndGettingMVPofTheSignal_ReturnedIsMVPofTheSignal()
+            public void GivenNoSignals_WhenGettingMVPOfAnySignal_ThrowedIsArgumentException()
             {
-                var signalRepositoryMock = new Mock<ISignalsRepository>();
-                signalRepositoryMock.Setup(sr => sr.Get(1)).Returns(new Signal());
-                var signalMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                var signalDomainService = new SignalsDomainService(signalRepositoryMock.Object, null, signalMissingValuePolicyRepositoryMock.Object);
-                var signalWebService = new SignalsWebService(signalDomainService);
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns<Signal>(null);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Path>())).Returns<Signal>(null);
 
-                signalWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy() { Id = 1, DataType = Dto.DataType.Decimal, Quality = Dto.Quality.Fair });
-                var result = signalWebService.GetMissingValuePolicy(1);
+                var result = signalsWebService.GetById(1);
 
-                Assert.AreEqual(1, result.Id);
-                Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
+                signalsWebService.GetMissingValuePolicy(1);
             }
 
             // -------------------------------------------------------------------------------------------
