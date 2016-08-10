@@ -244,7 +244,7 @@ namespace WebService.Tests
 
                 bool sortedStatus = true;
 
-                for (int i = 0; i < result.Length-1; i++)
+                for (int i = 0; i < result.Length - 1; i++)
                 {
                     int compareResult = DateTime.Compare(result[i].Timestamp, result[i + 1].Timestamp);
                     if (compareResult > 0) sortedStatus = false;
@@ -252,6 +252,35 @@ namespace WebService.Tests
                 Assert.IsTrue(sortedStatus);
 
                 Assert.IsNotNull(result[0].Value);
+            }
+            [TestMethod]
+            public void GivenASignal_WhenGetData_ReturnDatumsWithMissingValues()
+            {
+                GivenASignal(SignalWith(DataType.Double));
+                SetupDataRepository<double>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(s => s.Get(It.IsAny<Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray<Dto.Datum>().ToArray();
+
+                DateTime timeStampMin = result.Min(d => d.Timestamp);
+                DateTime timeStampMax = result.Max(d => d.Timestamp);
+
+                DateTime currentTimeSamp = timeStampMin;
+                while (currentTimeSamp != timeStampMax)
+                {
+                    currentTimeSamp = currentTimeSamp.AddMonths(1);
+                    var currentDatum = (from x in result
+                                        where x.Timestamp == currentTimeSamp
+                                        select x).FirstOrDefault();
+
+                    if (currentDatum == null)
+                    {
+                        Assert.Fail("Result have missing values");
+                    }
+                }
             }
 
             [TestMethod]
@@ -273,7 +302,7 @@ namespace WebService.Tests
                 var newSignal = SignalWith(id: null);
 
                 var result = signalsWebService.Add(newSignal);
-                
+
                 var mvp = signalsWebService.GetMissingValuePolicy(result.Id.Value);
 
                 Assert.AreEqual("NoneQualityMissingValuePolicy", mvp.GetType().Name);
@@ -290,14 +319,14 @@ namespace WebService.Tests
                 return new Dto.Datum[] {
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = default(T) },
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = default(T) },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = default(T) } };
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2001, 1, 1), Value = default(T) } };
             }
             private IEnumerable<Domain.Datum<T>> GetDomainDatum<T>()
             {
                 return new Domain.Datum<T>[] {
-                    new Domain.Datum<T>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = default(T) },
-                    new Domain.Datum<T>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = default(T) },
-                    new Domain.Datum<T>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = default(T) } };
+                    new Domain.Datum<T>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = default(T), Signal = SignalWith() },
+                    new Domain.Datum<T>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = default(T), Signal = SignalWith() },
+                    new Domain.Datum<T>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2001, 1, 1), Value = default(T), Signal = SignalWith() } };
             }
             private bool EqualsSignal(Signal a, Signal b)
             {
@@ -330,7 +359,7 @@ namespace WebService.Tests
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
-                Dto.Granularity granularity = Dto.Granularity.Day,
+                Dto.Granularity granularity = Dto.Granularity.Month,
                 Dto.Path path = null)
             {
                 return new Dto.Signal()
@@ -366,7 +395,7 @@ namespace WebService.Tests
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                    .Returns<Domain.Signal>(s => 
+                    .Returns<Domain.Signal>(s =>
                     {
                         s.Id = 1;
                         return s;
