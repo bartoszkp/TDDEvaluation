@@ -119,7 +119,7 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalDomainService);
                 var result = signalsWebService.GetById(0);
 
-                Assert.IsNotNull(result);
+                Assert.IsNull(result);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

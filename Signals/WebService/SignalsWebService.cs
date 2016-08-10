@@ -36,7 +36,7 @@ namespace WebService
         {
             if (signalId == 0)
             {
-                throw new Domain.Exceptions.IdIsZeroException();
+                return null;
             }
             else return signalsDomainService.GetById(signalId).ToDto<Dto.Signal>();
         }
