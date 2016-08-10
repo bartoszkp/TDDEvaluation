@@ -61,7 +61,7 @@ namespace WebService
             var signal = GetById(signalId);
 
             if (signal == null)
-                throw new Domain.Exceptions.GettingDataOfNotExistingSignal();
+                return null;
 
             if(signal.DataType == Dto.DataType.Boolean)
             {
@@ -271,9 +271,9 @@ namespace WebService
             var signal = GetById(signalId);
 
             if (signal == null)
-                return null;
-
-            return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
+                throw new Domain.Exceptions.GettingDataOfNotExistingSignal();
+            
+                return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)

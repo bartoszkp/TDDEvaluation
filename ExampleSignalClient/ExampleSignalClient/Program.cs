@@ -9,22 +9,17 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var newSignal = new Signal()
+            try
             {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "signal1" } }
-            };
+                var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
+            }
+            catch (System.ServiceModel.FaultException e)
+            {
+                Console.WriteLine("Failed to read data", e);
+            }
 
-            var id = client.Add(newSignal).Id.Value;
-
-            var result = client.GetById(id);
-
-            Console.WriteLine(result.Id);
-            Console.WriteLine(result.DataType);
-            Console.WriteLine(result.Granularity);
-            Console.WriteLine(string.Join("/", result.Path.Components));
             Console.ReadKey();
+
         }
     }
 }
