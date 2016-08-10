@@ -270,7 +270,7 @@ namespace WebService.Tests
                     .Returns(signal);
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(It.IsAny<int>()))
-                    .Returns(signal);
+                    .Returns<Domain.Signal>(null);
                 missingValueRepoMock
                     .Setup(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<NoneQualityMissingValuePolicy<string>>()));
 
