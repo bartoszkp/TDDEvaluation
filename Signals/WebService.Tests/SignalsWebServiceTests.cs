@@ -250,12 +250,13 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.SignalNotExistException))]
             public void GivenNoSignals_GetIdByPath_ExpectedException()
             {
                 GivenNoSignals();
 
-                signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
+                var signal = signalsWebService.Get(new Dto.Path() { Components = new[] { "root", "signal" } });
+
+                Assert.IsNull(signal);
             }
 
             [TestMethod]
@@ -369,6 +370,15 @@ namespace WebService.Tests
                 Assert.IsTrue(AssertDtoLists(expectedResult, result));
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingASignalByPath_ReturnsNull()
+            {
+                GivenNoSignals();
+
+                Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
+
+                Assert.IsNull(this.signalsWebService.Get(path));
+            }
 
             private Dto.Signal SignalWith(
                 int? id = null,
