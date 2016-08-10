@@ -401,15 +401,12 @@ namespace WebService.Tests
             [TestMethod]
             public void GetData_DataMissOnePoint_ShouldReturnDataWithFilledMissedPoints()
             {
-                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Month, Path = Domain.Path.FromString("x/y") };
-                MakeMocks();
-                MakeASignalsWebService();
-                signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
-
                 var datum = new Dto.Datum[] {
-                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (int)1.5 },
-                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (int)2.5 }
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 1 }
                 };
+                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Month, Path = Domain.Path.FromString("x/y") };
+                SetupDataRepositoryMock<int>(signal, datum);
 
                 dataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(),It.IsAny<DateTime>())).Returns(datum.ToDomain<IEnumerable<Domain.Datum<int>>>());
 
@@ -421,18 +418,13 @@ namespace WebService.Tests
             [TestMethod]
             public void GetData_DataMissOnePoint_ShouldReturnDataWithCorrectDatumPoint()
             {
-                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Month, Path = Domain.Path.FromString("x/y") };
-                MakeMocks();
-                MakeASignalsWebService();
-                signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
-
                 var datum = new Dto.Datum[] {
-                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (int)1.5 },
-                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (int)2.5 }
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 1 }
                 };
-
-                dataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(datum.ToDomain<IEnumerable<Domain.Datum<int>>>());
-
+                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Month, Path = Domain.Path.FromString("x/y") };
+                SetupDataRepositoryMock<int>(signal, datum);
+                 
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
                 var necessaryPoint = result.ToList()[1];
 
@@ -835,6 +827,14 @@ namespace WebService.Tests
                 }
                 return true;
             }
+
+            private void SetupDataRepositoryMock<T>(Domain.Signal signal, Dto.Datum[] datum) {
+                MakeMocks();
+                MakeASignalsWebService();
+                signalsRepositoryMock.Setup(x => x.Get(signal.Id.Value)).Returns(signal);
+                dataRepositoryMock.Setup(x => x.GetData<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(datum.ToDomain<IEnumerable<Domain.Datum<T>>>());
+            }
+
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
         }
