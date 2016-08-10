@@ -61,7 +61,7 @@ namespace WebService
             var signal = GetById(signalId);
 
             if (signal == null)
-                return null;
+                throw new  Domain.Exceptions.GettingDataOfNotExistingSignal(); ;
 
             if(signal.DataType == Dto.DataType.Boolean)
             {
