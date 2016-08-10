@@ -9,13 +9,13 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var signal = new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Week
-            };
+            //var signal = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Week
+            //};
 
-            client.Add(signal);
+            //client.Add(signal);
 
             client.SetMissingValuePolicy(1, new NoneQualityMissingValuePolicy() { DataType = DataType.Double });
 

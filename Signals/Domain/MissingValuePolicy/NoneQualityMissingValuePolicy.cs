@@ -9,145 +9,188 @@ namespace Domain.MissingValuePolicy
     {
         public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data)
         {
-            var dataDict = data.ToDictionary(d => d.Timestamp, d => d);
+            dataDictionary = data.ToDictionary(d => d.Timestamp, d => d);
             
-            var datum = DateTimeList(dataDict, data, signal);
+            var datum = DateTimeList(data, signal);
             
             return datum
-                .Select(d => dataDict.ContainsKey(d) ? dataDict[d] : Datum<T>.CreateNone(Signal, d));
+                .Select(d => dataDictionary.ContainsKey(d) ? dataDictionary[d] : Datum<T>.CreateNone(Signal, d));
         }
 
-        private List<DateTime> DateTimeList(Dictionary<DateTime, Datum<T>> dataDict, IEnumerable<Datum<T>> data, Signal signal)
+        private List<DateTime> DateTimeList(IEnumerable<Datum<T>> data, Signal signal)
         {
             var key = signal.Granularity;
 
-            var dictionary = Dictionary();
+            dictionary = Dictionary();
 
-            DateTime timestamp = data.First().Timestamp;
+            DateTime firstTimestamp = data.First().Timestamp;
 
-            List<DateTime> datetimeList = new List<DateTime>();
-
-            int count = 0;
-            int index = 0;
-
+            datetimeList = new List<DateTime>();
+            
             switch (signal.Granularity)
             {
                 case Granularity.Second:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalSeconds + 1;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (dataDict.ContainsKey(timestamp))
-                        {
-                            datetimeList.Add(data.ElementAt(index).Timestamp);
-                            index++;
-                        }
-                        else
-                        {
-                            datetimeList.Add(dictionary[key](timestamp));
-                        }
-                        timestamp = timestamp.AddSeconds(1);
-                    }
+                    CreateDateTimeListForSecondGranularity(data, firstTimestamp, key);
                     break;
                 case Granularity.Minute:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalMinutes + 1;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (dataDict.ContainsKey(timestamp))
-                        {
-                            datetimeList.Add(data.ElementAt(index).Timestamp);
-                            index++;
-                        }
-                        else
-                        {
-                            datetimeList.Add(dictionary[key](timestamp));
-                        }
-                        timestamp = timestamp.AddMinutes(1);
-                    }
+                    CreateDateTimeListForMinuteGranularity(data, firstTimestamp, key);
                     break;
                 case Granularity.Hour:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalHours + 1;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (dataDict.ContainsKey(timestamp))
-                        {
-                            datetimeList.Add(data.ElementAt(index).Timestamp);
-                            index++;
-                        }
-                        else
-                        {
-                            datetimeList.Add(dictionary[key](timestamp));
-                        }
-                        timestamp = timestamp.AddHours(1);
-                    }
+                    CreateDataTimeListForHourGranularity(data, firstTimestamp, key);
                     break;
                 case Granularity.Day:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays + 1;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (dataDict.ContainsKey(timestamp))
-                        {
-                            datetimeList.Add(data.ElementAt(index).Timestamp);
-                            index++;
-                        }
-                        else
-                        {
-                            datetimeList.Add(dictionary[key](timestamp));
-                        }
-                        timestamp = timestamp.AddDays(1);
-                    }
+                    CreateDateTimeListForDayGranularity(data, firstTimestamp, key);
                     break;
                 case Granularity.Week:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 7 + 1;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (dataDict.ContainsKey(timestamp))
-                        {
-                            datetimeList.Add(data.ElementAt(index).Timestamp);
-                            index++;
-                        }
-                        else
-                        {
-                            datetimeList.Add(dictionary[key](timestamp));
-                        }
-                        timestamp = timestamp.AddDays(7);
-                    }
+                    CreateDataTimeListForWeekGranularity(data, firstTimestamp, key);
                     break;
                 case Granularity.Month:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 30 + 1;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (dataDict.ContainsKey(timestamp))
-                        {
-                            datetimeList.Add(data.ElementAt(index).Timestamp);
-                            index++;
-                        }
-                        else
-                        {
-                            datetimeList.Add(dictionary[key](timestamp));
-                        }
-                        timestamp = timestamp.AddMonths(1);
-                    }
+                    CreateDateTimeListForMonthGranularity(data, firstTimestamp, key);
                     break;
                 case Granularity.Year:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 365 + 1;
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (dataDict.ContainsKey(timestamp))
-                        {
-                            datetimeList.Add(data.ElementAt(index).Timestamp);
-                            index++;
-                        }
-                        else
-                        {
-                            datetimeList.Add(dictionary[key](timestamp));
-                        }
-                        timestamp = timestamp.AddYears(1);
-                    }
+                    CreateDateTimeListForYearGranularity(data, firstTimestamp, key);
                     break;
             }
             
             return datetimeList;
         }
+
+        private void CreateDataTimeListForHourGranularity(IEnumerable<Datum<T>> data, DateTime firstTimestamp, Granularity key)
+        {
+            int count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalHours + 1;
+            int index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(firstTimestamp))
+                {
+                    datetimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    datetimeList.Add(dictionary[key](firstTimestamp));
+                }
+                firstTimestamp = firstTimestamp.AddHours(1);
+            }
+        }
+
+        private void CreateDateTimeListForDayGranularity(IEnumerable<Datum<T>> data, DateTime firstTimestamp, Granularity key)
+        {
+            int count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays + 1;
+            int index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(firstTimestamp))
+                {
+                    datetimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    datetimeList.Add(dictionary[key](firstTimestamp));
+                }
+                firstTimestamp = firstTimestamp.AddDays(1);
+            }
+        }
+
+        private void CreateDataTimeListForWeekGranularity(IEnumerable<Datum<T>> data, DateTime firstTimestamp, Granularity key)
+        {
+            int count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 7 + 1;
+            int index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(firstTimestamp))
+                {
+                    datetimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    datetimeList.Add(dictionary[key](firstTimestamp));
+                }
+                firstTimestamp = firstTimestamp.AddDays(7);
+            }
+        }
+
+        private void CreateDateTimeListForMonthGranularity(IEnumerable<Datum<T>> data, DateTime firstTimestamp, Granularity key)
+        {
+            int count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 30 + 1;
+            int index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(firstTimestamp))
+                {
+                    datetimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    datetimeList.Add(dictionary[key](firstTimestamp));
+                }
+                firstTimestamp = firstTimestamp.AddMonths(1);
+            }
+        }
+
+        private void CreateDateTimeListForYearGranularity(IEnumerable<Datum<T>> data, DateTime firstTimestamp, Granularity key)
+        {
+            int count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 365 + 1;
+            int index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(firstTimestamp))
+                {
+                    datetimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    datetimeList.Add(dictionary[key](firstTimestamp));
+                }
+                firstTimestamp = firstTimestamp.AddYears(1);
+            }
+        }
+
+        private void CreateDateTimeListForSecondGranularity(IEnumerable<Datum<T>> data, DateTime firstTimestamp, Granularity key)
+        {
+            int index = 0;
+            int count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalSeconds + 1;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(firstTimestamp))
+                {
+                    datetimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    datetimeList.Add(dictionary[key](firstTimestamp));
+                }
+                firstTimestamp = firstTimestamp.AddSeconds(1);
+            }
+        }
+
+        private void CreateDateTimeListForMinuteGranularity(IEnumerable<Datum<T>> data, DateTime firstTimestamp, Granularity key)
+        {
+            int count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalMinutes + 1;
+            int index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(firstTimestamp))
+                {
+                    datetimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    datetimeList.Add(dictionary[key](firstTimestamp));
+                }
+                firstTimestamp = firstTimestamp.AddMinutes(1);
+            }
+        }
+
+        private List<DateTime> datetimeList;
+        private Dictionary<Granularity, Func<DateTime, DateTime>> dictionary;
+        private Dictionary<DateTime, Datum<T>> dataDictionary;
 
         private Dictionary<Granularity, Func<DateTime, DateTime>> Dictionary()
         {
