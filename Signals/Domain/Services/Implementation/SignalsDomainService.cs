@@ -75,28 +75,10 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> dataDomain)
         {
-            List<Datum<T>> dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToList();
+            List<Datum<T>> dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToList();          
 
-            List<Datum<T>> missingDatas = new List<Datum<T>>();
+            dataDomainOrderedList = AddMissingData(dataDomainOrderedList);
 
-            if (dataDomain.First().Signal.Granularity == Granularity.Month)
-            {
-                for (int i = 0; i < dataDomainOrderedList.Count - 1; i++)
-                {
-                    if (dataDomainOrderedList[i].Timestamp.CompareTo(dataDomainOrderedList[i + 1].Timestamp.AddMonths(-1)) != 0)
-                    {
-                        missingDatas.Add(new Datum<T>()
-                        {
-                            Id = 0,
-                            Quality = Quality.None,
-                            Timestamp = dataDomainOrderedList[i].Timestamp.AddMonths(1),
-                            Signal = dataDomainOrderedList[i].Signal,
-                            Value = default(T)
-                        });
-                    }
-                }
-            }
-            dataDomainOrderedList.AddRange(missingDatas);
             this.signalsDataRepository.SetData<T>(dataDomainOrderedList.OrderBy(d => d.Timestamp));
         }
 
@@ -128,6 +110,33 @@ namespace Domain.Services.Implementation
                 default:
                     throw new TypeUnsupportedException();
             }
+        }
+        
+        private List<Datum<T>> AddMissingData<T>(List<Datum<T>> dataDomainOrderedList)
+        {
+            List<Datum<T>> missingDatas = new List<Datum<T>>();
+
+            if (dataDomainOrderedList.First().Signal.Granularity == Granularity.Month)
+            {
+                for (int i = 0; i < dataDomainOrderedList.Count - 1; i++)
+                {
+                    if (dataDomainOrderedList[i].Timestamp.CompareTo(dataDomainOrderedList[i + 1].Timestamp.AddMonths(-1)) != 0)
+                    {
+                        missingDatas.Add(new Datum<T>()
+                        {
+                            Id = 0,
+                            Quality = Quality.None,
+                            Timestamp = dataDomainOrderedList[i].Timestamp.AddMonths(1),
+                            Signal = dataDomainOrderedList[i].Signal,
+                            Value = default(T)
+                        });
+                    }
+                }
+            }
+
+
+            dataDomainOrderedList.AddRange(missingDatas);
+            return dataDomainOrderedList;
         }
     }
 }
