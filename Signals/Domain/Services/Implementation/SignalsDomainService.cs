@@ -43,34 +43,13 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(path);
         }
 
-        public IEnumerable<Datum<double>> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = signalsRepository.Get(signalId);
 
-            var result = signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc);
+            var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             return result.ToArray();
-        }
-
-        public MissingValuePolicy<double> GetMissingValuePolicy(int signalId)
-        {
-            var signal = signalsRepository.Get(signalId);
-
-            var mvp = missingValuePolicyRepository.Get(signal);
-
-            if (mvp == null) return null;
-
-            else return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy.MissingValuePolicy<double>;
-
-        }
-
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicy<double> missingValuePolicy)
-        {
-            var signal = signalsRepository.Get(signalId);
-
-            missingValuePolicyRepository.Set(signal, missingValuePolicy);
-
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable)
@@ -95,15 +74,6 @@ namespace Domain.Services.Implementation
             else if (type == typeof(decimal)) signalsDataRepository.SetData<decimal>(enumerable as IEnumerable<Datum<decimal>>);
             else if (type == typeof(string)) signalsDataRepository.SetData<string>(enumerable as IEnumerable<Datum<string>>);
             else throw new ArgumentException("Type of the 'data' parameter's signals must be bool, int, double, decimal or string.");
-        }
-
-        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
-        {
-            var signal = signalsRepository.Get(signalId);
-
-            var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-
-            return result.ToArray();
         }
     }
 }

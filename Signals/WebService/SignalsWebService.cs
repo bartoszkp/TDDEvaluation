@@ -60,6 +60,25 @@ namespace WebService
             throw new NotImplementedException();
         }
 
+        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
+
+            else
+            {
+                var signal = signalsDomainService.GetById(signalId);
+
+                var type = signal.DataType.ToString();
+
+                if (type == "Boolean") return signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "Integer") return signalsDomainService.GetData<int>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "Double") return signalsDomainService.GetData<double>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "Decimal") return signalsDomainService.GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else if (type == "String") return signalsDomainService.GetData<string>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
+                else throw new ArgumentException("Type of the signal must be bool, int, double, decimal or string.");
+            }
+        }
+
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
@@ -85,40 +104,12 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
-
-            else
-            {
-                if (signalsDomainService.GetMissingValuePolicy(signalId) == null) return null;
-
-                else return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<SpecificValueMissingValuePolicy>();
-            }
+            throw new NotImplementedException();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            if (signalsDomainService.GetById(signalId)==null) throw new ArgumentException();
-
-            else signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>());
-        }
-
-        public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
-        {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
-
-            else
-            {
-                var signal = signalsDomainService.GetById(signalId);
-
-                var type = signal.DataType.ToString();
-
-                if (type == "Boolean") return signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
-                else if (type == "Integer") return signalsDomainService.GetData<int>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
-                else if (type == "Double") return signalsDomainService.GetData<double>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
-                else if (type == "Decimal") return signalsDomainService.GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
-                else if (type == "String") return signalsDomainService.GetData<string>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
-                else throw new ArgumentException("Type of the signal must be bool, int, double, decimal or string.");
-            }
-        }
+            throw new NotImplementedException();
+        } 
     }
 }
