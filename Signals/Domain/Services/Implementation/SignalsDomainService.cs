@@ -51,7 +51,14 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
-            res.Add(new Datum<T>());
+            res.Add(new Datum<T>()
+            {
+                Quality = Quality.None,
+                Signal = signal,
+                Timestamp = res[0].Timestamp.AddMonths(1),
+                Value = default(T)
+            });
+            var or = res.OrderBy(x => x.Timestamp);
             return res.OrderBy(x => x.Timestamp);
         }
 
