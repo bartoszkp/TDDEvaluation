@@ -108,7 +108,7 @@ namespace Domain.Services.Implementation
             var result = signalsRepository.Get(path);
 
             if (result == null)
-                throw new Domain.Exceptions.GettingByPathSignalDoesntExistsException();
+                return null;
 
             return result;
         }

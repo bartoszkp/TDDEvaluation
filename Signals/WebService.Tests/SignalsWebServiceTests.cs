@@ -304,19 +304,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.GettingByPathSignalDoesntExistsException))]
-            public void GivenNoSignal_WhenGettingByPath_ThrowsException()
-            {
-                MockSetup();
-
-                signalsWebService = new SignalsWebService(signalDomainService);
-                var returndSignal = signalsWebService.Get(new Dto.Path()
-                {
-                    Components = new[] { "not/existing/path" },
-                });
-            }
-
-            [TestMethod]
             public void GivenNoSignal_WhenGettingByPath_ReturnsNull()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -330,7 +317,7 @@ namespace WebService.Tests
                     Components = new[] { "not/existing/path" },
                 });
 
-                Assert.IsNotNull(result);
+                Assert.IsNull(result);
             }
 
             [TestMethod]
