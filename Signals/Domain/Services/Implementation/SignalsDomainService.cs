@@ -83,9 +83,9 @@ namespace Domain.Services.Implementation
 
             var mvp = GetMissingValuePolicy(signal.Id.GetValueOrDefault());
 
-            Domain.DataFillStrategy.DataFillStrategy strategy = DataFillStrategyProvider.GetStrategy(signal.Granularity,mvp);
+            Domain.DataFillStrategy.DataFillStrategy dataFillStrategy = DataFillStrategyProvider.GetStrategy(signal.Granularity,mvp);
 
-            strategy.FillMissingData(items,fromIncludedUtc,toExcludedUtc);
+            dataFillStrategy.FillMissingData(items,fromIncludedUtc,toExcludedUtc);
 
 
             var result = from d in items
@@ -119,64 +119,7 @@ namespace Domain.Services.Implementation
                 return null;
         }
 
-        private void FillMissingData<T>(Granularity granularity, MissingValuePolicyBase mvp, List<Datum<T>> datum, DateTime after, DateTime before)
-        {
 
-            if (granularity == Granularity.Month)
-                FillMonthData(mvp, datum, after, before);
-
-            
-        }
-
-
-        private void FillMonthData<T>(MissingValuePolicyBase mvp, List<Datum<T>> datum, DateTime after, DateTime before)
-        {
-            int currentMonth = after.Month + 1;
-
-            if (mvp is NoneQualityMissingValuePolicy<T>)
-            {
-                if (after.Year == before.Year)
-                {
-                    while (currentMonth < before.Month - 1)
-                    {
-                        datum.Add(new Datum<T>()
-                        {
-                            Quality = Quality.None,
-                            Value = default(T),
-                            Timestamp = new DateTime(after.Year, after.Month + 1, after.Day)
-                        });
-
-                        currentMonth++;
-                    }
-                }
-
-                else
-                {
-                    int currentYear = after.Year;
-
-                    while (currentYear <= before.Year && currentMonth != before.Month - 1)
-                    {
-
-                        datum.Add(new Datum<T>()
-                        {
-                            Quality = Quality.None,
-                            Value = default(T),
-                            Timestamp = new DateTime(currentYear, currentMonth, after.Day)
-                        });
-
-                        currentMonth++;
-
-                        if (currentMonth == 13)
-                        {
-                            currentMonth = 1;
-                            currentYear++;
-                        }
-                    }
-                }
-
-            }
-
-        }
     }
 
 
