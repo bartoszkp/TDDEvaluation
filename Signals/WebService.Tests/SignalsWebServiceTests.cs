@@ -433,6 +433,28 @@ namespace WebService.Tests
                 Assert.AreEqual(necessaryPoint.Value, 0);
             }
 
+            [TestMethod]
+            public void GetData_DataMissFourPoints_ShouldReturnDataWithCorrectDatumPoints()
+            {
+                var datum = new Dto.Datum[] {
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1,1,0,0), Value = 1 },
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1,3,0,0), Value = 3 },
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1,5,0,0), Value = 5 },
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1,7,0,0), Value = 7 },
+                           new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1,9,0,0), Value = 9 }
+                };
+                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Hour, Path = Domain.Path.FromString("x/y") };
+                SetupDataRepositoryMock<int>(signal, datum);
+
+                var  result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
+
+                for (int i = 1; i < 8; i+=2)
+                {
+                    Assert.AreNotEqual(result.ToList()[i], null);
+                }
+
+            }
+
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
@@ -545,9 +567,6 @@ namespace WebService.Tests
 
                 MakeASignalsWebService();
 
-               
-
-             
                 //act
                 var result=signalsWebService.GetMissingValuePolicy(dummyInt);
                 //assert
@@ -564,9 +583,6 @@ namespace WebService.Tests
                 MakeAMissingValuePolicyRepositoryMock();
 
                 MakeASignalsWebService();
-
-
-
 
                 //act
                 var result = signalsWebService.GetMissingValuePolicy(dummyInt)as Dto.MissingValuePolicy.FirstOrderMissingValuePolicy;
@@ -649,23 +665,7 @@ namespace WebService.Tests
                 Assert.AreEqual(dummyInt, result.Id);
 
             }
-            [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignal_WhenGettingSignalByPath_ThrowsException()
-            {
-
-                //arrange
-                dummyInt = 2;
-                Dto.Path path = MakePathFromString(new[] { "a", "y" });
-                MakeMocks();
-                SignalsRepositoryMock_GetSpecificPaths_ReturnsToSpecificPathASignal(new[] { "x", "y" });
-
-                MakeASignalsWebService();
-                //act
-                var result = signalsWebService.Get(path);
-                //assert
-
-            }
+          
             [TestMethod]
             public void GivenASignal_WhenGettingSignalBySpecificPath_GetIsCalled()
             {
