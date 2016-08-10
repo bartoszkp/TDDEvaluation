@@ -17,7 +17,8 @@ namespace Domain.DataFillStrategy
                     break;
                     
                 case Granularity.Minute:
-                    break;
+                    return new MinuteDataFillStrategy(mvp);
+
                 case Granularity.Hour:
                     return new HourFillDataStrategy(mvp);
 
