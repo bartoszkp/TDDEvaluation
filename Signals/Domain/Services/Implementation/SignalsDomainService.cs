@@ -119,14 +119,10 @@ namespace Domain.Services.Implementation
             var signal = this.signalsRepository.Get(signalId);           
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-
-
-            var sortedList = result.OrderBy(x => x.Timestamp).Where(x=>x.Timestamp>=fromIncludedUtc&&x.Timestamp<toExcludedUtc).ToList();
+            var sortedList = result.Where(x=>x.Timestamp>=fromIncludedUtc&&x.Timestamp<toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
 
           
             var r = GetMissingValuePolicy(signalId);
-            var datumToAdd = new Datum<T>();
-            int i = 0;
             var time = fromIncludedUtc;
 
 
@@ -137,7 +133,7 @@ namespace Domain.Services.Implementation
                     if (sortedList.FindIndex(x=>x.Timestamp==time)<0)
                     {
                      
-                        sortedList.Add(new Datum<T>() { Quality = datumToAdd.Quality, Timestamp = time, Value = datumToAdd.Value });
+                        sortedList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
                     }
                     time = AddTime(signal.Granularity, time);
                 }
