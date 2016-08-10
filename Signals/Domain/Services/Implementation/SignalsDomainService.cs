@@ -79,7 +79,7 @@ namespace Domain.Services.Implementation
 
             dataDomainOrderedList = AddMissingData(dataDomainOrderedList);
 
-            this.signalsDataRepository.SetData<T>(dataDomainOrderedList.OrderBy(d => d.Timestamp));
+            this.signalsDataRepository.SetData<T>(dataDomainOrderedList);
         }
 
 
@@ -112,31 +112,30 @@ namespace Domain.Services.Implementation
             }
         }
         
-        private List<Datum<T>> AddMissingData<T>(List<Datum<T>> dataDomainOrderedList)
+        private List<Datum<T>> AddMissingData<T>(List<Datum<T>> dataDomainList)
         {
             List<Datum<T>> missingDatas = new List<Datum<T>>();
 
-            if (dataDomainOrderedList.First().Signal.Granularity == Granularity.Month)
+            if (dataDomainList.First().Signal.Granularity == Granularity.Month)
             {
-                for (int i = 0; i < dataDomainOrderedList.Count - 1; i++)
+                for (int i = 0; i < dataDomainList.Count - 1; i++)
                 {
-                    if (dataDomainOrderedList[i].Timestamp.CompareTo(dataDomainOrderedList[i + 1].Timestamp.AddMonths(-1)) != 0)
+                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddMonths(-1)) != 0)
                     {
                         missingDatas.Add(new Datum<T>()
                         {
                             Id = 0,
                             Quality = Quality.None,
-                            Timestamp = dataDomainOrderedList[i].Timestamp.AddMonths(1),
-                            Signal = dataDomainOrderedList[i].Signal,
+                            Timestamp = dataDomainList[i].Timestamp.AddMonths(1),
+                            Signal = dataDomainList[i].Signal,
                             Value = default(T)
                         });
                     }
                 }
             }
 
-
-            dataDomainOrderedList.AddRange(missingDatas);
-            return dataDomainOrderedList;
+            dataDomainList.AddRange(missingDatas);
+            return dataDomainList.OrderBy( l => l.Timestamp).ToList();
         }
     }
 }
