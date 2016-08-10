@@ -119,6 +119,7 @@ namespace Domain.Services.Implementation
             DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             List<Datum<T>> list = array.ToList();
+
             int i = 0;
             for (DateTime iterativeDateTime = fromIncludedUtc; iterativeDateTime < toExcludedUtc; 
                 AddToDateTime(ref iterativeDateTime,signal.Granularity),++i)
@@ -136,14 +137,17 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            IEnumerable<Datum<T>> toReturn =
+            IEnumerable<Datum<T>> returnedData =
                 this.signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
+
+            IEnumerable<Datum<T>> sortedData = returnedData.OrderBy(x => x.Timestamp);
+            sortedData = sortedData.ToArray();
 
             var policy = ReturnMissingValuePolicy(foundSignal);
             if(GetMissingValuePolicy(foundSignal.Id.Value).GetType() == policy.GetType())
-                FillDatumArray<T>(ref toReturn, foundSignal, fromIncludedUtc, toExcludedUtc);
+                FillDatumArray<T>(ref sortedData, foundSignal, fromIncludedUtc, toExcludedUtc);
 
-            return toReturn;
+            return sortedData;
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp)
