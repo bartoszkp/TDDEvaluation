@@ -89,9 +89,11 @@
     <Compile Include="Repositories\ISignalsRepository.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\DayFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityDayDataFill.cs" />
+    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityHourDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityMonthDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityWeekDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQualityYearDataFill.cs" />
+    <Compile Include="Services\Implementation\DataFillStrategy\HourFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\MonthFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\WeekFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\YearFillDataStrategy.cs" />

@@ -14,7 +14,7 @@ namespace ExampleSignalClient
             Signal signal = new Signal()
             {
                 DataType = DataType.Double,
-                Granularity = Granularity.Day,
+                Granularity = Granularity.Hour,
                 Path = new Path() { Components = new[] { "x" + random.Next(1000), "y" } }
             };
 
@@ -24,14 +24,14 @@ namespace ExampleSignalClient
 
             client.SetData(fetchedSignal.Id.GetValueOrDefault(), new Datum[]
             {
-               new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-               new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = (double)2.5 }
+               new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1,1,1,1), Value = (double)1.5 },
+               new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1,3,1,1), Value = (double)2.5 }
             });
 
 
 
 
-            var result = client.GetData(fetchedSignal.Id.GetValueOrDefault(), new DateTime(2000, 1, 1), new DateTime(2000, 1, 4));
+            var result = client.GetData(fetchedSignal.Id.GetValueOrDefault(), new DateTime(2000, 1, 1,1,1,1), new DateTime(2000, 1, 1,5,1,1));
 
             foreach (var d in result)
             {
