@@ -363,6 +363,42 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GivenASignalWithSetMVP_WhenGettingMVPOftheSignal_ReturnedIsTheMVP()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("root/signal1")
+                };
+                var dummyMissingValuePolicy = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>()
+                {
+                    Id = 1,
+                    Quality = Quality.Fair,
+                    Signal = dummySignal,
+                    Value = 10.0
+                };
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == dummySignal.Id.Value))).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(path => path.Equals(dummySignal.Path)))).Returns(dummySignal);
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>(signal =>
+                   signal.Id == dummySignal.Id &&
+                   signal.DataType == dummySignal.DataType &&
+                   signal.Granularity == dummySignal.Granularity &&
+                   signal.Path.Equals(dummySignal.Path))))
+                .Returns(dummyMissingValuePolicy);
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+
+                Assert.AreEqual(dummyMissingValuePolicy.Id, result.Id);
+                Assert.AreEqual(dummyMissingValuePolicy.Signal, result.Signal);
+            }
+
             // -------------------------------------------------------------------------------------------
             // 3rd Iteration:
             // -------------------------------------------------------------------------------------------
