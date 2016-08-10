@@ -445,7 +445,7 @@ namespace WebService.Tests
                 };
                 var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Hour, Path = Domain.Path.FromString("x/y") };
                 SetupDataRepositoryMock<int>(signal, datum);
-
+                
                 var  result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
 
                 for (int i = 1; i < 8; i+=2)

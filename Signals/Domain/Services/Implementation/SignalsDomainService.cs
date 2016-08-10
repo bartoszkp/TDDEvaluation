@@ -51,10 +51,9 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
-            int iterator = 0;
-            DateTime date = res.First().Timestamp;
+            var date = res.First().Timestamp;
 
-            while (iterator != res.Count())
+            for (int i = 0; i < res.Count(); i++)
             {
                 var datum = (from x in res
                              where x.Timestamp == date
@@ -71,17 +70,9 @@ namespace Domain.Services.Implementation
                     };
                     res.Add(tempDatum);
                 }
-
-                if (signal.Granularity == Granularity.Second) date = date.AddSeconds(1);
-                if (signal.Granularity == Granularity.Minute) date = date.AddMinutes(1);
-                if (signal.Granularity == Granularity.Hour) date = date.AddHours(1);
-                if (signal.Granularity == Granularity.Day) date = date.AddDays(1);
-                if (signal.Granularity == Granularity.Week) date = date.AddDays(7);
-                if (signal.Granularity == Granularity.Month) date = date.AddMonths(1);
-                if (signal.Granularity == Granularity.Year) date = date.AddYears(1);
-
-                iterator++;
+                date = AddTime(signal.Granularity, date);
             }
+             
             return res.OrderBy(x => x.Timestamp);
         }
 
@@ -101,6 +92,18 @@ namespace Domain.Services.Implementation
         public Signal Get(Path path)
         {
             return signalsRepository.Get(path);
+        }
+
+        private DateTime AddTime(Granularity granuality,DateTime date)
+        {
+            if (granuality == Granularity.Second) return  date.AddSeconds(1);
+            if (granuality == Granularity.Minute) return date.AddMinutes(1);
+            if (granuality == Granularity.Hour) return date.AddHours(1);
+            if (granuality == Granularity.Day) return date.AddDays(1);
+            if (granuality == Granularity.Week) return date.AddDays(7);
+            if (granuality == Granularity.Month) return date.AddMonths(1);
+            if (granuality == Granularity.Year) return date.AddYears(1);
+            return date;
         }
       
     }
