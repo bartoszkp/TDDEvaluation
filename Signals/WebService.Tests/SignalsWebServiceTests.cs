@@ -369,43 +369,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoneQualityMissingValuePolicy_WhenGettingMissingValue_ReturnsDatumWithNoneQualityAndDefaultValue()
-            {
-                int signalId = 2;
-                Signal signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>();
-
-                var result = mvp.GetMissingValue(signal, new DateTime(2000, 10, 2));
-
-                Assert.AreEqual(Quality.None, result.Quality);
-                Assert.AreEqual(default(double), result.Value);
-            }
-
-            [TestMethod]
-            public void GivenNoneQualityMissingValuePolicy_WhenGettingMissingValue_ReturnsDatumWithSetSignalAndTimeStamp()
-            {
-                int signalId = 2;
-                Signal signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.Double,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>();
-
-                var result = mvp.GetMissingValue(signal, new DateTime(2000, 10, 2));
-
-                Assert.AreEqual(2, result.Signal.Id);
-                Assert.AreEqual(Domain.DataType.Double, result.Signal.DataType);
-                Assert.AreEqual(Domain.Granularity.Month, result.Signal.Granularity);
-                Assert.AreEqual("root/signal", result.Signal.Path.ToString());
-                Assert.AreEqual(new DateTime(2000, 10, 2), result.Timestamp);
-            }
-
-            [TestMethod]
             public void GivenASignal_WhenGettingData_ReturnsCorrectAmount()
             {
                 int signalId = 7;
@@ -493,7 +456,26 @@ namespace WebService.Tests
                 Assert.AreEqual(default(string), result[6].Value);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithMissingData_DataHasCorrectQuality()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
+                GivenData(signalId, GetDomainStringData());
 
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1)).ToArray();
+
+                Assert.AreEqual(Dto.Quality.Fair, result[0].Quality);
+                Assert.AreEqual(Dto.Quality.None, result[1].Quality);
+                Assert.AreEqual(Dto.Quality.Good, result[2].Quality);
+                Assert.AreEqual(Dto.Quality.None, result[3].Quality);
+            }
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()

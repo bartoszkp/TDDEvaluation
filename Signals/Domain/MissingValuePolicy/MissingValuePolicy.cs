@@ -19,7 +19,5 @@ namespace Domain.MissingValuePolicy
     {
         [NHibernateIgnore]
         public override Type NativeDataType { get { return typeof(T); } }
-
-        public abstract Datum<T> GetMissingValue(Signal signal, DateTime timeStamp);
     }
 }

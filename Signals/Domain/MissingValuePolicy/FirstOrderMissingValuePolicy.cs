@@ -7,9 +7,5 @@ namespace Domain.MissingValuePolicy
 {
     public class FirstOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override Datum<T> GetMissingValue(Signal signal, DateTime timeStamp)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -10,10 +10,5 @@ namespace Domain.MissingValuePolicy
         public virtual T Value { get; set; }
 
         public virtual Quality Quality { get; set; }
-
-        public override Datum<T> GetMissingValue(Signal signal, DateTime timeStamp)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

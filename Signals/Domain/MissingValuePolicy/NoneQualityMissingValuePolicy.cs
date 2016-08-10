@@ -7,9 +7,6 @@ namespace Domain.MissingValuePolicy
 {
     public class NoneQualityMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override Datum<T> GetMissingValue(Signal signal, DateTime timeStamp)
-        {
-            return Datum<T>.CreateNone(signal, timeStamp);
-        }
+
     }
 }

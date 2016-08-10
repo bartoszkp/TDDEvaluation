@@ -81,6 +81,16 @@ namespace Domain.Services.Implementation
             return current;
         }
 
+        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp)
+        {
+            if(mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
+            {
+                return Datum<T>.CreateNone(signal, timeStamp);
+            }
+
+            return null;
+        }
+
         public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Signal signal = GetById(signalId);
@@ -96,7 +106,9 @@ namespace Domain.Services.Implementation
             while(current < toExcludedUtc)
             {
                 if (i >= data.Count || data[i].Timestamp != current)
-                    data.Add(mvp.GetMissingValue(signal, current));
+                {
+                    data.Add(GetMissingValue<T>(mvp, signal, current));
+                }
                 else
                     i++;
 
