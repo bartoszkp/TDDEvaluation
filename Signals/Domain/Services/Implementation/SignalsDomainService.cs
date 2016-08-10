@@ -84,8 +84,9 @@ namespace Domain.Services.Implementation
 
             if (mvp == null) return null;
 
-            else return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType())
+            else return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
+
     }
 }
