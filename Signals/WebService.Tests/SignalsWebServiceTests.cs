@@ -126,18 +126,21 @@ namespace WebService.Tests
                 Domain.Signal domainSignal = new Domain.Signal()
                 {
                     Id = signalId,
-                    DataType = Domain.DataType.Integer,
+                    DataType = Domain.DataType.Double,
                     Granularity = Domain.Granularity.Hour,
                     Path = Domain.Path.FromString("root/signal44")
                 };
 
-                List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
-                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
-                    Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
-                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good,
-                    Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
+                List<Domain.Datum<object>> addedCollection = new List<Datum<object>>(new Datum<object>[] {
+                     new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
+                     new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
 
-                Setup_CheckingDatumLists_Integer(addedCollection,domainSignal);
+                Setup_AllRepos(domainSignal);
+                GivenAColletionOfDatums(addedCollection, domainSignal);
+
+                var returnedMvp = new NoneQualityMissingValuePolicyInteger();
+
+                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(), new DateTime()).ToList();
 
@@ -534,10 +537,10 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void GivenAColletionOfDatums(IEnumerable<Datum<Int32>> data, Domain.Signal signal)
+            private void GivenAColletionOfDatums<T>(IEnumerable<Datum<T>> data, Domain.Signal signal)
             {
                 signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData<Int32>(
+                    .Setup(sdr => sdr.GetData<T>(
                         It.Is<Domain.Signal>( s => s.DataType == signal.DataType &&
                                                 s.Granularity == signal.Granularity &&
                                                 s.Id == signal.Id),
