@@ -51,14 +51,37 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
-            res.Add(new Datum<T>()
+            int iterator = 0;
+            DateTime date = res.First().Timestamp;
+
+            while (iterator != res.Count())
             {
-                Quality = Quality.None,
-                Signal = signal,
-                Timestamp = res[0].Timestamp.AddMonths(1),
-                Value = default(T)
-            });
-            var or = res.OrderBy(x => x.Timestamp);
+                var datum = (from x in res
+                             where x.Timestamp == date
+                             select x).FirstOrDefault();
+
+                if (datum == null)
+                {
+                    var tempDatum = new Domain.Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Signal = signal,
+                        Timestamp = date,
+                        Value = default(T)
+                    };
+                    res.Add(tempDatum);
+                }
+
+                if (signal.Granularity == Granularity.Second) date = date.AddSeconds(1);
+                if (signal.Granularity == Granularity.Minute) date = date.AddMinutes(1);
+                if (signal.Granularity == Granularity.Hour) date = date.AddHours(1);
+                if (signal.Granularity == Granularity.Day) date = date.AddDays(1);
+                if (signal.Granularity == Granularity.Week) date = date.AddDays(7);
+                if (signal.Granularity == Granularity.Month) date = date.AddMonths(1);
+                if (signal.Granularity == Granularity.Year) date = date.AddYears(1);
+
+                iterator++;
+            }
             return res.OrderBy(x => x.Timestamp);
         }
 

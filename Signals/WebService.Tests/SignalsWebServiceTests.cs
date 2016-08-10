@@ -341,7 +341,7 @@ namespace WebService.Tests
             public void GetData_SignalWithGivenIdExist_ReturnDatumOrderedByDate()
             {
                 MakeMocks();
-                MakeASignalsRepositoryMock(1, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("x/y"));
+                MakeASignalsRepositoryMock(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y"));
                 MakeASignalsWebService();
                 var datum = new Dto.Datum[] {
                          new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
