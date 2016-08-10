@@ -126,21 +126,18 @@ namespace WebService.Tests
                 Domain.Signal domainSignal = new Domain.Signal()
                 {
                     Id = signalId,
-                    DataType = Domain.DataType.Double,
+                    DataType = Domain.DataType.Integer,
                     Granularity = Domain.Granularity.Hour,
                     Path = Domain.Path.FromString("root/signal44")
                 };
 
-                List<Domain.Datum<object>> addedCollection = new List<Datum<object>>(new Datum<object>[] {
-                     new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
-                     new Datum<object>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
+                List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
+                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
+                    Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
+                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good,
+                    Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
 
-                Setup_AllRepos(domainSignal);
-                GivenAColletionOfDatums(addedCollection, domainSignal);
-
-                var returnedMvp = new NoneQualityMissingValuePolicyInteger();
-
-                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
+                Setup_CheckingDatumLists_Integer(addedCollection,domainSignal);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(), new DateTime()).ToList();
 
