@@ -42,7 +42,7 @@ namespace ExampleSignalClient
             }
 
             Console.WriteLine("\n//MissingValuePolicy\n");
-            
+
             var mvp = new Signals.SpecificValueMissingValuePolicy() { DataType = DataType.Double, Quality = Quality.Fair, Value = (double)1.5 };
 
             client.SetMissingValuePolicy(id, mvp);

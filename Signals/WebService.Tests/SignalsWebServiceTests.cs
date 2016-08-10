@@ -183,7 +183,7 @@ namespace WebService.Tests
                 Assert.AreEqual(lastValue, result.Last().Value);
                 Assert.AreEqual(lastTimestamp, result.Last().Timestamp);
             }
-
+            
             [TestMethod]
             [ExpectedException(typeof(SignalNotFoundException))]
             public void GivenNoSignals_WhenSettingMissingValuePolicy_ThrowSignalNotFoundException()
