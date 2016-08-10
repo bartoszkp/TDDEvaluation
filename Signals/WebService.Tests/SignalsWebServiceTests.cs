@@ -230,11 +230,7 @@ namespace WebService.Tests
             [ExpectedException(typeof(Domain.Exceptions.GettingDataOfNotExistingSignal))]
             public void GivenASignal_WhenGettingDataForNotExistingSignal_ThrowsGettingDataOfNotExistingSignal()
             {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
+                MockSetup();
                 signalsWebService = new SignalsWebService(signalDomainService);
 
                 var fromIncludedDate = new DateTime(2016, 8, 1);
@@ -312,6 +308,7 @@ namespace WebService.Tests
             public void GivenNoSignal_WhenGettingByPath_ThrowsException()
             {
                 MockSetup();
+
                 signalsWebService = new SignalsWebService(signalDomainService);
                 var returndSignal = signalsWebService.Get(new Dto.Path()
                 {
