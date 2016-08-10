@@ -14,7 +14,7 @@ namespace Domain.DataFillStrategy
             switch (granularity)
             {
                 case Granularity.Second:
-                    break;
+                    return new SecondDataFillStrategy(mvp);
                     
                 case Granularity.Minute:
                     return new MinuteDataFillStrategy(mvp);
@@ -35,10 +35,9 @@ namespace Domain.DataFillStrategy
                     return new YearFillDataStrategy(mvp);
 
                 default:
-                    break;
+                    return null;
             }
-
-            return null;
+            
         }
 
 

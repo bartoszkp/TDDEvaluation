@@ -92,11 +92,13 @@
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityHourDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityMinuteDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityMonthDataFill.cs" />
+    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualitySecondDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityWeekDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityYearDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\HourFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\MinuteDataFillStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\MonthFillDataStrategy.cs" />
+    <Compile Include="Services\Implementation\DataFillStrategy\SecondDataFillStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\WeekFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\YearFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />

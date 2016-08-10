@@ -7,17 +7,16 @@ using Domain.Services.Implementation.DataFillStrategy.Helpers.NoneQuality;
 
 namespace Domain.Services.Implementation.DataFillStrategy
 {
-    public class MinuteDataFillStrategy : Domain.DataFillStrategy.DataFillStrategy
+    public class SecondDataFillStrategy : Domain.DataFillStrategy.DataFillStrategy
     {
-        public MinuteDataFillStrategy(MissingValuePolicy.MissingValuePolicyBase mvp)
+        public SecondDataFillStrategy(MissingValuePolicy.MissingValuePolicyBase mvp)
         {
             this.missingValuePolicy = mvp;
         }
 
-
         public override void FillMissingData<T>(List<Datum<T>> datum, DateTime after, DateTime before)
         {
-            NoneQualityMinuteDataFill.FillData(datum, after, before);
+            NoneQualitySecondDataFill.FillData(datum, after, before);
         }
     }
 }
