@@ -481,7 +481,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenDataAndSignal_WhenSetData_VerifyItIsMissingSignal_ForMonthGranularity()
+            public void GivenDataAndSignal_WhenSetData_VerifyIfAddedDatums_ForMonthGranularity()
             {
                 int signalId = 6;
 
@@ -497,7 +497,9 @@ namespace WebService.Tests
                 signalsWebService.SetData(signalId, settedData);
 
                 signalsDataRepositoryMock.Verify(sdr => sdr.SetData<decimal>(It.Is<IEnumerable<Datum<decimal>>>(d => 
-                d.ElementAt(1).Timestamp == new DateTime(2000, 2, 1))));
+                d.ElementAt(1).Timestamp == new DateTime(2000, 2, 1)
+                && d.ElementAt(1).Quality == Quality.None 
+                && d.ElementAt(1).Value == 0m)));
             }
 
             [TestMethod]
