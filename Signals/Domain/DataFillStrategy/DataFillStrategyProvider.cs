@@ -22,7 +22,7 @@ namespace Domain.DataFillStrategy
                     break;
 
                 case Granularity.Day:
-                    break;
+                    return new DayFillDataStrategy(mvp);
                     
                 case Granularity.Week:
                     return new WeekFillDataStrategy(mvp);
