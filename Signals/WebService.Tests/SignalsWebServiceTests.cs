@@ -341,6 +341,28 @@ namespace WebService.Tests
                 signalsWebService.GetMissingValuePolicy(2);
             }
 
+            [TestMethod]
+            public void GivenANewlyAddedSignal_WhenGettingMVPOfTheSignal_ReturnedIsNull()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("root/signal1")
+                };
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == dummySignal.Id.Value))).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(path => path.Equals(dummySignal.Path)))).Returns(dummySignal);
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+
+                Assert.IsNull(result);
+            }
+
             // -------------------------------------------------------------------------------------------
             // 3rd Iteration:
             // -------------------------------------------------------------------------------------------
