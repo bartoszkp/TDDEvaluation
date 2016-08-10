@@ -9,5 +9,10 @@ namespace Domain.MissingValuePolicy
         public virtual T Value { get; set; }
 
         public virtual Quality Quality { get; set; }
+
+        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data)
+        {
+            return null;
+        }
     }
 }

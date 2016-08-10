@@ -117,8 +117,13 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUTC, DateTime toExcludedUTC)
         {
-            return this.signalsDataRepository
-                .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToArray();
+            var data = this.signalsDataRepository
+                .GetData<T>(signal, fromIncludedUTC, toExcludedUTC);
+
+            var missingValuePolicy = GetMissingValuePolicy(signal)
+                as MissingValuePolicy.MissingValuePolicy<T>;
+
+            return missingValuePolicy.FillData(signal, data).ToArray();
         }
     }
 }
