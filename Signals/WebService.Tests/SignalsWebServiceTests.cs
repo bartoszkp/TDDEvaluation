@@ -305,6 +305,7 @@ namespace WebService.Tests
             // -------------------------------------------------------------------------------------------
 
             [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignals_WhenGettingMVPOfAnySignal_ThrowedIsArgumentException()
             {
                 var signalsRepositoryMock = new Mock<ISignalsRepository>();
