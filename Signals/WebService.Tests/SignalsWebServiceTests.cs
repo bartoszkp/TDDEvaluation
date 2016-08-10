@@ -306,10 +306,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignal_WhenGettingByPath_ReturnsNull()
             {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                MockSetup();
 
                 signalsWebService = new SignalsWebService(signalDomainService);
                 var result = signalsWebService.Get(new Dto.Path()
