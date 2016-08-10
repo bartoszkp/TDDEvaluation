@@ -123,6 +123,7 @@ namespace WebService
                         var domainModel = data.ToDomain<IEnumerable<Domain.Datum<decimal>>>()
                             .ToList();
                         setSignalToData(domainModel, signal);
+
                         signalsDomainService.SetData<decimal>(domainModel);
                         break;
                     }
@@ -131,6 +132,7 @@ namespace WebService
                         var domainModel = data.ToDomain<IEnumerable<Domain.Datum<bool>>>()
                             .ToList();
                         setSignalToData(domainModel, signal);
+
                         signalsDomainService.SetData<bool>(domainModel);
                         break;
                     }

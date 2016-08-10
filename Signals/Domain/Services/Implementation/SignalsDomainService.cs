@@ -85,8 +85,6 @@ namespace Domain.Services.Implementation
 
             Domain.DataFillStrategy.DataFillStrategy strategy = DataFillStrategyProvider.GetStrategy(signal.Granularity,mvp);
 
-           
-
             strategy.FillMissingData(items,fromIncludedUtc,toExcludedUtc);
 
 

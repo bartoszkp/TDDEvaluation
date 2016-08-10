@@ -16,7 +16,8 @@ namespace Domain.Services.Implementation.DataFillStrategy
 
         public override void FillMissingData<T>(List<Datum<T>> datum, DateTime after, DateTime before)
         {
-            NoneQualitySecondDataFill.FillData(datum, after, before);
+            if (this.missingValuePolicy is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
+                NoneQualitySecondDataFill.FillData(datum, after, before);
         }
     }
 }
