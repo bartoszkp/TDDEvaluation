@@ -111,10 +111,8 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingByIdWithNullValue_ReturnsNull()
             {
-                
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
-                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                GivenNoSignals();
 
                 signalsWebService = new SignalsWebService(signalDomainService);
                 var result = signalsWebService.GetById(0);
