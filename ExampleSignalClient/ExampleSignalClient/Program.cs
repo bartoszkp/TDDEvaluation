@@ -18,7 +18,6 @@ namespace ExampleSignalClient
                 Path = new Path() { Components = new[] { "x" + random.Next(1000), "y" } }
             };
 
-
             var result = client.Add(newSignal);
 
             var mvp = client.GetMissingValuePolicy(result.Id.Value);

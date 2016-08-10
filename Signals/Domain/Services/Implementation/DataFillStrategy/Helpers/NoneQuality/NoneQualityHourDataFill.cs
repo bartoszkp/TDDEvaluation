@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Services.Implementation.DataFillStrategy.Helpers
 {
-    class NoneQualityHourDataFill
+    static class NoneQualityHourDataFill
     {
         public static void FillData<T>(List<Domain.Datum<T>> datum, DateTime after, DateTime before)
         {

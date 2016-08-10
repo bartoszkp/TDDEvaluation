@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Services.Implementation.DataFillStrategy.Helpers
 {
-    public static class NoneQualityWeekDataFill
+    static class NoneQualityWeekDataFill
     {
         public static void FillData<T>(List<Domain.Datum<T>> datum, DateTime after, DateTime before)
         {

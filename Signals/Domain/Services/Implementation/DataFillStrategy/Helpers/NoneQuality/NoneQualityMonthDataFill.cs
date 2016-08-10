@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Services.Implementation.DataFillStrategy.Helpers
 {
-    [NHibernateIgnore]
-    public static class NoneQualityMonthDataFill
+    static class NoneQualityMonthDataFill
     {
         public static void FillData<T>(List<Domain.Datum<T>> datum, DateTime after, DateTime before)
         {
