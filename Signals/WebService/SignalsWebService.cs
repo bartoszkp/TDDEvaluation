@@ -60,9 +60,6 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            if (DateTime.Compare(fromIncludedUtc, toExcludedUtc) > 0)
-                throw new ArgumentException("Given dates are invalid.");
-
             var signal = this.GetById(signalId);
 
             if (signal == null)
