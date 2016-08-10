@@ -132,16 +132,12 @@ namespace WebService.Tests
                 };
 
                 List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
-                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
-                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
+                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
+                    Timestamp = new DateTime(2005, 1, 1), Value = (int)5 },
+                new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good,
+                    Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
 
-                Setup_AllRepos(domainSignal);
-
-                var returnedMvp = new NoneQualityMissingValuePolicyInteger();
-
-                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
-
-                GivenAColletionOfDatums(addedCollection, domainSignal);
+                Setup_CheckingDatumLists_Integer(addedCollection,domainSignal);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(), new DateTime()).ToList();
 
@@ -241,16 +237,18 @@ namespace WebService.Tests
 
                 Setup_SignalsRepoAndMissingValuePolicyRepo_SetupGetMethod(signal, returnedMvp);                            
 
-                var result = (Dto.MissingValuePolicy.SpecificValueMissingValuePolicy)signalsWebService.GetMissingValuePolicy(signalId);
+                var result = (Dto.MissingValuePolicy.SpecificValueMissingValuePolicy)
+                    signalsWebService.GetMissingValuePolicy(signalId);
 
                 Assert.AreEqual(value, result.Value);           
                 Assert.AreEqual(Dto.Quality.Fair, result.Quality);
                 CheckIfDtoSignalAreEqual(
-                    result.Signal, signalId, Dto.DataType.Double, Dto.Granularity.Minute, new Dto.Path() { Components = new[] { "root", "signal8" } } );
+                    result.Signal, signalId, Dto.DataType.Double, Dto.Granularity.Minute, 
+                    new Dto.Path() { Components = new[] { "root", "signal8" } } );
             }
 
             [TestMethod]
-            public void GivenNoSignals_GetIdByPath_ExpectedException()
+            public void GivenNoSignals_GetIdByPath_ReturnsNull()
             {
                 GivenNoSignals();
 
@@ -264,15 +262,17 @@ namespace WebService.Tests
             {
                 Dto.Path dtoPath = new Dto.Path() { Components = new[] { "x", "y" } };
 
+                int signalId = 5;
+
                 GivenASignal(SignalWith(
-                   id: 5,
+                   id: signalId,
                    dataType: Domain.DataType.Boolean,
                    granularity: Domain.Granularity.Hour,
                    path: Domain.Path.FromString("x/y")));
 
                 var result = signalsWebService.Get(dtoPath);
 
-                Assert.AreEqual(5, result.Id);
+                Assert.AreEqual(signalId, result.Id);
                 Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
                 Assert.AreEqual(Dto.Granularity.Hour, result.Granularity);
                 CollectionAssert.AreEqual(dtoPath.Components.ToArray(), result.Path.Components.ToArray());
@@ -336,14 +336,7 @@ namespace WebService.Tests
             public void GivenASignalWithDataSource_WhenGettingData_ChecksContentAndLengthOfArray()
             {
                 var signalId = 2;
-
-                Domain.Signal domainSignal = new Domain.Signal()
-                {
-                    Id = signalId,
-                    DataType = Domain.DataType.Integer,
-                    Granularity = Domain.Granularity.Month,
-                    Path = Domain.Path.FromString("root/signal44")
-                };
+                Domain.Signal domainSignal = SetDefaultSignal_IntegerMonth(signalId);
 
                 List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
                     new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
@@ -351,12 +344,7 @@ namespace WebService.Tests
                     new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good,
                         Timestamp = new DateTime(2005, 3, 1), Value = (int)7, } });
 
-                Setup_AllRepos(domainSignal);
-                GivenAColletionOfDatums(addedCollection, domainSignal);
-
-                var returnedMvp = new NoneQualityMissingValuePolicyInteger();
-
-                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
+                Setup_CheckingDatumLists_Integer(addedCollection, domainSignal);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, 
                     new DateTime(2005,1,1), new DateTime(2005,3,2)).ToList();
@@ -378,6 +366,63 @@ namespace WebService.Tests
                 Dto.Path path = new Dto.Path() { Components = new[] { "root", "signal" } };
 
                 Assert.IsNull(this.signalsWebService.Get(path));
+            }
+
+            [TestMethod]
+            public void GivenASignalWithCompleteDataSource_WhenGettingSortedgData_ChecksContentAndLengthOfArray()
+            {
+                int signalId = 2;
+                Domain.Signal domainSignal = SetDefaultSignal_IntegerMonth(signalId);
+
+                List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good,
+                        Timestamp = new DateTime(2005, 3, 1), Value = (int)7, },
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
+                        Timestamp = new DateTime(2005, 1, 1), Value = (int)11 },
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
+                        Timestamp = new DateTime(2005, 2, 1), Value = (int)2 }
+                     });
+
+                Setup_CheckingDatumLists_Integer(addedCollection, domainSignal);
+
+                List<Dto.Datum> result = signalsWebService.GetData(signalId,
+                    new DateTime(2005, 1, 1), new DateTime(2005, 3, 2)).ToList();
+
+                List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)11 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 2, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7 } });
+
+                Assert.AreEqual(expectedResult.Count, result.Count);
+                Assert.IsTrue(AssertDtoLists(expectedResult, result));
+            }
+
+            [TestMethod]
+            public void GivenASignalWithIncompleteDataSource_WhenGettingSortedData_ChecksContentAndLengthOfArray()
+            {
+                var signalId = 2;
+
+                Domain.Signal domainSignal = SetDefaultSignal_IntegerMonth(signalId);
+
+                List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Good,
+                        Timestamp = new DateTime(2005, 3, 1), Value = (int)7, },
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
+                        Timestamp = new DateTime(2005, 1, 1), Value = (int)11 }
+                     });
+
+                Setup_CheckingDatumLists_Integer(addedCollection, domainSignal);
+
+                List<Dto.Datum> result = signalsWebService.GetData(signalId,
+                    new DateTime(2005, 1, 1), new DateTime(2005, 3, 2)).ToList();
+
+                List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)11 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2005, 2, 1), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 3, 1), Value = (int)7 } });
+
+                Assert.AreEqual(expectedResult.Count, result.Count);
+                Assert.IsTrue(AssertDtoLists(expectedResult, result));
             }
 
             private Dto.Signal SignalWith(
@@ -407,6 +452,17 @@ namespace WebService.Tests
                     DataType = dataType,
                     Granularity = granularity,
                     Path = path
+                };
+            }
+
+            public Domain.Signal SetDefaultSignal_IntegerMonth(int signalId)
+            {
+                return new Domain.Signal()
+                {
+                    Id = signalId,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal44")
                 };
             }
 
@@ -545,6 +601,16 @@ namespace WebService.Tests
 
                 missingValuePolicyRepoMock.Setup(mvp => mvp.Get(signal))
                 .Returns(returnedMvp);
+            }
+
+            private void Setup_CheckingDatumLists_Integer(List<Domain.Datum<Int32>> addedCollection, Domain.Signal domainSignal)
+            {
+                Setup_AllRepos(domainSignal);
+                GivenAColletionOfDatums(addedCollection, domainSignal);
+
+                var returnedMvp = new NoneQualityMissingValuePolicyInteger();
+
+                this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
             }
 
             private void CheckIfDtoSignalAreEqual(Dto.Signal signal, int signalId, Dto.DataType datatype, Dto.Granularity granularity, Dto.Path path)
