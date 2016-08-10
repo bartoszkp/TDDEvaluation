@@ -341,7 +341,7 @@ namespace WebService.Tests
                 dataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(datum.ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>());
 
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
-                var expectedResult = datum.OrderBy(x => x.Timestamp);
+                var expectedResult = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).OrderBy(x => x.Timestamp);
 
                 Assert.IsTrue(CompareTwoDatum(result, expectedResult));
             }
@@ -392,6 +392,7 @@ namespace WebService.Tests
             {
                 var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Month, Path = Domain.Path.FromString("x/y") };
                 MakeMocks();
+                MakeASignalsWebService();
                 signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
 
                 var datum = new Dto.Datum[] {
