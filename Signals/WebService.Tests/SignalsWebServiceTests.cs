@@ -482,154 +482,65 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignalAndDataAndMVPBySecond_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
             {
-                int signalId = 1;
-                GivenASignal(SignalWith(
-                    signalId,
-                    DataType.Boolean,
-                    Granularity.Second,
-                    Path.FromString("")));
-
-                GivenData(signalId, new[]
-                {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddSeconds(1) }
-                });
-
-                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
-
-                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddSeconds(2));
-
-                Assert.IsTrue(result.Count() == 2);
-                Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
-                CollectionAssert.AreEquivalent(
-                    new[]
-                    {
-                        new DateTime(),
-                        new DateTime().AddSeconds(1)
-                    },
-                    result.Select(d => d.Timestamp).ToArray());
+                GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP
+                    (Granularity.Second, (i) => new DateTime().AddSeconds(i));
             }
 
             [TestMethod]
             public void GivenASignalAndDataAndMVPByMinute_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
             {
-                int signalId = 1;
-                GivenASignal(SignalWith(
-                    signalId,
-                    DataType.Boolean,
-                    Granularity.Minute,
-                    Path.FromString("")));
-
-                GivenData(signalId, new[]
-                {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddMinutes(1) }
-                });
-
-                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
-
-                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddMinutes(2));
-
-                Assert.IsTrue(result.Count() == 2);
-                Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
-                CollectionAssert.AreEquivalent(
-                    new[]
-                    {
-                        new DateTime(),
-                        new DateTime().AddMinutes(1)
-                    },
-                    result.Select(d => d.Timestamp).ToArray());
+                GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP
+                    (Granularity.Minute, (i) => new DateTime().AddMinutes(i));
             }
 
             [TestMethod]
             public void GivenASignalAndDataAndMVPByHour_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
             {
-                int signalId = 1;
-                GivenASignal(SignalWith(
-                    signalId,
-                    DataType.Boolean,
-                    Granularity.Hour,
-                    Path.FromString("")));
-
-                GivenData(signalId, new[]
-                {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddHours(1) }
-                });
-
-                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
-
-                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddHours(2));
-
-                Assert.IsTrue(result.Count() == 2);
-                Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
-                CollectionAssert.AreEquivalent(
-                    new[]
-                    {
-                        new DateTime(),
-                        new DateTime().AddHours(1)
-                    },
-                    result.Select(d => d.Timestamp).ToArray());
+                GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP
+                    (Granularity.Hour, (i) => new DateTime().AddHours(i));
             }
 
             [TestMethod]
             public void GivenASignalAndDataAndMVPByWeek_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
             {
-                int signalId = 1;
-                GivenASignal(SignalWith(
-                    signalId,
-                    DataType.Boolean,
-                    Granularity.Week,
-                    Path.FromString("")));
-
-                GivenData(signalId, new[]
-                {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddDays(7) }
-                });
-
-                GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
-
-                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddDays(14));
-
-                Assert.IsTrue(result.Count() == 2);
-                Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
-                CollectionAssert.AreEquivalent(
-                    new[]
-                    {
-                        new DateTime(),
-                        new DateTime().AddDays(7)
-                    },
-                    result.Select(d => d.Timestamp).ToArray());
+                GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP
+                    (Granularity.Week, (i) => new DateTime().AddDays(i * 7));
             }
 
             [TestMethod]
             public void GivenASignalAndDataAndMVPByYear_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP()
             {
+                GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP
+                    (Granularity.Year, (i) => new DateTime().AddYears(i));
+            }
+
+            private void GivenASignalAndDataAndMVP_WhenGettingData_ReturnsMissingValuesAccordingToNoneQualityMVP
+                (Granularity granularity, Func<int, DateTime> timeChange)
+            {
                 int signalId = 1;
                 GivenASignal(SignalWith(
                     signalId,
                     DataType.Boolean,
-                    Granularity.Year,
+                    granularity,
                     Path.FromString("")));
 
                 GivenData(signalId, new[]
                 {
-                    new Datum<bool> {Quality = Quality.Fair, Timestamp = new DateTime() },
-                    new Datum<bool> {Quality = Quality.Good, Timestamp = new DateTime().AddYears(1) }
+                    new Datum<bool> {Quality = Quality.Fair, Timestamp = timeChange(0) },
+                    new Datum<bool> {Quality = Quality.Good, Timestamp = timeChange(1) }
                 });
 
                 GivenMissingValuePolicy(signalId, new NoneQualityMissingValuePolicyBoolean());
 
-                var result = signalsWebService.GetData(signalId, new DateTime(), new DateTime().AddYears(2));
+                var result = signalsWebService.GetData(signalId, timeChange(0), timeChange(2));
 
                 Assert.IsTrue(result.Count() == 2);
                 Assert.IsTrue(result.Any(d => d.Quality != Dto.Quality.None));
                 CollectionAssert.AreEquivalent(
                     new[]
                     {
-                        new DateTime(),
-                        new DateTime().AddYears(1)
+                        timeChange(0),
+                        timeChange(1)
                     },
                     result.Select(d => d.Timestamp).ToArray());
             }
