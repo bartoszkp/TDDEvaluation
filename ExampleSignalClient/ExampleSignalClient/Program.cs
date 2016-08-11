@@ -12,7 +12,7 @@ namespace ExampleSignalClient
             var signal = new Signal()
             {
                 DataType = DataType.Double,
-                Granularity = Granularity.Year
+                Granularity = Granularity.Week
             };
 
             client.Add(signal);
@@ -22,13 +22,11 @@ namespace ExampleSignalClient
             client.SetData(1, new Datum[]
             {
                 new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 0), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2002, 1, 1, 1, 1, 0), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2004, 1, 1, 1, 1, 0), Value = (double)2.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2006, 1, 1, 1, 1, 0), Value = (double)2.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2007, 1, 1, 1, 1, 0), Value = (double)2.5 }
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 8, 1, 1, 0), Value = (double)1.5 },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 22, 1, 1, 0), Value = (double)2.5 }
             });
 
-            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2008, 1, 1));
+            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 2, 12));
 
             foreach (var d in result)
             {

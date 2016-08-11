@@ -7,17 +7,17 @@ namespace Domain.MissingValuePolicy
 {
     public class NoneQualityMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data)
+        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             dataDictionary = data.ToDictionary(d => d.Timestamp, d => d);
             
-            var datum = DateTimeList(data, signal);
+            var datum = DateTimeList(data, signal, fromIncludedUtc, toExcludedUtc);
             
             return datum
                 .Select(d => dataDictionary.ContainsKey(d) ? dataDictionary[d] : Datum<T>.CreateNone(Signal, d));
         }
 
-        private List<DateTime> DateTimeList(IEnumerable<Datum<T>> data, Signal signal)
+        private List<DateTime> DateTimeList(IEnumerable<Datum<T>> data, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var key = signal.Granularity;
 
@@ -29,34 +29,36 @@ namespace Domain.MissingValuePolicy
 
             int count = 0;
 
+            TimeSpan timeSpan = toExcludedUtc.Subtract(fromIncludedUtc);
+
             switch (signal.Granularity)
             {
                 case Granularity.Second:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalSeconds + 1;
+                    count = (int)timeSpan.TotalSeconds;
                     CreateDateTimeList(data, firstTimestamp, key, count);
                     break;
                 case Granularity.Minute:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalMinutes + 1;
+                    count = (int)timeSpan.TotalMinutes;
                     CreateDateTimeList(data, firstTimestamp, key, count);
                     break;
                 case Granularity.Hour:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalHours + 1;
+                    count = (int)timeSpan.TotalHours;
                     CreateDateTimeList(data, firstTimestamp, key, count);
                     break;
                 case Granularity.Day:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays + 1;
+                    count = (int)timeSpan.TotalDays;
                     CreateDateTimeList(data, firstTimestamp, key, count);
                     break;
                 case Granularity.Week:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 7 + 1;
+                    count = (int)timeSpan.TotalDays / 7;
                     CreateDateTimeList(data, firstTimestamp, key, count);
                     break;
                 case Granularity.Month:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 30 + 1;
+                    count = (int)timeSpan.TotalDays / 30;
                     CreateDateTimeList(data, firstTimestamp, key, count);
                     break;
                 case Granularity.Year:
-                    count = (int)data.Last().Timestamp.Subtract(data.First().Timestamp).TotalDays / 365 + 1;
+                    count = (int)timeSpan.TotalDays / 365;
                     CreateDateTimeList(data, firstTimestamp, key, count);
                     break;
             }

@@ -20,6 +20,6 @@ namespace Domain.MissingValuePolicy
         [NHibernateIgnore]
         public override Type NativeDataType { get { return typeof(T); } }
 
-        public abstract IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data);
+        public abstract IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }

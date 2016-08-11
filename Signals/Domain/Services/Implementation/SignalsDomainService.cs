@@ -123,7 +123,7 @@ namespace Domain.Services.Implementation
             var missingValuePolicy = GetMissingValuePolicy(signal)
                 as MissingValuePolicy.MissingValuePolicy<T>;
 
-            return missingValuePolicy.FillData(signal, data).ToArray();
+            return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
         }
     }
 }
