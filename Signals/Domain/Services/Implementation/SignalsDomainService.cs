@@ -30,6 +30,8 @@ namespace Domain.Services.Implementation
         {
             var signal =  this.signalsRepository.Add(newSignal);
 
+            
+
             return signal;
         }
 

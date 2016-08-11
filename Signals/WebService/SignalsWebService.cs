@@ -118,8 +118,12 @@ namespace WebService
         {
             if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
 
-            else signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+            else SetMVP(signalId, policy);
         }
 
+        private void SetMVP(int signalId, MissingValuePolicy policy)
+        {
+            signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+        }
     }
 }
