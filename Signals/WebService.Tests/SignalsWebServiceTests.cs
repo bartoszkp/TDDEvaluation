@@ -481,25 +481,25 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenDataAndSignal_WhenSetData_VerifyIfAddedDatums_ForMonthGranularity()
+            public void GivenDataAndSignal_WhenSetData_VerifyIfAddedDatums_ForDayGranularity()
             {
                 int signalId = 6;
 
                 Dto.Datum[] settedData = new Dto.Datum[]{
-                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (decimal) 1},
-                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (decimal) 3}};
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double) 1},
+                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 3), Value = (double) 3}};
 
                 SetupWebService();
 
                 signalsRepositoryMock.Setup(srm => srm.Get(It.Is<int>(id => id == signalId)))
-                    .Returns(new Domain.Signal() { DataType = DataType.Decimal, Granularity = Granularity.Month });
+                    .Returns(new Domain.Signal() { DataType = DataType.Double, Granularity = Granularity.Day });
 
                 signalsWebService.SetData(signalId, settedData);
 
-                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<decimal>(It.Is<IEnumerable<Datum<decimal>>>(d => 
-                d.ElementAt(1).Timestamp == new DateTime(2000, 2, 1)
-                && d.ElementAt(1).Quality == Quality.None 
-                && d.ElementAt(1).Value == 0m)));
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d =>
+                d.ElementAt(1).Timestamp == new DateTime(2000, 1, 2)
+                && d.ElementAt(1).Quality == Quality.None
+                && d.ElementAt(1).Value == (double)0)));
             }
 
             [TestMethod]
