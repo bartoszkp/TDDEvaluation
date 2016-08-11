@@ -13,8 +13,8 @@ namespace ExampleSignalClient
             var newSignal = new Signal()
             {
                 DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy533" } }
+                Granularity = Granularity.Year,
+                Path = new Path() { Components = new[] { "root", "defaultPolicy534" } }
             };
 
             int signalId = client.Add(newSignal).Id.Value;
@@ -23,13 +23,13 @@ namespace ExampleSignalClient
 
             client.SetData(signalId, new Datum[]
             {
-                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 1), Value = (double)1.5 },
-                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 5, 1, 1, 1, 1), Value = (double)22 },
-                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 9, 1, 1, 1, 1), Value = (double)5 },
-                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 10, 1, 1, 1, 1), Value = (double)3}
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1), Value = (double)1.5 },
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 1), Value = (double)22 },
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2009, 1, 1, 1, 1, 1), Value = (double)5 },
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2010, 1, 1, 1, 1, 1), Value = (double)3}
             });
 
-            var result = client.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2007, 4, 1));
+            var result = client.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2015, 4, 1));
 
             foreach (var d in result)
             {
