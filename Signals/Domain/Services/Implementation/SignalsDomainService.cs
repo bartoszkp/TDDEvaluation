@@ -143,6 +143,24 @@ namespace Domain.Services.Implementation
                 }
             }
 
+            if (dataDomainList.First().Signal.Granularity == Granularity.Minute)
+            {
+                for (int i = 0; i < dataDomainList.Count - 1; i++)
+                {
+                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddMinutes(-1)) != 0)
+                    {
+                        missingDatas.Add(new Datum<T>()
+                        {
+                            Id = 0,
+                            Quality = Quality.None,
+                            Timestamp = dataDomainList[i].Timestamp.AddMinutes(1),
+                            Signal = dataDomainList[i].Signal,
+                            Value = default(T)
+                        });
+                    }
+                }
+            }
+
             if (dataDomainList.First().Signal.Granularity == Granularity.Day)
             {
                 for (int i = 0; i < dataDomainList.Count - 1; i++)
