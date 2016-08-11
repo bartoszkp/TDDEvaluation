@@ -51,6 +51,8 @@ namespace Domain.Services.Implementation
 
             var resultArray = result.ToArray();
 
+            SortArray(resultArray);
+
             return resultArray;
         }
 
@@ -97,6 +99,23 @@ namespace Domain.Services.Implementation
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
-        
+        private void SortArray<T>(Datum<T>[] array)
+        {
+            while (true)
+            {
+                bool changed = false;
+                for (int i = 0; i < array.Length - 1; i++)
+                {
+                    var tmp = array[i];
+                    if (array[i].Timestamp > array[i + 1].Timestamp)
+                    {
+                        array[i] = array[i + 1];
+                        array[i + 1] = tmp;
+                        changed = true;
+                    }
+                }
+                if (!changed) break;
+            }
+        }
     }
 }
