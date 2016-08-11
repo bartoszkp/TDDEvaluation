@@ -518,8 +518,6 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignalAndDatumWithMissingData_WhenGettingData_FilledDatumIsReturned()
             {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-
                 var existingSignal = new Signal()
                 {
                     Id = 1,
@@ -528,16 +526,12 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("root/signal1")
                 };
 
-                GivenASignal(existingSignal);
-
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                var existingDatum = new Datum<double>[]
+                var existingDatum = new Dto.Datum[]
                 {
-                    new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (double)1.5 },
-                    new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2001, 1, 1),  Value = (double)2.5 },
-                    new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1),  Value = (double)3.5 },
-                    new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2005, 1, 1),  Value = (double)4.5 }
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (double)1.5 },
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2001, 1, 1),  Value = (double)2.5 },
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2003, 1, 1),  Value = (double)3.5 },
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 1, 1),  Value = (double)4.5 }
                 };
 
                 var filledDatum = new Dto.Datum[]
@@ -550,24 +544,9 @@ namespace WebService.Tests
                     new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 1, 1),  Value = (double)4.5 }
                 };
 
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(filledDatum.ToDomain<IEnumerable<Domain.Datum<double>>>());
-
-                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-
-                missingValuePolicyRepositoryMock
-                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
-
-                var signalsDomainService = new SignalsDomainService(
-                    signalsRepositoryMock.Object,
-                    signalsDataRepositoryMock.Object,
-                    missingValuePolicyRepositoryMock.Object);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2006, 1, 1));
+                SetupGettingData<double>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+                
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2005, 1, 1));
 
                 AssertGettingGenericData(filledDatum, result);
             }
