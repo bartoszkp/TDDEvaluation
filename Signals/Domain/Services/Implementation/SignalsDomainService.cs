@@ -162,6 +162,24 @@ namespace Domain.Services.Implementation
                 }
             }
 
+            if (dataDomainList.First().Signal.Granularity == Granularity.Year)
+            {
+                for (int i = 0; i < dataDomainList.Count - 1; i++)
+                {
+                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddYears(-1)) != 0)
+                    {
+                        missingDatas.Add(new Datum<T>()
+                        {
+                            Id = 0,
+                            Quality = Quality.None,
+                            Timestamp = dataDomainList[i].Timestamp.AddYears(1),
+                            Signal = dataDomainList[i].Signal,
+                            Value = default(T)
+                        });
+                    }
+                }
+            }
+
             dataDomainList.AddRange(missingDatas);
             return dataDomainList;
         }
