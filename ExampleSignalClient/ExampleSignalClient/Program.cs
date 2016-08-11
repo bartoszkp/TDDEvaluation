@@ -14,7 +14,7 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy392" } }
+                Path = new Path() { Components = new[] { "root", "defaultPolicy507" } }
             };
 
             int signalId = client.Add(newSignal).Id.Value;
@@ -23,8 +23,10 @@ namespace ExampleSignalClient
 
             client.SetData(signalId, new Datum[]
             {
-                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 2), Value = (double)1.5 },
-                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 8), Value = (double)2.5 }
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 1), Value = (double)1.5 },
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 5), Value = (double)22 },
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 9), Value = (double)5 },
+                    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1, 1, 1, 10), Value = (double)3}
             });
 
             var result = client.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2007, 4, 1));
