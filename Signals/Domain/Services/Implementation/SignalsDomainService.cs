@@ -232,14 +232,21 @@ namespace Domain.Services.Implementation
                 {
                     if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddDays(-7)) != 0)
                     {
-                        missingDatas.Add(new Datum<T>()
+                        int addingAmountOfTime = 0;
+                        do
                         {
-                            Id = 0,
-                            Quality = Quality.None,
-                            Timestamp = dataDomainList[i].Timestamp.AddDays(7),
-                            Signal = dataDomainList[i].Signal,
-                            Value = default(T)
-                        });
+                            addingAmountOfTime += 7;
+
+                            missingDatas.Add(new Datum<T>()
+                            {
+                                Id = 0,
+                                Quality = Quality.None,
+                                Timestamp = dataDomainList[i].Timestamp.AddDays(addingAmountOfTime),
+                                Signal = dataDomainList[i].Signal,
+                                Value = default(T)
+                            });
+
+                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddDays(-7)) < 0);
                     }
                 }
             }
