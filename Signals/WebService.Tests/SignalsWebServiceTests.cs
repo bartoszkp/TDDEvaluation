@@ -481,26 +481,26 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenDataAndSignal_WhenSetData_VerifyIfAddedAllDatums_ForSecondGranularity()
+            public void GivenDataAndSignal_WhenSetData_VerifyIfAddedAllDatums_ForMinuteGranularity()
             {
                 int signalId = 6;
 
                 Dto.Datum[] settedData = new Dto.Datum[]{
                      new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1), Value = (double) 1},
-                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 1, 1, 4), Value = (double) 3}};
+                     new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 1, 4, 1), Value = (double) 3}};
 
                 SetupWebService();
 
                 signalsRepositoryMock.Setup(srm => srm.Get(It.Is<int>(id => id == signalId)))
-                    .Returns(new Domain.Signal() { DataType = DataType.Double, Granularity = Granularity.Second });
+                    .Returns(new Domain.Signal() { DataType = DataType.Double, Granularity = Granularity.Minute });
 
                 signalsWebService.SetData(signalId, settedData);
 
                 signalsDataRepositoryMock.Verify(sdr => sdr.SetData<double>(It.Is<IEnumerable<Datum<double>>>(d =>
-                d.ElementAt(1).Timestamp == new DateTime(2000, 1, 1, 1, 1, 2)
+                d.ElementAt(1).Timestamp == new DateTime(2000, 1, 1, 1, 2, 1)
                 && d.ElementAt(1).Quality == Quality.None
                 && d.ElementAt(1).Value == (double)0
-                && d.ElementAt(2).Timestamp == new DateTime(2000, 1, 1, 1, 1, 3)
+                && d.ElementAt(2).Timestamp == new DateTime(2000, 1, 1, 1, 3, 1)
                 && d.ElementAt(2).Quality == Quality.None
                 && d.ElementAt(2).Value == (double)0)));
             }
