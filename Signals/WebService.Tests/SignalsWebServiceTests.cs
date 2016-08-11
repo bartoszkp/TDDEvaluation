@@ -187,9 +187,6 @@ namespace WebService.Tests
                     .Returns(new Signal() { DataType = DataType.Double });
 
                 var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
-
-
-
             }
 
             [TestMethod]
@@ -205,10 +202,7 @@ namespace WebService.Tests
                 var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
 
                 Assert.IsTrue(item.Count() == 0);
-
-
             }
-
 
 
             private Dto.Signal SignalWith(
