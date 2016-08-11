@@ -516,28 +516,7 @@ namespace WebService.Tests
 
             // -------------------------------------------------------------------------------------------
 
-            [TestMethod]
-            public void GivenANewlyAddedSignal_WhileAddingThatSignal_WasCalledSetMissingValuePolicyMethod()
-            {
-                var dummySignal = new Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Boolean,
-                    Granularity = Granularity.Hour,
-                    Path = Path.FromString("root/signal1")
-                };
-                var signalsRepositoryMock = new Mock<ISignalsRepository>();
-                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
-                var signalsWebService = new SignalsWebService(signalsDomainService);
-                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == dummySignal.Id.Value))).Returns(dummySignal);
-
-                signalsWebService.Add(dummySignal.ToDto<Dto.Signal>());
-
-                missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set
-                    (It.Is<Signal>(signal => signal.Id == dummySignal.Id && signal.DataType == dummySignal.DataType &&
-                         signal.Granularity == dummySignal.Granularity && signal.Path.Equals(dummySignal.Path)), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
-            }
+           
 
         }
     }
