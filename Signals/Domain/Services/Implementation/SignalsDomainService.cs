@@ -30,7 +30,28 @@ namespace Domain.Services.Implementation
         {
             var signal =  this.signalsRepository.Add(newSignal);
 
-            
+            var typeOfSignal = signal.DataType;
+
+            switch (typeOfSignal)
+            {
+                case DataType.Boolean:
+                    missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>());
+                    break;
+                case DataType.Integer:
+                    missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
+                    break;
+                case DataType.Double:
+                    missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>());
+                    break;
+                case DataType.Decimal:
+                    missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>());
+                    break;
+                case DataType.String:
+                    missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>());
+                    break;
+                default:
+                    break;
+            }
 
             return signal;
         }
