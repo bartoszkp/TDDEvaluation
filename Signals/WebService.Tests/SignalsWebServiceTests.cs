@@ -60,6 +60,24 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenNoSignals_WhenAddingSignal_SetsNoneQualityMissingValuePolicyForIt()
+            {
+                GivenNoSignals();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => new Signal() { Id = 1, DataType = s.DataType, Granularity = s.Granularity, Path = s.Path });
+                
+                var sig = signalsWebService.Add(new Dto.Signal() {
+                    DataType = Dto.DataType.Double,
+                    Granularity = Dto.Granularity.Month,
+                    Path = new Dto.Path() { Components = new[] { "root", "signal" } }
+                    });
+
+                missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenGettingById_ReturnsNull()
             {
                 GivenNoSignals();
