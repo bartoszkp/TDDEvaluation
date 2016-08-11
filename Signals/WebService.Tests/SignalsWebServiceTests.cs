@@ -315,7 +315,7 @@ namespace WebService.Tests
 
                 signalsDataRepositoryMock
                     .Setup(srm => srm.GetData<int>(signal, fromIncludedDate, toExcludedDate))
-                    .Returns(data);
+                    .Returns(sorted);
 
                 signalsRepositoryMock
                     .Setup(srm => srm.Add(signal))

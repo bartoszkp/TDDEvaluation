@@ -190,7 +190,9 @@ namespace WebService
 
                 IEnumerable<Domain.Datum<bool>> domainData = domainDatumList.AsEnumerable<Domain.Datum<bool>>();
 
-                signalsDomainService.SetData(signalId, domainData);
+                var sortedDomainData = domainData.OrderBy(d => d.Timestamp).AsEnumerable<Domain.Datum<bool>>();
+
+                signalsDomainService.SetData(signalId, sortedDomainData);
             }
             else if(signal.DataType == Dto.DataType.Decimal)
             {
@@ -209,7 +211,9 @@ namespace WebService
 
                 IEnumerable<Domain.Datum<decimal>> domainData = domainDatumList.AsEnumerable<Domain.Datum<decimal>>();
 
-                signalsDomainService.SetData(signalId, domainData);
+                var sortedDomainData = domainData.OrderBy(d => d.Timestamp).AsEnumerable<Domain.Datum<decimal>>();
+
+                signalsDomainService.SetData(signalId, sortedDomainData);
             }
             else if(signal.DataType == Dto.DataType.Double)
             {
@@ -228,7 +232,9 @@ namespace WebService
 
                 IEnumerable<Domain.Datum<double>> domainData = domainDatumList.AsEnumerable<Domain.Datum<double>>();
 
-                signalsDomainService.SetData(signalId, domainData);
+                var sortedDomainData = domainData.OrderBy(d => d.Timestamp).AsEnumerable<Domain.Datum<double>>();
+
+                signalsDomainService.SetData(signalId, sortedDomainData);
             }
             else if (signal.DataType == Dto.DataType.Integer)
             {
@@ -247,7 +253,9 @@ namespace WebService
 
                 IEnumerable<Domain.Datum<int>> domainData = domainDatumList.AsEnumerable<Domain.Datum<int>>();
 
-                signalsDomainService.SetData(signalId, domainData);
+                var sortedDomainData = domainData.OrderBy(d => d.Timestamp).AsEnumerable<Domain.Datum<int>>();
+
+                signalsDomainService.SetData(signalId, sortedDomainData);
             }
             else if (signal.DataType == Dto.DataType.String)
             {
@@ -266,7 +274,9 @@ namespace WebService
 
                 IEnumerable<Domain.Datum<string>> domainData = domainDatumList.AsEnumerable<Domain.Datum<string>>();
 
-                signalsDomainService.SetData(signalId, domainData);
+                var sortedDomainData = domainData.OrderBy(d => d.Timestamp).AsEnumerable<Domain.Datum<string>>();
+
+                signalsDomainService.SetData(signalId, sortedDomainData);
             }
         }
 
