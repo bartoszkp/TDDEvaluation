@@ -223,8 +223,6 @@ namespace WebService.Tests
                 var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
                 Assert.AreEqual(item.First().Timestamp, dbList[1].Timestamp);
-
-
             }
 
             private Dto.Signal SignalWith(

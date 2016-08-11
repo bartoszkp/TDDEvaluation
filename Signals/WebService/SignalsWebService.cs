@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.MissingValuePolicy;
 
 namespace WebService
 {
