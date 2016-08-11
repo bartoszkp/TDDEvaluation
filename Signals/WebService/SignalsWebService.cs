@@ -67,40 +67,42 @@ namespace WebService
             if (signal == null)
                 throw new InvalidOperationException("Signal dosen't exist");
 
-            switch(signal.DataType)
+            switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
                     {
-                        var listOfItems = this.signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .ToDto<IEnumerable<Datum>>();
-                        return listOfItems;
+                        var item = signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.Decimal:
                     {
-                        var listOfItems = this.signalsDomainService.GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .ToDto<IEnumerable<Datum>>();
-                        return listOfItems;
+                        var item = signalsDomainService.GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.Double:
                     {
-                        var listOfItems = this.signalsDomainService.GetData<double>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .ToDto<IEnumerable<Datum>>();
-                        return listOfItems;
+                        var item = signalsDomainService.GetData<double>(signalId, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.Integer:
                     {
-                        var listOfItems = this.signalsDomainService.GetData<int>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .ToDto<IEnumerable<Datum>>();
-                        return listOfItems;
+                        var item = signalsDomainService.GetData<int>(signalId, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 case Domain.DataType.String:
                     {
-                        var listOfItems = this.signalsDomainService.GetData<string>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .ToDto<IEnumerable<Datum>>();
-                        return listOfItems;
+                        var item = signalsDomainService.GetData<string>(signalId, fromIncludedUtc, toExcludedUtc)
+                            .ToList();
+                        return item?.ToDto<IEnumerable<Dto.Datum>>();
                     }
                 default:
-                    return null;
+                    {
+                        return null;
+                    }
             }
         }
 

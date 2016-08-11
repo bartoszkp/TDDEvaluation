@@ -83,7 +83,8 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = this.GetById(signalId);
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            return data;
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> domianModel)
