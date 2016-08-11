@@ -357,28 +357,13 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignal_WhenGettingData_ReturnsCompletedData_WithFilledMissingData()
             {
-                var domainSignal = new Domain.Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Boolean,
-                    Granularity = Granularity.Day,
-                    Path = Domain.Path.FromString("path"),
-                };
-                prepareDataRepository(domainSignal.Id.Value, domainSignal);
-
                 var from = new DateTime(2000, 1, 1, 4, 30, 30);
                 var to = new DateTime(2000, 1, 4, 4, 30, 30);
 
                 var expectedResult = new List<Dto.Datum>();
                 expectedResult = prepareExpectedResult();
 
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<bool>(domainSignal, from, to))
-                    .Returns(expectedResult.ToDomain<IEnumerable<Datum<bool>>>);
-
-                signalsRepositoryMock
-                    .Setup(srm => srm.Get(It.IsAny<int>()))
-                    .Returns(domainSignal);
+                SetupGetRepositories(from, to, expectedResult);
 
                 var result = signalsWebService.GetData(1, from, to);
 
@@ -390,6 +375,26 @@ namespace WebService.Tests
                     Assert.AreEqual(expectedResult[i].Value, d.Value);
                     ++i;
                 }
+            }
+
+            private void SetupGetRepositories(DateTime fromIncluded, DateTime toExcluded, List<Dto.Datum> expectedResult)
+            {
+                var domainSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("path"),
+                };
+                prepareDataRepository(domainSignal.Id.Value, domainSignal);
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<bool>(domainSignal, fromIncluded, toExcluded))
+                    .Returns(expectedResult.ToDomain<IEnumerable<Datum<bool>>>);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(It.IsAny<int>()))
+                    .Returns(domainSignal);
             }
 
             private List<Dto.Datum> prepareExpectedResult()
