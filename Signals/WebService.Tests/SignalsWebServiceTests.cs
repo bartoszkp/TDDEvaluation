@@ -546,7 +546,7 @@ namespace WebService.Tests
                     new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2001, 1, 1),  Value = (double)2.5 },
                     new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2002, 1, 1),  Value = default(double)},
                     new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2003, 1, 1),  Value = (double)3.5 },
-                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1),  Value = default(double)},
+                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2004, 1, 1),  Value = default(double)},
                     new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 1, 1),  Value = (double)4.5 }
                 };
 
@@ -554,7 +554,16 @@ namespace WebService.Tests
                     .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(filledDatum.ToDomain<IEnumerable<Domain.Datum<double>>>());
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
