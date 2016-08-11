@@ -127,11 +127,30 @@ namespace Domain.Services.Implementation
             List<Datum<T>> sortedDatumsList = new List<Datum<T>>();
             sortedDatumsList = sortedDatums.ToList();
 
+            List<Datum<T>> sortedDatumsListToReturn = new List<Datum<T>>();
+            sortedDatumsListToReturn = sortedDatums.ToList();
+
             List<Datum<T>> newList = new List<Datum<T>>();
 
             if (granularity == Granularity.Year)
             {
                 int yearsDifference = (toExcludedUtc.Year - fromIncludedUtc.Year);
+
+                if (sortedDatumsList.Count == 0)
+                {
+                    for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;
+                        currentDate = currentDate.AddYears(1))
+                    {
+                        Datum<T> datumToAdd = new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = currentDate,
+                        };
+
+                        sortedDatumsList.Add(datumToAdd);
+                    }
+                }
 
                 if (yearsDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
                 {
@@ -139,19 +158,21 @@ namespace Domain.Services.Implementation
                 }
                 else
                 {
-                    for(int index = 0, currentYear = fromIncludedUtc.Year; currentYear < toExcludedUtc.Year;
-                        index++, currentYear++)
+                    DateTime currentDate = fromIncludedUtc;
+                    for(int index = 0; currentDate < toExcludedUtc;
+                        index++, currentDate = currentDate.AddYears(1))
                     {
-                        if (sortedDatumsList[index].Timestamp.Year != currentYear)
+                        if (index == sortedDatumsList.Count)
+                            sortedDatumsList.Add(new Datum<T>());
+
+                        if (sortedDatumsList[index].Timestamp.Year != currentDate.Year)
                         {
                             Datum<T> datumToAdd = new Datum<T>()
                             {
                                 Quality = Quality.None,
                                 Value = default(T),
-                                Timestamp = fromIncludedUtc,
+                                Timestamp = currentDate,
                             };
-
-                            datumToAdd.Timestamp = new DateTime(currentYear, fromIncludedUtc.Month, fromIncludedUtc.Day, fromIncludedUtc.Hour, fromIncludedUtc.Minute, fromIncludedUtc.Second);
 
                             newList.Add(datumToAdd);
                             index--;
@@ -161,7 +182,23 @@ namespace Domain.Services.Implementation
             }
             else if (granularity == Granularity.Month)
             {
-                int monthsDifference = (toExcludedUtc.Month - fromIncludedUtc.Month);
+                int monthsDifference = (toExcludedUtc.Year - fromIncludedUtc.Year) * 12 + (toExcludedUtc.Month - fromIncludedUtc.Month);
+
+                if (sortedDatumsList.Count == 0)
+                {
+                    for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;
+                        currentDate = currentDate.AddMonths(1))
+                    {
+                        Datum<T> datumToAdd = new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = currentDate,
+                        };
+
+                        sortedDatumsList.Add(datumToAdd);
+                    }
+                }
 
                 if (monthsDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
                 {
@@ -169,19 +206,21 @@ namespace Domain.Services.Implementation
                 }
                 else
                 {
-                    for (int index = 0, currentMonth = fromIncludedUtc.Month; currentMonth < toExcludedUtc.Month;
-                        index++, currentMonth++)
+                    DateTime currentDate = fromIncludedUtc;
+                    for (int index = 0; currentDate < toExcludedUtc;
+                        index++, currentDate = currentDate.AddMonths(1))
                     {
-                        if (sortedDatumsList[index].Timestamp.Month != currentMonth)
+                        if (index == sortedDatumsList.Count)
+                            sortedDatumsList.Add(new Datum<T>());
+
+                        if (sortedDatumsList[index].Timestamp != currentDate)
                         {
                             Datum<T> datumToAdd = new Datum<T>()
                             {
                                 Quality = Quality.None,
                                 Value = default(T),
-                                Timestamp = fromIncludedUtc,
+                                Timestamp = currentDate,
                             };
-
-                            datumToAdd.Timestamp = new DateTime(fromIncludedUtc.Year, currentMonth, fromIncludedUtc.Day, fromIncludedUtc.Hour, fromIncludedUtc.Minute, fromIncludedUtc.Second);
 
                             newList.Add(datumToAdd);
                             index--;
@@ -191,31 +230,93 @@ namespace Domain.Services.Implementation
             }
             else if (granularity == Granularity.Week)
             {
-                
-            }
-            else if (granularity == Granularity.Day)
-            {
-                int daysDifference = (toExcludedUtc.Day - fromIncludedUtc.Day);
+                double weeksDifference = ((toExcludedUtc - fromIncludedUtc).TotalDays) / 7.0;
 
-                if (daysDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
+                if (sortedDatumsList.Count == 0)
+                {
+                    for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;
+                        currentDate = currentDate = currentDate.AddDays(7))
+                    {
+                        Datum<T> datumToAdd = new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = currentDate,
+                        };
+
+                        sortedDatumsList.Add(datumToAdd);
+                    }
+                }
+
+                if (Math.Ceiling(weeksDifference) == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
                 {
                     return sortedDatums;
                 }
                 else
                 {
-                    for (int index = 0, currentDay = fromIncludedUtc.Day; currentDay < toExcludedUtc.Day;
-                        index++, currentDay++)
+                    DateTime currentDate = fromIncludedUtc;
+                    for (int index = 0; currentDate < toExcludedUtc;
+                        index++, currentDate = currentDate.AddDays(7))
                     {
-                        if (sortedDatumsList[index].Timestamp.Day != currentDay)
+                        if (index == sortedDatumsList.Count)
+                            sortedDatumsList.Add(new Datum<T>());
+
+                        if (sortedDatumsList[index].Timestamp != currentDate)
                         {
                             Datum<T> datumToAdd = new Datum<T>()
                             {
                                 Quality = Quality.None,
                                 Value = default(T),
-                                Timestamp = fromIncludedUtc,
+                                Timestamp = currentDate,
                             };
 
-                            datumToAdd.Timestamp = new DateTime(fromIncludedUtc.Year, fromIncludedUtc.Month, currentDay, fromIncludedUtc.Hour, fromIncludedUtc.Minute, fromIncludedUtc.Second);
+                            newList.Add(datumToAdd);
+                            index--;
+                        }
+                    }
+                }
+            }
+            else if (granularity == Granularity.Day)
+            {
+                double daysDifference = (toExcludedUtc - fromIncludedUtc).TotalDays;
+
+                if (sortedDatumsList.Count == 0)
+                {
+                    for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;
+                        currentDate = currentDate.AddDays(1))
+                    {
+                        Datum<T> datumToAdd = new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = currentDate,
+                        };
+
+                        sortedDatumsList.Add(datumToAdd);
+                    }
+                }
+
+                if ((int)daysDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
+                {
+                    return sortedDatums;
+                }
+                else
+                {
+                    DateTime currentDate = fromIncludedUtc;
+                    for (int index = 0; currentDate < toExcludedUtc;
+                        index++, currentDate = currentDate.AddDays(1))
+                    {
+                        if (index == sortedDatumsList.Count)
+                            sortedDatumsList.Add(new Datum<T>());
+
+                        if (sortedDatumsList[index].Timestamp != currentDate)
+                        {
+                            Datum<T> datumToAdd = new Datum<T>()
+                            {
+                                Quality = Quality.None,
+                                Value = default(T),
+                                Timestamp = currentDate,
+                            };
 
                             newList.Add(datumToAdd);
                             index--;
@@ -225,27 +326,46 @@ namespace Domain.Services.Implementation
             }
             else if (granularity == Granularity.Hour)
             {
-                int hoursDifference = (toExcludedUtc.Hour - fromIncludedUtc.Hour);
+                double hoursDifference = (toExcludedUtc - fromIncludedUtc).TotalHours;
 
-                if (hoursDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
+                if ((int)hoursDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
                 {
                     return sortedDatums;
                 }
+
+                if (sortedDatumsList.Count == 0)
+                {
+                    for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;
+                        currentDate = currentDate.AddHours(1))
+                    {
+                        Datum<T> datumToAdd = new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = currentDate,
+                        };
+
+                        sortedDatumsList.Add(datumToAdd);
+                    }
+                }
+
                 else
                 {
-                    for (int index = 0, currentHour = fromIncludedUtc.Hour; currentHour < toExcludedUtc.Hour;
-                        index++, currentHour++)
+                    DateTime currentDate = fromIncludedUtc;
+                    for (int index = 0; currentDate < toExcludedUtc;
+                        index++, currentDate = currentDate.AddHours(1.0))
                     {
-                        if (sortedDatumsList[index].Timestamp.Hour != currentHour)
+                        if (index == sortedDatumsList.Count)
+                            sortedDatumsList.Add(new Datum<T>());
+
+                        if (sortedDatumsList[index].Timestamp != currentDate)
                         {
                             Datum<T> datumToAdd = new Datum<T>()
                             {
                                 Quality = Quality.None,
                                 Value = default(T),
-                                Timestamp = fromIncludedUtc,
+                                Timestamp = currentDate,
                             };
-
-                            datumToAdd.Timestamp = new DateTime(fromIncludedUtc.Year, fromIncludedUtc.Month, fromIncludedUtc.Day, currentHour, fromIncludedUtc.Minute, fromIncludedUtc.Second);
 
                             newList.Add(datumToAdd);
                             index--;
@@ -255,27 +375,45 @@ namespace Domain.Services.Implementation
             }
             else if (granularity == Granularity.Minute)
             {
-                int minutesDifference = (toExcludedUtc.Minute - fromIncludedUtc.Minute);
+                double minutesDifference = (toExcludedUtc - fromIncludedUtc).TotalMinutes;
 
-                if (minutesDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
+                if (sortedDatumsList.Count == 0)
+                {
+                    for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;
+                        currentDate = currentDate.AddMinutes(1))
+                    {
+                        Datum<T> datumToAdd = new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = currentDate,
+                        };
+
+                        sortedDatumsList.Add(datumToAdd);
+                    }
+                }
+
+                if ((int)minutesDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
                 {
                     return sortedDatums;
                 }
                 else
                 {
-                    for (int index = 0, currentMinute = fromIncludedUtc.Minute; currentMinute < toExcludedUtc.Minute;
-                        index++, currentMinute++)
+                    DateTime currentDate = fromIncludedUtc;
+                    for (int index = 0; currentDate < toExcludedUtc;
+                        index++, currentDate = currentDate.AddMinutes(1.0))
                     {
-                        if (sortedDatumsList[index].Timestamp.Minute != currentMinute)
+                        if (index == sortedDatumsList.Count)
+                            sortedDatumsList.Add(new Datum<T>());
+
+                        if (sortedDatumsList[index].Timestamp != currentDate)
                         {
                             Datum<T> datumToAdd = new Datum<T>()
                             {
                                 Quality = Quality.None,
                                 Value = default(T),
-                                Timestamp = fromIncludedUtc,
+                                Timestamp = currentDate,
                             };
-
-                            datumToAdd.Timestamp = new DateTime(fromIncludedUtc.Year, fromIncludedUtc.Month, fromIncludedUtc.Day, fromIncludedUtc.Hour, currentMinute, fromIncludedUtc.Second);
 
                             newList.Add(datumToAdd);
                             index--;
@@ -285,27 +423,45 @@ namespace Domain.Services.Implementation
             }
             else if (granularity == Granularity.Second)
             {
-                int secondsDifference = (toExcludedUtc.Second - fromIncludedUtc.Second);
+                double secondsDifference = (toExcludedUtc - fromIncludedUtc).TotalSeconds;
 
-                if (secondsDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
+                if (sortedDatumsList.Count == 0)
+                {
+                    for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;
+                        currentDate = currentDate.AddSeconds(1))
+                    {
+                        Datum<T> datumToAdd = new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Value = default(T),
+                            Timestamp = currentDate,
+                        };
+
+                        sortedDatumsList.Add(datumToAdd);
+                    }
+                }
+
+                if ((int)secondsDifference == sortedDatumsList.Count() && sortedDatumsList[0].Timestamp == fromIncludedUtc)
                 {
                     return sortedDatums;
                 }
                 else
                 {
-                    for (int index = 0, currentSecond = fromIncludedUtc.Second; currentSecond < toExcludedUtc.Second;
-                        index++, currentSecond++)
+                    DateTime currentDate = fromIncludedUtc;
+                    for (int index = 0; currentDate < toExcludedUtc;
+                        index++, currentDate = currentDate.AddSeconds(1.0))
                     {
-                        if (sortedDatumsList[index].Timestamp.Second != currentSecond)
+                        if (index == sortedDatumsList.Count)
+                            sortedDatumsList.Add(new Datum<T>());
+
+                        if (sortedDatumsList[index].Timestamp!= currentDate)
                         {
                             Datum<T> datumToAdd = new Datum<T>()
                             {
                                 Quality = Quality.None,
                                 Value = default(T),
-                                Timestamp = fromIncludedUtc,
+                                Timestamp = currentDate,
                             };
-
-                            datumToAdd.Timestamp = new DateTime(fromIncludedUtc.Year, fromIncludedUtc.Month, fromIncludedUtc.Day, fromIncludedUtc.Hour, fromIncludedUtc.Minute, currentSecond);
 
                             newList.Add(datumToAdd);
                             index--;
@@ -314,8 +470,8 @@ namespace Domain.Services.Implementation
                 }
             }
 
-            sortedDatumsList.AddRange(newList);
-            return sortedDatumsList.OrderBy(datum => datum.Timestamp);
+            sortedDatumsListToReturn.AddRange(newList);
+            return sortedDatumsListToReturn.OrderBy(datum => datum.Timestamp);
         }
     }
 }
