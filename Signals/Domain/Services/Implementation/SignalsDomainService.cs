@@ -145,7 +145,7 @@ namespace Domain.Services.Implementation
                                 Value = default(T)
                             });
 
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddSeconds(-1)) != 0);
+                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddSeconds(-1)) < 0);
 
                     }
                 }
