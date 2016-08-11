@@ -80,25 +80,13 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void SetData(int signalId, IEnumerable<Datum<double>> dataDomain)
-        {
-            var signal = this.signalsRepository.Get(signalId);
-
-            foreach (var item in dataDomain)
-            {
-                item.Signal = signal;
-            }
-
-            this.signalsDataRepository.SetData<double>(dataDomain);
-        }
-
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = this.GetById(signalId);
             return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
         }
 
-        public void SetData<T>(List<Datum<T>> domianModel)
+        public void SetData<T>(IEnumerable<Datum<T>> domianModel)
         {
             signalsDataRepository.SetData(domianModel);
         }

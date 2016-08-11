@@ -5,6 +5,8 @@ using Domain.Services.Implementation;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -114,6 +116,101 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(InvalidOperationException))]
+            public void EmptyRepository_SetData_SignalDesentExistException()
+            {
+                GiveNoSignalData();
+
+                signalsWebService.SetData(1, new List<Dto.Datum>());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(InvalidOperationException))]
+            public void EmptyRepository_GetData_SignalDesentExistException()
+            {
+                GiveNoSignalData();
+
+                signalsWebService.GetData(1, new DateTime(), new DateTime());
+            }
+
+
+            [TestMethod]
+            public void RepositoryWithSignal_SetData_DataSaved()
+            {
+                GiveNoSignalData();
+
+                var item = new List<Dto.Datum>()
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = 1.0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = 2.0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = 3.0 }
+                };
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                    .Returns(new Signal() { DataType = DataType.Double });
+
+
+                
+
+                signalsWebService.SetData(1, item);
+
+                signalDataRepositoryMock.Verify(x => x.SetData<double>(
+                    It.Is<IEnumerable<Datum<double>>>(d => DataDtoCompareDouble(d))));
+
+            }
+
+            private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
+            {
+                var list = data.ToList();
+                if (list[0].Value == 1 && list[1].Value == 2 & list[2].Value == 3)
+                    return true;
+                else
+                    return false;
+            }
+
+  
+
+            [TestMethod]
+            public void RepositoryWithSignalAndData_GetData_DataReturned()
+            {
+                GiveNoSignalData();
+
+                signalDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<Datum<double>>()
+                    {
+                        new Datum<double>(),
+                        new Datum<double>()
+                    });
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                    .Returns(new Signal() { DataType = DataType.Double });
+
+                var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
+
+
+
+            }
+
+            [TestMethod]
+            public void RepositoryWithSignalAndNoData_GetData_ReturnEmptyCollection()
+            {
+                GiveNoSignalData();
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                    .Returns(new Signal() { DataType = DataType.Double });
+
+
+
+                var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
+
+                Assert.IsTrue(item.Count() == 0);
+
+
+            }
+
+
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
@@ -144,6 +241,15 @@ namespace WebService.Tests
                 };
             }
 
+            private void GiveNoSignalData()
+            {
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDomianService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalDomianService);
+            }
+
+
             private void GivenNoSignals()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -173,6 +279,7 @@ namespace WebService.Tests
 
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
+            private Mock<ISignalsDataRepository> signalDataRepositoryMock;
         }
     }
 }

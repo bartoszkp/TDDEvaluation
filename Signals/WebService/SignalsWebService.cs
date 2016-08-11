@@ -64,6 +64,9 @@ namespace WebService
         {
             var signal = this.signalsDomainService.GetById(signalId);
 
+            if (signal == null)
+                throw new InvalidOperationException("Signal dosen't exist");
+
             switch(signal.DataType)
             {
                 case Domain.DataType.Boolean:
@@ -104,6 +107,8 @@ namespace WebService
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var signal = signalsDomainService.GetById(signalId);
+            if (signal == null)
+                throw new InvalidOperationException("Signal dosen't exist");
 
             switch (signal.DataType)
             {
