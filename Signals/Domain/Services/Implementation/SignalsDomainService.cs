@@ -77,7 +77,8 @@ namespace Domain.Services.Implementation
         {
             List<Datum<T>> dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToList();          
 
-            dataDomainOrderedList = AddMissingData(dataDomainOrderedList);
+            if(dataDomain.Count() > 1)
+                dataDomainOrderedList = AddMissingData(dataDomainOrderedList);
 
             this.signalsDataRepository.SetData<T>(dataDomainOrderedList);
         }
