@@ -334,27 +334,27 @@ namespace WebService.Tests
 
                 CollectionAssert.AreEqual(sorted, result.ToList<Datum<int>>());
             }
-
+            
             private void SetupData(List<Domain.Datum<int>> data)
             {
                 data.Add(new Domain.Datum<int>()
                 {
                     Quality = Domain.Quality.Fair,
-                    Timestamp = new DateTime(2000, 2, 2),
+                    Timestamp = new DateTime(2000, 4, 4),
                     Value = 12,
                 });
 
                 data.Add(new Domain.Datum<int>()
                 {
                     Quality = Domain.Quality.Good,
-                    Timestamp = new DateTime(2000, 2, 3),
+                    Timestamp = new DateTime(2000, 3, 3),
                     Value = 10,
                 });
 
                 data.Add(new Domain.Datum<int>()
                 {
                     Quality = Domain.Quality.Poor,
-                    Timestamp = new DateTime(2000, 2, 4),
+                    Timestamp = new DateTime(2000, 2, 2),
                     Value = 14,
                 });
             }
