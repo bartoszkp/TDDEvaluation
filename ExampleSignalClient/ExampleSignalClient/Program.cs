@@ -14,7 +14,7 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy384" } }
+                Path = new Path() { Components = new[] { "root", "defaultPolicy385" } }
             };
 
             int signalId = client.Add(newSignal).Id.Value;

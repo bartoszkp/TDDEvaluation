@@ -114,8 +114,17 @@ namespace Domain.Services.Implementation
         }
         
         private List<Datum<T>> AddMissingData<T>(List<Datum<T>> dataDomainList)
+        {       
+            dataDomainList = AddDataDependOnGranurality(dataDomainList);
+
+            return dataDomainList.OrderBy( l => l.Timestamp).ToList();
+        }
+
+
+        private List<Datum<T>> AddDataDependOnGranurality<T>(List<Datum<T>> dataDomainList)
         {
             List<Datum<T>> missingDatas = new List<Datum<T>>();
+
 
             if (dataDomainList.First().Signal.Granularity == Granularity.Day)
             {
@@ -154,7 +163,7 @@ namespace Domain.Services.Implementation
             }
 
             dataDomainList.AddRange(missingDatas);
-            return dataDomainList.OrderBy( l => l.Timestamp).ToList();
+            return dataDomainList;
         }
     }
 }
