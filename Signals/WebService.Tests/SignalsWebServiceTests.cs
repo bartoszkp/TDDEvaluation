@@ -203,7 +203,29 @@ namespace WebService.Tests
 
                 Assert.IsTrue(item.Count() == 0);
             }
+            [TestMethod]
+            public void RepositoryWithSignalAndData_GetData_ReturnSortedCollection()
+            {
+                GiveNoSignalData();
 
+                var dbList = new List<Datum<double>>()
+                {
+                        new Datum<double>() { Timestamp = new DateTime(2000, 2, 1) },
+                        new Datum<double>() { Timestamp = new DateTime(2000, 1, 1) }
+                };
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                    .Returns(new Signal() { DataType = DataType.Double });
+
+                signalDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(dbList);
+
+                var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                Assert.AreEqual(item.First().Timestamp, dbList[1].Timestamp);
+
+
+            }
 
             private Dto.Signal SignalWith(
                 int? id = null,
