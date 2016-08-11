@@ -6,6 +6,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
+using System;
 
 namespace WebService.Tests
 {
@@ -254,15 +255,14 @@ namespace WebService.Tests
                 prepareDataRepository(signal.Id.Value, signal);
                 var enumerable = new Dto.Datum[] {
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1), Value = (double)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 2, 1), Value = (double)1.5 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new System.DateTime(2000, 3, 1), Value = (double)2 } };
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 8), Value = (double)1.5 }};
                 signalsDataRepositoryMock
                     .Setup(sdr => sdr.GetData<double>(
                         It.Is<Domain.Signal>(s => s == signal),
-                        It.Is<System.DateTime>(dt => dt == System.DateTime.MinValue),
-                        It.Is<System.DateTime>(dt => dt == System.DateTime.Today)))
+                        It.Is<System.DateTime>(dt => dt == new DateTime(2000, 1, 1)),
+                        It.Is<System.DateTime>(dt => dt == new DateTime(2000, 1, 15))))
                     .Returns(enumerable.ToDomain<System.Collections.Generic.IEnumerable<Datum<double>>>);
-                var result = signalsWebService.GetData(signal.Id.Value, System.DateTime.MinValue, System.DateTime.Today);
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 15));
                 
                 int i = 0;
                 foreach (var d in result)
