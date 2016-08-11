@@ -354,6 +354,69 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
             }
 
+            [TestMethod]
+            public void GivenNoSignal_WhenGettingData_ReturnsCompletedData_WithFilledMissingData()
+            {
+                var domainSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("path"),
+                };
+                prepareDataRepository(domainSignal.Id.Value, domainSignal);
+
+                var from = new DateTime(2000, 1, 1, 4, 30, 30);
+                var to = new DateTime(2000, 1, 4, 4, 30, 30);
+
+                var expectedResult = new List<Dto.Datum>();
+                expectedResult = prepareExpectedResult();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<bool>(domainSignal, from, to))
+                    .Returns(expectedResult.ToDomain<IEnumerable<Datum<bool>>>);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(It.IsAny<int>()))
+                    .Returns(domainSignal);
+
+                var result = signalsWebService.GetData(1, from, to);
+
+                int i = 0;
+                foreach (var d in result)
+                {
+                    Assert.AreEqual(expectedResult[i].Quality, d.Quality);
+                    Assert.AreEqual(expectedResult[i].Timestamp, d.Timestamp);
+                    Assert.AreEqual(expectedResult[i].Value, d.Value);
+                    ++i;
+                }
+            }
+
+            private List<Dto.Datum> prepareExpectedResult()
+            {
+                List<Dto.Datum> toReturn = new List<Dto.Datum>();
+                toReturn.Add(new Dto.Datum()
+                {
+                    Quality = Dto.Quality.Good,
+                    Timestamp = new DateTime(2000, 1, 1, 4, 30, 30),
+                    Value = false,
+                });
+                toReturn.Add(new Dto.Datum()
+                {
+                    Quality = Dto.Quality.Fair,
+                    Timestamp = new DateTime(2000, 1, 2, 4, 30, 30),
+                    Value = false,
+                });
+                toReturn.Add(new Dto.Datum()
+                {
+                    Quality = Dto.Quality.Good,
+                    Timestamp = new DateTime(2000, 1, 3, 4, 30, 30),
+                    Value = false,
+                });
+
+                return toReturn;
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
