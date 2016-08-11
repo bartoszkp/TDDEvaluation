@@ -16,6 +16,37 @@ namespace WebService.Tests
         [TestClass]
         public class SignalsWebServiceTests
         {
+
+            [TestMethod]
+            public void GivenSignalWithDataSetNotInDateOrder_WhenGettingDataOfTheSignal_ReturnedIsSortedArray()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("root/signal")
+                };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(dummySignal.Id.Value)).Returns(dummySignal);                
+
+                signalsDataRepositoryMock.Setup(sdr => sdr.GetData<double>(
+                    It.Is<Signal>(s => s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path)),
+                    It.Is<DateTime>(dt => dt.Year==2000 && dt.Month == 1 && dt.Day == 1), It.Is<DateTime>(dt => dt.Year == 2000 && dt.Month == 3 && dt.Day == 1)))
+                .Returns(new Datum<double>[]
+                { new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)1 },
+                  new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 }});
+
+                var result = signalsWebService.GetData(dummySignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                Assert.AreEqual(new DateTime(2000,1,1), result.ToArray()[0].Timestamp);
+                Assert.AreEqual(new DateTime(2000,2,1), result.ToArray()[1].Timestamp);
+            }
+
             // -------------------------------------------------------------------------------------------
             // 1st Iteration:
             // -------------------------------------------------------------------------------------------
@@ -516,8 +547,7 @@ namespace WebService.Tests
 
             // -------------------------------------------------------------------------------------------
 
-           
-
+            
         }
     }
 }

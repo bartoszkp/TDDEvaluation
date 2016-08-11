@@ -49,7 +49,9 @@ namespace Domain.Services.Implementation
 
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            return result.ToArray();
+            var resultArray = result.ToArray();
+
+            return resultArray;
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable)
@@ -95,5 +97,6 @@ namespace Domain.Services.Implementation
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
+        
     }
 }
