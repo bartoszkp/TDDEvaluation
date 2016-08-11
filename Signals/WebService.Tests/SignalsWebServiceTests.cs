@@ -272,6 +272,69 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(data, result.ToList<Datum<int>>());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_ReturnsCorrectDataWchihIsSorted()
+            {
+                MockSetup();
+
+                List<Domain.Datum<int>> data = new List<Domain.Datum<int>>();
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Fair,
+                    Timestamp = new DateTime(2000, 4, 4),
+                    Value = 12,
+                });
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Good,
+                    Timestamp = new DateTime(2000, 3, 3),
+                    Value = 10,
+                });
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Poor,
+                    Timestamp = new DateTime(2000, 2, 2),
+                    Value = 14,
+                });
+
+                Signal signal = new Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                var sorted = data.OrderBy(d => d.Timestamp).ToList();
+
+                var fromIncludedDate = new DateTime(2000, 1, 2);
+                var toExcludedDate = new DateTime(2000, 5, 4);
+
+                signalsDataRepositoryMock
+                    .Setup(srm => srm.GetData<int>(signal, fromIncludedDate, toExcludedDate))
+                    .Returns(data);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Add(signal))
+                    .Returns(signal);
+                signalDomainService.Add(signal);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(signal.Id.Value))
+                    .Returns(signal);
+
+                signalDomainService.SetData(1, data.AsEnumerable());
+                data.RemoveAt(2);
+                sorted.RemoveAt(2);
+
+                var result = signalDomainService.GetData<int>(signal.Id.Value, fromIncludedDate, toExcludedDate);
+
+                CollectionAssert.AreEqual(sorted, result.ToList<Datum<int>>());
+            }
+
             private void SetupData(List<Domain.Datum<int>> data)
             {
                 data.Add(new Domain.Datum<int>()
