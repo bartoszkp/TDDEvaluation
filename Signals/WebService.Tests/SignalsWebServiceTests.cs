@@ -355,9 +355,17 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
                 };
 
-                SetupGettingData<double>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+                var firstTimestamp = existingDatum.First().Timestamp;
+                var lastTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+                SetupGettingData<double>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
 
                 AssertGettingGenericData(existingDatum, result);
             }
@@ -380,9 +388,17 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
                 };
 
-                SetupGettingData<int>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
+                var firstTimestamp = existingDatum.First().Timestamp;
+                var lastTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+                SetupGettingData<int>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
 
                 AssertGettingGenericData(existingDatum, result);
             }
@@ -405,9 +421,17 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (decimal)2 }
                 };
 
-                SetupGettingData<decimal>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal());
+                var firstTimestamp = existingDatum.First().Timestamp;
+                var lastTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+                SetupGettingData<decimal>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp.AddMonths(1));
 
                 AssertGettingGenericData(existingDatum, result);
             }
@@ -430,9 +454,17 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (bool)false }
                 };
 
-                SetupGettingData<bool>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyBoolean());
+                var firstTimestamp = existingDatum.First().Timestamp;
+                var lastTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
+
+                SetupGettingData<bool>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyBoolean(),
+                    firstTimestamp,
+                    lastTimestamp);
                 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
 
                 AssertGettingGenericData(existingDatum, result);
             }
@@ -455,9 +487,17 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (string)"nie" }
                 };
 
-                SetupGettingData<string>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
+                var firstTimestamp = existingDatum.First().Timestamp;
+                var lastTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
+
+                SetupGettingData<string>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString(),
+                    firstTimestamp,
+                    lastTimestamp);
                 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
 
                 AssertGettingGenericData(existingDatum, result);
             }
@@ -522,31 +562,40 @@ namespace WebService.Tests
                 {
                     Id = 1,
                     DataType = DataType.Double,
-                    Granularity = Granularity.Year,
+                    Granularity = Granularity.Month,
                     Path = Domain.Path.FromString("root/signal1")
                 };
 
                 var existingDatum = new Dto.Datum[]
                 {
                     new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (double)1.5 },
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2001, 1, 1),  Value = (double)2.5 },
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2003, 1, 1),  Value = (double)3.5 },
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 1, 1),  Value = (double)4.5 }
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1),  Value = (double)2.5 },
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1),  Value = (double)3.5 },
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 6, 1),  Value = (double)4.5 }
                 };
 
                 var filledDatum = new Dto.Datum[]
                 {
                     new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (double)1.5 },
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2001, 1, 1),  Value = (double)2.5 },
-                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2002, 1, 1),  Value = default(double)},
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2003, 1, 1),  Value = (double)3.5 },
-                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2004, 1, 1),  Value = default(double)},
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2005, 1, 1),  Value = (double)4.5 }
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1),  Value = (double)2.5 },
+                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1),  Value = default(double)},
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1),  Value = (double)3.5 },
+                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1),  Value = default(double)},
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 6, 1),  Value = (double)4.5 },
+                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1),  Value = default(double)}
                 };
 
-                SetupGettingData<double>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+                var firstTimestamp = new DateTime(2000, 1, 1);
+                var lastTimestamp = new DateTime(2000, 8, 1);
+
+                SetupGettingData<double>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble(),
+                    firstTimestamp,
+                    lastTimestamp);
                 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2005, 1, 1));
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 8, 1));
 
                 AssertGettingGenericData(filledDatum, result);
             }
@@ -670,15 +719,20 @@ namespace WebService.Tests
                 }
             }
             
-            private void SetupGettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum, Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T> genericInstance)
+            private void SetupGettingData<T>(
+                Signal existingSignal,
+                Dto.Datum[] existingDatum,
+                Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T> genericInstance,
+                DateTime firstTimestamp,
+                DateTime lastTimestamp)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
                 signalsDataRepositoryMock
                     .Setup(sdrm => sdrm.GetData<T>(
                         existingSignal,
-                        existingDatum.First().Timestamp,
-                        existingDatum.Last().Timestamp))
+                        firstTimestamp,
+                        lastTimestamp))
                     .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<T>>>());
 
                 GivenASignal(existingSignal);
