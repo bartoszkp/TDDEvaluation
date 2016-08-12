@@ -74,10 +74,12 @@ namespace Domain.Services.Implementation
 
             var resultArray = result.ToArray();
 
-            SortArray(resultArray);
+            SortArrayByTimestamp(resultArray);
 
             return resultArray;
         }
+
+        
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable)
         {
@@ -103,26 +105,9 @@ namespace Domain.Services.Implementation
             else throw new ArgumentException("Type of the 'data' parameter's signals must be bool, int, double, decimal or string.");
         }
 
-        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
-        {
-            var signal = signalsRepository.Get(signalId);
+        
 
-            var mvp = missingValuePolicyRepository.Get(signal);
-
-            if (mvp == null) return null;
-
-            else return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy.MissingValuePolicyBase;
-        }
-
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicy)
-        {
-            var signal = signalsRepository.Get(signalId);
-
-            missingValuePolicyRepository.Set(signal, missingValuePolicy);
-        }
-
-        private void SortArray<T>(Datum<T>[] array)
+        private void SortArrayByTimestamp<T>(Datum<T>[] array)
         {
             while (true)
             {
@@ -140,5 +125,7 @@ namespace Domain.Services.Implementation
                 if (!changed) break;
             }
         }
+
+        
     }
 }

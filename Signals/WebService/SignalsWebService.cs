@@ -104,26 +104,12 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
-
-            else
-            {
-                if (signalsDomainService.GetMissingValuePolicy(signalId) == null) return null;
-
-                else return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
-            }
+            throw new NotImplementedException();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
-
-            else SetMVP(signalId, policy);
-        }
-
-        private void SetMVP(int signalId, MissingValuePolicy policy)
-        {
-            signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+            throw new NotImplementedException();
         }
     }
 }
