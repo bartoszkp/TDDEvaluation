@@ -481,40 +481,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSettingANoneQualityPolicy_CorrectRepositoryMethodIsCalled()
             {
-                policyMock = new Mock<Domain.MissingValuePolicy.MissingValuePolicyBase>();
-
-                var exampleSignal = new Domain.Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Boolean,
-                    Granularity = Granularity.Day,
-                    Path = Domain.Path.FromString("example/path"),
-                };
-
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                    .Setup(srm => srm.Get(It.IsAny<int>()))
-                    .Returns(new Signal());
-
-                Mock<Dto.MissingValuePolicy.MissingValuePolicy> dtoPolicyMock = new Mock<Dto.MissingValuePolicy.MissingValuePolicy>();
-                SetupMissingValuePolicy(dtoPolicyMock);
-
-                policyMock = new Mock<Domain.MissingValuePolicy.MissingValuePolicyBase>();
-
-                Mock<Domain.Services.ISignalsDomainService> signalDomainServiceMock = new Mock<Domain.Services.ISignalsDomainService>();
-                signalDomainServiceMock
-                    .Setup(sdsm => sdsm.SetMissingValuePolicy(exampleSignal, policyMock.Object));
-
-                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-
-                missingValuePolicyRepositoryMock
-                   .Setup(mvprm => mvprm.Set(exampleSignal, It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
-
-                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
-
-                signalDomainService.SetMissingValuePolicy(exampleSignal, policyMock.Object);
-
-                missingValuePolicyRepositoryMock.Verify(sdsm => sdsm.Set(exampleSignal, policyMock.Object));
+                
             }
 
             [TestMethod]
