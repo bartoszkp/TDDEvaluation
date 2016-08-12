@@ -496,32 +496,7 @@ namespace WebService.Tests
             {
                 Mock<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>> policyMockForNoneQuality = new Mock<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>();
 
-                var exampleSignal = new Domain.Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Boolean,
-                    Granularity = Granularity.Day,
-                    Path = Domain.Path.FromString("example/path"),
-                };
-
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                    .Setup(srm => srm.Get(It.IsAny<int>()))
-                    .Returns(new Signal());
-
-                Mock<Dto.MissingValuePolicy.NoneQualityMissingValuePolicy> dtoPolicyMock = new Mock<Dto.MissingValuePolicy.NoneQualityMissingValuePolicy>();
-                SetupMissingValuePolicyForNoneQuality(dtoPolicyMock);
-
-                Mock<Domain.Services.ISignalsDomainService> signalDomainServiceMock = new Mock<Domain.Services.ISignalsDomainService>();
-                signalDomainServiceMock
-                    .Setup(sdsm => sdsm.SetMissingValuePolicy(exampleSignal, policyMockForNoneQuality.Object));
-
-                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-
-                missingValuePolicyRepositoryMock
-                   .Setup(mvprm => mvprm.Set(exampleSignal, policyMockForNoneQuality.Object));
-
-                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var exampleSignal = SetupPolicyMockForNoneQuality();
 
                 signalDomainService.SetMissingValuePolicy(exampleSignal, policyMockForNoneQuality.Object);
 
@@ -543,6 +518,17 @@ namespace WebService.Tests
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
+                var exampleSignal = SetupGetPolicyMockForNoneQuality();
+
+                var result = signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
+
+                Assert.AreEqual(result.GetType(), typeof(Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>));
+            }
+
+            private Signal SetupGetPolicyMockForNoneQuality()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
                 var exampleSignal = new Domain.Signal()
                 {
                     Id = 2,
@@ -560,9 +546,41 @@ namespace WebService.Tests
 
                 signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
 
-                var result = signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
+                return exampleSignal;
+            }
 
-                Assert.AreEqual(result.GetType(), typeof(Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>));
+            private Signal SetupPolicyMockForNoneQuality()
+            {
+                var exampleSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(It.IsAny<int>()))
+                    .Returns(new Signal());
+
+                Mock<Dto.MissingValuePolicy.NoneQualityMissingValuePolicy> dtoPolicyMock = new Mock<Dto.MissingValuePolicy.NoneQualityMissingValuePolicy>();
+                SetupMissingValuePolicyForNoneQuality(dtoPolicyMock);
+
+                Mock<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>> policyMockForNoneQuality = new Mock<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>();
+
+                Mock<Domain.Services.ISignalsDomainService> signalDomainServiceMock = new Mock<Domain.Services.ISignalsDomainService>();
+                signalDomainServiceMock
+                    .Setup(sdsm => sdsm.SetMissingValuePolicy(exampleSignal, policyMockForNoneQuality.Object));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                   .Setup(mvprm => mvprm.Set(exampleSignal, policyMockForNoneQuality.Object));
+
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                return exampleSignal;
             }
 
             private Signal SetupGetPolicyMock()
