@@ -98,6 +98,7 @@ namespace Domain.Services.Implementation
         //Naprawienie buga, aby mo¿na bylo ustawiaæ i pobierac dowolny typ danych, Testy by³y wczeœniej napisane
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {           
+            
                 return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
     }

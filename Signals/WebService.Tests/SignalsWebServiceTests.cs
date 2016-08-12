@@ -673,7 +673,30 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenGettingData_ReturnListWithElementsNone()
+            {
+                var existingSignal = ExistingSignal();
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                };
+                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
 
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                var expectedDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = 0 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                };
+                for(int i = 0; i < expectedDatum.Length; i++)
+                {
+                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
+                }
+            }
            
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
