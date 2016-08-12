@@ -176,6 +176,8 @@ namespace WebService.Tests
             {
                 GiveNoSignalData();
 
+                missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
                 signalDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(new List<Datum<double>>()
                     {
@@ -197,7 +199,7 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
                     .Returns(new Signal() { DataType = DataType.Double });
 
-
+                missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
 
                 var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
 
@@ -217,6 +219,9 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
                     .Returns(new Signal() { DataType = DataType.Double });
 
+                missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+
                 signalDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(dbList);
 
@@ -224,6 +229,20 @@ namespace WebService.Tests
 
                 Assert.AreEqual(item.First().Timestamp, dbList[1].Timestamp);
             }
+
+            [TestMethod]
+            public void RepositoryWithNoSignal_WhenAdd_PolicyIsAdded()
+            {
+                GivenNoSignals();
+
+                var item = SignalWith(null, Dto.DataType.Boolean, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "z" } });
+
+                signalsWebService.Add(item);
+
+                missingValuePolicyMock.Verify(x => x.Set(
+                    It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
+            }
+           
 
             private Dto.Signal SignalWith(
                 int? id = null,
@@ -259,8 +278,11 @@ namespace WebService.Tests
             {
                 signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
-                var signalDomianService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+                missingValuePolicyMock = new Mock<IMissingValuePolicyRepository>();
+                var signalDomianService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyMock.Object);
                 signalsWebService = new SignalsWebService(signalDomianService);
+
+
             }
 
 
