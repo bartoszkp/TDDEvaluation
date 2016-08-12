@@ -74,20 +74,23 @@ namespace WebService.Tests
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
                 var signalsWebService = new SignalsWebService(signalsDomainService);
                 var dummySignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Hour, Path = Path.FromString("root/signal") };
-                var dummyMVP = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<decimal>() { Id=1, Quality=Quality.Fair, Signal = dummySignal, Value=10.0M };
+                var dummyMVP = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<bool>() { Id=1, Quality=Quality.Fair, Signal = dummySignal, Value=true };
 
                 signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
                 signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(dummySignal.Path)))).Returns(dummySignal);
 
                 missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
                     (s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.DataType == dummySignal.DataType)))
-                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDecimal() { Id=1, Quality=Quality.Fair, Signal=dummySignal, Value=10.0M});
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean() { Id=1, Quality=Quality.Fair, Signal=dummySignal, Value=true,});
 
                 var result = signalsWebService.GetMissingValuePolicy(1);
                
                 Assert.AreEqual(dummyMVP.Id, result.Id);
-                Assert.AreEqual(dummyMVP.Signal, result.Signal);
-                Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
+                Assert.AreEqual(dummyMVP.Signal.Id, result.Signal.Id);
+                Assert.AreEqual(dummyMVP.Signal.DataType, result.Signal.DataType.ToDomain<Domain.DataType>());
+                Assert.AreEqual(dummyMVP.Signal.Granularity, result.Signal.Granularity.ToDomain<Domain.Granularity>());
+                CollectionAssert.AreEqual(dummyMVP.Signal.Path.Components.ToArray(), result.Signal.Path.Components.ToArray());
+                Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
 
             }
 
