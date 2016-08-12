@@ -286,8 +286,16 @@ namespace WebService
 
             if (signal == null)
                 throw new Domain.Exceptions.GettingDataOfNotExistingSignal();
-            
+
+            if (signal.DataType == DataType.String)
+            {
                 return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
+            }
+            else if (signal.DataType == DataType.Double)
+            {
+                return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.NoneQualityMissingValuePolicy>();
+            }
+            else return null;
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)

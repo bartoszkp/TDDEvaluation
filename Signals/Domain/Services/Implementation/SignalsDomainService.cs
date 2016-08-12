@@ -115,7 +115,14 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal exampleSignal, MissingValuePolicyBase policy)
         {
-            missingValuePolicyRepository.Set(exampleSignal, policy);
+            if (exampleSignal.DataType == DataType.String)
+            {
+                this.missingValuePolicyRepository.Set(exampleSignal, new MissingValuePolicy.SpecificValueMissingValuePolicy<string>());
+            }
+            else if (exampleSignal.DataType == DataType.Double)
+            {
+                this.missingValuePolicyRepository.Set(exampleSignal, new MissingValuePolicy.NoneQualityMissingValuePolicy<double>());
+            }
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
