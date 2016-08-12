@@ -59,15 +59,37 @@ namespace WebService
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = this.signalsDomainService?.GetById(signalId);
-            
+            if(fromIncludedUtc == null)
+            {
+                throw new NotImplementedException();
+            }
             if(signal == null)
             {
                 throw new KeyNotFoundException();
             }
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.Decimal:
+                    return signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.Double:
+                    return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.Integer:
+                    return signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.String:
+                    return signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                default:
+                    throw new KeyNotFoundException();
+            }
+                    
 
-            var datum = this.signalsDomainService?.GetData(signal, fromIncludedUtc, toExcludedUtc);
-
-            return datum?.ToDto<IEnumerable<Dto.Datum>>().OrderBy(x => x.Timestamp);
+            
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

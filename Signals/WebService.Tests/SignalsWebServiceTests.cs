@@ -507,6 +507,34 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignal_WhenAddingSingal_ThenSettingNoneQualityMissingValuePolicy()
+            {
+                
+                var resultSignal = signalsWebService.Add(SignalWith(
+                    dataType: Dto.DataType.Double,
+                    granularity: Dto.Granularity.Week,
+                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(resultSignal.Id.Value))
+                    .Returns(resultSignal.ToDomain<Domain.Signal>());
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+
+                var result = signalsWebService.GetMissingValuePolicy(resultSignal.Id.Value);
+                Assert.AreEqual(result, "NoneQualityMissingValuePolicyDouble");
+            }
+
+            [TestMethod]
             public void GivenASignalAndDatum_WhenSettingDataWithWrongSignalId_ExceptionIsThrown()
             {
                 var existingSignal = ExistingSignal();
@@ -518,18 +546,7 @@ namespace WebService.Tests
                 verifyOrAssert.AssertSetDataIsExceptionThrownWhenInvalidKey(signalsWebService, wrongSignalId);
             }
 
-            [TestMethod]
-            public void GivenASignal_WhenGettingDataForSpecificSignal_RepositoryGetDataAndGetIsCalled()
-            {
-                var existingSignal = ExistingSignal();
-
-                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal);
-
-                signalsWebService.GetData(existingSignal.Id.Value, new DateTime(), new DateTime());
-
-                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
-                signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
-            }
+            
 
             private void SetupSignalsDataRepositoryAndSignalsRepository(Domain.Signal existingSignal)
             {
@@ -553,9 +570,8 @@ namespace WebService.Tests
                 var existingDatum = ExistingDatum();
 
                 SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
-
-                signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+                
                 SetupVerifyOrAssert();
                 verifyOrAssert.VerifyRepositoryGetDataAndGetIsCalled(existingSignal, existingDatum, signalsDataRepositoryMock, signalsRepositoryMock);
             }
@@ -617,6 +633,7 @@ namespace WebService.Tests
 
                 SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
 
+
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
                 var existingSortedDatum = existingDatum.OrderBy(x => x.Timestamp);
@@ -627,6 +644,8 @@ namespace WebService.Tests
                 }
             }
 
+
+           
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -718,7 +737,7 @@ namespace WebService.Tests
                 return new Domain.Signal()
                 {
                     Id = 1,
-                    DataType = Domain.DataType.Boolean,
+                    DataType = Domain.DataType.Double,
                     Granularity = Domain.Granularity.Day,
                     Path = Domain.Path.FromString("root/signal1")
                 };

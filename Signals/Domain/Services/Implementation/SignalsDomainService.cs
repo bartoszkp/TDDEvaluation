@@ -56,7 +56,7 @@ namespace Domain.Services.Implementation
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
-            var mvp = this.missingValuePolicyRepository.Get(signal);
+            var mvp = this.missingValuePolicyRepository?.Get(signal);
             if (mvp == null)
             {
                 return null;
@@ -83,9 +83,43 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData<T>(datum);
         }
 
-        public IEnumerable<Datum<double>> GetData(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return this.signalsDataRepository.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            
+                return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            /*if (GetMissingValuePolicy(signal).GetType().Name.Contains("NoneQualityMissingValuePolicy"))
+            {
+                /*var gettingList = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+                var returnList = new List<Datum<T>>();
+                var granulitary = signal.Granularity;
+                if (granulitary == Granularity.Day) ;
+                {
+                    TimeSpan difference = toExcludedUtc - fromIncludedUtc;
+                    DateTime checkedDateTime = fromIncludedUtc;
+                    int countElementOfList = difference.Days;
+                    for (int i = 0; i < countElementOfList; i++)
+                    {
+
+                        Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                        if (xx == null)
+                        {
+                            var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                            returnList.Add(addingItem);
+
+                        }
+                        else
+                        {
+                            returnList.Add(xx);
+                        }
+                        checkedDateTime = checkedDateTime.AddDays(1);
+                    }
+                }
+                return returnList;
+                throw new NotImplementedException();
+            }
+            else*/
+
+
         }
     }
 }
