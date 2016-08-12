@@ -24,7 +24,20 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
-                GivenNoSignals();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
                 var result = signalsWebService.Add(new Dto.Signal());
 
@@ -48,11 +61,7 @@ namespace WebService.Tests
                     signalsDataRepositoryMock.Object,
                     missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
-                signalsRepositoryMock
-                                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                                    .Returns<Domain.Signal>(s => new Domain.Signal() { Id = 1, DataType = s.DataType, Granularity = s.Granularity, Path = s.Path });
-
-
+                
                 var result = signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Decimal,
                     granularity: Dto.Granularity.Week,
