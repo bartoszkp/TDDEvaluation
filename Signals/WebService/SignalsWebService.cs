@@ -110,23 +110,7 @@ namespace WebService
             {
                 if (signalsDomainService.GetMissingValuePolicy(signalId) == null) return null;
 
-                else
-                {
-                    return new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
-                    {
-                        Id = 1,
-                        DataType = DataType.Boolean,
-                        Quality = Quality.Fair,
-                        Signal = new Signal()
-                        {
-                            Id = 1,
-                            DataType = DataType.Decimal,
-                            Granularity = Granularity.Hour,
-                            Path = new Path() { Components = new[] { "root", "signal" } }
-                        },
-                        Value = true
-                    };
-                }
+                else return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
             }
         }
 
