@@ -83,7 +83,7 @@ namespace Domain.Services.Implementation
 
             var mvp = GetMissingValuePolicy(signal.Id.GetValueOrDefault());
 
-            Domain.DataFillStrategy.DataFillStrategy dataFillStrategy = DataFillStrategyProvider.GetStrategy(signal.Granularity,mvp);
+            var dataFillStrategy = DataFillStrategyProvider.GetStrategy(signal.Granularity,mvp);
 
             dataFillStrategy.FillMissingData(items,fromIncludedUtc,toExcludedUtc);
 
