@@ -138,5 +138,11 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicyBase)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
+        }
     }
 }

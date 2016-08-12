@@ -18,5 +18,6 @@ namespace Domain.Services
 
         MissingValuePolicyBase GetMissingValuePolicy(int signalId);
 
+        void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicyBase);
     }
 }
