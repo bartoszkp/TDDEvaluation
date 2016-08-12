@@ -74,7 +74,21 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
             {
-                GivenNoSignals();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
 
                 signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Decimal,
