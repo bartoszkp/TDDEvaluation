@@ -686,213 +686,78 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignalAndDatumWithGranularityMonth_WhenGettingData_ReturnListWithElementsNone()
             {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1111,
-                    DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Month,
-                    Path = Domain.Path.FromString("root/signall")
-                };
-                var existingDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 4, 1), Value = (double)3.1 }
-                };
-                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
-
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
-                var expectedDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = 0 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
-                };
-                for(int i = 0; i < expectedDatum.Length; i++)
-                {
-                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
-                }
+                SetupGivenASignalAndatumWithGranularity(Domain.Granularity.Month,
+                    new DateTime[] { new DateTime(2000, 1, 1), new DateTime(2000, 3, 1) , new DateTime(2000, 4, 1) },
+                    new DateTime[] { new DateTime(2000, 1, 1),new DateTime(2000, 2, 1) ,new DateTime(2000, 3, 1) });
             }
 
             [TestMethod]
             public void GivenASignalAndDatumWithGranularityDays_WhenGettingData_ReturnListWithElementsNone()
             {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1111,
-                    DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Day,
-                    Path = Domain.Path.FromString("root/signall")
-                };
-                var existingDatum = new Dto.Datum[]
-                {
-                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = (double)2.5 },
-                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 4), Value = (double)3.1 }
-                };
-                    SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
-
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
-                var expectedDatum = new Dto.Datum[]
-                {
-                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                            new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 2), Value = 0 },
-                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = (double)2.5 }
-                };
-                for(int i = 0; i<expectedDatum.Length; i++)
-                {
-                        Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
-                 }
+                SetupGivenASignalAndatumWithGranularity(Domain.Granularity.Day,
+                    new DateTime[] { new DateTime(2000, 1, 1), new DateTime(2000, 1, 3), new DateTime(2000, 1, 4) },
+                    new DateTime[] { new DateTime(2000, 1, 1), new DateTime(2000, 1, 2), new DateTime(2000, 1, 3) });
             }
             
 
             [TestMethod]
             public void GivenASignalAndatumWithGranularityYear_WhenGettingData_ReturnListWithelementsNone()
             {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1111,
-                    DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Year,
-                    Path = Domain.Path.FromString("root/signall")
-                };
-                var existingDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2001, 1, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2003, 1, 1), Value = (double)2.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2004, 1, 1), Value = (double)3.1 }
-                };
-                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
-
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
-                var expectedDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2001, 1, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2002, 1, 1), Value = 0 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2003, 1, 1), Value = (double)2.5 }
-                };
-                for (int i = 0; i < expectedDatum.Length; i++)
-                {
-                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
-                }
+                SetupGivenASignalAndatumWithGranularity(Domain.Granularity.Year,
+                    new DateTime[] { new DateTime(2001, 1, 1), new DateTime(2003, 1, 1), new DateTime(2004, 1, 1) },
+                    new DateTime[] { new DateTime(2001, 1, 1), new DateTime(2002, 1, 1), new DateTime(2003, 1, 1) });
             }
 
 
             [TestMethod]
             public void GivenASignalAndatumWithGranularityHour_WhenGettingData_ReturnListWithelementsNone()
             {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1111,
-                    DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Hour,
-                    Path = Domain.Path.FromString("root/signall")
-                };
-                var existingDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,0,0), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 5,0,0), Value = (double)2.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 7,0,0), Value = (double)3.1 }
-                };
-                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
-
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
-                var expectedDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,0,0), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 5,0,0), Value = 0 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 6,0,0), Value = (double)2.5 }
-                };
-                for (int i = 0; i < expectedDatum.Length; i++)
-                {
-                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
-                }
+                SetupGivenASignalAndatumWithGranularity(Domain.Granularity.Hour,
+                    new DateTime[] { new DateTime(2000, 1, 1, 4, 0, 0), new DateTime(2000, 1, 1, 5, 0, 0), new DateTime(2000, 1, 1, 7, 0, 0) },
+                    new DateTime[] { new DateTime(2000, 1, 1, 4, 0, 0), new DateTime(2000, 1, 1, 5, 0, 0), new DateTime(2000, 1, 1, 6, 0, 0) });
             }
 
             [TestMethod]
             public void GivenASignalAndatumWithGranularityMinute_WhenGettingData_ReturnListWithelementsNone()
             {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1111,
-                    DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Minute,
-                    Path = Domain.Path.FromString("root/signall")
-                };
-                var existingDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,1,0), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,2,0), Value = (double)2.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 4,4,0), Value = (double)3.1 }
-                };
-                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
-
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
-                var expectedDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,1,0), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 4,2,0), Value = 0 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,3,0), Value = (double)2.5 }
-                };
-                for (int i = 0; i < expectedDatum.Length; i++)
-                {
-                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
-                }
+                SetupGivenASignalAndatumWithGranularity(Domain.Granularity.Minute,
+                    new DateTime[] { new DateTime(2000, 1, 1, 4, 1, 0), new DateTime(2000, 1, 1, 4, 2, 0), new DateTime(2000, 1, 1, 4, 4, 0) },
+                    new DateTime[] { new DateTime(2000, 1, 1, 4, 1, 0), new DateTime(2000, 1, 1, 4, 2, 0), new DateTime(2000, 1, 1, 4, 3, 0) });
             }
 
 
             [TestMethod]
             public void GivenASignalAndatumWithGranularitySecond_WhenGettingData_ReturnListWithelementsNone()
             {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1111,
-                    DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Second,
-                    Path = Domain.Path.FromString("root/signall")
-                };
-                var existingDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,1,1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,1,2), Value = (double)2.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 4,1,4), Value = (double)3.1 }
-                };
-                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
-
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
-
-                var expectedDatum = new Dto.Datum[]
-                {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,1,1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 4,1,2), Value = 0 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 4,1,3), Value = (double)2.5 }
-                };
-                for (int i = 0; i < expectedDatum.Length; i++)
-                {
-                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
-                }
+                SetupGivenASignalAndatumWithGranularity(Domain.Granularity.Second,
+                    new DateTime[] { new DateTime(2000, 1, 1, 4, 1, 1), new DateTime(2000, 1, 1, 4, 1, 2), new DateTime(2000, 1, 1, 4, 1, 4) },
+                    new DateTime[] { new DateTime(2000, 1, 1, 4, 1, 1), new DateTime(2000, 1, 1, 4, 1, 2), new DateTime(2000, 1, 1, 4, 1, 3) });
             }
 
             [TestMethod]
             public void GivenASignalAndatumWithGranularityWeek_WhenGettingData_ReturnListWithelementsNone()
             {
+                SetupGivenASignalAndatumWithGranularity(Domain.Granularity.Week,
+                    new DateTime[] { new DateTime(2016, 8, 1), new DateTime(2016, 8, 8), new DateTime(2016, 8, 22) }, 
+                    new DateTime[] { new DateTime(2016, 8, 1), new DateTime(2016, 8, 8), new DateTime(2016, 8, 15) });
+                
+            }
+
+
+            private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
+            {
                 var existingSignal = new Domain.Signal()
                 {
                     Id = 1111,
                     DataType = Domain.DataType.Double,
-                    Granularity = Domain.Granularity.Week,
+                    Granularity = granulity,
                     Path = Domain.Path.FromString("root/signall")
                 };
                 var existingDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 8), Value = (double)2.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 22), Value = (double)3.1 }
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = existingListDatum[0], Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = existingListDatum[1], Value = (double)2.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = existingListDatum[2], Value = (double)3.1 }
                 };
                 SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
 
@@ -900,9 +765,9 @@ namespace WebService.Tests
 
                 var expectedDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 8, 8), Value = 0 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 15), Value = (double)2.5 }
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = expectedListDatum[0], Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = expectedListDatum[1], Value = 0 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = expectedListDatum[2], Value = (double)2.5 }
                 };
                 for (int i = 0; i < expectedDatum.Length; i++)
                 {
