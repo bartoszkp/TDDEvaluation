@@ -126,7 +126,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingMVPOfTheSignalAndGettingIt_ReturnedIsNotNullResult()
+            public void GivenASignal_WhenSettingMVPOfTheSignal_MVPRepositorySetMethodWasCalled()
             {
                 var signalsRepositoryMock = new Mock<ISignalsRepository>();
                 var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
@@ -142,9 +142,11 @@ namespace WebService.Tests
 
                 signalsWebService.SetMissingValuePolicy(1, dummyMVP);
 
-                var result = signalsWebService.GetMissingValuePolicy(1);
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Set
+                    (It.Is<Signal>(s => s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path)),
+                    It.Is<Domain.MissingValuePolicy.MissingValuePolicyBase>(mvp => mvp.Id == dummyMVP.Id && mvp.NativeDataType == dummyMVP.Value.GetType())));
 
-                Assert.IsNotNull(result);
+
             }
 
             // -------------------------------------------------------------------------------------------

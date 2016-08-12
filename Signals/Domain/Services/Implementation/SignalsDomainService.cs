@@ -137,5 +137,6 @@ namespace Domain.Services.Implementation
             else return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
+
     }
 }
