@@ -626,10 +626,20 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGettingSpecificDataForSpecificSignal_ReturnsThisData()
             {
-                var existingSignal = ExistingSignal();
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+                var existingDatum = new Dto.Datum[]
+                {
 
-                var existingDatum = ExistingDatum();
-
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (double)1.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 3), Value = (double)2 }
+                };
                 SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
                 
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
@@ -718,7 +728,7 @@ namespace WebService.Tests
                 var existingDatum = new Dto.Datum[]
                 {
                             new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (double)2.5 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = (double)2.5 },
                             new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 4), Value = (double)3.1 }
                 };
                     SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
@@ -734,7 +744,7 @@ namespace WebService.Tests
                 for(int i = 0; i<expectedDatum.Length; i++)
                 {
                         Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
-                }
+                 }
             }
            
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

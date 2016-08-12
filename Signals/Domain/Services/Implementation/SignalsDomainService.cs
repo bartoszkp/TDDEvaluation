@@ -115,6 +115,8 @@ namespace Domain.Services.Implementation
                     case Granularity.Month:
                         {
                             int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
+                            if (countElementOfList+1 == gettingList.Length)
+                                return gettingList;
                             for (int i = 0; i < countElementOfList; i++)
                             {
 
@@ -136,7 +138,23 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Day:
                         {
-                            break;
+                            int countElementOfList = toExcludedUtc.Day-fromIncludedUtc.Day;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            for (int i = 0; i < countElementOfList; i++)
+                            {
+
+                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                                if (xx == null)
+                                {
+                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    returnList.Add(addingItem);
+                                }
+                                else
+                                    returnList.Add(xx);
+                                checkedDateTime = checkedDateTime.AddDays(1);
+                            }
+                                break;
                         }
                     case Granularity.Second:
                         {
@@ -151,28 +169,9 @@ namespace Domain.Services.Implementation
                             break;
                         }
                 }
-                if (granulitary == Granularity.Month)
-                {
-                    
-                    int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
-                    for (int i = 0; i < countElementOfList; i++)
-                    {
-
-                        Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                        if (xx == null)
-                        {
-                            var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                            returnList.Add(addingItem);
-
-                        }
-                        else
-                        {
-                            returnList.Add(xx);
-                        }
-                        checkedDateTime = checkedDateTime.AddMonths(1);
-                    }
-                    return returnList;
-                }
+                
+               return returnList;
+                
             }
             return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
