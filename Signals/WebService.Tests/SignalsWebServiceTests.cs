@@ -613,7 +613,7 @@ namespace WebService.Tests
 
                 missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get
                     (It.Is<Domain.Signal>(s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path))))
-                .Returns(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>());
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
 
                 signalDataRepositoryMock.Setup(sdr => sdr.GetData<double>
                     (It.Is<Signal>(s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path)),
