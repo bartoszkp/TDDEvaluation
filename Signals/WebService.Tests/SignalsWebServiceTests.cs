@@ -267,10 +267,11 @@ namespace WebService.Tests
             private void GivenNoSignals()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
+                missingValuePolicyMock = new Mock<IMissingValuePolicyRepository>();
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
@@ -294,6 +295,7 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<ISignalsDataRepository> signalDataRepositoryMock;
+            private Mock<IMissingValuePolicyRepository> missingValuePolicyMock;
         }
     }
 }
