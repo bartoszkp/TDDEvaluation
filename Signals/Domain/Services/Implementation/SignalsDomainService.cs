@@ -79,8 +79,6 @@ namespace Domain.Services.Implementation
             return resultArray;
         }
 
-        
-
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable)
         {
             var signal = signalsRepository.Get(signalId);
