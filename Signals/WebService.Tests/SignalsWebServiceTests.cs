@@ -446,17 +446,6 @@ namespace WebService.Tests
                 };
             }
 
-            [TestMethod]
-            public void GivenASignal_WhenSettingAPolicy_CorrectRepositoryMethodIsCalled()
-            {
-                policyMock = new Mock<Domain.MissingValuePolicy.MissingValuePolicyBase>();
-                var exampleSignal = SetupPolicyMock();
-
-                signalDomainService.SetMissingValuePolicy(exampleSignal, policyMock.Object);
-
-                missingValuePolicyRepositoryMock.Verify(sdsm => sdsm.Set(exampleSignal, policyMock.Object));
-            }
-
             private Signal SetupPolicyMock()
             {
                 var exampleSignal = new Domain.Signal()
