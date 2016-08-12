@@ -242,6 +242,31 @@ namespace WebService.Tests
                 missingValuePolicyMock.Verify(x => x.Set(
                     It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
             }
+
+            [TestMethod]
+            public void RepositoryWithSignalAndData_WhenGet_DataIsFilled()
+            {
+                GiveNoSignalData();
+                var startDate = new DateTime(2000, 1, 1);
+                var endDate = new DateTime(2000, 5, 1);
+
+                var signal = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, new Domain.Path());
+
+                missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>())).Returns(signal);
+                signalDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), startDate, endDate)).Returns(new List<Datum<double>>()
+                {
+                    new Datum<double>() { Timestamp = startDate },
+                    new Datum<double>() { Timestamp = endDate }
+                });
+
+                var ListOfItems = signalsWebService.GetData(1, startDate, endDate);
+
+                Assert.AreEqual(ListOfItems.Count(), 5);
+
+
+            }
            
 
             private Dto.Signal SignalWith(
