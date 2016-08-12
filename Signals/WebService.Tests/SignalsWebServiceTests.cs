@@ -16,35 +16,21 @@ namespace WebService.Tests
         [TestClass]
         public class SignalsWebServiceTests
         {
-            
+
             [TestMethod]
-            public void GivenANewlyAddedSignal_WhileAddingThatSignal_WasCalledSetMissingValuePolicyMethod()
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignals_WhenGettingMVPOfAnySignal_ThrowedIsArgumentException()
             {
                 var signalsRepositoryMock = new Mock<ISignalsRepository>();
                 var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
                 var signalsWebService = new SignalsWebService(signalsDomainService);
-                var dummySignal = new Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Boolean,
-                    Granularity = Granularity.Hour,
-                    Path = Path.FromString("root/signal")
-                };
-                signalsRepositoryMock.Setup(sr => sr.Add(It.Is<Signal>(s => 
-                    s.DataType == dummySignal.DataType && 
-                    s.Granularity == dummySignal.Granularity && 
-                    s.Path.Equals(dummySignal.Path)))).Returns(dummySignal);
-                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<int>())).Returns<Signal>(null);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.IsAny<Path>())).Returns<Signal>(null);
 
-                signalsWebService.Add(dummySignal.ToDto<Dto.Signal>());
+                signalsWebService.GetMissingValuePolicy(1);
 
-                missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set(
-                    It.Is<Signal>(s => s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path)),
-                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
-                
             }
-
             // -------------------------------------------------------------------------------------------
             // 1st Iteration:
             // -------------------------------------------------------------------------------------------
@@ -460,7 +446,35 @@ namespace WebService.Tests
 
             // -------------------------------------------------------------------------------------------
 
+            [TestMethod]
+            public void GivenANewlyAddedSignal_WhileAddingThatSignal_WasCalledSetMissingValuePolicyMethod()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("root/signal")
+                };
+                signalsRepositoryMock.Setup(sr => sr.Add(It.Is<Signal>(s =>
+                    s.DataType == dummySignal.DataType &&
+                    s.Granularity == dummySignal.Granularity &&
+                    s.Path.Equals(dummySignal.Path)))).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
 
+                signalsWebService.Add(dummySignal.ToDto<Dto.Signal>());
+
+                missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set(
+                    It.Is<Signal>(s => s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path)),
+                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()));
+
+                // -------------------------------------------------------------------------------------------
+
+            }
         }
     }
 }
