@@ -33,16 +33,36 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            var res = this.signalsRepository.Add(newSignal);
-
-            
-            if (newSignal.DataType == DataType.Boolean) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<bool>());
-            if (newSignal.DataType == DataType.Decimal) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<decimal>());
-            if (newSignal.DataType == DataType.Double) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<double>());
-            if (newSignal.DataType == DataType.Integer) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<int>());
-            if (newSignal.DataType == DataType.String) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<string>());
-
-            return res;
+            var result = this.signalsRepository.Add(newSignal);
+            switch (newSignal.DataType)
+            {
+                case DataType.Boolean:
+                    {
+                        missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<bool>());
+                        break;
+                    }
+                case DataType.Decimal:
+                    {
+                        missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<decimal>());
+                        break;
+                    }
+                case DataType.Double:
+                    {
+                        missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<double>());
+                        break;
+                    }
+                case DataType.Integer:
+                    {
+                        missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<int>());
+                        break;
+                    }
+                case DataType.String:
+                    {
+                        missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<string>());
+                        break;
+                    }
+            }
+            return result;
         }
 
         public Signal GetById(int signalId)
@@ -96,7 +116,9 @@ namespace Domain.Services.Implementation
 
             this.signalsDataRepository.SetData<T>(datum);
         }
-        //Naprawienie buga, aby mo¿na bylo ustawiaæ i pobierac dowolny typ danych, Testy by³y wczeœniej napisane
+
+        
+
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             
