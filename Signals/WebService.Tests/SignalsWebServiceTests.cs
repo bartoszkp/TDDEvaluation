@@ -512,17 +512,19 @@ namespace WebService.Tests
             public void GivenASignalAndStringDatym_WhenSettingData_RepositorySetDataAndGetIsCalled()
             {
                 var existingSignal = ExistingSignal();
-
+                var value1 = "a";
+                var value2 = "b";
+                var value3 = "c";
                 var existingDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = "a" },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = "b" },
-                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = "c" }
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = value1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = value2 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = value3 }
                 };
 
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<decimal>(It.IsAny<IEnumerable<Datum<decimal>>>()));
+                    .Setup(sdrm => sdrm.SetData<string>(It.IsAny<IEnumerable<Datum<string>>>()));
 
                 GivenASignal(existingSignal);
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
@@ -533,12 +535,12 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
 
-                var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<decimal>>>();
+                var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<string>>>();
                 int index = 0;
 
                 foreach (var ed in datum)
                 {
-                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<decimal>(It.Is<IEnumerable<Datum<decimal>>>(d =>
+                    signalsDataRepositoryMock.Verify(sdrm => sdrm.SetData<string>(It.Is<IEnumerable<Datum<string>>>(d =>
                     (
                         d.ElementAt(index).Quality == ed.Quality
                         && d.ElementAt(index).Timestamp == ed.Timestamp
