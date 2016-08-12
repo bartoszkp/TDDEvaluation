@@ -877,6 +877,38 @@ namespace WebService.Tests
                     Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
                 }
             }
+
+            [TestMethod]
+            public void GivenASignalAndatumWithGranularityWeek_WhenGettingData_ReturnListWithelementsNone()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1111,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Week,
+                    Path = Domain.Path.FromString("root/signall")
+                };
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 8), Value = (double)2.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 22), Value = (double)3.1 }
+                };
+                SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+
+                var expectedDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 8, 8), Value = 0 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 15), Value = (double)2.5 }
+                };
+                for (int i = 0; i < expectedDatum.Length; i++)
+                {
+                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
+                }
+            }
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
