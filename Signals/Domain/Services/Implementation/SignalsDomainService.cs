@@ -95,44 +95,10 @@ namespace Domain.Services.Implementation
 
             this.signalsDataRepository.SetData<T>(datum);
         }
-
+        //Naprawienie buga, aby mo¿na bylo ustawiaæ i pobierac dowolny typ danych, Testy by³y wczeœniej napisane
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
-        {
-            
+        {           
                 return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
-            /*if (GetMissingValuePolicy(signal).GetType().Name.Contains("NoneQualityMissingValuePolicy"))
-            {
-                /*var gettingList = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
-                var returnList = new List<Datum<T>>();
-                var granulitary = signal.Granularity;
-                if (granulitary == Granularity.Day) ;
-                {
-                    TimeSpan difference = toExcludedUtc - fromIncludedUtc;
-                    DateTime checkedDateTime = fromIncludedUtc;
-                    int countElementOfList = difference.Days;
-                    for (int i = 0; i < countElementOfList; i++)
-                    {
-
-                        Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                        if (xx == null)
-                        {
-                            var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                            returnList.Add(addingItem);
-
-                        }
-                        else
-                        {
-                            returnList.Add(xx);
-                        }
-                        checkedDateTime = checkedDateTime.AddDays(1);
-                    }
-                }
-                return returnList;
-                throw new NotImplementedException();
-            }
-            else*/
-
-
         }
     }
 }
