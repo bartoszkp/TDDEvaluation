@@ -40,9 +40,7 @@ namespace WebService
         public Signal Add(Signal signalDto)
         {
             var signal = signalDto.ToDomain<Domain.Signal>();
-
             var result = signalsDomainService.Add(signal);
-
             return result.ToDto<Dto.Signal>();
         }
 
@@ -144,7 +142,7 @@ namespace WebService
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
             var mvp = policy?.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
-
+            
             var signal = signalsDomainService?.GetById(signalId);
             
             if(signal == null)

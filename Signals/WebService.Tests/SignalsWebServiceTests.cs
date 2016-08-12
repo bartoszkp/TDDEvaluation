@@ -509,29 +509,31 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenAddingSingal_ThenSettingNoneQualityMissingValuePolicy()
             {
-                
-                var resultSignal = signalsWebService.Add(SignalWith(
-                    dataType: Dto.DataType.Double,
-                    granularity: Dto.Granularity.Week,
-                    path: new Dto.Path() { Components = new[] { "root", "signal" } }));
-
-                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                missingValuePolicyRepositoryMock
-                    .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
-
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
-                    .Setup(srm => srm.Get(resultSignal.Id.Value))
-                    .Returns(resultSignal.ToDomain<Domain.Signal>());
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsRepositoryMock
+                                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                                    .Returns<Domain.Signal>(s => new Domain.Signal() { Id = 1, DataType = s.DataType, Granularity = s.Granularity, Path = s.Path });
 
-
-                var result = signalsWebService.GetMissingValuePolicy(resultSignal.Id.Value);
-                Assert.AreEqual(result, "NoneQualityMissingValuePolicyDouble");
+                var sig = signalsWebService.Add(new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Double,
+                    Granularity = Dto.Granularity.Month,
+                    Path = new Dto.Path() { Components = new[] { "root", "signal" } }
+                });
+                missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
             }
 
             [TestMethod]
