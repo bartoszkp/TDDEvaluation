@@ -35,6 +35,7 @@ namespace Domain.Services.Implementation
 
             var res = this.signalsRepository.Add(newSignal);
 
+            
             if (newSignal.DataType == DataType.Boolean) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<bool>());
             if (newSignal.DataType == DataType.Decimal) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<decimal>());
             if (newSignal.DataType == DataType.Double) missingValuePolicyRepository.Set(res, new NoneQualityMissingValuePolicy<double>());
@@ -97,9 +98,83 @@ namespace Domain.Services.Implementation
         }
         //Naprawienie buga, aby mo¿na bylo ustawiaæ i pobierac dowolny typ danych, Testy by³y wczeœniej napisane
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
-        {           
+        {
             
-                return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            if(GetMissingValuePolicy(signal)==null)
+            {
+                var gettingList = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+                var returnList = new List<Datum<T>>();
+                var granulitary = signal.Granularity;
+                DateTime checkedDateTime = fromIncludedUtc;
+                switch (granulitary)
+                {
+                    case Granularity.Minute:
+                        {
+                            break;
+                        }
+                    case Granularity.Month:
+                        {
+                            int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
+                            for (int i = 0; i < countElementOfList; i++)
+                            {
+
+                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                                if (xx == null)
+                                {
+                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    returnList.Add(addingItem);
+                                }
+                                else
+                                    returnList.Add(xx);
+                                checkedDateTime = checkedDateTime.AddMonths(1);
+                            }
+                            break;
+                        }
+                    case Granularity.Hour:
+                        {
+                            break;
+                        }
+                    case Granularity.Day:
+                        {
+                            break;
+                        }
+                    case Granularity.Second:
+                        {
+                            break;
+                        }
+                    case Granularity.Week:
+                        {
+                            break;
+                        }
+                    case Granularity.Year:
+                        {
+                            break;
+                        }
+                }
+                if (granulitary == Granularity.Month)
+                {
+                    
+                    int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
+                    for (int i = 0; i < countElementOfList; i++)
+                    {
+
+                        Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                        if (xx == null)
+                        {
+                            var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                            returnList.Add(addingItem);
+
+                        }
+                        else
+                        {
+                            returnList.Add(xx);
+                        }
+                        checkedDateTime = checkedDateTime.AddMonths(1);
+                    }
+                    return returnList;
+                }
+            }
+            return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
     }
 }

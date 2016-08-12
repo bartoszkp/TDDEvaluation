@@ -674,17 +674,24 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndDatum_WhenGettingData_ReturnListWithElementsNone()
+            public void GivenASignalAndDatumWithGranularityMonth_WhenGettingData_ReturnListWithElementsNone()
             {
-                var existingSignal = ExistingSignal();
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1111,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signall")
+                };
                 var existingDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 4, 1), Value = (double)3.1 }
                 };
                 SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
                 var expectedDatum = new Dto.Datum[]
                 {
