@@ -66,6 +66,31 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+            [TestMethod]
+            public void GivenASignalWithSetMVP_WhenGettingMVPOfTheSignal_ReturnedIsTheMVP()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Hour, Path = Path.FromString("root/signal") };
+                var dummyMVP = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<decimal>() { Id=1, Quality=Quality.Fair, Signal = dummySignal, Value=10.0M };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(dummySignal.Path)))).Returns(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
+                    (s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.DataType == dummySignal.DataType)))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDecimal() { Id=1, Quality=Quality.Fair, Signal=dummySignal, Value=10.0M});
+
+                var result = signalsWebService.GetMissingValuePolicy(1);
+               
+                Assert.AreEqual(dummyMVP.Id, result.Id);
+                Assert.AreEqual(dummyMVP.Signal, result.Signal);
+                Assert.AreEqual(Dto.DataType.Decimal, result.DataType);
+
+            }
+
             // -------------------------------------------------------------------------------------------
             // 1st Iteration:
             // -------------------------------------------------------------------------------------------
