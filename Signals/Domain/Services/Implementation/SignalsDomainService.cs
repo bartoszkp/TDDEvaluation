@@ -166,6 +166,22 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Year:
                         {
+                            int countElementOfList = toExcludedUtc.Year - fromIncludedUtc.Year;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            for (int i = 0; i < countElementOfList; i++)
+                            {
+
+                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                                if (xx == null)
+                                {
+                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    returnList.Add(addingItem);
+                                }
+                                else
+                                    returnList.Add(xx);
+                                checkedDateTime = checkedDateTime.AddYears(1);
+                            }
                             break;
                         }
                 }
