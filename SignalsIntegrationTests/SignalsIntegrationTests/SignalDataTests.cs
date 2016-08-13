@@ -353,15 +353,6 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        [TestCategory("issue2")]
-        public void GetDataUsingNonExistentSignalsThrows()
-        {
-            int dummySignalId = 0;
-
-            Assertions.AssertThrows(() => client.GetData(dummySignalId, new DateTime(2016, 12, 10), new DateTime(2016, 12, 14)));
-        }
-
-        [TestMethod]
         [TestCategory("issue6")]
         public void SignalWithoutDataReturnsNoneQualityDatumsForEachTimerangeStep()
         {
