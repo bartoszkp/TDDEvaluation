@@ -27,7 +27,7 @@ namespace SignalsIntegrationTests
                 
         [TestMethod]
         [TestCategory("issue2")]
-        public void GetDataUsingIncompleteSignalsThrows()
+        public void GivenNoSignals_WhenGettingDataWithInvalidSignalId_Throws()
         {
             GivenNoSignals();
 
@@ -399,16 +399,6 @@ namespace SignalsIntegrationTests
             ThenResultIsEmpty();
         }
 
-        private void GivenASignalWith(Granularity granularity)
-        {
-            signalId = AddNewIntegerSignal(granularity).Id.Value;
-        }
-
-        private void GivenNoSignals()
-        {
-            signalId = 0;
-        }
-
         private void WhenGettigData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             getData = () => client.GetData(signalId, fromIncludedUtc, toExcludedUtc);
@@ -426,7 +416,6 @@ namespace SignalsIntegrationTests
             Assert.IsFalse(result.Any());
         }
 
-        private int signalId;
         private Func<Dto.Datum[]> getData;
     }
 }

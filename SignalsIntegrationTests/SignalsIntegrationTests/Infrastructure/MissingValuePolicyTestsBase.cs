@@ -22,26 +22,6 @@ namespace SignalsIntegrationTests.Infrastructure
             TestsBase.ClassCleanup();
         }
 
-        protected void GivenASignal(Granularity granularity)
-        {
-            signalId = AddNewIntegerSignal(granularity).Id.Value;
-        }
-
-        protected void GivenNoData()
-        {
-            GivenData();
-        }
-
-        protected void GivenSingleDatum(Datum<int> datum)
-        {
-            GivenData(datum);
-        }
-
-        protected void GivenData(params Datum<int>[] datums)
-        {
-            client.SetData(signalId, datums.ToDto<Dto.Datum[]>());
-        }
-
         protected void WithMissingValuePolicy(MissingValuePolicyBase missingValuePolicy)
         {
             client.SetMissingValuePolicy(signalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
@@ -57,7 +37,6 @@ namespace SignalsIntegrationTests.Infrastructure
             Assertions.AreEqual(expected, whenReadingDataResult);
         }
 
-        protected int signalId;
         protected IEnumerable<Datum<int>> whenReadingDataResult;
     }
 }

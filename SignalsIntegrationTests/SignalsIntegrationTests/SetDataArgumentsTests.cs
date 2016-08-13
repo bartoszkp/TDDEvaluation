@@ -27,7 +27,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void SetDataUsingIncompleteSignalsThrows()
         {
-            GivenNoSignal();
+            GivenNoSignals();
 
             WhenSettigDataFor(Timestamp);
 
@@ -320,19 +320,6 @@ namespace SignalsIntegrationTests
             ThenRequestThrows();
         }
 
-        private int signalId;
-        private Action setDataAction;
-
-        private void GivenASignalWith(Granularity granularity)
-        {
-            signalId = AddNewIntegerSignal(granularity).Id.Value;
-        }
-
-        private void GivenNoSignal()
-        {
-            signalId = 0;
-        }
-
         private void WhenSettigDataFor(DateTime dataTimestampUtc)
         {
             var data = new[]
@@ -352,5 +339,7 @@ namespace SignalsIntegrationTests
         {
             Assertions.AssertThrows(setDataAction);
         }
+
+        private Action setDataAction;
     }
 }

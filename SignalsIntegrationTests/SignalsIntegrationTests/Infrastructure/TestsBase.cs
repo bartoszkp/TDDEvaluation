@@ -36,6 +36,31 @@ namespace SignalsIntegrationTests.Infrastructure
             serviceGuard.Dispose();
         }
 
+        protected void GivenASignalWith(Granularity granularity)
+        {
+            signalId = AddNewIntegerSignal(granularity).Id.Value;
+        }
+
+        protected void GivenNoSignals()
+        {
+            signalId = 0;
+        }
+
+        protected void GivenNoData()
+        {
+            GivenData();
+        }
+
+        protected void GivenSingleDatum(Datum<int> datum)
+        {
+            GivenData(datum);
+        }
+
+        protected void GivenData(params Datum<int>[] datums)
+        {
+            client.SetData(signalId, datums.ToDto<Dto.Datum[]>());
+        }
+
         protected Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second, Domain.Path path = null)
         {
             if (path == null)
@@ -64,5 +89,7 @@ namespace SignalsIntegrationTests.Infrastructure
 
             return client.Add(signal.ToDto<Dto.Signal>());
         }
+
+        protected int signalId;
     }
 }
