@@ -29,7 +29,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GetDataUsingIncompleteSignalsThrows()
         {
-            GivenNoSignal();
+            GivenNoSignals();
 
             WhenGettigData(FromTimestamp, ToTimestamp);
 
@@ -404,7 +404,7 @@ namespace SignalsIntegrationTests
             signalId = AddNewIntegerSignal(granularity).Id.Value;
         }
 
-        private void GivenNoSignal()
+        private void GivenNoSignals()
         {
             signalId = 0;
         }
