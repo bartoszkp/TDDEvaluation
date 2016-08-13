@@ -36,6 +36,11 @@ namespace SignalsIntegrationTests.Infrastructure
             serviceGuard.Dispose();
         }
 
+        protected void GivenASignalWith(DataType dataType, Granularity granularity)
+        {
+            signalId = AddNewSignal(dataType, granularity).Id.Value;
+        }
+
         protected void GivenASignalWith(Granularity granularity)
         {
             signalId = AddNewIntegerSignal(granularity).Id.Value;
@@ -56,12 +61,27 @@ namespace SignalsIntegrationTests.Infrastructure
             GivenData(datum);
         }
 
+        protected void GivenSingleDatum(Dto.Datum datum)
+        {
+            client.SetData(signalId, new[] { datum });
+        }
+
         protected void GivenData(params Datum<int>[] datums)
         {
             client.SetData(signalId, datums.ToDto<Dto.Datum[]>());
         }
 
         protected Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second, Domain.Path path = null)
+        {
+            return AddNewSignal(DataType.Integer, granularity, path);
+        }
+
+        protected Dto.Signal AddNewStringSignal()
+        {
+            return AddNewSignal(DataType.String, Granularity.Day);
+        }
+
+        protected Dto.Signal AddNewSignal(Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path = null)
         {
             if (path == null)
             {
@@ -72,19 +92,7 @@ namespace SignalsIntegrationTests.Infrastructure
             {
                 Path = path,
                 Granularity = granularity,
-                DataType = DataType.Integer,
-            };
-
-            return client.Add(signal.ToDto<Dto.Signal>());
-        }
-
-        protected Dto.Signal AddNewStringSignal()
-        {
-            var signal = new Signal()
-            {
-                Path = SignalPathGenerator.Generate(),
-                Granularity = Granularity.Day,
-                DataType = DataType.String
+                DataType = dataType,
             };
 
             return client.Add(signal.ToDto<Dto.Signal>());

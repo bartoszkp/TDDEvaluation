@@ -28,6 +28,11 @@ namespace SignalsIntegrationTests.Infrastructure
             Assert.AreNotEqual(typeof(InvalidCastException).ToString(), ex?.Detail.Type);
         }
 
+        public static void AreEqual<T>(Domain.Datum<T> expected, Domain.Datum<T> actual)
+        {
+            AreEqual(new[] { expected }, new[] { actual });
+        }
+
         public static void AreEqual<T>(IEnumerable<Domain.Datum<T>> expected, IEnumerable<Domain.Datum<T>> actual)
         {
             CollectionAssert.AreEqual(

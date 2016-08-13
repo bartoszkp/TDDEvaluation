@@ -25,7 +25,7 @@ namespace SignalsIntegrationTests
                 
         [TestMethod]
         [TestCategory("issue2")]
-        public void SetDataUsingIncompleteSignalsThrows()
+        public void GivenNoSignals_WhenSettingDataWithInvalidSignalId_Throws()
         {
             GivenNoSignals();
 
