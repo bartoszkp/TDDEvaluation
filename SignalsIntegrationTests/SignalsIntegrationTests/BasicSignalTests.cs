@@ -150,6 +150,20 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue1")]
+        public void GivenSignalWithNullPath_WhenAddingThatSignal_ServiceThrows()
+        {
+            var signal = new Signal()
+            {
+                Path = null,
+                Granularity = Granularity.Day,
+                DataType = DataType.Integer,
+            };
+
+            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+        }
+
+        [TestMethod]
         [TestCategory("issue5")]
         public void NewSignalHasNoneQualityMissingValuePolicy()
         {
@@ -186,10 +200,10 @@ namespace SignalsIntegrationTests
 
             var policy1 = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>();
             var policy2 = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
-                {
-                    Value = 42,
-                    Quality = Quality.Fair
-                };
+            {
+                Value = 42,
+                Quality = Quality.Fair
+            };
 
             client.SetMissingValuePolicy(signal1Id, policy1.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
             client.SetMissingValuePolicy(signal2Id, policy2.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());

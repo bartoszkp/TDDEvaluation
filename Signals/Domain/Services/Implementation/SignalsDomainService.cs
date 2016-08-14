@@ -42,6 +42,9 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
+            if (signal.Path == null)
+                throw new ArgumentNullException(nameof(signal.Path));
+
             var defaultPolicy = MissingValuePolicy.MissingValuePolicyBase.CreateForNativeType(
                 typeof(MissingValuePolicy.NoneQualityMissingValuePolicy<>),
                 DataTypeUtils.GetNativeType(signal.DataType));
