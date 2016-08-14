@@ -164,63 +164,6 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        [TestCategory("issue5")]
-        public void NewSignalHasNoneQualityMissingValuePolicy()
-        {
-            var signal = AddNewIntegerSignal();
-
-            var result = client.GetMissingValuePolicy(signal.Id.Value);
-
-            Assert.IsInstanceOfType(result, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
-        }
-
-        [TestMethod]
-        [TestCategory("issue3")]
-        public void WhenGettingMissingValuePolicyForNonExistentSignal_Throws()
-        {
-            Assertions.AssertThrows(() => client.GetMissingValuePolicy(0));
-        }
-
-        [TestMethod]
-        [TestCategory("issue3")]
-        public void WhenSettingsMissingValuePolicyForNonExistentSignal_Throws()
-        {
-            var mvp = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>()
-                .ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
-
-            Assertions.AssertThrows(() => client.SetMissingValuePolicy(0, mvp));
-        }
-
-        [TestMethod]
-        [TestCategory("issue3")]
-        public void MissingValuePolicyCanBeSetForSignal()
-        {
-            var signal1Id = AddNewIntegerSignal().Id.Value;
-            var signal2Id = AddNewIntegerSignal().Id.Value;
-
-            var policy1 = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>();
-            var policy2 = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
-            {
-                Value = 42,
-                Quality = Quality.Fair
-            };
-
-            client.SetMissingValuePolicy(signal1Id, policy1.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
-            client.SetMissingValuePolicy(signal2Id, policy2.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
-
-            var result1 = client.GetMissingValuePolicy(signal1Id);
-            var result2 = client.GetMissingValuePolicy(signal2Id);
-
-            Assert.IsInstanceOfType(result1, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
-            Assert.IsInstanceOfType(result2, typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy));
-
-            var specificMissingValuePolicy = result2.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>>();
-
-            Assert.AreEqual(42, specificMissingValuePolicy.Value);
-            Assert.AreEqual(Quality.Fair, specificMissingValuePolicy.Quality);
-        }
-
-        [TestMethod]
         [TestCategory("issue12")]
         public void WhenDeletingNonExistentSignal_Throws()
         {
