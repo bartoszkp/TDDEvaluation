@@ -77,20 +77,24 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue2")]
-        public void SetDataOverridesExistingData()
+        public void GivenSignalWithData_WhenSettingOverlappingData_DataIsOverwritten()
         {
             var timestamp = new DateTime(2019, 1, 1);
-            var signal = AddNewIntegerSignal(Granularity.Day);
 
-            var originalData = new[] { new Datum<int>() { Timestamp = timestamp.AddDays(0), Value = 1, Quality = Quality.Fair },
-                                       new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 2, Quality = Quality.Fair },
-                                       new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 3, Quality = Quality.Fair },
-                                       new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
-                                     };
+            GivenASignalWith(Granularity.Day);
 
-            var newData      = new[] { new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
-                                       new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 9, Quality = Quality.Good},
-                                     };
+            GivenData(new[] { new Datum<int>() { Timestamp = timestamp.AddDays(0), Value = 1, Quality = Quality.Fair },
+                              new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 2, Quality = Quality.Fair },
+                              new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 3, Quality = Quality.Fair },
+                              new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
+                            });
+
+
+            client.SetData(
+                signalId,
+                new[] { new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
+                        new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 9, Quality = Quality.Good},
+                      }.ToDto<Dto.Datum[]>());
 
             var expectedData = new[] { new Datum<int>() { Timestamp = timestamp.AddDays(0), Value = 1, Quality = Quality.Fair },
                                        new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
@@ -98,10 +102,9 @@ namespace SignalsIntegrationTests
                                        new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
                                      };
 
-            client.SetData(signal.Id.Value, originalData.ToDto<Dto.Datum[]>());
-            client.SetData(signal.Id.Value, newData.ToDto<Dto.Datum[]>());
+            var retrievedData = client.GetData(signalId, timestamp, timestamp.AddDays(4))
+                .ToDomain<Domain.Datum<int>[]>();
 
-            var retrievedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(4)).ToDomain<Domain.Datum<int>[]>();
             Assertions.AreEqual(expectedData, retrievedData);
         }
 
