@@ -25,6 +25,15 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue2")]
+        public void GivenASignal_WhenSettingEmptyData_ShouldNotThrow()
+        {
+            GivenASignalWith(Granularity.Second);
+
+            client.SetData(signalId, new Dto.Datum[0]);
+        }
+
+        [TestMethod]
+        [TestCategory("issue2")]
         public void GivenASignalWithSingleDatum_WhenGettingData_ReturnsTheDatum()
         {
             ForAllSignalTypes((dataType, granularity, quality, timestamp, message)

@@ -59,13 +59,19 @@ namespace DataAccess.Repositories
 
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
+            if (!data.Any())
+            {
+                return;
+            }
+
             var concreteDatumType = GetConcreteDatumType<T>();
 
-            var firstTs = data.Min(d => d.Timestamp);
-            var lastTs = data.Max(d => d.Timestamp);
+            var firstTimestamp = data.Min(d => d.Timestamp);
+            var lastTimestamp = data.Max(d => d.Timestamp);
 
             var existingData = data.Any()
-                       ? GetData<T>(data.First().Signal, firstTs, lastTs.AddSeconds(1)).ToDictionary(d => d.Timestamp)
+                       ? GetData<T>(data.First().Signal, firstTimestamp, lastTimestamp.AddSeconds(1))
+                         .ToDictionary(d => d.Timestamp)
                        : new Dictionary<DateTime, Datum<T>>();
 
             foreach (var datum in data)
