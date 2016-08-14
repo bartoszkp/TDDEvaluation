@@ -11,8 +11,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SignalDataTests : TestsBase
     {
-        private DateTime timestamp = new DateTime(2019, 4, 14);
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
