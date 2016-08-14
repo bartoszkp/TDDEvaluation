@@ -55,6 +55,11 @@ namespace Domain.Infrastructure
             if (this.current == null)
             {
                 this.current = FromIncludedUtc;
+
+                if (FromIncludedUtc == ToExcludedUtcUtc)
+                {
+                    return true;
+                }
             }
             else
             {

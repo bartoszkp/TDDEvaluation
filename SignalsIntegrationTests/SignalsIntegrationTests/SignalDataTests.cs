@@ -59,13 +59,9 @@ namespace SignalsIntegrationTests
                             Value = values[dataType]
                         };
 
-                        var te = new Domain.Infrastructure.TimeEnumerator(timestamps[granularity], 1, granularity);
-                        te.MoveNext();
-                        te.MoveNext();
-                        
                         GivenSingleDatum(datum);
 
-                        var retrievedData = client.GetData(signalId, timestamps[granularity], te.Current)
+                        var retrievedData = client.GetData(signalId, timestamps[granularity], timestamps[granularity])
                             .SingleOrDefault();
 
                         var message = dataType.ToString() + ", " + granularity.ToString() + ", " + quality.ToString();

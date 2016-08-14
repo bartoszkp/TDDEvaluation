@@ -37,11 +37,22 @@ namespace DataAccess.Repositories
             var signalPropertyName = GetDatumPropertyName<T>(d => d.Signal);
             var timestampPropertyName = GetDatumPropertyName<T>(d => d.Timestamp);
 
-            return Session
+            var query = Session
                 .CreateCriteria(concreteDatumType)
                 .Add(Restrictions.Eq(signalPropertyName, signal))
-                .Add(Restrictions.Ge(timestampPropertyName, fromIncludedUtc))
-                .Add(Restrictions.Lt(timestampPropertyName, toExcludedUtc))
+                .Add(Restrictions.Ge(timestampPropertyName, fromIncludedUtc));
+
+            if (toExcludedUtc > fromIncludedUtc)
+            {
+                query = query.Add(Restrictions.Lt(timestampPropertyName, toExcludedUtc));
+            }
+            else
+            {
+                query = query.Add(Restrictions.Le(timestampPropertyName, toExcludedUtc));
+            }
+
+
+            return query
                 .List()
                 .Cast<Datum<T>>();
         }
