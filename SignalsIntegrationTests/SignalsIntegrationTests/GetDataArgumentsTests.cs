@@ -37,6 +37,31 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue2")]
+        public void GivenAStringSignal_WhenSettingNullValue_ShouldNotThrow()
+        {
+            GivenASignalWith(DataType.String, Granularity.Hour);
+
+            client.SetData(signalId, new[] { new Dto.Datum() { Timestamp = new DateTime(2000, 1, 1) } });
+        }
+
+        [TestMethod]
+        [TestCategory("issue2")]
+        public void GivenAStringSignalWithNullValue_WhenReadingData_ShouldReturnNullValue()
+        {
+            var timestamp = new DateTime(2000, 1, 1);
+
+            GivenASignalWith(DataType.String, Granularity.Hour);
+            GivenData(new Dto.Datum() { Timestamp = timestamp });
+
+            var result = client.GetData(signalId, timestamp, timestamp)
+                .SingleOrDefault();
+
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.Value);
+        }
+
+        [TestMethod]
+        [TestCategory("issue2")]
         public void GivenASignal_WhenGettingDataWithReversedTimestamps_ReturnsEmpty()
         {
             ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
