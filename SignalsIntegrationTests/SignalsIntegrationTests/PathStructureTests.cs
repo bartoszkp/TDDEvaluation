@@ -35,6 +35,7 @@ namespace SignalsIntegrationTests
             var result = GetPathEntry(Path.Root + "emptyPath");
 
             Assert.IsFalse(result.Signals.Any());
+            Assert.IsFalse(result.SubPaths.Any());
         }
 
         [TestMethod]
@@ -48,6 +49,19 @@ namespace SignalsIntegrationTests
             var result = GetPathEntry(directory);
 
             CollectionAssert.AreEquivalent(new[] { signalPath }, result.Signals.Select(s => s.Path).ToArray());
+        }
+
+        [TestMethod]
+        [TestCategory("issue7")]
+        public void GivenOneSignal_WhenReadingItsParent_ReturnsPathEntryWithNoSubPaths()
+        {
+            var directory = Path.Root + "oneSignal_nosubs";
+            var signalPath = directory + "signal";
+            AddNewIntegerSignal(path: signalPath);
+
+            var result = GetPathEntry(directory);
+
+            Assert.IsFalse(result.SubPaths.Any());
         }
 
         [TestMethod]
@@ -115,6 +129,56 @@ namespace SignalsIntegrationTests
             var result = GetPathEntry(directory1);
 
             CollectionAssert.AreEquivalent(new[] { expectedSignalPath }, result.Signals.Select(s => s.Path).ToArray());
+        }
+
+        [TestMethod]
+        [TestCategory("issue7")]
+        public void GivenThreePathsLevels_ReadingTopLevel_ReturnsOnlyDirectSubPaths()
+        {
+            var topLevelDirectory = Path.Root + "topLevelWithTwoSubLevels";
+            var subDir1 = topLevelDirectory + "sub1";
+            var subDir2 = topLevelDirectory + "sub2";
+            var subsubDir = subDir1 + "subsub";
+
+            AddNewIntegerSignal(path: subDir1 + "signal1");
+            AddNewIntegerSignal(path: subDir2 + "signal2");
+            AddNewIntegerSignal(path: subsubDir + "signal3");
+
+            var result = GetPathEntry(topLevelDirectory);
+
+            CollectionAssert.AreEquivalent(new[] { subDir1, subDir2 }, result.SubPaths.ToArray());
+        }
+
+        [TestMethod]
+        [TestCategory("issue7")]
+        public void GivenSignalPathWithSignalsInSubdirs_ReadingTopLevel_ReturnsNoSignalsAndTwoSubPaths()
+        {
+            var topLevelDirectory = Path.Root + "topLevelWithoutSignalsButWithSubpaths";
+            var subDir1 = topLevelDirectory + "sub1";
+            var subDir2 = topLevelDirectory + "sub2";
+
+            AddNewIntegerSignal(path: subDir1 + "signal1");
+            AddNewIntegerSignal(path: subDir2 + "signal2");
+
+            var result = GetPathEntry(topLevelDirectory);
+
+            CollectionAssert.AreEquivalent(new[] { subDir1, subDir2 }, result.SubPaths.ToArray());
+            Assert.IsFalse(result.Signals.Any());
+        }
+
+        [TestMethod]
+        [TestCategory("issue7")]
+        public void GivenSingleSignalAtSecondSubLevel_ReadingTopLevel_ReturnsSecondLevelSubPath()
+        {
+            var topLevel = Path.Root + "topLevelWithSingleDeepChild";
+            var level1 = topLevel + "level1";
+            var level2 = level1 + "level2";
+
+            AddNewIntegerSignal(path: level2 + "signal1");
+
+            var result = GetPathEntry(topLevel);
+
+            CollectionAssert.AreEquivalent(new[] { level1 }, result.SubPaths.ToArray());
         }
     }
 }
