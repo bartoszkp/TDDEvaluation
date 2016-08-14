@@ -36,7 +36,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignalWithSingleDatum_WhenGettingData_ReturnsTheDatum()
         {
-            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypesAndQualites((dataType, granularity, quality, timestamp, message)
             =>
             {
                 GivenASignalWith(dataType, granularity);
@@ -53,7 +53,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignalWithUnorderedData_WhenGettingData_ReturnsDataSorted()
         {
-            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypesAndQualites((dataType, granularity, quality, timestamp, message)
             =>
             {
                 GivenASignalWith(dataType, granularity);

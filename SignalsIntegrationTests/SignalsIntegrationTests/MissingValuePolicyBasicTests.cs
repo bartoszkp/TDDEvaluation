@@ -23,13 +23,14 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue5")]
-        public void NewSignalHasNoneQualityMissingValuePolicy()
+        public void GivenANewSignal_WhenGettingMissingValuePolicy_NoneQualityMissingValuePolicyIsReturned()
         {
-            var signal = AddNewIntegerSignal();
-
-            var result = client.GetMissingValuePolicy(signal.Id.Value);
-
-            Assert.IsInstanceOfType(result, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
+            ForAllSignalTypes((dataType, granularity, timestamp, message)
+               =>
+            {
+                GivenASignalWith(dataType, granularity);
+                ThenMissingValuePolicyHasType(typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
+            });
         }
 
         [TestMethod]
@@ -51,38 +52,9 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue3")]
-        public void MissingValuePolicyCanBeSetForSignal()
-        {
-            var signal1Id = AddNewIntegerSignal().Id.Value;
-            var signal2Id = AddNewIntegerSignal().Id.Value;
-
-            var policy1 = new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>();
-            var policy2 = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
-            {
-                Value = 42,
-                Quality = Quality.Fair
-            };
-
-            client.SetMissingValuePolicy(signal1Id, policy1.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
-            client.SetMissingValuePolicy(signal2Id, policy2.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
-
-            var result1 = client.GetMissingValuePolicy(signal1Id);
-            var result2 = client.GetMissingValuePolicy(signal2Id);
-
-            Assert.IsInstanceOfType(result1, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
-            Assert.IsInstanceOfType(result2, typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy));
-
-            var specificMissingValuePolicy = result2.ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>>();
-
-            Assert.AreEqual(42, specificMissingValuePolicy.Value);
-            Assert.AreEqual(Quality.Fair, specificMissingValuePolicy.Quality);
-        }
-
-        [TestMethod]
-        [TestCategory("issue3")]
         public void GivenASignal_WhenSettingNoneMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypes((dataType, granularity, timestamp, message)
                 =>
             {
                 GivenASignalWith(dataType, granularity);
@@ -100,7 +72,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue3")]
         public void GivenASignal_WhenSettingSpecificValueMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypesAndQualites((dataType, granularity, quality, timestamp, message)
                 =>
             {
                 GivenASignalWith(dataType, granularity);
@@ -115,7 +87,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue3")]
         public void GivenASignal_WhenSettingZeroOrderMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypes((dataType, granularity, timestamp, message)
                 =>
             {
                 GivenASignalWith(dataType, granularity);
@@ -132,7 +104,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue3")]
         public void GivenASignal_WhenSettingFirstOrderMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypes((dataType, granularity, timestamp, message)
                 =>
             {
                 if (dataType == DataType.String)

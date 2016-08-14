@@ -104,7 +104,7 @@ namespace SignalsIntegrationTests.Infrastructure
             return client.Add(signal.ToDto<Dto.Signal>());
         }
 
-        protected void ForAllSignalTypes(Action<DataType, Granularity, Quality, DateTime, string> test)
+        protected void ForAllSignalTypesAndQualites(Action<DataType, Granularity, Quality, DateTime, string> test)
         {
             foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
             {
@@ -115,6 +115,18 @@ namespace SignalsIntegrationTests.Infrastructure
                         var message = dataType.ToString() + ", " + granularity.ToString() + ", " + quality.ToString();
                         test(dataType, granularity, quality, timestamps[granularity], message);
                     }
+                }
+            }
+        }
+
+        protected void ForAllSignalTypes(Action<DataType, Granularity, DateTime, string> test)
+        {
+            foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
+            {
+                foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
+                {
+                    var message = dataType.ToString() + ", " + granularity.ToString();
+                    test(dataType, granularity, timestamps[granularity], message);
                 }
             }
         }
