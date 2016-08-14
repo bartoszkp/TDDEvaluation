@@ -22,7 +22,8 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        [TestCategory("issue1")]
+        [TestCategory("issue4")]
+        [TestCategory("issue13")]
         public void GivenBadPath_WhenGettingSignal_NullIsReturned()
         {
             var path = Path.FromString("/non/existent/path");
@@ -32,6 +33,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue1")]
+        [TestCategory("issue13")]
         public void GivenBadId_WhenGettingSignal_NullIsReturned()
         {
             Assert.IsNull(client.GetById(0));
