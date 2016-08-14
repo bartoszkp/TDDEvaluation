@@ -38,9 +38,19 @@ namespace SignalsIntegrationTests.Infrastructure
             CollectionAssert.AreEqual(
                 expected.ToList(),
                 actual.ToList(),
-                Comparer<Domain.Datum<T>>.Create((x, y) => x.Value.Equals(y.Value) 
-                                                            && x.Quality == y.Quality
-                                                            && x.Timestamp.Equals(y.Timestamp) ? 0 : 1));
+                Comparer<Domain.Datum<T>>.Create((x, y) => x.Quality.Equals(y.Quality) 
+                                                            && x.Timestamp == y.Timestamp
+                                                            && x.Value.Equals(y.Value) ? 0 : 1));
+        }
+
+        public static void AreEqual(IEnumerable<Dto.Datum> expected, IEnumerable<Dto.Datum> actual)
+        {
+            CollectionAssert.AreEqual(
+                expected.ToList(),
+                actual.ToList(),
+                Comparer<Dto.Datum>.Create((x, y) => x.Quality.Equals(y.Quality)
+                                                     && x.Timestamp.Equals(y.Timestamp)
+                                                     && x.Value.Equals(y.Value) ? 0 : 1));
         }
     }
 }

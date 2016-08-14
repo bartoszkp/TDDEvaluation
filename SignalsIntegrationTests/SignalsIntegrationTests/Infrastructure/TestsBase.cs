@@ -53,7 +53,6 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected void GivenNoData()
         {
-            GivenData();
         }
 
         protected void GivenSingleDatum(Datum<int> datum)
@@ -68,7 +67,12 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected void GivenData(params Datum<int>[] datums)
         {
-            client.SetData(signalId, datums.ToDto<Dto.Datum[]>());
+            GivenData(datums.ToDto<Dto.Datum[]>());
+        }
+
+        protected void GivenData(params Dto.Datum[] datums)
+        {
+            client.SetData(signalId, datums);
         }
 
         protected Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second, Domain.Path path = null)
