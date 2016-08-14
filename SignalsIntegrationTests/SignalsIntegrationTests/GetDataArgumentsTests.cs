@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Domain;
-using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 
@@ -37,6 +36,25 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue2")]
+        public void GivenASignal_WhenGettingDataWithReversedTimestamps_ReturnsEmpty()
+        {
+            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            =>
+            {
+                GivenASignalWith(dataType, granularity);
+                GivenData(new Dto.Datum() { Timestamp = timestamp, Quality = Dto.Quality.Good });
+
+                var from = GetNextTimestamp(timestamp, granularity);
+                var to = timestamp;
+
+                WhenGettigData(from, to);
+
+                ThenResultIsEmpty();
+            });
+        }
+
+        [TestMethod]
         [TestCategory("issue9")]
         public void GetDataForSecondGranularityRequiresZeroMillisecondsInFromTimestamps()
         {
@@ -45,17 +63,6 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddMilliseconds(1), ToTimestamp);
 
             ThenRequestThrows();
-        }
-
-        [TestMethod]
-        [TestCategory("issue2")]
-        public void GetDataForSecondGranularityReturnsEmptyForReversedTimestamps()
-        {
-            GivenASignalWith(Granularity.Second);
-
-            WhenGettigData(FromTimestamp, FromTimestamp.AddSeconds(-1));
-
-            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -78,17 +85,6 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddSeconds(1), ToTimestamp);
 
             ThenRequestThrows();
-        }
-
-        [TestMethod]
-        [TestCategory("issue2")]
-        public void GetDataForMinuteGranularityReturnsEmptyForReversedTimestamps()
-        {
-            GivenASignalWith(Granularity.Minute);
-
-            WhenGettigData(FromTimestamp, FromTimestamp.AddMinutes(-1));
-
-            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -122,17 +118,6 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddMinutes(1), ToTimestamp);
 
             ThenRequestThrows();
-        }
-
-        [TestMethod]
-        [TestCategory("issue2")]
-        public void GetDataForHourGranularityReturnsEmptyForReversedTimestamps()
-        {
-            GivenASignalWith(Granularity.Hour);
-
-            WhenGettigData(FromTimestamp, FromTimestamp.AddHours(-1));
-
-            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -177,17 +162,6 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddHours(1), ToTimestamp);
 
             ThenRequestThrows();
-        }
-
-        [TestMethod]
-        [TestCategory("issue2")]
-        public void GetDataForDayGranularityReturnsEmptyForReversedTimestamps()
-        {
-            GivenASignalWith(Granularity.Day);
-
-            WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-1));
-
-            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -243,17 +217,6 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddDays(1), ToTimestamp);
 
             ThenRequestThrows();
-        }
-
-        [TestMethod]
-        [TestCategory("issue2")]
-        public void GetDataForWeekGranularityReturnsEmptyForReversedTimestamps()
-        {
-            GivenASignalWith(Granularity.Week);
-
-            WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-7));
-
-            ThenResultIsEmpty();
         }
 
         [TestMethod]
@@ -386,17 +349,6 @@ namespace SignalsIntegrationTests
             WhenGettigData(FromTimestamp.AddMonths(1), ToTimestamp);
 
             ThenRequestThrows();
-        }
-
-        [TestMethod]
-        [TestCategory("issue2")]
-        public void GetDataForYearGranularityReturnsEmptyForReversedTimestamps()
-        {
-            GivenASignalWith(Granularity.Year);
-
-            WhenGettigData(FromTimestamp, FromTimestamp.AddYears(-1));
-
-            ThenResultIsEmpty();
         }
 
         private void WhenGettigData(DateTime fromIncludedUtc, DateTime toExcludedUtc)

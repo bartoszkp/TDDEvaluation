@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -102,6 +104,47 @@ namespace SignalsIntegrationTests.Infrastructure
             return client.Add(signal.ToDto<Dto.Signal>());
         }
 
+        protected void ForAllSignalTypes(Action<DataType, Granularity, Quality, DateTime, string> test)
+        {
+            foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
+            {
+                foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
+                {
+                    foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
+                    {
+                        var message = dataType.ToString() + ", " + granularity.ToString() + ", " + quality.ToString();
+                        test(dataType, granularity, quality, timestamps[granularity], message);
+                    }
+                }
+            }
+        }
+
+        protected DateTime GetNextTimestamp(DateTime dateTime, Granularity granularity)
+        {
+            var te = new TimeEnumerator(dateTime, 1, granularity);
+            return te.ToExcludedUtcUtc;
+        }
+
+        protected DateTime GetSecondNextTimestamp(DateTime dateTime, Granularity granularity)
+        {
+            var te = new TimeEnumerator(dateTime, 2, granularity);
+            return te.ToExcludedUtcUtc;
+        }
+
         protected int signalId;
+        protected Dictionary<DataType, object> values = new Dictionary<DataType, object>()
+            { { DataType.Boolean, true },
+              { DataType.Decimal, 42.0m },
+              { DataType.Double, 42.42 },
+              { DataType.Integer, 42 },
+              { DataType.String, "string" } };
+        protected Dictionary<Granularity, DateTime> timestamps = new Dictionary<Granularity, DateTime>()
+            { { Granularity.Day, new DateTime(2000, 2, 12) },
+              { Granularity.Hour, new DateTime(2000, 2, 12, 13, 0, 0) },
+              { Granularity.Minute, new DateTime(2000, 2, 12, 13, 14, 0) },
+              { Granularity.Month, new DateTime(2000, 2, 1) },
+              { Granularity.Second, new DateTime(2000, 2, 12, 13, 14, 15) },
+              { Granularity.Week, new DateTime(2000, 2, 7) },
+              { Granularity.Year, new DateTime(2000, 1, 1) } };
     }
 }
