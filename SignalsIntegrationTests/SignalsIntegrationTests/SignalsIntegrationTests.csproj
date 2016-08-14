@@ -39,7 +39,8 @@
     <Reference Include="Bootstrapper">
       <HintPath>..\..\Signals\Bootstrapper\bin\Debug\Bootstrapper.dll</HintPath>
     </Reference>
-    <Reference Include="Domain">
+    <Reference Include="Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Signals\Domain\bin\Debug\Domain.dll</HintPath>
     </Reference>
     <Reference Include="Dto">
@@ -83,10 +84,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="GetDataArgumentsTests.cs" />
+    <Compile Include="Infrastructure\TimeEnumerator.cs" />
     <Compile Include="SignalDataTests.cs" />
     <Compile Include="Infrastructure\DatumArray.cs" />
     <Compile Include="Infrastructure\DatumExtensions.cs" />
-    <Compile Include="Infrastructure\TimeEnumerator.cs" />
     <Compile Include="NoneQualityPolicyTests.cs" />
     <Compile Include="Infrastructure\MissingValuePolicyTestsBase.cs" />
     <Compile Include="Infrastructure\Assertions.cs" />

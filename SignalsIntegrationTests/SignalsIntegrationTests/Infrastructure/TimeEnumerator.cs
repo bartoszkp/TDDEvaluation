@@ -42,7 +42,7 @@ namespace SignalsIntegrationTests.Infrastructure
         public TimeEnumerator(DateTime fromIncludedUtc, int steps, Granularity granularity)
         {
             this.FromIncludedUtc = fromIncludedUtc;
-            this.ToExcludedUtcUtc = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncludedUtc, steps), (result, step) => granularityTimeSteps[granularity](result));
+            this.ToExcludedUtcUtc = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncludedUtc, steps + 1), (result, step) => granularityTimeSteps[granularity](result));
             this.Granularity = granularity;
             this.Reset();
         }
@@ -56,10 +56,16 @@ namespace SignalsIntegrationTests.Infrastructure
             if (this.current == null)
             {
                 this.current = FromIncludedUtc;
-                return true;
-            }
 
-            this.current = granularityTimeSteps[this.Granularity](this.current.Value);
+                if (FromIncludedUtc == ToExcludedUtcUtc)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                this.current = granularityTimeSteps[this.Granularity](this.current.Value);
+            }
 
             return this.current.Value < this.ToExcludedUtcUtc;
         }

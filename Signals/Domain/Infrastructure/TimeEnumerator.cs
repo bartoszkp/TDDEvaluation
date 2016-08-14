@@ -41,7 +41,7 @@ namespace Domain.Infrastructure
         public TimeEnumerator(DateTime fromIncludedUtc, int steps, Granularity granularity)
         {
             this.FromIncludedUtc = fromIncludedUtc;
-            this.ToExcludedUtcUtc = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncludedUtc, steps), (result, step) => granularityTimeSteps[granularity](result));
+            this.ToExcludedUtcUtc = Enumerable.Aggregate(Enumerable.Repeat(this.FromIncludedUtc, steps + 1), (result, step) => granularityTimeSteps[granularity](result));
             this.Granularity = granularity;
             this.Reset();
         }

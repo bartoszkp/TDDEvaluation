@@ -29,76 +29,33 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignalWithSingleDatum_WhenGettingData_ReturnsTheDatum()
         {
-            foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
+            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            =>
             {
-                foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
-                {
-                    foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
-                    {
-                        GivenASignalWith(dataType, granularity);
+                GivenASignalWith(dataType, granularity);
+                var datum = GivenDatumFor(dataType, granularity, quality);
 
-                        var datum = new Dto.Datum()
-                        {
-                            Quality = quality.ToDto<Dto.Quality>(),
-                            Timestamp = timestamps[granularity],
-                            Value = values[dataType]
-                        };
+                var retrievedData = client.GetData(signalId, timestamp, timestamp)
+                    .SingleOrDefault();
 
-                        GivenSingleDatum(datum);
-
-                        var retrievedData = client.GetData(signalId, timestamps[granularity], timestamps[granularity])
-                            .SingleOrDefault();
-
-                        var message = dataType.ToString() + ", " + granularity.ToString() + ", " + quality.ToString();
-                        Assert.IsNotNull(retrievedData, message);
-                        Assert.AreEqual(datum.Quality, retrievedData.Quality, message);
-                        Assert.AreEqual(datum.Timestamp, retrievedData.Timestamp, message);
-                        Assert.AreEqual(datum.Value, retrievedData.Value, message);
-                        Assert.AreEqual(datum.Value.GetType(), retrievedData.Value.GetType(), message);
-                    }
-                }
+                Assertions.AreEqual(datum, retrievedData, message);
+            });
             }
-        }
-
 
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenASignalWithInorderedData_WhenGettingData_ReturnsDataSorted()
         {
-            foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
+            ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
+            =>
             {
-                foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
-                {
-                    foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
-                    {
-                        GivenASignalWith(dataType, granularity);
+                GivenASignalWith(dataType, granularity);
+                var data = GivenTwoUnsortedDatumsFor(dataType, granularity, quality);
 
-                        var from = timestamps[granularity];
-                        var to = GetNextTimestamp(from, granularity);
+                var retrievedData = client.GetData(signalId, timestamp, GetSecondNextTimestamp(timestamp, granularity));
 
-                        var data1 = new Dto.Datum()
-                        {
-                            Quality = quality.ToDto<Dto.Quality>(),
-                            Timestamp = to,
-                            Value = values[dataType]
-                        };
-                        var data2 = new Dto.Datum()
-                        {
-                            Quality = quality.ToDto<Dto.Quality>(),
-                            Timestamp = from,
-                            Value = values[dataType]
-                        };
-
-                        GivenData(data1, data2);
-
-                        var retrievedData = client.GetData(signalId, from, GetNextTimestamp(to, granularity));
-
-                        var message = dataType.ToString() + ", " + granularity.ToString() + ", " + quality.ToString();
-                        Assert.IsNotNull(retrievedData, message);
-                        Assertions.AreEqual(new[] { data2, data1 }, retrievedData);
-                    }
-                }
-            }
+                Assertions.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, message);
+            });
         }
 
         [TestMethod]
@@ -150,12 +107,68 @@ namespace SignalsIntegrationTests
             Assertions.AreEqual(expectedData, retrievedData);
         }
 
+        private void ForAllSignalTypes(Action<DataType, Granularity, Quality, DateTime, string> test)
+        {
+            foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
+            {
+                foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
+                {
+                    foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
+                    { 
+                        var message = dataType.ToString() + ", " + granularity.ToString() + ", " + quality.ToString();
+                        test(dataType, granularity, quality, timestamps[granularity], message);
+                    }
+                }
+            }
+        }
+
+        private Dto.Datum GivenDatumFor(DataType dataType, Granularity granularity, Quality quality)
+        {
+            var datum = new Dto.Datum()
+            {
+                Quality = quality.ToDto<Dto.Quality>(),
+                Timestamp = timestamps[granularity],
+                Value = values[dataType]
+            };
+
+            GivenSingleDatum(datum);
+
+            return datum;
+        }
+
+        private Dto.Datum[] GivenTwoUnsortedDatumsFor(DataType dataType, Granularity granularity, Quality quality)
+        {
+            var from = timestamps[granularity];
+            var to = GetNextTimestamp(from, granularity);
+
+            var data1 = new Dto.Datum()
+            {
+                Quality = quality.ToDto<Dto.Quality>(),
+                Timestamp = to,
+                Value = values[dataType]
+            };
+            var data2 = new Dto.Datum()
+            {
+                Quality = quality.ToDto<Dto.Quality>(),
+                Timestamp = from,
+                Value = values[dataType]
+            };
+
+            GivenData(data1, data2);
+
+            return new[] { data1, data2 };
+        }
+
         private DateTime GetNextTimestamp(DateTime dateTime, Granularity granularity)
         {
             var te = new TimeEnumerator(dateTime, 1, granularity);
-            te.MoveNext();
-            te.MoveNext();
-            return te.Current;
+            return te.ToExcludedUtcUtc;
+        }
+
+        private DateTime GetSecondNextTimestamp(DateTime dateTime, Granularity granularity)
+        {
+            var te = new TimeEnumerator(dateTime, 2, granularity);
+            return te.ToExcludedUtcUtc;
         }
 
         private Dictionary<DataType, object> values = new Dictionary<DataType, object>()

@@ -64,9 +64,18 @@ namespace WebService
 
             var getData = GetAppropriateGetDataMethod(signal.DataType);
 
-            var result = getData
-                .Invoke(this.signalsDomainService, new object[] { signal, fromIncludedUtc, toExcludedUtc })
-                as IEnumerable;
+            IEnumerable result;
+
+            try
+            {
+                result = getData
+                    .Invoke(this.signalsDomainService, new object[] { signal, fromIncludedUtc, toExcludedUtc })
+                    as IEnumerable;
+            }
+            catch (TargetInvocationException te)
+            {
+                throw te.InnerException;
+            }
 
             if (result == null)
                 return null;
@@ -94,7 +103,14 @@ namespace WebService
 
             var setData = GetAppropriateSetDataMethod(signal.DataType);
 
-            setData.Invoke(this.signalsDomainService, new object[] { signal, concreteData });
+            try
+            {
+                setData.Invoke(this.signalsDomainService, new object[] { signal, concreteData });
+            }
+            catch (TargetInvocationException te)
+            {
+                throw te.InnerException;
+            }
         }
 
         private static MethodInfo GetAppropriateGetDataMethod(Domain.DataType dataType)
