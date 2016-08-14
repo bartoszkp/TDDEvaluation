@@ -301,17 +301,6 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue9")]
-        public void GetDataForMonthGranularityReturnsEmptyForReversedTimestamps()
-        {
-            GivenASignalWith(Granularity.Month);
-
-            WhenGettigData(FromTimestamp, FromTimestamp.AddDays(-31));
-
-            ThenResultIsEmpty();
-        }
-
-        [TestMethod]
-        [TestCategory("issue9")]
         public void GetDataForYearGranularityRequiresZeroMillisecondsInFromTimestamps()
         {
             GivenASignalWith(Granularity.Year);
