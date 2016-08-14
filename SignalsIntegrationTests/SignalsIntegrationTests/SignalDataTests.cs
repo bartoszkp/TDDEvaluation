@@ -42,7 +42,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue2")]
-        public void GivenASignalWithInorderedData_WhenGettingData_ReturnsDataSorted()
+        public void GivenASignalWithUnorderedData_WhenGettingData_ReturnsDataSorted()
         {
             ForAllSignalTypes((dataType, granularity, quality, timestamp, message)
             =>
@@ -106,6 +106,18 @@ namespace SignalsIntegrationTests
                 .ToDomain<Domain.Datum<int>[]>();
 
             Assertions.AreEqual(expectedData, retrievedData);
+        }
+
+        [TestMethod]
+        [TestCategory("issue2")]
+        public void GivenASignal_WhenSettingDataWithDuplicateTimestamps_Throws()
+        {
+            GivenASignalWith(Granularity.Day);
+
+            Assertions.AssertThrows(() => client.SetData(
+                signalId,
+                new[] { new Dto.Datum() { Timestamp = new DateTime(2000, 1, 1) },
+                        new Dto.Datum() { Timestamp = new DateTime(2000, 1, 1) } }));
         }
 
         private void ForAllSignalTypes(Action<DataType, Granularity, Quality, DateTime, string> test)

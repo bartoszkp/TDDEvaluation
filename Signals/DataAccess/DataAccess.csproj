@@ -96,6 +96,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoMappingOverrides\DatumConvention.cs" />
     <Compile Include="AutoMappingOverrides\MissingValuePolicyBaseMappingOverride.cs" />
     <Compile Include="AutoMappingOverrides\CustomTypes\PathComponentsList.cs" />
     <Compile Include="AutoMappingOverrides\SignalMappingOverride.cs" />
