@@ -120,9 +120,19 @@ namespace SignalsIntegrationTests
             });
         }
 
+        private static Domain.MissingValuePolicy.MissingValuePolicyBase CreateForNativeType(
+            Type genericPolicyType, Type nativeType)
+        {
+            return genericPolicyType
+                .MakeGenericType(nativeType)
+                .GetConstructor(Type.EmptyTypes)
+                .Invoke(null) as Domain.MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+
         private void WhenSettingSpecificValueMissingValuePolicy(DataType dataType, Quality quality)
         {
-            var newPolicy = Domain.MissingValuePolicy.MissingValuePolicyBase.CreateForNativeType(
+            var newPolicy = CreateForNativeType(
                typeof(Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<>),
                Domain.Infrastructure.DataTypeUtils.GetNativeType(dataType));
 
@@ -134,7 +144,7 @@ namespace SignalsIntegrationTests
 
         private void WhenSettingMissingValuePolicy(Type policyType, DataType signalDataType)
         {
-            var newPolicy = Domain.MissingValuePolicy.MissingValuePolicyBase.CreateForNativeType(
+            var newPolicy = CreateForNativeType(
                 policyType,
                 Domain.Infrastructure.DataTypeUtils.GetNativeType(signalDataType));
 
