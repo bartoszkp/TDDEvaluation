@@ -57,7 +57,7 @@ namespace SignalsIntegrationTests.Infrastructure
         {
         }
 
-        protected void GivenSingleDatum(Datum<int> datum)
+        protected void GivenSingleDatum<T>(Datum<T> datum)
         {
             GivenData(datum);
         }
@@ -67,7 +67,7 @@ namespace SignalsIntegrationTests.Infrastructure
             client.SetData(signalId, new[] { datum });
         }
 
-        protected void GivenData(params Datum<int>[] datums)
+        protected void GivenData<T>(params Datum<T>[] datums)
         {
             GivenData(datums.ToDto<Dto.Datum[]>());
         }

@@ -6,7 +6,7 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class ZeroOrderPolicyTests : MissingValuePolicyTestsBase
+    public class ZeroOrderPolicyTests : MissingValuePolicyTestsBase<int>
     {
         private DateTime BeginTimestamp { get { return new DateTime(2020, 10, 12); } }
 
@@ -17,13 +17,13 @@ namespace SignalsIntegrationTests
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolicyTestsBase.ClassInitialize(testContext);
+            MissingValuePolicyTestsBase<int>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolicyTestsBase.ClassCleanup();
+            MissingValuePolicyTestsBase<int>.ClassCleanup();
         }
 
         [TestInitialize]
