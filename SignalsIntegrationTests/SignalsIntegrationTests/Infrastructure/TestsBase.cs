@@ -138,13 +138,17 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected DateTime GetNextTimestamp(DateTime dateTime, Granularity granularity)
         {
-            var te = new TimeEnumerator(dateTime, 1, granularity);
-            return te.ToExcludedUtcUtc;
+            return GetNthNextTimestamp(1, dateTime, granularity);
         }
 
         protected DateTime GetSecondNextTimestamp(DateTime dateTime, Granularity granularity)
         {
-            var te = new TimeEnumerator(dateTime, 2, granularity);
+            return GetNthNextTimestamp(2, dateTime, granularity);
+        }
+
+        protected DateTime GetNthNextTimestamp(int n, DateTime dateTime, Granularity granularity)
+        {
+            var te = new TimeEnumerator(dateTime, n, granularity);
             return te.ToExcludedUtcUtc;
         }
 

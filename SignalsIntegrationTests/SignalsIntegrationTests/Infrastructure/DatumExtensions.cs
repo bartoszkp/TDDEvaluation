@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Domain;
+using Domain.Infrastructure;
+using Dto.Conversions;
 
 namespace SignalsIntegrationTests.Infrastructure
 {
@@ -27,11 +29,17 @@ namespace SignalsIntegrationTests.Infrastructure
             return @this;
         }
 
+        public static Datum<T>[] WithValueAt<T>(this Datum<T>[] @this, T value, Quality quality, DateTime timestamp)
+        {
+            @this.Single(datum => datum.Timestamp == timestamp).Value = value;
+            @this.Single(datum => datum.Timestamp == timestamp).Quality = quality;
+
+            return @this;
+        }
+
         public static Datum<T>[] WithGoodQualityValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)
         {
-            @this.Single(datum => datum.Timestamp == timestamp).Quality = Quality.Good;
-
-            return @this.WithValueAt(value, timestamp);
+            return @this.WithValueAt(value, Quality.Good, timestamp);
         }
 
         public static Datum<T>[] WithSingleGoodQualityValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)

@@ -40,7 +40,7 @@ namespace SignalsIntegrationTests.Infrastructure
                 actual.ToList(),
                 Comparer<Domain.Datum<T>>.Create((x, y) => x.Quality.Equals(y.Quality) 
                                                             && x.Timestamp == y.Timestamp
-                                                            && x.Value.Equals(y.Value) ? 0 : 1));
+                                                            && ((x.Value == null && y.Value == null ) || x.Value.Equals(y.Value)) ? 0 : 1));
         }
 
         public static void AreEqual(Dto.Datum expected, Dto.Datum actual, string message = "")
