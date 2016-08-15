@@ -1,6 +1,5 @@
 ﻿using System;
 using Domain;
-using Domain.Infrastructure;
 
 namespace SignalsIntegrationTests.Infrastructure
 {
@@ -8,8 +7,6 @@ namespace SignalsIntegrationTests.Infrastructure
     {
         public static DateTime AddSteps(this DateTime @this, Granularity granularity, int steps)
         {
-            granularity.ValidateTimestamp(@this);
-
             switch (granularity)
             {
                 case Granularity.Second:

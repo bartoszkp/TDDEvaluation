@@ -36,13 +36,13 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignalWithSingleDatum_WhenGettingData_ReturnsTheDatum()
         {
-            ForAllSignalTypesAndQualites((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypesAndQualites((dataType, granularity, quality, message)
             =>
             {
                 GivenASignalWith(dataType, granularity);
                 var datum = GivenDatumFor(dataType, granularity, quality);
 
-                var retrievedData = client.GetData(signalId, timestamp, timestamp)
+                var retrievedData = client.GetData(signalId, UniversalBeginTimestamp, UniversalBeginTimestamp)
                     .SingleOrDefault();
 
                 Assertions.AreEqual(datum, retrievedData, message);
@@ -53,13 +53,13 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignalWithUnorderedData_WhenGettingData_ReturnsDataSorted()
         {
-            ForAllSignalTypesAndQualites((dataType, granularity, quality, timestamp, message)
+            ForAllSignalTypesAndQualites((dataType, granularity, quality, message)
             =>
             {
                 GivenASignalWith(dataType, granularity);
                 var data = GivenTwoUnsortedDatumsFor(dataType, granularity, quality);
 
-                var retrievedData = client.GetData(signalId, timestamp, GetSecondNextTimestamp(timestamp, granularity));
+                var retrievedData = client.GetData(signalId, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 2));
 
                 Assertions.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, message);
             });
@@ -134,7 +134,7 @@ namespace SignalsIntegrationTests
             var datum = new Dto.Datum()
             {
                 Quality = quality.ToDto<Dto.Quality>(),
-                Timestamp = timestamps[granularity],
+                Timestamp = UniversalBeginTimestamp,
                 Value = values[dataType]
             };
 
@@ -145,8 +145,8 @@ namespace SignalsIntegrationTests
 
         private Dto.Datum[] GivenTwoUnsortedDatumsFor(DataType dataType, Granularity granularity, Quality quality)
         {
-            var from = timestamps[granularity];
-            var to = GetNextTimestamp(from, granularity);
+            var from = UniversalBeginTimestamp;
+            var to = from.AddSteps(granularity, 1);
 
             var data1 = new Dto.Datum()
             {

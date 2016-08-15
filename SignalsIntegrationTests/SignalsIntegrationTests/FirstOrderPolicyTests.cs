@@ -10,18 +10,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public abstract class FirstOrderPolicyTests<T> : MissingValuePolicyTestsBase<T>
     {
-        private DateTime BeginTimestamp { get { return new DateTime(2018, 1, 1); } }
-
-        private DateTime EndTimestamp(Granularity granularity)
-        {
-            return BeginTimestamp.AddSteps(granularity, 5);
-        }
-
-        private DateTime MiddleTimestamp(Granularity granularity)
-        {
-            return BeginTimestamp.AddSteps(granularity, 2);
-        }
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -43,10 +31,10 @@ namespace SignalsIntegrationTests
             {
                 GivenNoData();
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
             });
         }
 
@@ -57,12 +45,12 @@ namespace SignalsIntegrationTests
             ForAllGranularities((granularity)
                 =>
             {
-                GivenSingleDatum(new Datum<T>() { Quality = Quality.Good, Value = Value(1410), Timestamp = BeginTimestamp });
+                GivenSingleDatum(new Datum<T>() { Quality = Quality.Good, Value = Value(1410), Timestamp = UniversalBeginTimestamp });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWithGoodQualityValue(Value(1410)));
             });
         }
@@ -74,13 +62,13 @@ namespace SignalsIntegrationTests
             ForAllGranularities((granularity)
                =>
             {
-                GivenSingleDatum(new Datum<T>() { Quality = Quality.Good, Value = Value(1410), Timestamp = BeginTimestamp.AddSteps(granularity, 1) });
+                GivenSingleDatum(new Datum<T>() { Quality = Quality.Good, Value = Value(1410), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithSingleGoodQualityValueAt(Value(1410), BeginTimestamp.AddSteps(granularity, 1)));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithSingleGoodQualityValueAt(Value(1410), UniversalBeginTimestamp.AddSteps(granularity, 1)));
             });
         }
 
@@ -92,17 +80,17 @@ namespace SignalsIntegrationTests
               =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Good, BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithValueAt(Value(15), BeginTimestamp.AddSteps(granularity, 1))
-                    .WithValueAt(Value(20), BeginTimestamp.AddSteps(granularity, 2))
-                    .WithValueAt(Value(25), BeginTimestamp.AddSteps(granularity, 3))
-                    .WithValueAt(Value(30), BeginTimestamp.AddSteps(granularity, 4)));
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Good, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithValueAt(Value(15), UniversalBeginTimestamp.AddSteps(granularity, 1))
+                    .WithValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 2))
+                    .WithValueAt(Value(25), UniversalBeginTimestamp.AddSteps(granularity, 3))
+                    .WithValueAt(Value(30), UniversalBeginTimestamp.AddSteps(granularity, 4)));
             });
         }
 
@@ -114,16 +102,16 @@ namespace SignalsIntegrationTests
               =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp.AddSteps(granularity, 1) },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -2) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1) },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -2) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithGoodQualityValueAt(Value(10), BeginTimestamp.AddSteps(granularity, 1))
-                    .WithGoodQualityValueAt(Value(20), BeginTimestamp.AddSteps(granularity, 2))
-                    .WithGoodQualityValueAt(Value(30), BeginTimestamp.AddSteps(granularity, 3)));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithGoodQualityValueAt(Value(10), UniversalBeginTimestamp.AddSteps(granularity, 1))
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 2))
+                    .WithGoodQualityValueAt(Value(30), UniversalBeginTimestamp.AddSteps(granularity, 3)));
             });
         }
 
@@ -135,15 +123,15 @@ namespace SignalsIntegrationTests
               =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp.AddSteps(granularity, -1) },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = BeginTimestamp.AddSteps(granularity, 1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, -1) },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithGoodQualityValueAt(Value(20), BeginTimestamp)
-                    .WithGoodQualityValueAt(Value(30), BeginTimestamp.AddSteps(granularity, 1)));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp)
+                    .WithGoodQualityValueAt(Value(30), UniversalBeginTimestamp.AddSteps(granularity, 1)));
             });
         }
 
@@ -155,18 +143,18 @@ namespace SignalsIntegrationTests
                =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(35), Timestamp = EndTimestamp(granularity) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(35), Timestamp = UniversalEndTimestamp(granularity) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .ForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithGoodQualityValueAt(Value(10), BeginTimestamp.AddSteps(granularity, 0))
-                    .WithGoodQualityValueAt(Value(15), BeginTimestamp.AddSteps(granularity, 1))
-                    .WithGoodQualityValueAt(Value(20), BeginTimestamp.AddSteps(granularity, 2))
-                    .WithGoodQualityValueAt(Value(25), BeginTimestamp.AddSteps(granularity, 3))
-                    .WithGoodQualityValueAt(Value(30), BeginTimestamp.AddSteps(granularity, 4)));
+                    .ForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithGoodQualityValueAt(Value(10), UniversalBeginTimestamp.AddSteps(granularity, 0))
+                    .WithGoodQualityValueAt(Value(15), UniversalBeginTimestamp.AddSteps(granularity, 1))
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 2))
+                    .WithGoodQualityValueAt(Value(25), UniversalBeginTimestamp.AddSteps(granularity, 3))
+                    .WithGoodQualityValueAt(Value(30), UniversalBeginTimestamp.AddSteps(granularity, 4)));
             });
         }
 
@@ -178,17 +166,17 @@ namespace SignalsIntegrationTests
                =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp.AddSteps(granularity, 1) },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(35), Timestamp = EndTimestamp(granularity).AddSteps(granularity, 1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1) },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(35), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, 1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithGoodQualityValueAt(Value(10), BeginTimestamp.AddSteps(granularity, 1))
-                    .WithGoodQualityValueAt(Value(15), BeginTimestamp.AddSteps(granularity, 2))
-                    .WithGoodQualityValueAt(Value(20), BeginTimestamp.AddSteps(granularity, 3))
-                    .WithGoodQualityValueAt(Value(25), BeginTimestamp.AddSteps(granularity, 4)));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithGoodQualityValueAt(Value(10), UniversalBeginTimestamp.AddSteps(granularity, 1))
+                    .WithGoodQualityValueAt(Value(15), UniversalBeginTimestamp.AddSteps(granularity, 2))
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 3))
+                    .WithGoodQualityValueAt(Value(25), UniversalBeginTimestamp.AddSteps(granularity, 4)));
             });
         }
 
@@ -200,18 +188,18 @@ namespace SignalsIntegrationTests
                 =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp.AddSteps(granularity, -1) },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(80), Timestamp = EndTimestamp(granularity).AddSteps(granularity, 1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, -1) },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(80), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, 1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .ForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithGoodQualityValueAt(Value(20), BeginTimestamp.AddSteps(granularity, 0))
-                    .WithGoodQualityValueAt(Value(30), BeginTimestamp.AddSteps(granularity, 1))
-                    .WithGoodQualityValueAt(Value(40), BeginTimestamp.AddSteps(granularity, 2))
-                    .WithGoodQualityValueAt(Value(50), BeginTimestamp.AddSteps(granularity, 3))
-                    .WithGoodQualityValueAt(Value(60), BeginTimestamp.AddSteps(granularity, 4)));
+                    .ForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 0))
+                    .WithGoodQualityValueAt(Value(30), UniversalBeginTimestamp.AddSteps(granularity, 1))
+                    .WithGoodQualityValueAt(Value(40), UniversalBeginTimestamp.AddSteps(granularity, 2))
+                    .WithGoodQualityValueAt(Value(50), UniversalBeginTimestamp.AddSteps(granularity, 3))
+                    .WithGoodQualityValueAt(Value(60), UniversalBeginTimestamp.AddSteps(granularity, 4)));
             });
         }
 
@@ -223,19 +211,19 @@ namespace SignalsIntegrationTests
                 =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = MiddleTimestamp(granularity) },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(30), Timestamp = UniversalMiddleTimestamp(granularity) },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .ForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithGoodQualityValueAt(Value(10), BeginTimestamp.AddSteps(granularity, 0))
-                    .WithGoodQualityValueAt(Value(20), BeginTimestamp.AddSteps(granularity, 1))
-                    .WithGoodQualityValueAt(Value(30), BeginTimestamp.AddSteps(granularity, 2))
-                    .WithGoodQualityValueAt(Value(20), BeginTimestamp.AddSteps(granularity, 3))
-                    .WithGoodQualityValueAt(Value(10), BeginTimestamp.AddSteps(granularity, 4)));
+                    .ForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithGoodQualityValueAt(Value(10), UniversalBeginTimestamp.AddSteps(granularity, 0))
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 1))
+                    .WithGoodQualityValueAt(Value(30), UniversalBeginTimestamp.AddSteps(granularity, 2))
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 3))
+                    .WithGoodQualityValueAt(Value(10), UniversalBeginTimestamp.AddSteps(granularity, 4)));
             });
         }
 
@@ -247,13 +235,13 @@ namespace SignalsIntegrationTests
                 =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWithGoodQualityValue(Value(10)));
             });
         }
@@ -265,13 +253,13 @@ namespace SignalsIntegrationTests
             ForAllGranularities((granularity)
                =>
             {
-                GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = BeginTimestamp },
-                      new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .EndingWithGoodQualityValue(Value(10)));
             });
         }
@@ -284,13 +272,13 @@ namespace SignalsIntegrationTests
                =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWithGoodQualityValue(Value(10)));
             });
         }
@@ -303,13 +291,13 @@ namespace SignalsIntegrationTests
                =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .EndingWithGoodQualityValue(Value(10)));
             });
         }
@@ -322,13 +310,13 @@ namespace SignalsIntegrationTests
                =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWithGoodQualityValue(Value(10)));
             });
         }
@@ -341,13 +329,13 @@ namespace SignalsIntegrationTests
              =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .EndingWithGoodQualityValue(Value(10)));
             });
         }
@@ -360,13 +348,13 @@ namespace SignalsIntegrationTests
                 =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWith(Value(10), Quality.Fair));
             });
         }
@@ -379,13 +367,13 @@ namespace SignalsIntegrationTests
                 =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .EndingWith(Value(10), Quality.Fair));
             });
         }
@@ -397,13 +385,13 @@ namespace SignalsIntegrationTests
             ForAllGranularities((granularity)
               =>
             {
-                GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = BeginTimestamp },
-                          new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                          new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWith(Value(10), Quality.Fair));
             });
         }
@@ -416,13 +404,13 @@ namespace SignalsIntegrationTests
                 =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .EndingWith(Value(10), Quality.Fair));
             });
         }
@@ -435,13 +423,13 @@ namespace SignalsIntegrationTests
                =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWith(Value(10), Quality.Poor));
             });
         }
@@ -454,13 +442,13 @@ namespace SignalsIntegrationTests
                =>
             {
                 GivenData(
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = BeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .EndingWith(Value(10), Quality.Poor));
             });
         }

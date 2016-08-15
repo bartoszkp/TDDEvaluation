@@ -64,16 +64,13 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignal_WhenGettingDataWithReversedTimestamps_ReturnsEmpty()
         {
-            ForAllSignalTypes((dataType, granularity, timestamp, message)
+            ForAllSignalTypes((dataType, granularity, message)
             =>
             {
                 GivenASignalWith(dataType, granularity);
-                GivenData(new Dto.Datum() { Timestamp = timestamp, Quality = Dto.Quality.Good });
+                GivenData(new Dto.Datum() { Timestamp = UniversalBeginTimestamp, Quality = Dto.Quality.Good });
 
-                var from = GetNextTimestamp(timestamp, granularity);
-                var to = timestamp;
-
-                WhenGettigData(from, to);
+                WhenGettigData(UniversalEndTimestamp(granularity), UniversalBeginTimestamp);
 
                 ThenResultIsEmpty();
             });

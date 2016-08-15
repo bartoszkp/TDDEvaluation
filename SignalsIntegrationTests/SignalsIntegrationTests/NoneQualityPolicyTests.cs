@@ -11,18 +11,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class NoneQualityPolicyTests<T> : MissingValuePolicyTestsBase<T>
     {
-        private DateTime BeginTimestamp { get { return new DateTime(2018, 1, 1); } }
-
-        private DateTime EndTimestamp(Granularity granularity)
-        {
-            return BeginTimestamp.AddSteps(granularity, 5);
-        }
-
-        private DateTime MiddleTimestamp(Granularity granularity)
-        {
-            return BeginTimestamp.AddSteps(granularity, 2);
-        }
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -49,10 +37,10 @@ namespace SignalsIntegrationTests
             {
                 GivenNoData();
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
             });
         }
 
@@ -64,12 +52,12 @@ namespace SignalsIntegrationTests
                 =>
             {
                 T value = (T)values[typeof(T).FromNativeType()];
-                GivenSingleDatum(new Datum<T>() { Quality = quality, Value = value, Timestamp = BeginTimestamp });
+                GivenSingleDatum(new Datum<T>() { Quality = quality, Value = value, Timestamp = UniversalBeginTimestamp });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .StartingWith(value, quality));
             });
         }
@@ -82,12 +70,12 @@ namespace SignalsIntegrationTests
                 =>
             {
                 T value = (T)values[typeof(T).FromNativeType()];
-                GivenSingleDatum(new Dto.Datum() { Quality = quality.ToDto<Dto.Quality>(), Value = value, Timestamp = BeginTimestamp.AddSteps(granularity, -1) });
+                GivenSingleDatum(new Dto.Datum() { Quality = quality.ToDto<Dto.Quality>(), Value = value, Timestamp = UniversalBeginTimestamp.AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
             });
         }
 
@@ -99,12 +87,12 @@ namespace SignalsIntegrationTests
               =>
             {
                 T value = (T)values[typeof(T).FromNativeType()];
-                GivenSingleDatum(new Datum<T>() { Quality = quality, Value = value, Timestamp = EndTimestamp(granularity).AddSteps(granularity, -1) });
+                GivenSingleDatum(new Datum<T>() { Quality = quality, Value = value, Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                     .EndingWith(value, quality));
             });
         }
@@ -117,12 +105,12 @@ namespace SignalsIntegrationTests
                 =>
             {
                 T value = (T)values[typeof(T).FromNativeType()];
-                GivenSingleDatum(new Datum<T>() { Quality = Quality.Good, Value = value, Timestamp = EndTimestamp(granularity) });
+                GivenSingleDatum(new Datum<T>() { Quality = Quality.Good, Value = value, Timestamp = UniversalEndTimestamp(granularity) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
             });
         }
 
@@ -134,13 +122,13 @@ namespace SignalsIntegrationTests
                =>
             {
                 T value = (T)values[typeof(T).FromNativeType()];
-                GivenSingleDatum(new Datum<T>() { Quality = quality, Value = value, Timestamp = MiddleTimestamp(granularity) });
+                GivenSingleDatum(new Datum<T>() { Quality = quality, Value = value, Timestamp = UniversalMiddleTimestamp(granularity) });
 
-                WhenReadingData(BeginTimestamp, EndTimestamp(granularity));
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
                 ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(BeginTimestamp, EndTimestamp(granularity), granularity)
-                    .WithValueAt(value, quality, MiddleTimestamp(granularity)));
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithValueAt(value, quality, UniversalMiddleTimestamp(granularity)));
             });
         }
 

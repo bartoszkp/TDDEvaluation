@@ -9,8 +9,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SetDataArgumentsTests : TestsBase
     {
-        private DateTime Timestamp { get; } = new DateTime(2029, 1, 1, 0, 0, 0, 0);
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -29,7 +27,7 @@ namespace SignalsIntegrationTests
         {
             GivenNoSignals();
 
-            WhenSettigDataFor(Timestamp);
+            WhenSettigDataFor(UniversalBeginTimestamp);
 
             ThenRequestThrows();
         }
@@ -40,7 +38,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Second);
 
-            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMilliseconds(1));
 
             ThenRequestThrows();
         }
@@ -51,7 +49,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Minute);
 
-            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMilliseconds(1));
 
             ThenRequestThrows();
         }
@@ -62,7 +60,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Minute);
 
-            WhenSettigDataFor(Timestamp.AddSeconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddSeconds(1));
 
             ThenRequestThrows();
         }
@@ -73,7 +71,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Hour);
 
-            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMilliseconds(1));
 
             ThenRequestThrows();
         }
@@ -84,7 +82,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Hour);
 
-            WhenSettigDataFor(Timestamp.AddSeconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddSeconds(1));
 
             ThenRequestThrows();
         }
@@ -95,7 +93,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Hour);
 
-            WhenSettigDataFor(Timestamp.AddMinutes(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMinutes(1));
 
             ThenRequestThrows();
         }
@@ -106,7 +104,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Day);
 
-            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMilliseconds(1));
 
             ThenRequestThrows();
         }
@@ -117,7 +115,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Day);
 
-            WhenSettigDataFor(Timestamp.AddSeconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddSeconds(1));
 
             ThenRequestThrows();
         }
@@ -128,7 +126,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Day);
 
-            WhenSettigDataFor(Timestamp.AddMinutes(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMinutes(1));
 
             ThenRequestThrows();
         }
@@ -139,7 +137,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Day);
 
-            WhenSettigDataFor(Timestamp.AddHours(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddHours(1));
 
             ThenRequestThrows();
         }
@@ -150,7 +148,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Week);
 
-            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMilliseconds(1));
 
             ThenRequestThrows();
         }
@@ -161,7 +159,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Week);
 
-            WhenSettigDataFor(Timestamp.AddSeconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddSeconds(1));
 
             ThenRequestThrows();
         }
@@ -172,7 +170,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Week);
 
-            WhenSettigDataFor(Timestamp.AddMinutes(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMinutes(1));
 
             ThenRequestThrows();
         }
@@ -183,7 +181,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Week);
 
-            WhenSettigDataFor(Timestamp.AddHours(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddHours(1));
 
             ThenRequestThrows();
         }
@@ -194,7 +192,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Week);
 
-            WhenSettigDataFor(Timestamp.AddDays(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddDays(1));
 
             ThenRequestThrows();
         }
@@ -205,7 +203,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Month);
 
-            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMilliseconds(1));
 
             ThenRequestThrows();
         }
@@ -216,7 +214,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Month);
 
-            WhenSettigDataFor(Timestamp.AddSeconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddSeconds(1));
 
             ThenRequestThrows();
         }
@@ -227,7 +225,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Month);
 
-            WhenSettigDataFor(Timestamp.AddMinutes(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMinutes(1));
 
             ThenRequestThrows();
         }
@@ -238,7 +236,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Month);
 
-            WhenSettigDataFor(Timestamp.AddHours(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddHours(1));
 
             ThenRequestThrows();
         }
@@ -249,7 +247,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Month);
 
-            WhenSettigDataFor(Timestamp.AddDays(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddDays(1));
 
             ThenRequestThrows();
         }
@@ -260,7 +258,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Year);
 
-            WhenSettigDataFor(Timestamp.AddMilliseconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMilliseconds(1));
 
             ThenRequestThrows();
         }
@@ -271,7 +269,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Year);
 
-            WhenSettigDataFor(Timestamp.AddSeconds(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddSeconds(1));
 
             ThenRequestThrows();
         }
@@ -282,7 +280,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Year);
 
-            WhenSettigDataFor(Timestamp.AddMinutes(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMinutes(1));
 
             ThenRequestThrows();
         }
@@ -293,7 +291,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Year);
 
-            WhenSettigDataFor(Timestamp.AddHours(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddHours(1));
 
             ThenRequestThrows();
         }
@@ -304,7 +302,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Year);
 
-            WhenSettigDataFor(Timestamp.AddDays(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddDays(1));
 
             ThenRequestThrows();
         }
@@ -315,7 +313,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Year);
 
-            WhenSettigDataFor(Timestamp.AddMonths(1));
+            WhenSettigDataFor(UniversalBeginTimestamp.AddMonths(1));
 
             ThenRequestThrows();
         }
