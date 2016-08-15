@@ -38,6 +38,11 @@ namespace SignalsIntegrationTests.Infrastructure
             serviceGuard.Dispose();
         }
 
+        protected void GivenASignal(Path path, DataType dataType = DataType.Integer, Granularity granularity = Granularity.Day)
+        {
+            signalId = AddNewSignal(dataType, granularity, path).Id.Value;
+        }
+
         protected void GivenASignalWith(DataType dataType, Granularity granularity)
         {
             signalId = AddNewSignal(dataType, granularity).Id.Value;

@@ -22,7 +22,6 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        [TestCategory("issue4")]
         [TestCategory("issue13")]
         public void GivenBadPath_WhenGettingSignal_NullIsReturned()
         {
@@ -32,7 +31,6 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        [TestCategory("issue1")]
         [TestCategory("issue13")]
         public void GivenBadId_WhenGettingSignal_NullIsReturned()
         {
@@ -66,6 +64,17 @@ namespace SignalsIntegrationTests
             signal = client.Add(signal.ToDto<Dto.Signal>()).ToDomain<Domain.Signal>();
 
             Assert.IsNotNull(signal.Id);
+        }
+
+        [TestMethod]
+        [TestCategory("issue4")]
+        public void GivenASignal_WhenGettingByIncompletePath_ReturnsNull()
+        {
+            GivenASignal(Path.FromString("/root/signal1"));
+
+            var result = client.Get(new Dto.Path() { Components = new[] { "root" } });
+
+            Assert.IsNull(result);
         }
 
         [TestMethod]
