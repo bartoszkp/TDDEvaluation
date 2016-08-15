@@ -83,6 +83,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="MissingValuePolicyBasicTests.cs" />
     <Compile Include="GetDataArgumentsTests.cs" />
     <Compile Include="Infrastructure\TimeEnumerator.cs" />
