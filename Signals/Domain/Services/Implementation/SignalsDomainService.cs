@@ -69,24 +69,25 @@ namespace Domain.Services.Implementation
                 var date = fromIncluded;
                 var newData = new List<Datum<T>>();
 
-                while (date < toExcluded)
-                {
-                    var datum = result.FirstOrDefault(d => d.Timestamp == date);
-
-                    if (policy is NoneQualityMissingValuePolicy<T>)
-                        newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
-                    else if (policy is SpecificValueMissingValuePolicy<T>)
+                if (policy is NoneQualityMissingValuePolicy<T>)
+                    while (date < toExcluded)
                     {
-                        var mvp = policy as SpecificValueMissingValuePolicy<T>;                       
-                        var svDatum = Datum<T>.CreateNone(policy.Signal, date);
-                        svDatum.Quality = mvp.Quality;
-                        svDatum.Value = mvp.Value;
-                        newData.Add(datum ?? svDatum);
-                    }
-                    else
-                        throw new NotImplementedException();
-                    date = timeNextMethod(date);
+                        var datum = result.FirstOrDefault(d => d.Timestamp == date);                    
+                        newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
+                        date = timeNextMethod(date);
+                    }                
+                else if (policy is SpecificValueMissingValuePolicy<T>)
+                {
+                    var mvp = policy as SpecificValueMissingValuePolicy<T>;
+                    while (date < toExcluded)
+                    {
+                        var datum = result.FirstOrDefault(d => d.Timestamp == date);
+                        newData.Add(datum ?? Datum<T>.CreateSpecific(policy.Signal, date, mvp.Quality, mvp.Value));
+                        date = timeNextMethod(date);
+                    }                    
                 }
+                else
+                    throw new NotImplementedException();
 
                 return newData;
             }
