@@ -439,6 +439,24 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareDatum(expectedDatum, result));
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithNullString_DataValueIsNull()
+            {
+                var signal = SignalWith(1, DataType.String, Granularity.Month, Path.FromString("x/y"));
+                GivenASignal(signal);
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
+
+                var datum = new Datum<string>[] {
+                   new Datum<string>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = null } };
+
+                SetupGetData(datum);
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.IsNull(result.Single().Value);
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
