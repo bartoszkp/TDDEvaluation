@@ -83,9 +83,9 @@ namespace Domain.Services.Implementation
 
             var mvp = GetMissingValuePolicy(signal.Id.GetValueOrDefault());
 
-            var dataFillStrategy = DataFillStrategyProvider.GetStrategy(signal.Granularity,mvp);
+            var dataFillStrategy = DataFillStrategyProvider.GetStrategy(signal.Granularity, mvp);
 
-            dataFillStrategy.FillMissingData(items,fromIncludedUtc,toExcludedUtc);
+            dataFillStrategy.FillMissingData(items, fromIncludedUtc, toExcludedUtc);
 
 
             var result = from d in items
@@ -119,7 +119,43 @@ namespace Domain.Services.Implementation
                 return null;
         }
 
+        public PathEntry GetPathEntry(Path path)
+        {
+            var result = signalsRepository.GetAllWithPathPrefix(path);
+            int pathLength = path.Components.Count();
 
+            List<Signal> signals = new List<Signal>();
+            foreach (var s in result)
+                if (pathLength + 1 == s.Path.Components.Count())
+                    signals.Add(s);
+
+            List<Path> paths = new List<Path>();
+            foreach (var s in result)
+                if (pathLength + 2 <= s.Path.Components.Count())
+                {
+                    List<string> newPath = new List<string>();
+                    int i = 0;
+                    foreach (var p in s.Path.Components)
+                    {
+                        newPath.Add(p);
+                        if (++i >= pathLength + 1)
+                            break;
+                    }
+                    var pathString = Path.FromString(string.Join("/", newPath));
+                    if (pathIsAdded(paths, pathString))
+                        paths.Add(pathString);
+                }
+
+            return new PathEntry(signals, paths);
+        }
+
+        private bool pathIsAdded(List<Path> paths, Path path)
+        {
+            foreach (var p in paths)
+                if (p.ToString() == path.ToString())
+                    return false;
+            return true;
+        }
     }
 
 
