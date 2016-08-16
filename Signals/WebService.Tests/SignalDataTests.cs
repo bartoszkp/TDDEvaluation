@@ -263,7 +263,7 @@ namespace WebService.Tests
             };
             SetupMocksGetPath(domainSignalsToReturn);
 
-            var pathDto = new Dto.Path() { Components = new[] { "root/signals1" } };
+            var pathDto = new Dto.Path() { Components = new[] { "root", "signals1" } };
             var result = signalsWebService.GetPathEntry(pathDto);
 
             var dtoSignals = new Dto.Signal[]
