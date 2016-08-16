@@ -197,6 +197,19 @@ namespace Domain.Services.Implementation
         {
             var signals = signalsRepository.GetAllWithPathPrefix(path);
 
+            List<Signal> signalsToAdd = new List<Signal>();
+
+            foreach (var signal in signals)
+            {
+                Signal signalToAdd = new Signal();
+                if (signal.Path.GetPrefix(path.Length).ToString() == path.ToString() &&
+                    signal.Path.ToString().LastIndexOf('/') == (path.ToString().Length))
+                {
+                    signalToAdd = signal;
+                    signalsToAdd.Add(signalToAdd);
+                }
+            }
+
             List<Path> subPaths = new List<Path>();
 
             foreach (var signal in signals)
@@ -209,7 +222,7 @@ namespace Domain.Services.Implementation
                 }
             }
 
-            PathEntry toReturn = new PathEntry(signals, subPaths);
+            PathEntry toReturn = new PathEntry(signalsToAdd, subPaths);
             return toReturn;
         }
     }
