@@ -1324,6 +1324,36 @@ namespace WebService.Tests
 
                 Assert.IsNull(result);
             }
+
+            [TestMethod]
+            public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathEntryWithListOfThoseSignal()
+            {
+                List<Signal> signalsList = new List<Signal>()
+                {
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/s1")},
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s2") }
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()))
+                    .Returns(signalsList.AsEnumerable);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                int index = 0;
+                foreach(var signal in signalsList)
+                {
+                    Assert.AreEqual(signal.DataType, result.Signals.ElementAt(index).DataType);
+                    Assert.AreEqual(signal.Path, result.Signals.ElementAt(index).Path);
+                    index++;
+                }
+            }
         }
     }
 }
