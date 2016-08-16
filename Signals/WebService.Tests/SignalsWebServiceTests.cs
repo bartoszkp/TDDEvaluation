@@ -633,6 +633,32 @@ namespace WebService.Tests
 
                 Assert.AreEqual(2, result.Count());
             }
+
+            [TestMethod]
+            public void GivenSomeSignals_WhenGettingPathEntry_ReturnsNotNull()
+            {
+                GivenSomeSignals(new[]
+                {
+                    new Signal {Id = 1, Path = Path.FromString("p") },
+                    new Signal {Id = 2, Path = Path.FromString("s/p") },
+                    new Signal {Id = 3, Path = Path.FromString("s/s/p") }
+                });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path { Components = new[] { "s" } });
+
+                Assert.IsNotNull(result);
+            }
+
+            private void GivenSomeSignals(Signal[] signals)
+            {
+                GivenNoSignals();
+
+                foreach (var signal in signals)
+                {
+                    signalsRepositoryMock.Setup(sr => sr.Get(signal.Id.Value)).Returns(signal);
+                    signalsRepositoryMock.Setup(sr => sr.Get(signal.Path)).Returns(signal);
+                }
+            }
         }
     }
 }
