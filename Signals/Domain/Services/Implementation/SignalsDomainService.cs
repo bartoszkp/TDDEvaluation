@@ -97,7 +97,7 @@ namespace Domain.Services.Implementation
             var result = new List<Datum<T>>();
             var dt = fromIncludedUtc;
 
-            while(dt < toExcludedUtc)
+            while(dt < toExcludedUtc || dt == fromIncludedUtc)
             {
                 var next = SignalUtils.GetNextDate(dt, signal.Granularity);
 
