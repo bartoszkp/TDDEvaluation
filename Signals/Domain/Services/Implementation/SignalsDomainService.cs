@@ -52,20 +52,10 @@ namespace Domain.Services.Implementation
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
 
-            if(res.Count == 0)
-            {
-                return new Datum<T>[] {
-                    new Datum<T>() { Id = 1, Quality = Quality.None, Signal = signal, Timestamp = fromIncludedUtc, Value = default(T)},
-                    new Datum<T>() { Id = 2, Quality = Quality.None, Signal = signal, Timestamp = AddTime(signal.Granularity, fromIncludedUtc), Value = default(T)}
-                };
-            }
-
-            var date = res.First().Timestamp;
-
-            for (int i = 0; i < res.Count(); i++)
+            while(fromIncludedUtc < toExcludedUtc)
             {
                 var datum = (from x in res
-                             where x.Timestamp == date
+                             where x.Timestamp == fromIncludedUtc
                              select x).FirstOrDefault();
 
                 if (datum == null)
@@ -74,12 +64,13 @@ namespace Domain.Services.Implementation
                     {
                         Quality = Quality.None,
                         Signal = signal,
-                        Timestamp = date,
+                        Timestamp = fromIncludedUtc,
                         Value = default(T)
                     };
                     res.Add(tempDatum);
                 }
-                date = AddTime(signal.Granularity, date);
+
+                fromIncludedUtc = AddTime(signal.Granularity, fromIncludedUtc);
             }
              
             return res.OrderBy(x => x.Timestamp);
