@@ -147,17 +147,19 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue1")]
-        public void TryingToAddSignalWithNotNullIdThrows()
+        public void GivenASignal_WhenAddingAnotherWithTheSameId_Throws()
         {
-            var signal = new Signal()
+            GivenASignal();
+
+            var newSignal = new Signal()
             {
                 Path = SignalPathGenerator.Generate(),
                 Granularity = Granularity.Day,
                 DataType = DataType.Integer,
-                Id = 42
+                Id = signalId
             };
 
-            Assertions.AssertThrows(() => client.Add(signal.ToDto<Dto.Signal>()));
+            Assertions.AssertThrows(() => client.Add(newSignal.ToDto<Dto.Signal>()));
         }
 
         [TestMethod]

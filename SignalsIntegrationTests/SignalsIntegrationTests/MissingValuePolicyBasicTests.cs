@@ -129,7 +129,6 @@ namespace SignalsIntegrationTests
                 .Invoke(null) as Domain.MissingValuePolicy.MissingValuePolicyBase;
         }
 
-
         private void WhenSettingSpecificValueMissingValuePolicy(DataType dataType, Quality quality)
         {
             var newPolicy = CreateForNativeType(

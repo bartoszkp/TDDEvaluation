@@ -98,7 +98,6 @@ namespace SignalsIntegrationTests
                               new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
                             });
 
-
             client.SetData(
                 signalId,
                 new[] { new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
