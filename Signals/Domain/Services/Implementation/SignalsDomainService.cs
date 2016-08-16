@@ -77,17 +77,15 @@ namespace Domain.Services.Implementation
             var mvp = GetMissingValuePolicy(signalId);
 
             if (mvp != null && mvp.GetType().GetGenericTypeDefinition() == typeof(NoneQualityMissingValuePolicy<>))
-                resultArray = FillArray(resultArray, fromIncludedUtc, toExcludedUtc);
+                resultArray = FillArray(resultArray, signal, fromIncludedUtc, toExcludedUtc);
 
             return resultArray;
         }
 
-        private Datum<T>[] FillArray<T>(Datum<T>[] array, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        private Datum<T>[] FillArray<T>(Datum<T>[] array, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            if (array.Length < 1)
-                return array;
-
-            var signal = array.First().Signal;
+            var empty = array.Length < 1;
+            
             DateTime tmp;
             var dateModifier = DateModifier(signal.Granularity);
             var filledArray = new Datum<T>[NumberOfPeriods(fromIncludedUtc, toExcludedUtc, signal.Granularity)];
@@ -96,7 +94,7 @@ namespace Domain.Services.Implementation
             int j = 0;
             for (int i = 0; i < filledArray.Length; i++)
             {
-                if (array[j].Timestamp == tmp)
+                if (!empty && array[j].Timestamp == tmp)
                 {
                     filledArray[i] = array[j];
                     j = (j + 1) % array.Length;
