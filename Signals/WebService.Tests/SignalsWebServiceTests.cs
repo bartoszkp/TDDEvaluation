@@ -744,7 +744,8 @@ namespace WebService.Tests
                 int expectedElements = 1;
                 Assert.AreEqual(expectedElements, result.SubPaths.ToArray().Length);
 
-                PathEntry expectedPathEntry = new PathEntry(null, new Path[] { signal.Path });
+                PathEntry expectedPathEntry = new PathEntry(null, new Domain.Path[] {
+                    Domain.Path.FromString("x/y") } );
                 CollectionAssert.AreEqual(expectedPathEntry.SubPaths.ElementAt(0).Components.ToArray(), 
                     result.SubPaths.ElementAt(0).Components.ToArray());
             }
@@ -757,7 +758,7 @@ namespace WebService.Tests
                 Dto.Path prefix = new Dto.Path() { Components = new[] { "x" } };
 
                 Signal[] signals = new[] {
-                    SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/x")),
+                    SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/p")),
                     SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/y")),
                     SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/z/c")),
                     SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/z/x")),
@@ -767,7 +768,7 @@ namespace WebService.Tests
 
                 var result = this.signalsWebService.GetPathEntry(prefix);
 
-                int expectedElements = 2;
+                int expectedElements = 1;
                 Assert.AreEqual(expectedElements, result.SubPaths.ToArray().Length);
 
                 Dto.PathEntry expectedPathEntry = new Dto.PathEntry()
@@ -786,7 +787,7 @@ namespace WebService.Tests
                 }
                 for (int i = 0; i < 2; ++i)
                 {
-                    AssertSignalsAreEqual(expectedPathEntry.Signals.ElementAt(i),result.Signals.ElementAt(i));
+                    AssertSignalsAreEqual(expectedPathEntry.Signals.ElementAt(i), result.Signals.ElementAt(i));
                 }
             }
 

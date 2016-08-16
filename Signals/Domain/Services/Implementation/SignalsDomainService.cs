@@ -334,11 +334,39 @@ namespace Domain.Services.Implementation
                 }
                 else
                 {
-                    listOfPaths.Add(signal.Path);
+                    Path path = signal.Path;
+                    List<string> components = new List<string>();
+                    for(int i = 0; i < prefixCount + 1; ++i)
+                    {
+                        components.Add(path.Components.ElementAt(i));
+                    }
+                    string stringComponents = Domain.Path.JoinComponents(components);
+                    listOfPaths.Add(Domain.Path.FromString(stringComponents));
                 }
             }
 
-            return new Domain.PathEntry(listOfSignals, listOfPaths);
+            //var distincedList = listOfPaths.GroupBy(x => x).Select(w => w.First()).ToArray();
+
+            return new Domain.PathEntry(listOfSignals, listOfPaths.Distinct());
+        }
+
+        private class CompareSameLengthPaths : IEqualityComparer<Path>
+        {
+            public bool Equals(Path path1, Path path2)
+            {
+                int size = path1.Components.ToArray().Length;
+                for (int i = 0; i < size; ++i)
+                {
+                    if (path1.Components.ElementAt(i) != path2.Components.ElementAt(i))
+                        return true;
+                }
+                return false;
+            }
+
+            public int GetHashCode(Path path)
+            {
+                return path.Components.ToArray().Length;
+            }
         }
 
         private bool PathEquals(Path expected, Path actual)
