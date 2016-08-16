@@ -170,6 +170,9 @@ namespace WebService
         private IEnumerable<Dto.Datum> ConvertCollectionDomainToDto<T>(IEnumerable<Domain.Datum<T>> data)
         {
             int i = 0;
+            if (data == null)
+                return null;
+
             var dto_data = new Dto.Datum[data.Count()];
             foreach (var datum in data)
                 dto_data[i++] = datum.ToDto<Dto.Datum>();
