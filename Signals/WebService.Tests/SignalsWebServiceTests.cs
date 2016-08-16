@@ -334,6 +334,64 @@ namespace WebService.Tests
                 Assert.IsInstanceOfType(mvp, typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingPathEntryWithTheSignalsPrefix_ReturnsEntryWithSignal()
+            {
+                GivenSignalsForPathEntry(new Signal[]
+                {
+                    new Signal() {Id = 1, Path = Domain.Path.FromString("root/s1") }
+                }, Domain.Path.FromString("root"));
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                CollectionAssert.AreEqual(new string[] { "root", "s1" }, result.Signals.Single().Path.Components.ToArray());
+            }
+
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingPathEntryWithTooShortPrefix_ReturnsEntryWithSubfolder()
+            {
+                GivenSignalsForPathEntry(new Signal[]
+                {
+                    new Signal() {Id = 1, Path = Domain.Path.FromString("root/subFolder1/s1") }
+                }, Domain.Path.FromString("root"));
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                CollectionAssert.AreEqual(new string[] { "root", "subFolder1" }, result.SubPaths.Single().Components.ToArray());
+            }
+
+
+            [TestMethod]
+            public void GivenASignal_WehnGettingPathEntryWithWrongPrefix_ReturnsEmptyPathEntry()
+            {
+                GivenSignalsForPathEntry(new Signal[]
+                {
+
+                }, Domain.Path.FromString("root"));
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                Assert.AreEqual(0, result.Signals.Count());
+                Assert.AreEqual(0, result.SubPaths.Count());
+            }
+
+
+            [TestMethod]
+            public void GivenManySignals_WhenGettingPathEntryWithTooShortPrefix_ReturnsEntryWithDistinctSubfolders()
+            {
+                GivenSignalsForPathEntry(new Signal[]
+                {
+                    new Signal() {Id = 1, Path = Domain.Path.FromString("root/subFolder1/s1") },
+                    new Signal() {Id = 2, Path = Domain.Path.FromString("root/subFolder1/s2") }
+                }, Domain.Path.FromString("root"));
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                CollectionAssert.AreEqual(new string[] { "root", "subFolder1" }, result.SubPaths.Single().Components.ToArray());
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
@@ -451,6 +509,15 @@ namespace WebService.Tests
                 
                     signalsRepositoryMock.Setup(x => x.Get(Path.FromString("x/y"))).Returns(signal.ToDomain<Domain.Signal>());
                 
+            }
+
+            private void GivenSignalsForPathEntry(IEnumerable<Signal> signals, Path Prefix)
+            {
+                GivenNoSignals();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.GetAllWithPathPrefix(It.Is<Path>(p => p.ToString() == Prefix.ToString())))
+                    .Returns(signals);
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;

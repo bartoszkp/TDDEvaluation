@@ -9,18 +9,43 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var newSignal = new Signal()
+            client.Add(new Signal()
             {
-                DataType = DataType.Integer,
-                Granularity = Granularity.Minute,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy" } }
-            };
+                Path = new Path() { Components = new string[] { "s0" } }
+            });
+            client.Add(new Signal()
+            {
+                Path = new Path() { Components = new string[] { "root", "s1" } }
+            });
+            client.Add(new Signal()
+            {
+                Path = new Path() { Components = new string[] { "root", "podkatalog", "s2" } }
+            });
+            client.Add(new Signal()
+            {
+                Path = new Path() { Components = new string[] { "root", "podkatalog", "s3" } }
+            });
+            client.Add(new Signal()
+            {
+                Path = new Path() { Components = new string[] { "root", "podkatalog", "podpodkatalog", "s4" } }
+            });
+            client.Add(new Signal()
+            {
+                Path = new Path() { Components = new string[] { "root", "podkatalog2", "s5" } }
+            });
 
-            var result = client.Add(newSignal);
+            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
 
-            var mvp = client.GetMissingValuePolicy(result.Id.Value);
-
-            Console.WriteLine(mvp);
+            Console.WriteLine("Sygnały w 'root':");
+            foreach (var r in result.Signals)
+            {
+                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+            }
+            Console.WriteLine("Ścieżki podrzędne w 'root':");
+            foreach (var s in result.SubPaths)
+            {
+                Console.WriteLine(string.Join("/", s.Components));
+            }
 
             Console.ReadKey();
         }
