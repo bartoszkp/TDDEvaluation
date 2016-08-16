@@ -698,6 +698,19 @@ namespace WebService.Tests
 
             #endregion
 
+            #region Issue #15 (Bug: SetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithEmptyDatum_ExceptNoException()
+            {
+                var id = 1;
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[0]);
+            }
+
+            #endregion
+
             private void SetupGetDataDatum(int id)
             {
                 var signal = SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
