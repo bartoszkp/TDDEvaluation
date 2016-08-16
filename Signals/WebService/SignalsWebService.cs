@@ -93,7 +93,7 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            if (data.Count() == 0) return; 
+            if (data == null || data.Count() == 0) return; 
            
             if (signalsDomainService != null)
             {
