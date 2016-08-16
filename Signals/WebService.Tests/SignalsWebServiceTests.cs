@@ -709,6 +709,15 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[0]);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithNull_ExpectNoException()
+            {
+                var id = 1;
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, null);
+            }
+
             #endregion
 
             private void SetupGetDataDatum(int id)
