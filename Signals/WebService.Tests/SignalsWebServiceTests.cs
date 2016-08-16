@@ -637,12 +637,16 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenSomeSignals_WhenGettingPathEntry_ReturnsTheCorrectEntry()
             {
-                GivenSomeSignals(new[]
+                var signals = new[]
                 {
                     new Signal {Id = 1, Path = Path.FromString("p") },
                     new Signal {Id = 2, Path = Path.FromString("s/p") },
                     new Signal {Id = 3, Path = Path.FromString("s/s/p") }
-                });
+                };
+                GivenSomeSignals(signals);
+
+                signalsRepositoryMock.Setup(sr => sr.GetAllWithPathPrefix(Path.FromString("s")))
+                    .Returns(signals.Except(new[] { signals[0] }));
 
                 var result = signalsWebService.GetPathEntry(new Dto.Path { Components = new[] { "s" } });
                 

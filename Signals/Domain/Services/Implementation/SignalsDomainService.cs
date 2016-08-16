@@ -186,5 +186,19 @@ namespace Domain.Services.Implementation
 
             missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
         }
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            var result = signalsRepository.GetAllWithPathPrefix(path);
+            var level = path.Length + 1;
+
+            var signals = result.Where(signal => signal.Path.Length == level);
+            var subpaths = result.Where(signal => signal.Path.Length > level)
+                .Select(signal => signal.Path)
+                .Select(p => Path.FromString(Path.JoinComponents(p.Components.Take(level + 1))))
+                .Distinct();
+
+            return new PathEntry(signals.ToList(), subpaths.ToList());
+        }
     }
 }
