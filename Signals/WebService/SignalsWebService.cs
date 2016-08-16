@@ -57,7 +57,7 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            throw new NotImplementedException();
+            return new PathEntry();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
