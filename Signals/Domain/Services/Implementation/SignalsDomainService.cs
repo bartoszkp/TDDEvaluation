@@ -304,5 +304,14 @@ namespace Domain.Services.Implementation
             dataDomainList.AddRange(missingDatas);
             return dataDomainList;
         }
+
+        public PathEntry GetByPrefixPath(Path path)
+        {
+            var pathEntry = new PathEntry();
+
+            var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
+
+            return new PathEntry(allSignals,null);
+        }
     }
 }

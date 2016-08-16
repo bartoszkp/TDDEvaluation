@@ -723,12 +723,15 @@ namespace WebService.Tests
 
                 Domain.Signal signal = GetDefaultSignal_IntegerMonth();
 
+                List<Domain.Signal> signals = new List<Domain.Signal>() { signal };
+
                 this.signalsRepositoryMock
-                    .Setup(x => x.Get(It.Is<Domain.Path>(y => y.Components.Equals(path.ToDomain<Domain.Path>().Components))))
-                    .Returns(signal);
+                    .Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(y => PathsEquals(y,path.ToDomain<Domain.Path>()))))
+                    .Returns(new[] { signal });
                 
                 var result = signalsWebService.GetPathEntry(path);
 
+                Assert.AreEqual(1,result.Signals.ToArray().Length);
                 AssertSignalsAreEqual(signal.ToDto<Dto.Signal>(),result.Signals.ElementAt(0));
             }
 
@@ -740,6 +743,21 @@ namespace WebService.Tests
                     Granularity = Granularity.Month,
                     DataType = DataType.Double
                 };
+            }
+
+            private bool PathsEquals(Domain.Path expected, Domain.Path actual)
+            {
+                if (expected.Components.ToArray().Length != actual.Components.ToArray().Length)
+                    return false;
+
+                int size = expected.Components.ToArray().Length;
+
+                for (int i =0; i < size; ++i)
+                {
+                    if (expected.Components.ElementAt(i) != actual.Components.ElementAt(i))
+                        return false;
+                }
+                return true;
             }
 
             private void GivenASignalAndData_SetupSignalsRepositoryMockAndVerifySetDataCall<T>(Signal signal, IEnumerable<Dto.Datum> data, DateTime timeStamp, T value)
