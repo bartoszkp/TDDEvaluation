@@ -706,7 +706,7 @@ namespace WebService.Tests
                 SetupWebService();
 
                 Dto.Path path = new Dto.Path() { Components = new[] { "x","y" } };
-                var result = signalsWebService.GetPathEntry(path);
+                var result = this.signalsWebService.GetPathEntry(path);
 
                 Assert.IsNotNull(result);
 
@@ -720,13 +720,10 @@ namespace WebService.Tests
                 SetupWebService();
 
                 Domain.Signal signal = GetDefaultSignal_IntegerMonth();
+                Dto.Path path = new Dto.Path() { Components = new[] { "x", "y" } };
 
-                this.signalsRepositoryMock
-                    .Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(y => 
-                        PathsEquals(y,signal.Path.ToDomain<Domain.Path>()))))
-                    .Returns(new[] { signal });
-                
-                var result = signalsWebService.GetPathEntry(signal.Path.ToDto<Dto.Path>());
+                SetupMock_GetAllWithPathPrefix(signal,path.ToDomain<Domain.Path>());
+                var result = this.signalsWebService.GetPathEntry(path);
 
                 int expectedElements = 1;
                 Assert.AreEqual(expectedElements,result.Signals.ToArray().Length);
@@ -739,15 +736,10 @@ namespace WebService.Tests
                 SetupWebService();
 
                 Domain.Signal signal = GetDefaultSignal_IntegerMonth();
-
                 Dto.Path prefix = new Dto.Path() { Components = new[] { "x" } };
 
-                this.signalsRepositoryMock
-                    .Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(y =>
-                        PathsEquals(y, prefix.ToDomain<Domain.Path>()))))
-                    .Returns(new[] { signal });
-
-                var result = signalsWebService.GetPathEntry(prefix);
+                SetupMock_GetAllWithPathPrefix(signal, prefix.ToDomain<Domain.Path>());
+                var result = this.signalsWebService.GetPathEntry(prefix);
 
                 int expectedElements = 1;
                 Assert.AreEqual(expectedElements, result.SubPaths.ToArray().Length);
@@ -755,6 +747,13 @@ namespace WebService.Tests
                 PathEntry expectedPathEntry = new PathEntry(null, new Path[] { signal.Path });
                 CollectionAssert.AreEqual(expectedPathEntry.SubPaths.ElementAt(0).Components.ToArray(), 
                     result.SubPaths.ElementAt(0).Components.ToArray());
+            }
+
+            private void SetupMock_GetAllWithPathPrefix(Signal signal,Path path)
+            {
+                this.signalsRepositoryMock
+                    .Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(y => PathsEquals(y, path))))
+                    .Returns(new[] { signal });
             }
 
             private Domain.Signal GetDefaultSignal_IntegerMonth()

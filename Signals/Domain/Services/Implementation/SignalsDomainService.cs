@@ -322,9 +322,10 @@ namespace Domain.Services.Implementation
             int prefixCount = prefix.Components.ToArray().Length;
 
             var array = signals.ToArray();
-
-            foreach (var signal in array)
+            if (array.Length > 0)
             {
+                var signal = signals.ElementAt(0);
+
                 if (signal.Path.Components.ToArray().Length == prefixCount)
                 {
                     if (PathEquals(signal.Path, prefix))
@@ -337,6 +338,7 @@ namespace Domain.Services.Implementation
                     listOfPaths.Add(signal.Path);
                 }
             }
+
             return new Domain.PathEntry(listOfSignals, listOfPaths);
         }
 
