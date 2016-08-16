@@ -10,24 +10,31 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            //client.Add(new Signals.Signal() { Path = new Path() { Components = new[] { "s0" } } });
-            //client.Add(new Signals.Signal() { Path = new Path() { Components = new[] { "root/s1" } } });
-            //client.Add(new Signals.Signal() { Path = new Path() { Components = new[] { "root/podkatalog/s2" } } });
-            //client.Add(new Signals.Signal() { Path = new Path() { Components = new[] { "root/podkatalog/s3" } } });
-            //client.Add(new Signals.Signal() { Path = new Path() { Components = new[] { "root/podkatalog/podpodkatalog/s4" } } });
-            //client.Add(new Signals.Signal() { Path = new Path() { Components = new[] { "root/podkatalog2/s5" } } });
-
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
-
-            Console.WriteLine("Sygnały w 'root':");
-            foreach (var r in result.Signals)
+            var newSignal = new Signal()
             {
-                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "signal1" } }
+            };
+
+            var id = client.Add(newSignal).Id.Value;
+
+            newSignal = new Signal()
+            {
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "signal2" } },
+                Id = id
+            };
+
+            try
+            {
+                client.Add(newSignal);
+                Console.WriteLine("Signal with duplicate ID didn't throw - WRONG");
             }
-            Console.WriteLine("Ścieżki podrzędne w 'root':");
-            foreach (var s in result.SubPaths)
+            catch (Exception)
             {
-                Console.WriteLine(string.Join("/", s.Components));
+                Console.WriteLine("Failed to add duplicate ID - OK");
             }
 
             Console.ReadKey();
