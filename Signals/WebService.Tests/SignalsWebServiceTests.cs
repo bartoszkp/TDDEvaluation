@@ -515,6 +515,16 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()), Times.Once);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingPathEntry_RepositoryGetAllWithPathPrefixIsCalledWithCorrectPath()
+            {
+                GivenNoSignals();
+
+                signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "x", "y", "z" } });
+
+                signalsRepositoryMock.Verify(srm => srm.GetAllWithPathPrefix(It.Is<Domain.Path>(p => p.ToString().Equals("x/y/z"))), Times.Once);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
