@@ -287,6 +287,40 @@ namespace WebService.Tests
             }
         }
 
+        [TestMethod]
+        public void WhenGettingWithGivenPathPrefix_ReturnsSignals_ContainedInSpecifiedPaths()
+        {
+            var domainSignalsToReturn = new Domain.Signal[]
+            {
+                new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Year, Path = Domain.Path.FromString("root/signal1") },
+                new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal2") },
+                new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal3") },
+                new Signal() { Id = 4, DataType = DataType.Decimal, Granularity = Granularity.Week, Path = Domain.Path.FromString("root/signals2/signals1/") },
+            };
+            SetupMocksGetPath(domainSignalsToReturn);
+
+            var pathDto1 = new Dto.Path() { Components = new[] { "root" } };
+            var result = signalsWebService.GetPathEntry(pathDto1);
+
+            var dtoSignals = new Dto.Signal[]
+            {
+                new Dto.Signal() { Id = 1, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Year, Path =  new Dto.Path() { Components = new[] { "root", "signal1" } } },
+                new Dto.Signal() { Id = 2, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "root", "signals1", "signal2" } } },
+                new Dto.Signal() { Id = 3, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "root", "signals1", "signal3" } } },
+                new Dto.Signal() { Id = 4, DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Week, Path = new Dto.Path() { Components = new[] { "root", "signals2", "signals1", "" } } },
+            };
+            var actualResultA = result.Signals.ToArray();
+            Assert.AreEqual(1, actualResultA.Count());
+
+            foreach (var signal in actualResultA)
+            {
+                Assert.AreEqual(dtoSignals[0].DataType, signal.DataType);
+                Assert.AreEqual(dtoSignals[0].Granularity, signal.Granularity);
+                Assert.AreEqual(dtoSignals[0].Id, signal.Id);
+                Assert.AreEqual(dtoSignals[0].Path.Components.ToString(), signal.Path.Components.ToString());
+            }
+        }
+
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
