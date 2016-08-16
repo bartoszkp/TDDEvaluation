@@ -573,6 +573,32 @@ namespace WebService.Tests
                 result.Select(datum => datum.Timestamp).ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignalAndData_CallingGetDataWithTheSameDateInBothArguments_ReturnsOneDatumWithThatDate()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    signalId,
+                    DataType.Boolean,
+                    Granularity.Month,
+                    Path.FromString("")));
+
+                DateTime thatDate = new DateTime(2000, 1, 1);
+                GivenData<bool>(signalId, 3, thatDate);
+
+                signalsDataRepoMock
+                    .Setup(sd => sd.GetData<bool>(It.Is<Signal>(s => s.Id == signalId), thatDate, thatDate))
+                    .Returns(new Datum<bool>[] 
+                    {
+                        new Datum<bool>() {Timestamp = thatDate }
+                    });
+
+                var result = signalsWebService.GetData(signalId, thatDate, thatDate);
+
+                Assert.AreEqual(1, result.Count());
+                Assert.AreEqual(thatDate, result.First().Timestamp);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
