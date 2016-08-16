@@ -197,6 +197,30 @@ namespace WebService.Tests
                 Assert.AreEqual(d.Timestamp, new DateTime(2000, 1, 1));
         }
 
+        [TestMethod]
+        public void WhenGettingDataForFromUtcSameAsToUtc_ReturnsSingleDatum()
+        {
+            var datums = new Datum<int>[]
+            {
+                    new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 3 },
+            };
+            var signal = new Domain.Signal()
+            {
+                Id = 1, DataType = DataType.Integer, Granularity = Granularity.Month, Path = Domain.Path.FromString("example/path"),
+            };
+
+            SetupMocks<int>(datums, signal);
+
+            var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(Dto.Quality.Bad, result.ElementAt(0).Quality);
+            Assert.AreEqual(new DateTime(2000, 1, 1), result.ElementAt(0).Timestamp);
+            Assert.AreEqual(1, result.ElementAt(0).Value);
+        }
+
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
