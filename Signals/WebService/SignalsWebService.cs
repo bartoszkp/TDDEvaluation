@@ -52,6 +52,7 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
+            this.signalsDomainService.GetPathEntry(pathDto.ToDomain<Domain.Path>());
             return new PathEntry();
         }
 

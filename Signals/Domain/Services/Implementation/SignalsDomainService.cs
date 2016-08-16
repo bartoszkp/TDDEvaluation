@@ -131,5 +131,10 @@ namespace Domain.Services.Implementation
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                as MissingValuePolicy.MissingValuePolicyBase;
         }
+
+        public void GetPathEntry(Path path)
+        {
+            this.signalsRepository.GetAllWithPathPrefix(null);
+        }
     }
 }
