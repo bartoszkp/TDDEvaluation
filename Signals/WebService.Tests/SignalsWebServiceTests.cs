@@ -19,6 +19,8 @@ namespace WebService.Tests
         {
             private ISignalsWebService signalsWebService;
 
+            #region Issue #1 ~ #7
+
             [TestMethod]
             public void Add_NoneQualityMissingValuePolicyShouldBeTheDefault_SetMissingPolicyCalled()
             {
@@ -651,7 +653,7 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(s => s.Get(It.Is<Domain.Path>(d => d.Components.ToArray().SequenceEqual(new[] { "x", "y" }))));
                
             }
-
+            #endregion
             #region Issue #13 (Bug: GetData)
 
             [TestMethod]
@@ -668,6 +670,23 @@ namespace WebService.Tests
                         new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = 0},
                         new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0},
                         new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = 0} }));
+            }
+
+            #endregion
+
+            #region Issue #16 (Bug: GetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDatumWithSameTimestamp_ReturnsEmpty()
+            {
+                var id = 1;
+                var signal = SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
+                GivenASignal(signal);
+                SetupDataRepositoryMock<double>(signal, MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 0.0));
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.IsTrue(result.Count() == 0);
             }
 
             #endregion
