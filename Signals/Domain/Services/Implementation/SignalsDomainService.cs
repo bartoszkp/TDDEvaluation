@@ -27,6 +27,9 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
+            if (newSignal.Id.HasValue)
+                throw new ArgumentException("Signal already has an Id.");
+
             var result =  this.signalsRepository.Add(newSignal);
 
             Type mvpType = typeof(MissingValuePolicy.NoneQualityMissingValuePolicy<>);
