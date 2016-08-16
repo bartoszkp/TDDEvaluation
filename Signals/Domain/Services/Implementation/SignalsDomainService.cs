@@ -87,10 +87,19 @@ namespace Domain.Services.Implementation
             {
                 return Datum<T>.CreateNone(signal, timeStamp);
             }
-            else
+            else if (mvp is MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
             {
-                return new Datum<T>();
+                var specificMVP = mvp as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
+                return new Datum<T>()
+                {
+                    Id = 0,
+                    Signal = signal,
+                    Timestamp = timeStamp,
+                    Quality = specificMVP.Quality,
+                    Value = specificMVP.Value
+                };
             }
+            return new Datum<T>();
         }
 
         public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
