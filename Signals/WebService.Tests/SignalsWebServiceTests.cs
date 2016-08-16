@@ -525,6 +525,29 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.GetAllWithPathPrefix(It.Is<Domain.Path>(p => p.ToString().Equals("x/y/z"))), Times.Once);
             }
 
+            [TestMethod]
+            public void GivenSignals_WhenGettingPathEntry_PathEntryWithCorrectSignalsIsReturned()
+            {
+                GivenNoSignals();
+                var signals = new List<Signal>()
+                {
+                    new Signal() { Path = Path.FromString("root/s1") },
+                    new Signal() { Path = Path.FromString("root/podkatalog/s2") },
+                    new Signal() { Path = Path.FromString("root/podkatalog/s3") },
+                    new Signal() { Path = Path.FromString("root/podkatalog/podpodkatalog/s4") },
+                    new Signal() { Path = Path.FromString("root/podkatalog2/s5") }
+                };
+                signalsRepositoryMock.Setup(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>())).Returns(signals);
+
+                var expectedSignals = new Dto.Signal[] { new Dto.Signal() { Path = new Dto.Path() { Components = new[] { "root", "s1" } } } };
+                var expectedPathEntry = new Dto.PathEntry();
+                expectedPathEntry.Signals = expectedSignals;
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root" } });
+
+                CollectionAssert.AreEqual(result.Signals.ElementAt(0).Path.Components.ToArray(), expectedPathEntry.Signals.ElementAt(0).Path.Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
