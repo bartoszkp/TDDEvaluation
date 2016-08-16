@@ -28,7 +28,7 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
-            var signal =  this.signalsRepository.Add(newSignal);
+            var signal = this.signalsRepository.Add(newSignal);
 
             var typeOfSignal = signal.DataType;
 
@@ -68,226 +68,104 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var signal = signalsRepository.Get(signalId);
+            var signal = GetById(signalId);
 
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            var resultArray = result.ToArray();
-
-            SortArrayByTimestamp(resultArray);
+            var resultArray = result.OrderBy(datum => datum.Timestamp).ToArray();
 
             var mvp = GetMissingValuePolicy(signalId);
 
-            if (mvp is NoneQualityMissingValuePolicy<bool> ||
-                mvp is NoneQualityMissingValuePolicy<int> ||
-                mvp is NoneQualityMissingValuePolicy<double> || 
-                mvp is NoneQualityMissingValuePolicy<decimal> ||
-                mvp is NoneQualityMissingValuePolicy<string>) resultArray = FillArray(resultArray, fromIncludedUtc, toExcludedUtc);
-            
+            if (mvp != null && mvp.GetType().GetGenericTypeDefinition() == typeof(NoneQualityMissingValuePolicy<>))
+                resultArray = FillArray(resultArray, fromIncludedUtc, toExcludedUtc);
+
             return resultArray;
         }
 
         private Datum<T>[] FillArray<T>(Datum<T>[] array, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var granularity = array[0].Signal.Granularity;
-            Datum<T>[] filledArray = null;
-            int timeSpan;
-            DateTime tmp;
+            if (array.Length < 1)
+                return array;
 
-            switch (granularity)
+            var signal = array.First().Signal;
+            DateTime tmp;
+            var dateModifier = DateModifier(signal.Granularity);
+            var filledArray = new Datum<T>[NumberOfPeriods(fromIncludedUtc, toExcludedUtc, signal.Granularity)];
+
+            tmp = fromIncludedUtc;
+            int j = 0;
+            for (int i = 0; i < filledArray.Length; i++)
             {
-                case Granularity.Second:
-                    timeSpan = toExcludedUtc.Second - fromIncludedUtc.Second;
-                    filledArray = new Datum<T>[timeSpan];
-                    tmp = fromIncludedUtc;
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        filledArray[i] = new Datum<T>();
-                        filledArray[i].Quality = Quality.None;
-                        filledArray[i].Timestamp = tmp;
-                        filledArray[i].Value = default(T);
-                        tmp = new DateTime(tmp.Year, tmp.Month, tmp.Day, tmp.Hour, tmp.Minute, tmp.Second+1);
-                    }
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            if (filledArray[i].Timestamp == array[j].Timestamp) filledArray[i] = array[j];
-                        }
-                    }
-                    break;
-                case Granularity.Minute:
-                    timeSpan = toExcludedUtc.Minute - fromIncludedUtc.Minute;
-                    filledArray = new Datum<T>[timeSpan];
-                    tmp = fromIncludedUtc;
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        filledArray[i] = new Datum<T>();
-                        filledArray[i].Quality = Quality.None;
-                        filledArray[i].Timestamp = tmp;
-                        filledArray[i].Value = default(T);
-                        tmp = new DateTime(tmp.Year, tmp.Month, tmp.Day, tmp.Hour, tmp.Minute+1, tmp.Second);
-                    }
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            if (filledArray[i].Timestamp == array[j].Timestamp) filledArray[i] = array[j];
-                        }
-                    }
-                    break;
-                case Granularity.Hour:
-                    timeSpan = toExcludedUtc.Hour - fromIncludedUtc.Hour;
-                    filledArray = new Datum<T>[timeSpan];
-                    tmp = fromIncludedUtc;
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        filledArray[i] = new Datum<T>();
-                        filledArray[i].Quality = Quality.None;
-                        filledArray[i].Timestamp = tmp;
-                        filledArray[i].Value = default(T);
-                        tmp = new DateTime(tmp.Year, tmp.Month, tmp.Day, tmp.Hour+1, tmp.Minute, tmp.Second);
-                    }
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            if (filledArray[i].Timestamp == array[j].Timestamp) filledArray[i] = array[j];
-                        }
-                    }
-                    break;
-                case Granularity.Day:
-                    timeSpan = toExcludedUtc.Day - fromIncludedUtc.Day;
-                    filledArray = new Datum<T>[timeSpan];
-                    tmp = fromIncludedUtc;
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        filledArray[i] = new Datum<T>();
-                        filledArray[i].Quality = Quality.None;
-                        filledArray[i].Timestamp = tmp;
-                        filledArray[i].Value = default(T);
-                        tmp = new DateTime(tmp.Year, tmp.Month, tmp.Day+1, tmp.Hour, tmp.Minute, tmp.Second);
-                    }
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            if (filledArray[i].Timestamp == array[j].Timestamp) filledArray[i] = array[j];
-                        }
-                    }
-                    break;
-                case Granularity.Week:
-                    timeSpan = toExcludedUtc.Day - fromIncludedUtc.Day / 7;
-                    filledArray = new Datum<T>[timeSpan];
-                    tmp = fromIncludedUtc;
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        filledArray[i] = new Datum<T>();
-                        filledArray[i].Quality = Quality.None;
-                        filledArray[i].Timestamp = tmp;
-                        filledArray[i].Value = default(T);
-                        tmp = new DateTime(tmp.Year, tmp.Month, tmp.Day+7, tmp.Hour, tmp.Minute, tmp.Second);
-                    }
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            if (filledArray[i].Timestamp == array[j].Timestamp) filledArray[i] = array[j];
-                        }
-                    }
-                    break;
-                case Granularity.Month:
-                    timeSpan = toExcludedUtc.Month - fromIncludedUtc.Month;
-                    filledArray = new Datum<T>[timeSpan];
-                    tmp = fromIncludedUtc;
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        filledArray[i] = new Datum<T>();
-                        filledArray[i].Quality = Quality.None;
-                        filledArray[i].Timestamp = tmp;
-                        filledArray[i].Value = default(T);
-                        tmp = new DateTime(tmp.Year, tmp.Month + 1, tmp.Day);                        
-                    }
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            if (filledArray[i].Timestamp == array[j].Timestamp) filledArray[i] = array[j];
-                        }
-                    }
-                    break;
-                case Granularity.Year:
-                    timeSpan = toExcludedUtc.Year - fromIncludedUtc.Year;
-                    filledArray = new Datum<T>[timeSpan];
-                    tmp = fromIncludedUtc;
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        filledArray[i] = new Datum<T>();
-                        filledArray[i].Quality = Quality.None;
-                        filledArray[i].Timestamp = tmp;
-                        filledArray[i].Value = default(T);
-                        tmp = new DateTime(tmp.Year+1, tmp.Month, tmp.Day);
-                    }
-                    for (int i = 0; i < filledArray.Length; i++)
-                    {
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            if (filledArray[i].Timestamp == array[j].Timestamp) filledArray[i] = array[j];
-                        }
-                    }
-                    break;
-                default:
-                    break;
+                if (array[j].Timestamp == tmp)
+                {
+                    filledArray[i] = array[j];
+                    j = (j + 1) % array.Length;
+                }
+                else
+                    filledArray[i] = Datum<T>.CreateNone(signal, tmp);
+                tmp = dateModifier(tmp);
             }
 
             return filledArray;
         }
 
+        private Func<DateTime, DateTime> DateModifier(Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return (date) => date.AddSeconds(1);
+                case Granularity.Minute:
+                    return (date) => date.AddMinutes(1);
+                case Granularity.Hour:
+                    return (date) => date.AddHours(1);
+                case Granularity.Day:
+                    return (date) => date.AddDays(1);
+                case Granularity.Week:
+                    return (date) => date.AddDays(7);
+                case Granularity.Month:
+                    return (date) => date.AddMonths(1);
+                case Granularity.Year:
+                    return (date) => date.AddYears(1);
+                default:
+                    return (date) => date;
+            }
+        }
+
+        private int NumberOfPeriods(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
+        {
+            var timeSpan = toExcludedUtc - fromIncludedUtc;
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return (int)timeSpan.TotalSeconds;
+                case Granularity.Minute:
+                    return (int)timeSpan.TotalMinutes;
+                case Granularity.Hour:
+                    return (int)timeSpan.TotalHours;
+                case Granularity.Day:
+                    return (int)timeSpan.TotalDays;
+                case Granularity.Week:
+                    return (int)(timeSpan.TotalDays / 7);
+                case Granularity.Month:
+                    return (toExcludedUtc.Month - fromIncludedUtc.Month) + 12 * (toExcludedUtc.Year - fromIncludedUtc.Year);
+                case Granularity.Year:
+                    return toExcludedUtc.Year - fromIncludedUtc.Year;
+                default:
+                    return 0;
+            }
+        }
+
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable)
         {
-            var signal = signalsRepository.Get(signalId);
+            var signal = GetById(signalId);
 
             foreach (var item in enumerable)
-            {
                 item.Signal = signal;
-            }
 
-            Type type = null;
-
-            foreach (var item in enumerable)
-            {
-                type = item.Value.GetType();
-            }
-
-            if (type == typeof(bool)) signalsDataRepository.SetData<bool>(enumerable as IEnumerable<Datum<bool>>);
-            else if (type == typeof(int)) signalsDataRepository.SetData<int>(enumerable as IEnumerable<Datum<int>>);
-            else if (type == typeof(double)) signalsDataRepository.SetData<double>(enumerable as IEnumerable<Datum<double>>);
-            else if (type == typeof(decimal)) signalsDataRepository.SetData<decimal>(enumerable as IEnumerable<Datum<decimal>>);
-            else if (type == typeof(string)) signalsDataRepository.SetData<string>(enumerable as IEnumerable<Datum<string>>);
-            else throw new ArgumentException("Type of the 'data' parameter's signals must be bool, int, double, decimal or string.");
+            signalsDataRepository.SetData(enumerable);
         }
-
         
-
-        private void SortArrayByTimestamp<T>(Datum<T>[] array)
-        {
-            while (true)
-            {
-                bool changed = false;
-                for (int i = 0; i < array.Length - 1; i++)
-                {
-                    var tmp = array[i];
-                    if (array[i].Timestamp > array[i + 1].Timestamp)
-                    {
-                        array[i] = array[i + 1];
-                        array[i + 1] = tmp;
-                        changed = true;
-                    }
-                }
-                if (!changed) break;
-            }
-        }
-
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
             var signal = signalsRepository.Get(signalId);
