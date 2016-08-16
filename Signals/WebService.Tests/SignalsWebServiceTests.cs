@@ -608,6 +608,22 @@ namespace WebService.Tests
                 AssertDefaultDataIsCorrect<string>(Dto.Quality.Good, "cc", result.ElementAt(0), result.ElementAt(1), result.ElementAt(2), result.ElementAt(5));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignalWithId_WhenAddingASignal_ThrowsArgumentException()
+            {
+                int signalId = 9;
+                GivenNoSignals();
+
+                signalsWebService.Add(new Dto.Signal()
+                {
+                    Id = signalId,
+                    DataType = Dto.DataType.Integer,
+                    Granularity = Dto.Granularity.Week,
+                    Path = new Dto.Path() { Components = new[] {"x", "y"} }
+                });
+            }
+
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
