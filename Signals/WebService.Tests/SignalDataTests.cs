@@ -202,9 +202,7 @@ namespace WebService.Tests
         {
             var datums = new Datum<int>[]
             {
-                    new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 2 },
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 3 },
+                new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
             };
             var signal = new Domain.Signal()
             {

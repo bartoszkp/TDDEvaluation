@@ -95,8 +95,14 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+
             if (result == null)
                 return null;
+
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                return result;
+            }
 
             for (int j = result.Length-1; j>0; --j)
                 for (int i=0; i<j; ++i)
@@ -114,18 +120,6 @@ namespace Domain.Services.Implementation
                 var date = DateTime.MinValue;
                 while (date < fromIncludedUtc)
                     increaseDate(ref date, signal.Granularity);
-
-                if(fromIncludedUtc == toExcludedUtc)
-                {
-                    foreach (var datum in result)
-                    {
-                        if (datum.Timestamp == fromIncludedUtc)
-                        {
-                            datums.Add(datum);
-                            return datums.ToArray();
-                        }
-                    }
-                }
 
                 for (int i = 0; date<toExcludedUtc && i<result.Length; increaseDate(ref date, signal.Granularity))
                 {
