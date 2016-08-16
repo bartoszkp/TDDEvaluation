@@ -311,7 +311,46 @@ namespace Domain.Services.Implementation
 
             var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
 
-            return new PathEntry(allSignals,null);
+            return FillPathEntryLists(allSignals, path);
+        }
+
+        private PathEntry FillPathEntryLists(IEnumerable<Domain.Signal> signals, Path prefix)
+        {
+            List<Signal> listOfSignals = new List<Signal>();
+            List<Path> listOfPaths = new List<Path>();
+
+            int prefixCount = prefix.Components.ToArray().Length;
+
+            var array = signals.ToArray();
+
+            foreach (var signal in array)
+            {
+                if (signal.Path.Components.ToArray().Length == prefixCount)
+                {
+                    if (PathEquals(signal.Path, prefix))
+                    {
+                        listOfSignals.Add(signal);
+                    }
+                }
+                else
+                {
+                    listOfPaths.Add(signal.Path);
+                }
+            }
+            return new Domain.PathEntry(listOfSignals, listOfPaths);
+        }
+
+        private bool PathEquals(Path expected, Path actual)
+        {
+            int actualCount = actual.Components.ToArray().Length;
+            for (int i = 0; i < actualCount; ++i)
+            {
+                if (!expected.Components.ElementAt(i).Equals(actual.Components.ElementAt(i)))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
