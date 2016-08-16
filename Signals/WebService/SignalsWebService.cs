@@ -152,10 +152,5 @@ namespace WebService
             var domainPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             signalsDomainService.SetMissingValuePolicy(signalId, domainPolicy);
         }
-
-
-        
-
-
     }
 }
