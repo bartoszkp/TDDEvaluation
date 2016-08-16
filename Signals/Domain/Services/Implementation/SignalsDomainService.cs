@@ -133,7 +133,7 @@ namespace Domain.Services.Implementation
 
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-            if(missingValuePolicyRepository == null)
+            if(missingValuePolicyRepository == null || fromIncludedUtc == toExcludedUtc)
             {
                 return data;
             }
