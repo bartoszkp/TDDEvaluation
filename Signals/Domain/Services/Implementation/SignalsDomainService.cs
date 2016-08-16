@@ -121,5 +121,17 @@ namespace Domain.Services.Implementation
 
             return mvp.FillMissingValue(result);
         }
+
+        public PathEntry GetPathEntry(Path pathDomain)
+        {
+            var signals = signalsRepository.GetAllWithPathPrefix(pathDomain);
+
+            var filteredSignals = signals.Where(s => s.Path.Length == pathDomain.Length + 1);
+            var subFolders = signals.Where(s => s.Path.Length > pathDomain.Length + 1).Select(s => s.Path.GetPrefix(pathDomain.Length + 1));
+
+            var result = new PathEntry(filteredSignals, subFolders);
+
+            return result;
+        }
     }
 }
