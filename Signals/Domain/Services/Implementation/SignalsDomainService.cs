@@ -136,6 +136,7 @@ namespace Domain.Services.Implementation
         {
             var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
             var signalsInDir = new List<Signal>();
+            var subPaths = new List<Path>();
 
             foreach (var signal in allSignals)
             {
@@ -146,9 +147,13 @@ namespace Domain.Services.Implementation
                 {
                     signalsInDir.Add(signal);
                 }
+                else
+                {
+                    subPaths.Add(Path.FromString(Path.JoinComponents(signal.Path.Components.Take(pathDomainComponentsCount + 1))));
+                }
             }
 
-            return new PathEntry(signalsInDir, null);
+            return new PathEntry(signalsInDir, subPaths.Distinct());
         }
     }
 }
