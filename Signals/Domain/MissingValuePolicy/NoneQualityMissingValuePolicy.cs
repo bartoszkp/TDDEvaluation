@@ -47,6 +47,10 @@ namespace Domain.MissingValuePolicy
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays + 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+                case Granularity.Week:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 7 + 1;
+                    CreateDateTimeList(data, timestamp, key, count);
+                    break;
                 case Granularity.Month:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30 + 1;
                     CreateDateTimeList(data, timestamp, key, count);
@@ -84,6 +88,7 @@ namespace Domain.MissingValuePolicy
                 {Granularity.Minute, time => time.AddMinutes(1) },
                 {Granularity.Hour, time => time.AddHours(1) },
                 {Granularity.Day, time => time.AddDays(1) },
+                {Granularity.Week, time => time.AddDays(7) },
                 {Granularity.Month, time => time.AddMonths(1) }
             };
         }
