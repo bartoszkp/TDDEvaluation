@@ -457,7 +457,7 @@ namespace WebService.Tests
                 var domainExistingPolicy = (Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>)existingPolicy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
                 missingValuePolicyRepositoryMock
-                    .Verify(mvprm => mvprm.Set(existingSignal, It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>(mv =>
+                    .Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>(mv =>
                     (
                         mv.NativeDataType == domainExistingPolicy.NativeDataType
                         && mv.Quality == domainExistingPolicy.Quality
