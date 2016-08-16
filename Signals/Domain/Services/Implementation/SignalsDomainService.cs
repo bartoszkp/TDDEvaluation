@@ -128,7 +128,7 @@ namespace Domain.Services.Implementation
 
             if (r.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
             {
-                while (time != toExcludedUtc)
+                while (time < toExcludedUtc)
                 {
                     if (sortedList.FindIndex(x=>x.Timestamp==time)<0)
                     {
