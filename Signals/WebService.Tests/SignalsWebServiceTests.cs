@@ -701,7 +701,7 @@ namespace WebService.Tests
             #region Issue #15 (Bug: SetData)
 
             [TestMethod]
-            public void GivenASignal_WhenSettingDataWithEmptyDatum_ExceptNoException()
+            public void GivenASignal_WhenSettingDataWithEmptyDatum_ExpectNoException()
             {
                 var id = 1;
                 GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
