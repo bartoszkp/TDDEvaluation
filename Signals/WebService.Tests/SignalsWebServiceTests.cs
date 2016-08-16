@@ -689,6 +689,19 @@ namespace WebService.Tests
                 Assert.IsTrue(result.Count() == 0);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDatumWithInvalidRange_ReturnsEmpty()
+            {
+                var id = 1;
+                var signal = SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
+                GivenASignal(signal);
+                SetupDataRepositoryMock<double>(signal, MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 0.0));
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(1999, 1, 1));
+
+                Assert.IsTrue(result.Count() == 0);
+            }
+
             #endregion
 
             private bool CompareDatumArrays(IEnumerable<Datum> a, Datum[] b)
