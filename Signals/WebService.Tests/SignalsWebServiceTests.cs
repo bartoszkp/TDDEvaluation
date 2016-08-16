@@ -703,12 +703,14 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingPathEntry_ReturnsEmptyPathEntry()
             {
+                SetupWebService();
+
                 Dto.Path path = new Dto.Path() { Components = new[] { "x","y" } };
                 var result = signalsWebService.GetPathEntry(path);
 
                 Assert.IsNotNull(result);
 
-                if (result.GetType() != typeof(PathEntry))
+                if (result.GetType() != typeof(Dto.PathEntry))
                     Assert.Fail();
             }
 
