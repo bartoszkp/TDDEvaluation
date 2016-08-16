@@ -724,6 +724,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenSettingDataWithNullValue_ExpectNoException()
             {
                 var id = 1;
+                MakeMocks();
                 GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
 
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = null } });
@@ -733,6 +734,7 @@ namespace WebService.Tests
 
             private void SetupGetDataDatum(int id)
             {
+                MakeMocks();
                 var signal = SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
                 GivenASignal(signal);
                 SetupDataRepositoryMock<double>(signal, MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 0.0));
@@ -825,7 +827,7 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, dataRepositoryMock?.Object, missingValuePolicyRepositoryMock?.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 

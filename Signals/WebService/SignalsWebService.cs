@@ -101,10 +101,10 @@ namespace WebService
 
                 if (result == null) throw new ArgumentException();
 
-                var type = data.ToArray()[0].Value.GetType();
-                if(data.Any(s=>s.Value.GetType()!=type))
-                 throw new ArgumentException(); 
+                var type = DataTypeUtils.GetNativeType(result.DataType);
+                var firstValueType = data.ToList()[0].Value?.GetType();
 
+                if (firstValueType != null && type != firstValueType) throw new ArgumentException();
 
                 switch (result.DataType)
                 {
