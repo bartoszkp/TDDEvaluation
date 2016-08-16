@@ -32,31 +32,31 @@ namespace Domain.MissingValuePolicy
             switch (key)
             {
                 case Granularity.Second:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds + 1;
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Minute:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalMinutes + 1;
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalMinutes;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Hour:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalHours + 1;
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalHours;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Day:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays + 1;
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Week:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 7 + 1;
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 7;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Month:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30 + 1;
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Year:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 365 + 1;
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 365;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
             }
