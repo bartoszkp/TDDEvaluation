@@ -640,6 +640,7 @@ namespace WebService.Tests
                 Assert.AreEqual(expectedArray[2].Value, result.ToArray()[2].Value);
             }
 
+            //-------------------------------------------------------------------------
 
             [TestMethod]
             public void GivenASignalWithData_WhenGettingDataWithIdenticalFromAndToDates_ReturnsASingleItem()
@@ -667,6 +668,31 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(dummyId, date, date);
 
                 Assert.AreEqual(1, result.Count());
+            }
+
+            [TestMethod]
+            public void GivenASignalWithData_WhenGettingDataFromAnEmptyPeriod_ReturnsCorrectAmountOfData()
+            {
+                var signalsRepositoryMock = new Mock<ISignalsRepository>();
+                var signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                var signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var dummyId = 1;
+                var dummySignal = new Signal() { Id = dummyId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("root/signal") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(dummySignal.Id.Value)).Returns(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                signalDataRepositoryMock.Setup(sdr => sdr.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(new Datum<double>[0]);
+
+                var result = signalsWebService.GetData(dummyId, new DateTime(), new DateTime().AddMonths(2));
+
+                Assert.AreEqual(2, result.Count());
             }
         }
     }
