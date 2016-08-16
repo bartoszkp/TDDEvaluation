@@ -8,6 +8,7 @@ using Moq;
 using System.Collections.Generic;
 using System;
 using DataAccess.GenericInstantiations;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -789,6 +790,18 @@ namespace WebService.Tests
                 {
                     AssertSignalsAreEqual(expectedPathEntry.Signals.ElementAt(i), result.Signals.ElementAt(i));
                 }
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IdNotNullException))]
+            public void GivenNoGignals_WhenAddingASignal_ThrowsIdNotNullException()
+            {
+                SetupWebService();
+
+                Dto.Signal signal = GetDefaultSignal_IntegerMonth().ToDto<Dto.Signal>();
+                signal.Id = 1;
+
+                this.signalsWebService.Add(signal);
             }
 
             private void SetupMock_GetAllWithPathPrefix(Signal[] signal,Path path)
