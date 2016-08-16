@@ -498,6 +498,13 @@ namespace WebService.Tests
                 Assert.AreEqual(5.0, result[0].Value);
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingPathEntry_DoesNotThrow()
+            {
+                GivenNoSignals();
+                signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "x" } });
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
