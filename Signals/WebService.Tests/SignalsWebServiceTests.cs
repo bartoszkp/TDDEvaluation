@@ -770,9 +770,11 @@ namespace WebService.Tests
                 int expectedElements = 2;
                 Assert.AreEqual(expectedElements, result.SubPaths.ToArray().Length);
 
-                Dto.PathEntry expectedPathEntry = new Dto.PathEntry() {
+                Dto.PathEntry expectedPathEntry = new Dto.PathEntry()
+                {
                     Signals = new Dto.Signal[] { signals[0].ToDto<Dto.Signal>(), signals[1].ToDto<Dto.Signal>() },
-                    SubPaths = new Dto.Path[] { signals[2].Path.ToDto<Dto.Path>(), signals[3].Path.ToDto<Dto.Path>() } };
+                    SubPaths = new Dto.Path[] { new Dto.Path() { Components = new[] { "x", "z" } } }
+                };
 
                 Assert.AreEqual(expectedPathEntry.Signals.ToArray().Length,result.Signals.ToArray().Length);
                 Assert.AreEqual(expectedPathEntry.SubPaths.ToArray().Length, result.SubPaths.ToArray().Length);
