@@ -320,6 +320,19 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GetData_EqualTimestamps_ReturnSingleDatum()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y")));
+                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), new DateTime(2000, 2, 1), new DateTime(2000, 2, 1))).Returns(Enumerable.Repeat(new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },1));
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1));
+
+                var expectedDataDto = Enumerable.Repeat(new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }, 1);
+                AssertDataDtoEquals(result,expectedDataDto);
+            }
+
+            [TestMethod]
             public void GivenData_WhenGettingData_DataIsReturnedOrderedByTimestampAscending()
             {
                 int signalId = 1;
@@ -548,6 +561,8 @@ namespace WebService.Tests
                 signalsDataRepositoryMock
                     .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns<Domain.Signal, DateTime, DateTime>((s, from, to) => data.Where(d => d.Timestamp >= from && d.Timestamp < to));
+
+
             }
 
             private Domain.Signal SignalWith(
