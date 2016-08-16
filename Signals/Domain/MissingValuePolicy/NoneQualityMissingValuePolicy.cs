@@ -13,14 +13,32 @@ namespace Domain.MissingValuePolicy
 
             var granularityToDateTime = new Dictionary<Granularity, Func<DateTime, DateTime>>()
             {
+                {Granularity.Second, time => time.AddSeconds(1) },
                 {Granularity.Month, time => time.AddMonths(1) }
             };
 
             List<DateTime> list = new List<DateTime>();
 
             var timestamp = data.First().Timestamp;
-
-            if (signal.Granularity == Granularity.Month)
+            if (signal.Granularity == Granularity.Second)
+            {
+                int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds + 1;
+                int index = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    if (dataDictionary.ContainsKey(timestamp))
+                    {
+                        list.Add(data.ElementAt(index).Timestamp);
+                        index++;
+                    }
+                    else
+                    {
+                        list.Add(timestamp);
+                    }
+                    timestamp = granularityToDateTime[Granularity.Second](timestamp);
+                }
+            }
+            else if (signal.Granularity == Granularity.Month)
             {
                 int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30 + 1;
                 int index = 0;
