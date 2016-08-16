@@ -652,6 +652,26 @@ namespace WebService.Tests
                
             }
 
+            #region Issue #13 (Bug: GetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDatum_ReturnsDefault()
+            {
+                var id = 1;
+                var signal = SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
+                GivenASignal(signal);
+                SetupDataRepositoryMock<double>(signal, MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 0.0));
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(2000, 7, 1));
+
+                CollectionAssert.AreEquivalent(new Datum[] {
+                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = 0.0},
+                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0.0}
+                    }, result.ToList());
+            }
+
+            #endregion
+
             private void SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal()
             {
                 signalsRepositoryMock
