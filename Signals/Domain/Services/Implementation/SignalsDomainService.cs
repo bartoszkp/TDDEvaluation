@@ -493,11 +493,20 @@ namespace Domain.Services.Implementation
 
             var filteredMatchingSignals = matchingSignals.Where(s => s.Path.Length == prefixPath.Length + 1);
 
-            var signalsInSubpaths = matchingSignals.Where(s => s.Path.Length > prefixPath.Length + 1);
+            var signalsInSubPaths = matchingSignals.Where(s => s.Path.Length > prefixPath.Length + 1);
 
-            var subpaths = new List<Path>();
+            var subPaths = CreateSubPathsList(signalsInSubPaths, prefixPath);
 
-            foreach (var signal in signalsInSubpaths)
+
+            return new PathEntry(filteredMatchingSignals, subPaths);
+
+        }
+
+        private List<Path> CreateSubPathsList(IEnumerable<Signal> signalsInSubPaths,Path prefixPath)
+        {
+            var subPaths = new List<Path>();
+
+            foreach (var signal in signalsInSubPaths)
             {
                 var filteredComponents = new string[prefixPath.Length + 1];
 
@@ -507,15 +516,12 @@ namespace Domain.Services.Implementation
                 }
 
                 Path subpath = Path.FromString(Path.JoinComponents(filteredComponents));
-                if (subpaths.Find(s => s.Equals(subpath)) == null)
-                    subpaths.Add(subpath);
-
-
+                if (subPaths.Find(s => s.Equals(subpath)) == null)
+                    subPaths.Add(subpath);
             }
 
-
-            return new PathEntry(filteredMatchingSignals, subpaths);
-
+            return subPaths;
         }
+
     }
 }
