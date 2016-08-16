@@ -53,7 +53,17 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            throw new NotImplementedException();
+            Domain.Path pathDomain = pathDto.ToDomain<Domain.Path>();
+            IEnumerable<Dto.Signal> signalsDto = signalsDomainService.GetPathEntry(pathDomain)?.ToDto<IEnumerable<Dto.Signal>>();
+            Dto.PathEntry pathEntry = new PathEntry()
+            {
+                Signals = signalsDto.Where<Dto.Signal>(s => s.Path.Components.Count() == 2).Select(signal => signal),
+                SubPaths = signalsDto
+                    .Where<Dto.Signal>(s => s.Path.Components.Count() > 2)
+                    .Select(signal => new Path(){ Components = signal.Path.Components.Take(2) })
+                    .Distinct(new PathComparer())
+            };
+            return pathEntry;
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -66,8 +76,8 @@ namespace WebService
             switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
-                     return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
-                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                    return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                 case Domain.DataType.Integer:
                     return signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);

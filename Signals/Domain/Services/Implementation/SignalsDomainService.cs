@@ -54,6 +54,12 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(path);
         }
 
+        public IEnumerable<Signal> GetPathEntry(Path prefix)
+        {
+           IEnumerable<Signal> result = signalsRepository.GetAllWithPathPrefix(prefix);
+           return result;
+        }
+
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
             data = data.Select(d =>
