@@ -1288,6 +1288,24 @@ namespace WebService.Tests
 
                 Assert.IsNull(result);
             }
+
+            [TestMethod]
+            public void GivenNoPath_WhenGettingPathEntry_RepositoryGetAllWithPathPrefixIsCalled()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.GetPathEntry(null);
+
+                signalsRepositoryMock
+                    .Verify(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()));
+            }
         }
     }
 }
