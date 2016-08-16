@@ -13,7 +13,10 @@ namespace Domain.MissingValuePolicy
 
         public override Datum<T> FillMissingValue(Datum<T> datum)
         {
-            throw new NotImplementedException();
+            datum.Quality = Quality;
+            datum.Value = Value;
+
+            return datum;
         }
     }
 }
