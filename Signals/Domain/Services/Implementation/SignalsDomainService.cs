@@ -28,7 +28,13 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
-            return this.signalsRepository.Add(newSignal);
+            var signal = this.signalsRepository.Add(newSignal);
+
+            if (newSignal.DataType.GetNativeType() == typeof(double))
+            {
+                this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<double>());
+            }
+            return signal;
         }
 
         public Signal GetById(int signalId)
