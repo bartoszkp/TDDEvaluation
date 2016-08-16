@@ -667,10 +667,8 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGetsMissingValuePolicy_ReturnsSignalWithPolicy()
             {
-                int signalId = 5;
                 Dto.Signal addedSignal = new Dto.Signal()
                 {
-                    Id = signalId,
                     DataType = Dto.DataType.Boolean,
                     Granularity = Dto.Granularity.Month,
                     Path = new Dto.Path() { Components = new[] { "root", "signal" } }
@@ -686,12 +684,10 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSetsMissingValuePolicy_VerifyRepo_CheckIfWorksForAllTypes()
             {
-                int signalId = 3;
                 GivenNoSignals_SetupSignalsRepositoryMock();
 
                 signalsWebService.Add(new Dto.Signal()
                 {
-                    Id = signalId,
                     DataType = Dto.DataType.Double,
                     Granularity = Dto.Granularity.Hour,
                     Path = new Dto.Path() { Components = new[] { "root", "signal5" } }
@@ -948,9 +944,15 @@ namespace WebService.Tests
             {
                 GivenNoSignals_SetupSignalsRepositoryMock();
 
-                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
+                int signalId = 3;
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal() { Id = signalId});
+
                 missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
                     .Returns(new NoneQualityMissingValuePolicyBoolean());
+
+                this.signalsRepositoryMock
+                    .Setup(x => x.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>( y => { return new Signal() { Id = signalId }; });
             }
 
             private void GivenRepositoryThatAssigns(int id)

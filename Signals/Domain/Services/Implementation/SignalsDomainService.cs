@@ -28,11 +28,14 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
+            if (newSignal.Id != null)
+                throw new IdNotNullException();
+
             Signal addedSignal = this.signalsRepository.Add(newSignal);
 
             SetMissingValuePolicyDependsOnSignalDatatype(newSignal);
 
-            return newSignal;
+            return addedSignal;
         }
 
         public Signal GetById(int signalId)
