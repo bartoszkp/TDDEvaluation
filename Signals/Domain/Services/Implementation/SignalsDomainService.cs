@@ -167,7 +167,10 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.GetAllWithPathPrefix(pathDomain);
 
-            return null;
+            if (signal == null)
+                return null;
+
+            return new PathEntry(null, null);
         }
     }
 }

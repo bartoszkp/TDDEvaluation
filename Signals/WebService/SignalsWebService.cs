@@ -59,7 +59,7 @@ namespace WebService
         {
             var pathDomain = pathDto.ToDomain<Domain.Path>();
 
-            return this.signalsDomainService.GetPathEntry(pathDomain).ToDto<Dto.PathEntry>();
+            return this.signalsDomainService?.GetPathEntry(pathDomain).ToDto<Dto.PathEntry>();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
