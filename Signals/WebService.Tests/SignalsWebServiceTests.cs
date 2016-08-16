@@ -671,7 +671,6 @@ namespace WebService.Tests
             }
 
             #endregion
-
             #region Issue #16 (Bug: GetData)
 
             [TestMethod]
@@ -697,7 +696,6 @@ namespace WebService.Tests
             }
 
             #endregion
-
             #region Issue #15 (Bug: SetData)
 
             [TestMethod]
@@ -716,6 +714,19 @@ namespace WebService.Tests
                 GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
 
                 signalsWebService.SetData(id, null);
+            }
+
+            #endregion
+
+            #region Issue #14 (Bug: SetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithNullValue_ExpectNoException()
+            {
+                var id = 1;
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = null } });
             }
 
             #endregion
