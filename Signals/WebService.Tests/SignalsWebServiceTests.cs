@@ -552,7 +552,7 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 missingValuePolicyRepositoryMock
                     .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble());
+                    .Returns(existingPolicy);
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
