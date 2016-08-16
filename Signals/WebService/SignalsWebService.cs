@@ -77,6 +77,11 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
+            if (pathDto == null)
+                throw new ArgumentNullException();
+            if (pathDto.Components == null)
+                return null;
+
             return this.signalsDomainService.GetPathEntry(pathDto.ToDomain<Domain.Path>())
                         ?.ToDto<Dto.PathEntry>();
         }

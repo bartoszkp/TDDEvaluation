@@ -486,9 +486,6 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path prefixPath)
         {
-            if (prefixPath == null)
-                throw new ArgumentNullException();
-
             var matchingSignals = this.signalsRepository.GetAllWithPathPrefix(prefixPath);
 
             if (matchingSignals == null)
