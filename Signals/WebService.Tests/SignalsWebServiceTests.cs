@@ -1244,6 +1244,45 @@ namespace WebService.Tests
                     index++;
                 }
             }
+
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenGettingSingleData_ReturnsThisData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                DateTime date = new DateTime(2000, 1, 1);
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), date, date))
+                    .Returns(existingDatum.First().ToDomain<IEnumerable<Domain.Datum<double>>>());
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(1, date, date);
+
+                Assert.AreEqual(existingDatum.First().Quality, result.First().Quality);
+                Assert.AreEqual(existingDatum.First().Timestamp, result.First().Timestamp);
+                Assert.AreEqual(existingDatum.First().Value, result.First().Value);
+            }
         }
     }
 }
