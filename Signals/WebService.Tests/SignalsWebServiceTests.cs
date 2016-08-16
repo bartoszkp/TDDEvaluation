@@ -1349,8 +1349,8 @@ namespace WebService.Tests
                 int index = 0;
                 foreach(var signal in signalsList)
                 {
-                    Assert.AreEqual(signal.DataType, result.Signals.ElementAt(index).DataType);
-                    Assert.AreEqual(signal.Path, result.Signals.ElementAt(index).Path);
+                    Assert.AreEqual(signal.ToDto<Dto.Signal>().DataType, result.Signals.ElementAt(index).DataType);
+                    CollectionAssert.AreEqual(signal.ToDto<Dto.Signal>().Path.Components.ToArray(), result.Signals.ElementAt(index).Path.Components.ToArray());
                     index++;
                 }
             }
