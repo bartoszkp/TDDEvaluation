@@ -131,7 +131,12 @@ namespace Domain.Services.Implementation
         {
             var signal = GetById(signalId);
 
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var data = this.signalsDataRepository
+                .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+            var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
+
+            return mvp.FillData(signal, data, fromIncludedUtc, toExcludedUtc).ToArray();
         }
 
         public Signal GetByPath(Path path)
