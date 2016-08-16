@@ -146,28 +146,20 @@ namespace Domain.Services.Implementation
             {
                 case Granularity.Second:
                    return time.AddSeconds(1);
-                    break;
                 case Granularity.Minute:
                     return time.AddMinutes(1);
-                    break;
                 case Granularity.Hour:
                     return time.AddHours(1);
-                    break;
                 case Granularity.Day:
                     return time.AddDays(1);
-                    break;
                 case Granularity.Week:
                     return time.AddDays(7);
-                    break;
                 case Granularity.Month:
                     return time.AddMonths(1);
-                    break;
                 case Granularity.Year:
                     return time.AddYears(1);
-                    break;
                 default:
                     return new DateTime();
-                    break;
             }
         }
 
