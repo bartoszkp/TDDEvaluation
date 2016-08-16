@@ -115,6 +115,18 @@ namespace Domain.Services.Implementation
                 while (date < fromIncludedUtc)
                     increaseDate(ref date, signal.Granularity);
 
+                if(fromIncludedUtc == toExcludedUtc)
+                {
+                    foreach (var datum in result)
+                    {
+                        if (datum.Timestamp == fromIncludedUtc)
+                        {
+                            datums.Add(datum);
+                            return datums.ToArray();
+                        }
+                    }
+                }
+
                 for (int i = 0; date<toExcludedUtc && i<result.Length; increaseDate(ref date, signal.Granularity))
                 {
                     if (result[i].Timestamp == date)
