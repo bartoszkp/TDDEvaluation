@@ -115,26 +115,26 @@ namespace Domain.Services.Implementation
             }
         }
 
-        private void FillDatumArray<T>(ref IEnumerable<Datum<T>> array, Signal signal, 
-            DateTime fromIncludedUtc, DateTime toExcludedUtc)
+    
+        private void FillDatumArray<T>(ref IEnumerable<Datum<T>> array, Signal signal,
+       DateTime fromIncludedUtc, DateTime toExcludedUtc,Quality quality=Quality.None, T value=default(T))
         {
             List<Datum<T>> list = array.ToList();
 
             int i = 0;
-            for (DateTime iterativeDateTime = fromIncludedUtc; iterativeDateTime < toExcludedUtc; 
-                AddToDateTime(ref iterativeDateTime,signal.Granularity),++i)
+            for (DateTime iterativeDateTime = fromIncludedUtc; iterativeDateTime < toExcludedUtc;
+                AddToDateTime(ref iterativeDateTime, signal.Granularity), ++i)
             {
                 DateTime period = iterativeDateTime;
                 AddToDateTime(ref period, signal.Granularity);
-                if(i == list.Count)
-                    list.Insert(i, Datum<T>.CreateNone(signal, iterativeDateTime));
+                if (i == list.Count)
+                    list.Insert(i, new Datum<T>() { Signal = signal, Id = (int)signal.Id, Quality = quality, Value = value, Timestamp = iterativeDateTime });
                 else if (!(list[i].Timestamp >= iterativeDateTime && list[i].Timestamp < period))
-                    list.Insert(i,Datum<T>.CreateNone(signal, iterativeDateTime));
+                    list.Insert(i, new Datum<T>() { Signal=signal,Id=(int)signal.Id,Quality=quality,Value=value,Timestamp=iterativeDateTime});
             }
 
             array = list.ToArray();
         }
-
         public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             IEnumerable<Datum<T>> returnedData =
@@ -143,11 +143,20 @@ namespace Domain.Services.Implementation
             IEnumerable<Datum<T>> sortedData = returnedData.OrderBy(x => x.Timestamp);
             sortedData = sortedData.ToArray();
 
-            var policy = ReturnMissingValuePolicy(foundSignal);
-            if(GetMissingValuePolicy(foundSignal.Id.Value).GetType() == policy.GetType())
+            var policy = GetMissingValuePolicy(foundSignal.Id.Value);
+            if (policy.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
+            {
+                
                 FillDatumArray<T>(ref sortedData, foundSignal, fromIncludedUtc, toExcludedUtc);
-
-            return sortedData;
+            }
+          else  if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+            {
+               
+               var c= policy as SpecificValueMissingValuePolicy<T>;
+                FillDatumArray<T>(ref sortedData, foundSignal, fromIncludedUtc, toExcludedUtc, c.Quality,c.Value);
+             
+            }
+                return sortedData;
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp)
