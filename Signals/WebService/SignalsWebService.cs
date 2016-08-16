@@ -282,20 +282,8 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            var signal = GetById(signalId);
-
-            if (signal == null)
-                throw new Domain.Exceptions.GettingDataOfNotExistingSignal();
-
-            if (signal.DataType == DataType.String)
-            {
-                return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.SpecificValueMissingValuePolicy>();
-            }
-            else if (signal.DataType == DataType.Double)
-            {
-                return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.NoneQualityMissingValuePolicy>();
-            }
-            else return null;
+            var signal = signalsDomainService.GetById(signalId);
+            return this.signalsDomainService.GetMissingValuePolicy(signal).ToDto<MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)

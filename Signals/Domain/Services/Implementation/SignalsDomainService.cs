@@ -118,9 +118,10 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository.Set(exampleSignal, policy);
         }
 
-        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
+        public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
-            return missingValuePolicyRepository.Get(GetById(signalId));
+            var result = this.missingValuePolicyRepository.Get(signal);
+            return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
         }
     }
 }
