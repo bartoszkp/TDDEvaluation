@@ -135,6 +135,10 @@ namespace Domain.Services.Implementation
         private int NumberOfPeriods(DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity granularity)
         {
             var timeSpan = toExcludedUtc - fromIncludedUtc;
+
+            if (fromIncludedUtc == toExcludedUtc)
+                return 1;
+
             switch (granularity)
             {
                 case Granularity.Second:
