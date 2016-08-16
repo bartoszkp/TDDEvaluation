@@ -605,14 +605,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2006, 1, 1));
 
-                Assert.AreEqual(result.ElementAt(0).Quality, Dto.Quality.Good);
-                Assert.AreEqual(result.ElementAt(1).Quality, Dto.Quality.Good);
-                Assert.AreEqual(result.ElementAt(2).Quality, Dto.Quality.Good);
-                Assert.AreEqual(result.ElementAt(5).Quality, Dto.Quality.Good);
-                Assert.AreEqual(result.ElementAt(0).Value, "cc");
-                Assert.AreEqual(result.ElementAt(1).Value, "cc");
-                Assert.AreEqual(result.ElementAt(2).Value, "cc");
-                Assert.AreEqual(result.ElementAt(5).Value, "cc");
+                AssertDefaultDataIsCorrect<string>(Dto.Quality.Good, "cc", result.ElementAt(0), result.ElementAt(1), result.ElementAt(2), result.ElementAt(5));
             }
 
             private void GivenSignals(IEnumerable<Signal> signals)
@@ -752,6 +745,15 @@ namespace WebService.Tests
                         new Domain.Datum<string>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = "test2" },
                         new Domain.Datum<string>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 6, 1), Value = "test3" }
                 };
+            }
+
+            private void AssertDefaultDataIsCorrect<T>(Dto.Quality quality, T value, params Dto.Datum[] data)
+            {
+                foreach (var datum in data)
+                {
+                    Assert.AreEqual(datum.Quality, quality);
+                    Assert.AreEqual(datum.Value, value);
+                }
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
