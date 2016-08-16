@@ -45,6 +45,10 @@ namespace Domain.Services.Implementation
             {
                 this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<decimal>());
             }
+            else if(newSignal.DataType.GetNativeType() == typeof(bool))
+            {
+                this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<bool>());
+            }
             return signal;
         }
 
