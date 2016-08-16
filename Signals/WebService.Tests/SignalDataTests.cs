@@ -263,7 +263,7 @@ namespace WebService.Tests
             };
             SetupMocksGetPath(domainSignalsToReturn);
 
-            var pathDto = new Dto.Path() { Components = new[] { "root" } };
+            var pathDto = new Dto.Path() { Components = new[] { "root/signals1" } };
             var result = signalsWebService.GetPathEntry(pathDto);
 
             var dtoSignals = new Dto.Signal[]
@@ -274,14 +274,17 @@ namespace WebService.Tests
                 new Dto.Signal() { Id = 4, DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Week, Path = new Dto.Path() { Components = new[] { "root", "signals2", "signals1", "" } } },
             };
             var actualResultA = result.Signals.ToArray();
-            Assert.AreEqual(1, actualResultA.Count());
+            Assert.AreEqual(2, actualResultA.Count());
 
+            int id = 1;
             foreach (var signal in actualResultA)
             {
-                Assert.AreEqual(dtoSignals[0].DataType, signal.DataType);
-                Assert.AreEqual(dtoSignals[0].Granularity, signal.Granularity);
-                Assert.AreEqual(dtoSignals[0].Id, signal.Id);
-                Assert.AreEqual(dtoSignals[0].Path.Components.ToString(), signal.Path.Components.ToString());
+                Assert.AreEqual(dtoSignals[id].DataType, signal.DataType);
+                Assert.AreEqual(dtoSignals[id].Granularity, signal.Granularity);
+                Assert.AreEqual(dtoSignals[id].Id, signal.Id);
+                Assert.AreEqual(dtoSignals[id].Path.Components.ToString(), signal.Path.Components.ToString());
+
+                id++;
             }
         }
 
