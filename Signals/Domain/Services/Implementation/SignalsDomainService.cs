@@ -162,5 +162,12 @@ namespace Domain.Services.Implementation
             var result = this.missingValuePolicyRepository.Get(signal);
             return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
         }
+
+        public PathEntry GetPathEntry(Path pathDomain)
+        {
+            var signal = signalsRepository.GetAllWithPathPrefix(pathDomain);
+
+            return null;
+        }
     }
 }
