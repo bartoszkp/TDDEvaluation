@@ -230,6 +230,38 @@ namespace WebService.Tests
             Assert.AreEqual(null, result);
         }
 
+        [TestMethod]
+        public void WhenGettingSignalsWithGivenPathPrefix_ReturnsAllSignals()
+        {
+            var signals = new Domain.Signal[]
+            {
+                new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Year, Path = Domain.Path.FromString("root/signals1/signal1") },
+                new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal2") },
+                new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal3") },
+                new Signal() { Id = 4, DataType = DataType.Decimal, Granularity = Granularity.Week, Path = Domain.Path.FromString("root/signals2/signal1") },
+            };
+
+            var subPaths = new Domain.Path[]
+            {
+                Domain.Path.FromString("root/signals1"),
+                Domain.Path.FromString("root/signals2"),
+            };
+            var dtoSubPaths = new Dto.Path[]
+            {
+                new Dto.Path() { Components = new[] { "root/signals1" } },
+                new Dto.Path() { Components = new[] { "root/signals2" } },
+            };
+
+            var toReturn = new Domain.PathEntry(signals, subPaths);
+            SetupMocksGetPath(toReturn);
+
+            var pathDto = new Dto.Path() { Components = new[] { "root" } };
+            var result = signalsWebService.GetPathEntry(pathDto);
+
+            CollectionAssert.AreEqual(null, result.Signals.ToArray());
+            CollectionAssert.AreEqual(dtoSubPaths, result.SubPaths.ToArray());
+        }
+
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
@@ -253,6 +285,14 @@ namespace WebService.Tests
             signalsDataRepoMock
                 .Setup(dr => dr.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .Returns(datums);
+        }
+
+        private void SetupMocksGetPath(PathEntry domainPathEntryToReturn)
+        {
+            SetupWebService();
+            signalsDataRepoMock
+                .Setup(sdrm => sdrm.GetPathEntry(It.IsAny<Dto.Path>()))
+                .Returns(domainPathEntryToReturn);
         }
 
         private Mock<ISignalsDataRepository> signalsDataRepoMock;
