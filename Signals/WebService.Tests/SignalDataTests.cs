@@ -220,39 +220,9 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void WhenGettingSignalsWithGivenPathPrefix_ReturnsNull()
-        {
-            SetupWebService();
-            var inputPath = new Dto.Path() { Components = new[] { "example", "path" } };
-
-            var result = signalsWebService.GetPathEntry(inputPath);
-
-            Assert.AreEqual(null, result);
-        }
-
-        [TestMethod]
         public void WhenGettingSignalsWithGivenPathPrefix_ReturnsAllSignals()
         {
-            var signals = new Domain.Signal[]
-            {
-                new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Year, Path = Domain.Path.FromString("root/signals1/signal1") },
-                new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal2") },
-                new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal3") },
-                new Signal() { Id = 4, DataType = DataType.Decimal, Granularity = Granularity.Week, Path = Domain.Path.FromString("root/signals2/signal1") },
-            };
-
-            var subPaths = new Domain.Path[]
-            {
-                Domain.Path.FromString("root/signals1"),
-                Domain.Path.FromString("root/signals2"),
-            };
-            var dtoSubPaths = new Dto.Path[]
-            {
-                new Dto.Path() { Components = new[] { "root/signals1" } },
-                new Dto.Path() { Components = new[] { "root/signals2" } },
-            };
-
-            SetupMocksGetPath(signals);
+            SetupMocksGetPath();
 
             var pathDto = new Dto.Path() { Components = new[] { "root" } };
             var result = signalsWebService.GetPathEntry(pathDto);
@@ -303,8 +273,16 @@ namespace WebService.Tests
                 .Returns(datums);
         }
 
-        private void SetupMocksGetPath(IEnumerable<Signal> domainSignalsToReturn)
+        private void SetupMocksGetPath()
         {
+            var domainSignalsToReturn = new Domain.Signal[]
+            {
+                new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Year, Path = Domain.Path.FromString("root/signals1/signal1") },
+                new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal2") },
+                new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal3") },
+                new Signal() { Id = 4, DataType = DataType.Decimal, Granularity = Granularity.Week, Path = Domain.Path.FromString("root/signals2/signal1") },
+            };
+
             SetupWebService();
             signalsRepoMock
                 .Setup(sdrm => sdrm.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
