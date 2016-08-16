@@ -120,7 +120,15 @@ namespace Domain.Services.Implementation
        DateTime fromIncludedUtc, DateTime toExcludedUtc,Quality quality=Quality.None, T value=default(T))
         {
             List<Datum<T>> list = array.ToList();
-
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                var k = list.FindIndex(x => x.Timestamp == toExcludedUtc);
+                if ( k< 0)
+                    list.Insert(0, new Datum<T>() { Signal = signal, Id = (int)signal.Id, Quality = quality, Value = value, Timestamp = toExcludedUtc });
+                
+                array = list.ToArray();
+                return;
+            }
             int i = 0;
             for (DateTime iterativeDateTime = fromIncludedUtc; iterativeDateTime < toExcludedUtc;
                 AddToDateTime(ref iterativeDateTime, signal.Granularity), ++i)
