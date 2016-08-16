@@ -392,6 +392,34 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new string[] { "root", "subFolder1" }, result.SubPaths.Single().Components.ToArray());
             }
 
+
+            [TestMethod]
+            public void GivenASignalWithSpecificValueMissingValuePolicy_WhenGettingData_MissingValuesHaveSpecificValue()
+            {
+                var signal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x/y"));
+                GivenASignal(signal);
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
+                {
+                    Quality = Quality.Good,
+                    Value = 3.1415
+                });
+
+                var datum = new Datum<double>[] {
+                   new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                   new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = 2 } };
+                var expectedDatum = new Dto.Datum[] {
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 3.1415 },
+                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 3.1415 } };
+
+                SetupGetData(datum);
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                Assert.IsTrue(CompareDatum(expectedDatum, result));
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
