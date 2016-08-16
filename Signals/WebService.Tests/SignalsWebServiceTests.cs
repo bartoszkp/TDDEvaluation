@@ -700,6 +700,18 @@ namespace WebService.Tests
                     It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingPathEntry_ReturnsEmptyPathEntry()
+            {
+                Dto.Path path = new Dto.Path() { Components = new[] { "x","y" } };
+                var result = signalsWebService.GetPathEntry(path);
+
+                Assert.IsNotNull(result);
+
+                if (result.GetType() != typeof(PathEntry))
+                    Assert.Fail();
+            }
+
             private void GivenASignalAndData_SetupSignalsRepositoryMockAndVerifySetDataCall<T>(Signal signal, IEnumerable<Dto.Datum> data, DateTime timeStamp, T value)
             {
                 signalsRepositoryMock.Setup(srm => srm.Get(signal.Id.Value)).Returns(signal);
