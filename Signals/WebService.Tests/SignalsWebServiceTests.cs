@@ -599,6 +599,27 @@ namespace WebService.Tests
                 Assert.AreEqual(thatDate, result.First().Timestamp);
             }
 
+            [TestMethod]
+            public void GivenASignalAndNoData_CallingGetDataWithTheSameDateInBothArguments_ReturnsNull()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    signalId,
+                    DataType.Boolean,
+                    Granularity.Month,
+                    Path.FromString("")));
+
+                DateTime thatDate = new DateTime(2000, 1, 1);
+
+                signalsDataRepoMock
+                    .Setup(sd => sd.GetData<bool>(It.Is<Signal>(s => s.Id == signalId), thatDate, thatDate))
+                    .Returns<IEnumerable<Datum<bool>>>(null);
+
+                var result = signalsWebService.GetData(signalId, thatDate, thatDate);
+
+                Assert.IsNull(result);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
