@@ -133,7 +133,10 @@ namespace Domain.Services.Implementation
 
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-
+            if(missingValuePolicyRepository == null)
+            {
+                return data;
+            }
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
 
             return mvp.FillData(signal, data, fromIncludedUtc, toExcludedUtc).ToArray();
