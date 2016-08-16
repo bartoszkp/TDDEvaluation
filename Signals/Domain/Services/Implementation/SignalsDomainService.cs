@@ -165,12 +165,12 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path pathDomain)
         {
-            var signal = signalsRepository.GetAllWithPathPrefix(pathDomain);
+            var signals = signalsRepository.GetAllWithPathPrefix(pathDomain);
 
-            if (signal == null)
+            if (signals == null)
                 return null;
 
-            return new PathEntry(null, null);
+            return new PathEntry(signals, null);
         }
     }
 }
