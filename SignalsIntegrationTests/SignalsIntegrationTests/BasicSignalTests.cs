@@ -164,7 +164,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue1")]
-        public void GivenSignalWithNullPath_WhenAddingThatSignal_ServiceThrows()
+        public void GivenNoSignals_WhenAddingASignalWithNullPath_ServiceThrows()
         {
             var signal = new Signal()
             {
