@@ -635,7 +635,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenSomeSignals_WhenGettingPathEntry_ReturnsNotNull()
+            public void GivenSomeSignals_WhenGettingPathEntry_ReturnsTheCorrectEntry()
             {
                 GivenSomeSignals(new[]
                 {
@@ -645,8 +645,9 @@ namespace WebService.Tests
                 });
 
                 var result = signalsWebService.GetPathEntry(new Dto.Path { Components = new[] { "s" } });
-
-                Assert.IsNotNull(result);
+                
+                Assert.AreEqual(1, result.Signals.Count());
+                Assert.AreEqual(1, result.SubPaths.Count());
             }
 
             private void GivenSomeSignals(Signal[] signals)
