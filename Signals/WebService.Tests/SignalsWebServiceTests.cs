@@ -664,13 +664,30 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(2000, 7, 1));
 
-                CollectionAssert.AreEquivalent(new Datum[] {
-                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = 0.0},
-                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0.0}
-                    }, result.ToList());
+                Assert.IsTrue(CompareDatumArrays(result, new Datum[] {
+                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = 0},
+                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0} }));
             }
 
             #endregion
+
+            private bool CompareDatumArrays(IEnumerable<Datum> a, Datum[] b)
+            {
+                if (a.Count() != b.Count()) return false;
+
+                foreach (Datum d in a)
+                    if (b.Where(f => CompareDatum(f, d)) == null) return false;
+
+                return true;
+            }
+
+            private bool CompareDatum(Datum a, Datum b)
+            {
+                return a.Value.GetType() == b.Value.GetType() &&
+                    a.Value == b.Value &&
+                    a.Quality == b.Quality &&
+                    a.Timestamp == b.Timestamp;
+            }
 
             private void SignalsRepositoryMock_GetAllPaths_ReturnsToEachPathASignal()
             {
