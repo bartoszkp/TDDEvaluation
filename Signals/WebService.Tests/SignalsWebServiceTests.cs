@@ -420,6 +420,51 @@ namespace WebService.Tests
                 signalWebServiceMock.Verify(swsm => swsm.SetMissingValuePolicy(1, policyMock.Object));
             }
 
+            [TestMethod]
+            public void GivenASignalAndPolicy_WhenSettingMissingValuePolicy_RepositorySetIsCalledWithProperArguments()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day
+                };
+
+                var existingPolicy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Double,
+                    Quality = Dto.Quality.Bad,
+                    Value = (double)1.5
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetMissingValuePolicy(existingSignal.Id.Value, existingPolicy);
+
+                var domainExistingPolicy = (Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>)existingPolicy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+
+                missingValuePolicyRepositoryMock
+                    .Verify(mvprm => mvprm.Set(existingSignal, It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>(mv =>
+                    (
+                        mv.NativeDataType == domainExistingPolicy.NativeDataType
+                        && mv.Quality == domainExistingPolicy.Quality
+                        && mv.Value == domainExistingPolicy.Value
+                    ))));
+            }
+
             private void SetupMissingValuePolicy(Mock<Dto.MissingValuePolicy.MissingValuePolicy> policyMock)
             {
                 policyMock.Object.DataType = Dto.DataType.Boolean;
@@ -481,15 +526,9 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingANoneQualityPolicy_CorrectRepositoryMethodIsCalled()
+            public void GivenASignal_WhenSettingAPolicy_CorrectRepositoryMethodIsCalled()
             {
-                Mock<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>> policyMockForNoneQuality = new Mock<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>();
-
-                var exampleSignal = SetupPolicyMockForNoneQuality();
-
-                signalDomainService.SetMissingValuePolicy(exampleSignal, policyMockForNoneQuality.Object);
-
-                missingValuePolicyRepositoryMock.Verify(sdsm => sdsm.Set(exampleSignal, policyMock.Object));
+                
             }
 
             [TestMethod]
