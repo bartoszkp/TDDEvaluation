@@ -77,7 +77,8 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            throw new NotImplementedException();
+            return this.signalsDomainService.GetPathEntry(pathDto.ToDomain<Domain.Path>())
+                        ?.ToDto<Dto.PathEntry>();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -174,5 +175,7 @@ namespace WebService
             var policyDomain = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             signalsDomainService.SetMissingValuePolicyBase(signalId, policyDomain);
         }
+
+        
     }
 }

@@ -17,8 +17,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -104,7 +104,7 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new SignalWithThisIdNonExistException();
 
-            var datums = new Datum<T> [dataDomain.Count()];
+            var datums = new Datum<T>[dataDomain.Count()];
             int i = 0;
             foreach (Datum<T> d in dataDomain)
             {
@@ -121,9 +121,16 @@ namespace Domain.Services.Implementation
             signalsDataRepository.SetData<T>(sortedDatums);
         }
 
-        private IEnumerable<Datum<T>> FillMissingData<T>(Domain.Granularity granularity, IEnumerable<Datum<T>> sortedDatums, 
+
+
+
+
+        private IEnumerable<Datum<T>> FillMissingData<T>(Domain.Granularity granularity, IEnumerable<Datum<T>> sortedDatums,
             DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+
+
+
             List<Datum<T>> sortedDatumsList = new List<Datum<T>>();
             sortedDatumsList = sortedDatums.ToList();
 
@@ -159,7 +166,7 @@ namespace Domain.Services.Implementation
                 else
                 {
                     DateTime currentDate = fromIncludedUtc;
-                    for(int index = 0; currentDate < toExcludedUtc;
+                    for (int index = 0; currentDate < toExcludedUtc;
                         index++, currentDate = currentDate.AddYears(1))
                     {
                         if (index == sortedDatumsList.Count)
@@ -454,7 +461,7 @@ namespace Domain.Services.Implementation
                         if (index == sortedDatumsList.Count)
                             sortedDatumsList.Add(new Datum<T>());
 
-                        if (sortedDatumsList[index].Timestamp!= currentDate)
+                        if (sortedDatumsList[index].Timestamp != currentDate)
                         {
                             Datum<T> datumToAdd = new Datum<T>()
                             {
@@ -470,8 +477,48 @@ namespace Domain.Services.Implementation
                 }
             }
 
+
+
+
             sortedDatumsListToReturn.AddRange(newList);
             return sortedDatumsListToReturn.OrderBy(datum => datum.Timestamp);
+        }
+
+        public PathEntry GetPathEntry(Path prefixPath)
+        {
+            if (prefixPath == null)
+                throw new ArgumentNullException();
+
+            var matchingSignals = this.signalsRepository.GetAllWithPathPrefix(prefixPath);
+
+            if (matchingSignals == null)
+                return null;
+
+            var filteredMatchingSignals = matchingSignals.Where(s => s.Path.Length == prefixPath.Length + 1);
+
+            var signalsInSubpaths = matchingSignals.Where(s => s.Path.Length > prefixPath.Length + 1);
+
+            var subpaths = new List<Path>();
+
+            foreach (var signal in signalsInSubpaths)
+            {
+                var filteredComponents = new string[prefixPath.Length + 1];
+
+                for (int i = 0; i < filteredComponents.Length; i++)
+                {
+                    filteredComponents[i] = signal.Path.Components.ElementAt(i);
+                }
+
+                Path subpath = Path.FromString(Path.JoinComponents(filteredComponents));
+                if (subpaths.Find(s => s.Equals(subpath)) == null)
+                    subpaths.Add(subpath);
+
+
+            }
+
+
+            return new PathEntry(filteredMatchingSignals, subpaths);
+
         }
     }
 }
