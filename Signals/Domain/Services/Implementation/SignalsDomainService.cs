@@ -215,7 +215,7 @@ namespace Domain.Services.Implementation
             {
                 Path pathToAdd = signal.Path.GetPrefix(path.Length + 1);
 
-                if (!subPaths.Contains(pathToAdd))
+                if (!subPaths.Contains(pathToAdd) && pathToAdd.ToString() != signal.Path.ToString())
                 {
                     subPaths.Add(pathToAdd);
                 }
