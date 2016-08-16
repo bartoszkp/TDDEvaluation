@@ -733,6 +733,30 @@ namespace WebService.Tests
                 AssertSignalsAreEqual(signal.ToDto<Dto.Signal>(),result.Signals.ElementAt(0));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingPathEntry_GettingPathEntryWithOneSubPath()
+            {
+                SetupWebService();
+
+                Domain.Signal signal = GetDefaultSignal_IntegerMonth();
+
+                Dto.Path prefix = new Dto.Path() { Components = new[] { "x" } };
+
+                this.signalsRepositoryMock
+                    .Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(y =>
+                        PathsEquals(y, prefix.ToDomain<Domain.Path>()))))
+                    .Returns(new[] { signal });
+
+                var result = signalsWebService.GetPathEntry(prefix);
+
+                int expectedElements = 1;
+                Assert.AreEqual(expectedElements, result.SubPaths.ToArray().Length);
+
+                PathEntry expectedPathEntry = new PathEntry(null, new Path[] { signal.Path });
+                CollectionAssert.AreEqual(expectedPathEntry.SubPaths.ElementAt(0).Components.ToArray(), 
+                    result.SubPaths.ElementAt(0).Components.ToArray());
+            }
+
             private Domain.Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Domain.Signal()
