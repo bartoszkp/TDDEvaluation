@@ -263,7 +263,7 @@ namespace WebService.Tests
                         It.Is<System.DateTime>(dt => dt == new DateTime(2000, 1, 15))))
                     .Returns(enumerable.ToDomain<System.Collections.Generic.IEnumerable<Datum<double>>>);
                 var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 15));
-                
+
                 int i = 0;
                 foreach (var d in result)
                 {
@@ -376,6 +376,7 @@ namespace WebService.Tests
                     ++i;
                 }
             }
+            
 
             private void SetupGetRepositories(DateTime fromIncluded, DateTime toExcluded, List<Dto.Datum> expectedResult)
             {
@@ -455,13 +456,13 @@ namespace WebService.Tests
             private bool IEnumerableDatumAreEqual<T>(IEnumerable<Dto.Datum> datumDto,
                 IEnumerable<Domain.Datum<T>> datumDomain,
                 Domain.Signal signal)
-            {        
+            {
                 foreach (var dt in datumDto.Zip(datumDomain, System.Tuple.Create))
                 {
                     var datum = dt.Item2.ToDto<Dto.Datum>();
                     if (!(dt.Item1.Quality == datum.Quality
                         && dt.Item1.Timestamp == datum.Timestamp
-                        && signal.Id == dt.Item2.Signal.Id 
+                        && signal.Id == dt.Item2.Signal.Id
                         && signal.DataType == dt.Item2.Signal.DataType
                         && signal.Granularity == dt.Item2.Signal.Granularity
                         && signal.Path.ToString() == dt.Item2.Signal.Path.ToString()))
@@ -501,7 +502,7 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private void prepareDataRepository(int signalId, Domain.Signal signal=null)
+            private void prepareDataRepository(int signalId, Domain.Signal signal = null)
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
