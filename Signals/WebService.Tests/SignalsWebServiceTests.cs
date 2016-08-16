@@ -476,6 +476,28 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.Good, result[2].Quality);
                 Assert.AreEqual(Dto.Quality.None, result[3].Quality);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithEqualFromAndToTimestamps_ReturnsCorrectData()
+            {
+                int signalId = 6;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
+                GivenData(signalId, GetDomainDatumDouble());
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1)).ToArray();
+
+                Assert.AreEqual(Dto.Quality.Good, result[0].Quality);
+                Assert.AreEqual(new DateTime(2000, 2, 1), result[0].Timestamp);
+                Assert.AreEqual(5.0, result[0].Value);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
@@ -570,16 +592,22 @@ namespace WebService.Tests
                     .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId),
                     It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns<Domain.Signal, DateTime, DateTime>(
-                    (s, from, to) => data.Where(d => (d.Timestamp >= from && d.Timestamp < to)));
+                    (s, from, to) => data.Where(d => 
+                    {   
+                        if (!from.Equals(to))
+                            return d.Timestamp >= from && d.Timestamp < to;
+                        else
+                            return d.Timestamp >= from && d.Timestamp <= to;
+                    }));
             }
 
             private Domain.Datum<double>[] GetDomainDatumDouble()
             {
                 return new Domain.Datum<double>[]
                     {
-                        new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)5 },
-                        new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
-                        new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)5 },
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
                     };
             }
 
