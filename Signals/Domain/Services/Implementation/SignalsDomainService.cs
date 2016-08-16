@@ -134,7 +134,7 @@ namespace Domain.Services.Implementation
 
         public void GetPathEntry(Path path)
         {
-            this.signalsRepository.GetAllWithPathPrefix(null);
+            this.signalsRepository.GetAllWithPathPrefix(path);
         }
     }
 }
