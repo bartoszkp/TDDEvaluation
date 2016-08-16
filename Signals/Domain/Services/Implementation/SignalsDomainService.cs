@@ -121,7 +121,7 @@ namespace Domain.Services.Implementation
             }
             else if (exampleSignal.DataType == DataType.Double)
             {
-                this.missingValuePolicyRepository.Set(exampleSignal, new MissingValuePolicy.NoneQualityMissingValuePolicy<double>());
+                this.missingValuePolicyRepository.Set(exampleSignal, policy);
             }
         }
 
