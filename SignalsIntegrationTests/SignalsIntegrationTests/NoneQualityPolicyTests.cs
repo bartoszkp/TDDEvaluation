@@ -9,7 +9,7 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class NoneQualityPolicyTests<T> : MissingValuePolicyTestsBase<T>
+    public abstract class NoneQualityPolicyTests<T> : MissingValuePolicyTestsBase<T>
     {
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
@@ -21,11 +21,6 @@ namespace SignalsIntegrationTests
         public static new void ClassCleanup()
         {
             MissingValuePolicyTestsBase<T>.ClassCleanup();
-        }
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
         }
 
         [TestMethod]
