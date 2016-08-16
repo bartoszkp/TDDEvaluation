@@ -572,6 +572,24 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(result.SubPaths.ElementAt(1).Components.ToArray(), expectedPathEntry.SubPaths.ElementAt(1).Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignalWithIncompleteDataAndSpecificMissingValuePolicy_WhenGettingData_CorrectAmountOfDataIsReturned()
+            {
+                int signalId = 5;
+                var signal = new Signal() { Id = signalId, DataType = DataType.Integer, Granularity = Granularity.Day };
+                GivenASignal(signal);
+                missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(signal)).Returns(new SpecificValueMissingValuePolicyInteger());
+                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(signal, It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(new Datum<int>[]
+                {
+                    new Datum<int>() {Signal = signal, Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (int)3 },
+                    new Datum<int>() {Signal = signal, Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 4), Value = (int)4 }
+                });
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
+
+                Assert.AreEqual(5, result.Count());
+            }
+
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
