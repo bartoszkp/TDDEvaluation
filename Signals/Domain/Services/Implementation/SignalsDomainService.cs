@@ -90,14 +90,7 @@ namespace Domain.Services.Implementation
             else if (mvp is MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
             {
                 var specificMVP = mvp as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
-                return new Datum<T>()
-                {
-                    Id = 0,
-                    Signal = signal,
-                    Timestamp = timeStamp,
-                    Quality = specificMVP.Quality,
-                    Value = specificMVP.Value
-                };
+                return Datum<T>.CreateSpecific(signal, timeStamp, specificMVP.Quality, specificMVP.Value);
             }
             return new Datum<T>();
         }
