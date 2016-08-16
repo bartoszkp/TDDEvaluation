@@ -33,29 +33,35 @@ namespace Domain.Services.Implementation
             {
                 return signal;
             }
-            if (newSignal.DataType.GetNativeType() == typeof(double))
+
+            string typeName = signal.DataType.GetNativeType().Name;
+
+            switch (typeName)
             {
-                this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<double>());
-            }
-            else if(newSignal.DataType.GetNativeType() == typeof(int))
-            {
-                this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<int>());
-            }
-            else if(newSignal.DataType.GetNativeType() == typeof(decimal))
-            {
-                this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<decimal>());
-            }
-            else if(newSignal.DataType.GetNativeType() == typeof(bool))
-            {
-                this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<bool>());
-            }
-            else if(newSignal.DataType.GetNativeType() == typeof(string))
-            {
-                this.missingValuePolicyRepository.Set(newSignal, new NoneQualityMissingValuePolicy<string>());
+                case "Int32":
+                    GenericSetCall<int>(signal);
+                    break;
+                case "Double":
+                    GenericSetCall<double>(signal);
+                    break;
+                case "Decimal":
+                    GenericSetCall<decimal>(signal);
+                    break;
+                case "Boolean":
+                    GenericSetCall<bool>(signal);
+                    break;
+                case "String":
+                    GenericSetCall<string>(signal);
+                    break;
             }
             return signal;
         }
 
+
+        private void GenericSetCall<T>(Signal signal)
+        {
+            this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<T>());
+        }
         public Signal GetById(int signalId)
         {
             return this.signalsRepository.Get(signalId);
