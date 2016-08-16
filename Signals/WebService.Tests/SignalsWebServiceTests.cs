@@ -719,19 +719,17 @@ namespace WebService.Tests
             {
                 SetupWebService();
 
-                Dto.Path path = new Dto.Path() { Components = new[] { "x", "y" } };
-
                 Domain.Signal signal = GetDefaultSignal_IntegerMonth();
 
-                List<Domain.Signal> signals = new List<Domain.Signal>() { signal };
-
                 this.signalsRepositoryMock
-                    .Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(y => PathsEquals(y,path.ToDomain<Domain.Path>()))))
+                    .Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(y => 
+                        PathsEquals(y,signal.Path.ToDomain<Domain.Path>()))))
                     .Returns(new[] { signal });
                 
-                var result = signalsWebService.GetPathEntry(path);
+                var result = signalsWebService.GetPathEntry(signal.Path.ToDto<Dto.Path>());
 
-                Assert.AreEqual(1,result.Signals.ToArray().Length);
+                int expectedElements = 1;
+                Assert.AreEqual(expectedElements,result.Signals.ToArray().Length);
                 AssertSignalsAreEqual(signal.ToDto<Dto.Signal>(),result.Signals.ElementAt(0));
             }
 
