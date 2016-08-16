@@ -132,9 +132,23 @@ namespace Domain.Services.Implementation
                as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void GetPathEntry(Path path)
+        public PathEntry GetPathEntry(Path path)
         {
-            this.signalsRepository.GetAllWithPathPrefix(path);
+            var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
+            var signalsInDir = new List<Signal>();
+
+            foreach (var signal in allSignals)
+            {
+                int pathDomainComponentsCount = path.Components.Count();
+                int signalPathComponentsCount = signal.Path.Components.Count();
+
+                if (signalPathComponentsCount - 1 == pathDomainComponentsCount)
+                {
+                    signalsInDir.Add(signal);
+                }
+            }
+
+            return new PathEntry(signalsInDir, null);
         }
     }
 }

@@ -52,8 +52,7 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            this.signalsDomainService.GetPathEntry(pathDto.ToDomain<Domain.Path>());
-            return new PathEntry();
+            return this.signalsDomainService.GetPathEntry(pathDto.ToDomain<Domain.Path>()).ToDto<Dto.PathEntry>();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
