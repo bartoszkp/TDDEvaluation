@@ -252,8 +252,7 @@ namespace WebService.Tests
                 new Dto.Path() { Components = new[] { "root/signals2" } },
             };
 
-            var toReturn = new Domain.PathEntry(signals, subPaths);
-            SetupMocksGetPath(toReturn);
+            SetupMocksGetPath(signals);
 
             var pathDto = new Dto.Path() { Components = new[] { "root" } };
             var result = signalsWebService.GetPathEntry(pathDto);
@@ -287,12 +286,12 @@ namespace WebService.Tests
                 .Returns(datums);
         }
 
-        private void SetupMocksGetPath(PathEntry domainPathEntryToReturn)
+        private void SetupMocksGetPath(IEnumerable<Signal> domainSignalsToReturn)
         {
             SetupWebService();
-            signalsDataRepoMock
-                .Setup(sdrm => sdrm.GetPathEntry(It.IsAny<Dto.Path>()))
-                .Returns(domainPathEntryToReturn);
+            signalsRepoMock
+                .Setup(sdrm => sdrm.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
+                .Returns(domainSignalsToReturn);
         }
 
         private Mock<ISignalsDataRepository> signalsDataRepoMock;

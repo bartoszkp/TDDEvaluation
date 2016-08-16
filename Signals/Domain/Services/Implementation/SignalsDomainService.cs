@@ -103,7 +103,7 @@ namespace Domain.Services.Implementation
             {
                 return result;
             }
-
+            
             for (int j = result.Length-1; j>0; --j)
                 for (int i=0; i<j; ++i)
                     if (result[i].Timestamp > result[i+1].Timestamp)
@@ -193,5 +193,9 @@ namespace Domain.Services.Implementation
             throw new NotSupportedException("Granularity: " + granularity.ToString() + " is not supported");
         }
 
+        public PathEntry GetPathEntry(Path path)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
