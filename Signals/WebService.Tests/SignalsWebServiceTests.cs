@@ -590,6 +590,31 @@ namespace WebService.Tests
                 Assert.AreEqual(5, result.Count());
             }
 
+            [TestMethod]
+            public void GivenASignalWithIncompleteDataAndSpecificMissingValuePolicy_WhenGettingData_CorrectDataIsReturned()
+            {
+                int signalId = 8;
+                var signal = new Signal() { Id = signalId, DataType = DataType.String, Granularity = Granularity.Year };
+                GivenASignal(signal);
+                missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(signal)).Returns(new SpecificValueMissingValuePolicyString() { Quality = Quality.Good, Signal = signal, Value = "cc" });
+                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<string>(signal, It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(new Datum<string>[]
+                {
+                    new Datum<string>() {Signal = signal, Quality = Quality.Good, Timestamp = new DateTime(2003, 1, 1), Value = "aa" },
+                    new Datum<string>() {Signal = signal, Quality = Quality.Poor, Timestamp = new DateTime(2004, 1, 1), Value = "bb" }
+                });
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2006, 1, 1));
+
+                Assert.AreEqual(result.ElementAt(0).Quality, Dto.Quality.Good);
+                Assert.AreEqual(result.ElementAt(1).Quality, Dto.Quality.Good);
+                Assert.AreEqual(result.ElementAt(2).Quality, Dto.Quality.Good);
+                Assert.AreEqual(result.ElementAt(5).Quality, Dto.Quality.Good);
+                Assert.AreEqual(result.ElementAt(0).Value, "cc");
+                Assert.AreEqual(result.ElementAt(1).Value, "cc");
+                Assert.AreEqual(result.ElementAt(2).Value, "cc");
+                Assert.AreEqual(result.ElementAt(5).Value, "cc");
+            }
+
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
