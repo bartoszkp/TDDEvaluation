@@ -51,6 +51,9 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
+            var mvp = Get(signal);
+
+            if (mvp == null) mvp = new NoneQualityMissingValuePolicy<T>();
 
             while(fromIncludedUtc < toExcludedUtc)
             {
@@ -60,13 +63,10 @@ namespace Domain.Services.Implementation
 
                 if (datum == null)
                 {
-                    var tempDatum = new Domain.Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Signal = signal,
-                        Timestamp = fromIncludedUtc,
-                        Value = default(T)
-                    };
+                    var tempDatum = (mvp as MissingValuePolicy<T>).GetDatum();
+                    tempDatum.Signal = signal;
+                    tempDatum.Timestamp = fromIncludedUtc;
+
                     res.Add(tempDatum);
                 }
 
