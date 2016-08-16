@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
 using Domain.Infrastructure;
+using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
 
@@ -72,8 +73,18 @@ namespace Domain.Services.Implementation
                 {
                     var datum = result.FirstOrDefault(d => d.Timestamp == date);
 
-                    newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
-
+                    if (policy is NoneQualityMissingValuePolicy<T>)
+                        newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
+                    else if (policy is SpecificValueMissingValuePolicy<T>)
+                    {
+                        var mvp = policy as SpecificValueMissingValuePolicy<T>;                       
+                        var svDatum = Datum<T>.CreateNone(policy.Signal, date);
+                        svDatum.Quality = mvp.Quality;
+                        svDatum.Value = mvp.Value;
+                        newData.Add(datum ?? svDatum);
+                    }
+                    else
+                        throw new NotImplementedException();
                     date = timeNextMethod(date);
                 }
 
