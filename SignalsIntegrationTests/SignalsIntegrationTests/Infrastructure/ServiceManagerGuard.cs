@@ -18,22 +18,24 @@ namespace SignalsIntegrationTests.Infrastructure
         {
         }
 
+        // TODO: restart if crashed and not running
         public static IDisposable Attach()
         {
-            lock(paddle)
+            lock (paddle)
             {
                 if (instance == null)
                 {
                     instance = new ServiceManager();
                     instance.StartService();
                 }
+
                 return new ReferenceCounter();
             }
         }
 
         private static void Detach()
         {
-            lock(paddle)
+            lock (paddle)
             {
                 if (counter == 0)
                 {

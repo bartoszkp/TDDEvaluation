@@ -23,6 +23,10 @@ namespace SignalsIntegrationTests
             TestsBase.ClassCleanup();
         }
 
+        //TODO: add SetData test with Dto.Datum when Value type doesn't match signal type
+
+        //TODO: add test with SetData for different signals with the same data type (https://gitlab.tt.com.pl/TDDEvaluation/tdd4/issues/13)
+
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenASignal_WhenSettingEmptyData_ShouldNotThrow()
@@ -65,6 +69,7 @@ namespace SignalsIntegrationTests
             });
         }
 
+        // TODO: duplicate of GivenNoData_ReturnsNoneQualityForTheWholeRange?
         [TestMethod]
         [TestCategory("issue6")]
         public void SignalWithoutDataReturnsNoneQualityDatumsForEachTimerangeStep()
@@ -84,6 +89,7 @@ namespace SignalsIntegrationTests
             }
         }
 
+        //TODO: ForAll...
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenSignalWithData_WhenSettingOverlappingData_DataIsOverwritten()
@@ -116,6 +122,7 @@ namespace SignalsIntegrationTests
             Assertions.AreEqual(expectedData, retrievedData);
         }
 
+        //TODO: use Domain.Datum<T>, not Dto.Datum (null Values sometimes crash servers, bugs for strings are issued anyway already)
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenASignal_WhenSettingDataWithDuplicateTimestamps_Throws()
