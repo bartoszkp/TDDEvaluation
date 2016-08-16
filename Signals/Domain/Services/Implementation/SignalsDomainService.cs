@@ -117,7 +117,7 @@ namespace Domain.Services.Implementation
             if (mvp != null && typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
             {
                 List<Datum<T>> datums = new List<Datum<T>>();
-                var date = DateTime.MinValue;
+                var date = new DateTime(fromIncludedUtc.Year, 1, 1);
                 while (date < fromIncludedUtc)
                     increaseDate(ref date, signal.Granularity);
 
