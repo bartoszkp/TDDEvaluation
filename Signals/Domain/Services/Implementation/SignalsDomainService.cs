@@ -54,8 +54,8 @@ namespace Domain.Services.Implementation
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
             if (fromIncluded == toExcluded)
             {
-                if (result == null)
-                    return null;
+                if (result.Count() == 0)
+                    return result;
 
                 return new Datum<T>[1] { result.First() };
             }                

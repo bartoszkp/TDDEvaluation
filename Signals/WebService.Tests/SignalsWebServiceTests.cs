@@ -600,7 +600,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndNoData_CallingGetDataWithTheSameDateInBothArguments_ReturnsNull()
+            public void GivenASignalAndNoData_CallingGetDataWithTheSameDateInBothArguments_ReturnsEmptyResult()
             {
                 int signalId = 1;
                 GivenASignal(SignalWith(
@@ -613,11 +613,11 @@ namespace WebService.Tests
 
                 signalsDataRepoMock
                     .Setup(sd => sd.GetData<bool>(It.Is<Signal>(s => s.Id == signalId), thatDate, thatDate))
-                    .Returns<IEnumerable<Datum<bool>>>(null);
+                    .Returns(new Datum<bool>[] { });
 
                 var result = signalsWebService.GetData(signalId, thatDate, thatDate);
 
-                Assert.IsNull(result);
+                Assert.AreEqual(0, result.Count());
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
