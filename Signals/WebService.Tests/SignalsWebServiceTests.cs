@@ -542,15 +542,41 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenNoSignal_WhenGettingNoneQualityMissingValuePolicy_ReturnsCorrectDataTypeDouble()
+            public void GivenASignalAndPolicy_WhenGettingMissingValuePolicy_ReturnsThisPolicy()
             {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 2,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                var existingPolicy = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
+                {
+                    Id = 1,
+                    Quality = Domain.Quality.Bad,
+                    Value = (double)1.5
+                };
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble());
+
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
 
-                var exampleSignal = SetupGetPolicyMockForNoneQuality();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
 
-                var result = signalDomainService.GetMissingValuePolicy(exampleSignal.Id.Value);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var result = signalsWebService.GetMissingValuePolicy(existingSignal.Id.Value).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
 
-                Assert.AreEqual(result.GetType(), typeof(Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>));
+                Assert.AreEqual(existingPolicy.Id, result.Id);
+                Assert.AreEqual(existingPolicy.Quality, result.Quality);
+                Assert.AreEqual(existingPolicy.Value, result.Value);
             }
 
             private Signal SetupGetPolicyMockForNoneQuality()
