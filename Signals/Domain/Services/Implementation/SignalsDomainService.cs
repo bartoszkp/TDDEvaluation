@@ -87,8 +87,10 @@ namespace Domain.Services.Implementation
             {
                 return Datum<T>.CreateNone(signal, timeStamp);
             }
-
-            return null;
+            else
+            {
+                return new Datum<T>();
+            }
         }
 
         public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
