@@ -9,7 +9,7 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            client.SetMissingValuePolicy(1, new NoneQualityMissingValuePolicy() { DataType = DataType.Double });
+            client.SetMissingValuePolicy(1, new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
 
             client.SetData(1, new Datum[]
             {
@@ -25,6 +25,7 @@ namespace ExampleSignalClient
             }
 
             Console.ReadKey();
+
         }
     }
 }

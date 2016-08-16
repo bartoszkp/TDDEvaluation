@@ -91,10 +91,13 @@ namespace WebService
         {
             IEnumerable<Domain.Datum<T>> result = signalsDomainService.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
 
-            var mvp = this.signalsDomainService.GetMissingValuePolicy(signal.Id.Value) as Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T>;
+            var noneQualityMvp = this.signalsDomainService.GetMissingValuePolicy(signal.Id.Value) as Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T>;
 
-            if (mvp != null)
-                result = mvp?.SetMissingValue(result);
+            var specificQualityMvp = this.signalsDomainService.GetMissingValuePolicy(signal.Id.Value) as Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
+
+            if (noneQualityMvp != null)  result = noneQualityMvp?.SetMissingValue(result);
+
+            if (specificQualityMvp != null) result = specificQualityMvp.SetMissingValue(result, fromIncludedUtc, toExcludedUtc);
 
             result = result.OrderBy(dat => dat.Timestamp).ToArray();
 

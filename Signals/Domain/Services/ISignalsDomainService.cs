@@ -20,5 +20,6 @@ namespace Domain.Services
         void SetData<T>(IEnumerable<Datum<T>> data);
 
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+
     }
 }
