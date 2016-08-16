@@ -546,6 +546,32 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(result.Signals.ElementAt(0).Path.Components.ToArray(), expectedPathEntry.Signals.ElementAt(0).Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenSignals_WhenGettingPathEntry_PathEntryWithCorrectSubPathsIsReturned()
+            {
+                GivenSignals(new List<Signal>()
+                {
+                    new Signal() { Path = Path.FromString("root/s1") },
+                    new Signal() { Path = Path.FromString("root/podkatalog/s2") },
+                    new Signal() { Path = Path.FromString("root/podkatalog/s3") },
+                    new Signal() { Path = Path.FromString("root/podkatalog/podpodkatalog/s4") },
+                    new Signal() { Path = Path.FromString("root/podkatalog2/s5") }
+                });
+
+                var expectedSubPaths = new Dto.Path[]
+                {
+                    new Dto.Path() {Components = new[] {"root", "podkatalog"} },
+                    new Dto.Path() {Components = new[] {"root", "podkatalog2"} }
+                };
+                var expectedPathEntry = new Dto.PathEntry();
+                expectedPathEntry.SubPaths = expectedSubPaths;
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root" } });
+
+                CollectionAssert.AreEqual(result.SubPaths.ElementAt(0).Components.ToArray(), expectedPathEntry.SubPaths.ElementAt(0).Components.ToArray());
+                CollectionAssert.AreEqual(result.SubPaths.ElementAt(1).Components.ToArray(), expectedPathEntry.SubPaths.ElementAt(1).Components.ToArray());
+            }
+
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
