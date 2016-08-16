@@ -641,7 +641,8 @@ namespace WebService.Tests
                 {
                     new Signal {Id = 1, Path = Path.FromString("p") },
                     new Signal {Id = 2, Path = Path.FromString("s/p") },
-                    new Signal {Id = 3, Path = Path.FromString("s/s/p") }
+                    new Signal {Id = 3, Path = Path.FromString("s/s/p") },
+                    new Signal {Id = 3, Path = Path.FromString("s/s/p2") }
                 };
                 GivenSomeSignals(signals);
 

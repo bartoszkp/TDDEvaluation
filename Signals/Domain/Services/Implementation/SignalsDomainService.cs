@@ -195,7 +195,7 @@ namespace Domain.Services.Implementation
             var signals = result.Where(signal => signal.Path.Length == level);
             var subpaths = result.Where(signal => signal.Path.Length > level)
                 .Select(signal => signal.Path)
-                .Select(p => Path.FromString(Path.JoinComponents(p.Components.Take(level + 1))))
+                .Select(p => Path.FromString(Path.JoinComponents(p.Components.Take(level))))
                 .Distinct();
 
             return new PathEntry(signals.ToList(), subpaths.ToList());
