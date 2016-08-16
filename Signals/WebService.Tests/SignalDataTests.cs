@@ -219,6 +219,17 @@ namespace WebService.Tests
             Assert.AreEqual(1, result.ElementAt(0).Value);
         }
 
+        [TestMethod]
+        public void WhenGettingSignalsWithGivenPathPrefix_ReturnsNull()
+        {
+            SetupWebService();
+            var inputPath = new Dto.Path() { Components = new[] { "example", "path" } };
+
+            var result = signalsWebService.GetPathEntry(inputPath);
+
+            Assert.AreEqual(null, result);
+        }
+
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
