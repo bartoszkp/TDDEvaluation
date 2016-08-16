@@ -425,6 +425,33 @@ namespace WebService.Tests
                 Assert.IsTrue(AssertDtoLists(expectedResult, result));
             }
 
+            [TestMethod]
+            public void GivenASignalWithData_WhenGettingDataWithFromIncludedUtcEqualsToExcludedUtc_ReturnsExpectedValue()
+            {
+                //arrange
+                var signalId = 2;
+
+                Domain.Signal domainSignal = SetDefaultSignal_IntegerMonth(signalId);
+
+                List<Domain.Datum<Int32>> addedCollection = new List<Datum<Int32>>(new Datum<Int32>[] {
+                    new Datum<Int32>() { Signal = domainSignal, Quality = Domain.Quality.Fair,
+                        Timestamp = new DateTime(2005, 1, 1), Value = (int)11 }
+                     });
+
+                Setup_CheckingDatumLists_Integer(addedCollection, domainSignal);
+                //act
+                List<Dto.Datum> result = signalsWebService.GetData(signalId,
+                 new DateTime(2005, 1, 1), new DateTime(2005, 1, 1)).ToList();
+                //assert
+                List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)11 } });
+
+                Assert.AreEqual(expectedResult.Count, result.Count);
+                Assert.IsTrue(AssertDtoLists(expectedResult, result));
+
+
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
