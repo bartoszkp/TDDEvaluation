@@ -52,6 +52,8 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
+            if (fromIncluded == toExcluded)            
+                return new Datum<T>[1] { result.First() };            
 
             var policy = GetMissingValuePolicy(signal);
 
