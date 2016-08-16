@@ -866,6 +866,7 @@ namespace WebService.Tests
                     Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
                     Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
                     Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
+                    index++;
                 }
             }
         }
