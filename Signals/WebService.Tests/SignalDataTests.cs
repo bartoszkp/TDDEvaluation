@@ -220,42 +220,6 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void WhenGettingSignalsWithGivenPathPrefix_ReturnsAllSignals()
-        {
-            var domainSignalsToReturn = new Domain.Signal[]
-            {
-                new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Year, Path = Domain.Path.FromString("root/signals1/signal1") },
-                new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal2") },
-                new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/signals1/signal3") },
-                new Signal() { Id = 4, DataType = DataType.Decimal, Granularity = Granularity.Week, Path = Domain.Path.FromString("root/signals2/signal1") },
-            };
-            SetupMocksGetPath(domainSignalsToReturn);
-
-            var pathDto = new Dto.Path() { Components = new[] { "root" } };
-            var result = signalsWebService.GetPathEntry(pathDto);
-
-            var dtoSignals = new Dto.Signal[]
-            {
-                new Dto.Signal() { Id = 1, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Year, Path =  new Dto.Path() { Components = new[] { "root", "signals1", "signal1" } } },
-                new Dto.Signal() { Id = 2, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "root", "signals1", "signal2" } } },
-                new Dto.Signal() { Id = 3, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "root", "signals1", "signal3" } } },
-                new Dto.Signal() { Id = 4, DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Week, Path = new Dto.Path() { Components = new[] { "root", "signals2", "signal1" } } },
-            };
-            var actualResultA = result.Signals.ToArray();
-
-            int i = 0;
-            foreach (var actualItem in actualResultA)
-            {
-                Assert.AreEqual(dtoSignals[i].DataType, actualItem.DataType);
-                Assert.AreEqual(dtoSignals[i].Granularity, actualItem.Granularity);
-                Assert.AreEqual(dtoSignals[i].Id, actualItem.Id);
-                Assert.AreEqual(dtoSignals[i].Path.Components.ToString(), actualItem.Path.Components.ToString());
-
-                i++;
-            }
-        }
-
-        [TestMethod]
         public void WhenGettingWithGivenPathPrefix_CorrectlyReturnsSubPaths()
         {
             var domainSignalsToReturn = new Domain.Signal[]
@@ -288,7 +252,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void WhenGettingWithGivenPathPrefix_ReturnsSignals_ContainedInSpecifiedPaths()
+        public void WhenGettingWithGivenPathPrefix_ReturnsSignals_ContainedInSpecifiedPath()
         {
             var domainSignalsToReturn = new Domain.Signal[]
             {
@@ -299,8 +263,8 @@ namespace WebService.Tests
             };
             SetupMocksGetPath(domainSignalsToReturn);
 
-            var pathDto1 = new Dto.Path() { Components = new[] { "root" } };
-            var result = signalsWebService.GetPathEntry(pathDto1);
+            var pathDto = new Dto.Path() { Components = new[] { "root" } };
+            var result = signalsWebService.GetPathEntry(pathDto);
 
             var dtoSignals = new Dto.Signal[]
             {

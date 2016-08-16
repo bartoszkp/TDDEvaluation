@@ -198,6 +198,7 @@ namespace Domain.Services.Implementation
             var signals = signalsRepository.GetAllWithPathPrefix(path);
 
             List<Signal> signalsToAdd = new List<Signal>();
+            List<Path> subPaths = new List<Path>();
 
             foreach (var signal in signals)
             {
@@ -210,8 +211,6 @@ namespace Domain.Services.Implementation
                 }
             }
 
-            List<Path> subPaths = new List<Path>();
-
             foreach (var signal in signals)
             {
                 Path pathToAdd = signal.Path.GetPrefix(path.Length + 1);
@@ -222,8 +221,7 @@ namespace Domain.Services.Implementation
                 }
             }
 
-            PathEntry toReturn = new PathEntry(signalsToAdd, subPaths);
-            return toReturn;
+            return new PathEntry(signalsToAdd, subPaths);
         }
     }
 }
