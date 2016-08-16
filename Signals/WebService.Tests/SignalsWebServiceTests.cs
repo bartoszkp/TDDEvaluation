@@ -714,6 +714,34 @@ namespace WebService.Tests
                     Assert.Fail();
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingPathEntry_GettingPathEntryWithOneSingnal()
+            {
+                SetupWebService();
+
+                Dto.Path path = new Dto.Path() { Components = new[] { "x", "y" } };
+
+                Domain.Signal signal = GetDefaultSignal_IntegerMonth();
+
+                this.signalsRepositoryMock
+                    .Setup(x => x.Get(It.Is<Domain.Path>(y => y.Components.Equals(path.ToDomain<Domain.Path>().Components))))
+                    .Returns(signal);
+                
+                var result = signalsWebService.GetPathEntry(path);
+
+                AssertSignalsAreEqual(signal.ToDto<Dto.Signal>(),result.Signals.ElementAt(0));
+            }
+
+            private Domain.Signal GetDefaultSignal_IntegerMonth()
+            {
+                return new Domain.Signal()
+                {
+                    Path = Domain.Path.FromString("x/y"),
+                    Granularity = Granularity.Month,
+                    DataType = DataType.Double
+                };
+            }
+
             private void GivenASignalAndData_SetupSignalsRepositoryMockAndVerifySetDataCall<T>(Signal signal, IEnumerable<Dto.Datum> data, DateTime timeStamp, T value)
             {
                 signalsRepositoryMock.Setup(srm => srm.Get(signal.Id.Value)).Returns(signal);
