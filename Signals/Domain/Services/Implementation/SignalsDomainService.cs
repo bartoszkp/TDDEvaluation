@@ -195,7 +195,22 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path path)
         {
-            throw new NotImplementedException();
+            var signals = signalsRepository.GetAllWithPathPrefix(path);
+
+            List<Path> subPaths = new List<Path>();
+
+            foreach (var signal in signals)
+            {
+                Path pathToAdd = signal.Path.GetPrefix(path.Length + 1);
+
+                if (!subPaths.Contains(pathToAdd))
+                {
+                    subPaths.Add(pathToAdd);
+                }
+            }
+
+            PathEntry toReturn = new PathEntry(signals, subPaths);
+            return toReturn;
         }
     }
 }

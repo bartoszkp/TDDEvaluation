@@ -257,8 +257,25 @@ namespace WebService.Tests
             var pathDto = new Dto.Path() { Components = new[] { "root" } };
             var result = signalsWebService.GetPathEntry(pathDto);
 
-            CollectionAssert.AreEqual(null, result.Signals.ToArray());
-            CollectionAssert.AreEqual(dtoSubPaths, result.SubPaths.ToArray());
+            var dtoSignals = new Dto.Signal[]
+            {
+                new Dto.Signal() { Id = 1, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Year, Path =  new Dto.Path() { Components = new[] { "root", "signals1", "signal1" } } },
+                new Dto.Signal() { Id = 2, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "root", "signals1", "signal2" } } },
+                new Dto.Signal() { Id = 3, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "root", "signals1", "signal3" } } },
+                new Dto.Signal() { Id = 4, DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Week, Path = new Dto.Path() { Components = new[] { "root", "signals2", "signal1" } } },
+            };
+            var actualResultA = result.Signals.ToArray();
+
+            int i = 0;
+            foreach (var actualItem in actualResultA)
+            {
+                Assert.AreEqual(dtoSignals[i].DataType, actualItem.DataType);
+                Assert.AreEqual(dtoSignals[i].Granularity, actualItem.Granularity);
+                Assert.AreEqual(dtoSignals[i].Id, actualItem.Id);
+                Assert.AreEqual(dtoSignals[i].Path.Components.ToString(), actualItem.Path.Components.ToString());
+
+                i++;
+            }
         }
 
         private void SetupWebService(Signal signal=null)
