@@ -248,6 +248,31 @@ namespace WebService.Tests
             }
         }
 
+        [TestMethod]
+        public void WhenGettingWithGivenPathPrefix_CorrectlyReturnsSubPaths()
+        {
+            SetupMocksGetPath();
+
+            var pathDto = new Dto.Path() { Components = new[] { "root" } };
+            var result = signalsWebService.GetPathEntry(pathDto);
+
+            var expectedSubPaths = new Dto.Path[]
+            {
+                new Dto.Path() {Components = new[] {"root", "signals1"} },
+                new Dto.Path() {Components = new[] {"root", "signals2"} },
+            };
+
+            var actualResultA = result.SubPaths.ToArray();
+
+            int i = 0;
+            foreach (var actualItem in actualResultA)
+            {
+                Assert.AreEqual(expectedSubPaths[i].Components.ToString(), actualItem.Components.ToString());
+
+                i++;
+            }
+        }
+
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
