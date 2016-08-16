@@ -1278,6 +1278,16 @@ namespace WebService.Tests
                 Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Timestamp, result.First().Timestamp);
                 Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Value, result.First().Value);
             }
+
+            [TestMethod]
+            public void GetPathEntry_DoesNotThrow()
+            {
+                signalsWebService = new SignalsWebService(null);
+
+                var result = signalsWebService.GetPathEntry(null);
+
+                Assert.IsNull(result);
+            }
         }
     }
 }
