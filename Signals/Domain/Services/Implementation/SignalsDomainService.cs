@@ -119,9 +119,8 @@ namespace Domain.Services.Implementation
             var signal = this.signalsRepository.Get(signalId);           
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            var sortedList = result.Where(x=>x.Timestamp>=fromIncludedUtc&&x.Timestamp<toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
+            var sortedList = result.OrderBy(x => x.Timestamp).ToList();
 
-          
             var r = GetMissingValuePolicy(signalId);
             var time = fromIncludedUtc;
 
