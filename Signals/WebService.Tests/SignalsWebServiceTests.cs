@@ -756,20 +756,36 @@ namespace WebService.Tests
 
                 Dto.Path prefix = new Dto.Path() { Components = new[] { "x" } };
 
-                SetupMock_GetAllWithPathPrefix(new[] {
+                Signal[] signals = new[] {
                     SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/x")),
                     SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/y")),
-                    SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/z/c"))
-                    }, prefix.ToDomain<Domain.Path>());
+                    SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/z/c")),
+                    SignalWith(DataType.Boolean, Granularity.Day, Domain.Path.FromString("x/z/x")),
+                };
+
+                SetupMock_GetAllWithPathPrefix(signals, prefix.ToDomain<Domain.Path>());
 
                 var result = this.signalsWebService.GetPathEntry(prefix);
 
-                int expectedElements = 1;
+                int expectedElements = 2;
                 Assert.AreEqual(expectedElements, result.SubPaths.ToArray().Length);
 
-                PathEntry expectedPathEntry = new PathEntry(null, new Path[] { prefix.ToDomain<Domain.Path>() });
-                CollectionAssert.AreEqual(expectedPathEntry.SubPaths.ElementAt(0).Components.ToArray(),
-                    result.SubPaths.ElementAt(0).Components.ToArray());
+                Dto.PathEntry expectedPathEntry = new Dto.PathEntry() {
+                    Signals = new Dto.Signal[] { signals[0].ToDto<Dto.Signal>(), signals[1].ToDto<Dto.Signal>() },
+                    SubPaths = new Dto.Path[] { signals[2].Path.ToDto<Dto.Path>(), signals[3].Path.ToDto<Dto.Path>() } };
+
+                Assert.AreEqual(expectedPathEntry.Signals.ToArray().Length,result.Signals.ToArray().Length);
+                Assert.AreEqual(expectedPathEntry.SubPaths.ToArray().Length, result.SubPaths.ToArray().Length);
+
+                for (int i = 0; i < 1; ++i)
+                {
+                    CollectionAssert.AreEqual(expectedPathEntry.SubPaths.ElementAt(i).Components.ToArray(),
+                        result.SubPaths.ElementAt(i).Components.ToArray());
+                }
+                for (int i = 0; i < 2; ++i)
+                {
+                    AssertSignalsAreEqual(expectedPathEntry.Signals.ElementAt(i),result.Signals.ElementAt(i));
+                }
             }
 
             private void SetupMock_GetAllWithPathPrefix(Signal[] signal,Path path)
@@ -783,7 +799,7 @@ namespace WebService.Tests
             {
                 return new Domain.Signal()
                 {
-                    Path = Domain.Path.FromString("x/y"),
+                    Path = Domain.Path.FromString("x/y/z"),
                     Granularity = Granularity.Month,
                     DataType = DataType.Double
                 };

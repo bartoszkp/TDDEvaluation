@@ -322,11 +322,10 @@ namespace Domain.Services.Implementation
             int prefixCount = prefix.Components.ToArray().Length;
 
             var array = signals.ToArray();
-            if (array.Length > 0)
-            {
-                var signal = signals.ElementAt(0);
 
-                if (signal.Path.Components.ToArray().Length == prefixCount)
+            foreach(var signal in array)
+            {
+                if (signal.Path.Components.ToArray().Length - 1 == prefixCount)
                 {
                     if (PathEquals(signal.Path, prefix))
                     {
