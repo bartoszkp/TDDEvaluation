@@ -652,6 +652,17 @@ namespace WebService.Tests
                 signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<string>>>()));                
             }
 
+            [TestMethod]
+            public void GivenNoSignals_GettingPathEntry_CallsRepositoryGetAllWithPathPrefix()
+            {
+                GivenNoSignals();
+
+                var prefix = new Dto.Path() { Components = new[] { "root" } };
+                signalsWebService.GetPathEntry(prefix);
+
+                signalsRepositoryMock.Verify(d => d.GetAllWithPathPrefix(prefix.ToDomain<Domain.Path>()));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
