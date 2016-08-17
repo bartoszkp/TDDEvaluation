@@ -1184,7 +1184,7 @@ namespace WebService.Tests
                 var existingDatum = new Dto.Datum[]
                 {
                         new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)1.5 },
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)2.0 }
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 2),  Value = (double)2.0 }
                 };
 
                 var filledDatum = new Dto.Datum[]
