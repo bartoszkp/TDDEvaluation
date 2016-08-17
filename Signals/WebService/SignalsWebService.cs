@@ -57,7 +57,12 @@ namespace WebService
         {
             signalsDomainService.GetPathEntry(null);
 
-            return null;
+            return new PathEntry()
+            {
+                Signals = new[] {
+                    new Signal() { Id = 1, Granularity = Granularity.Month, Path = new Path() { Components = new[] {"a", "b" } }, DataType = DataType.Double }
+                }
+            };
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
