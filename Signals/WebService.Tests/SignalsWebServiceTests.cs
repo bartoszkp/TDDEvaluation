@@ -8,6 +8,7 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using DataAccess;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -394,7 +395,6 @@ namespace WebService.Tests
 
                 var dummySignal = new Signal()
                 {
-                    Id = 1,
                     DataType = DataType.Boolean,
                     Granularity = Granularity.Hour,
                     Path = Path.FromString("root/signal")
@@ -701,6 +701,15 @@ namespace WebService.Tests
                 signalsWebService.SetData(dummyId, new[] { new Dto.Datum { Value = 10.0 } });
 
                 signalsDataRepositoryMock.Verify(sdr => sdr.SetData(It.Is<IEnumerable<Datum<double>>>(enumerable => enumerable.All(d => d.Signal != null))));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IdNotNullException))]
+            public void GivenNoSignal_WhenAddingASignalWithIdSet_ThrowsException()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Add(new Dto.Signal { Id = 1 });
             }
         }
     }
