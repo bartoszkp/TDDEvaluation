@@ -392,10 +392,6 @@ namespace WebService.Tests
                 Assert.IsFalse(result.ToArray().Length == 0);
             }
 
-
-
-
-
             private void SetupDataRepository<T>()
             {
                 signalsDataRepositoryMock

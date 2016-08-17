@@ -19,10 +19,19 @@ namespace Domain.MissingValuePolicy
             {
                 List<Datum<T>> datumWithTimestampEqualFromAndToUtc = new List<Datum<T>>();
 
+                var newDatum = new Datum<T>()
+                {
+                    Quality = Quality,
+                    Timestamp = fromIncludedUtc,
+                    Value = Value
+                };
+
                 foreach (var datum in datums)
                 {
-                    if (datum.Timestamp == fromIncludedUtc) datumWithTimestampEqualFromAndToUtc.Add(datum);
+                    if (datum.Timestamp == newDatum.Timestamp) newDatum = datum;
                 }
+
+                datumWithTimestampEqualFromAndToUtc.Add(newDatum);
 
                 return datumWithTimestampEqualFromAndToUtc;
             }
