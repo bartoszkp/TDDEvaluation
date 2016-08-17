@@ -385,6 +385,53 @@ namespace WebService.Tests
                     i++;
                 }
             }
+
+            [TestMethod]
+            public void DatumTypeOfInt_WhenSettingData_RepoIsCalled()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+                var existingDatum = new Dto.Datum[]
+                {
+
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
+                };
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
+
+                GivenASignal(existingSignal);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, existingDatum);
+
+                signalsRepositoryMock.Verify(srm => srm.Get(existingSignal.Id.Value));
+
+                var datum = existingDatum.ToDomain<IEnumerable<Domain.Datum<int>>>();
+                int i = 0;
+
+                foreach (var ed in datum)
+                {
+                    signalDataRepositoryMock.Verify(sdrm => sdrm.SetData<int>(It.Is<IEnumerable<Datum<int>>>(d =>
+                    (
+                        d.ElementAt(i).Quality == ed.Quality
+                        && d.ElementAt(i).Timestamp == ed.Timestamp
+                        && d.ElementAt(i).Value == ed.Value))));
+                    i++;
+                }
+            }
+
+
+            
             private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
             {
                 var list = data.ToList();
