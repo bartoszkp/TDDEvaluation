@@ -300,7 +300,8 @@ namespace WebService.Tests
                 new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 3, 1), Value = 14.5 },
             };
 
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+            Assert.AreEqual(expectedDatumsResult.Count(), result.Count());
 
             int i = 0;
             foreach (var datum in result)
@@ -360,15 +361,13 @@ namespace WebService.Tests
 
             missingValueRepoMock
                 .Setup(mvrm => mvrm.Get(It.IsAny<Domain.Signal>()))
-                .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble());
-                
-                /*(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>()
+                .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
                 {
                     Id = 1,
                     Quality = Quality.Good,
                     Signal = exampleSignal,
                     Value = 13.5,
-                });*/
+                });
 
             var datums = new Datum<double>[]
             {
