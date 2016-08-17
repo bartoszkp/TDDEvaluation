@@ -64,7 +64,10 @@ namespace Domain.Services.Implementation
                 
                 do
                 {
-                    var datum = tempDatum.Select(d => d.Timestamp == fromIncludedUtc).First() ? tempDatum.First(d => d.Timestamp == fromIncludedUtc) : null;
+                    Datum<T> datum;
+                    try { datum = tempDatum.Select(d => d.Timestamp == fromIncludedUtc).First() ? tempDatum.First(d => d.Timestamp == fromIncludedUtc) : null;}
+                    catch { datum = null;}
+
                     if (datum == null) datumList.Add(new Datum<T>() { Signal = getSignal, Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) });
                     else datumList.Add(datum);
                     

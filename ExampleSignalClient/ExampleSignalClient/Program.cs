@@ -11,20 +11,14 @@ namespace ExampleSignalClient
 
             var signal = client.Add(new Signal()
             {
-                DataType = DataType.Integer,
-                Granularity = Granularity.Month,
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Second,
                 Path = new Path() { Components = new[] { "signal" } }
             });
 
-            client.SetData(signal.Id.Value, new[] { new Datum() { Quality = Quality.Good, Value = 1, Timestamp = new DateTime(2000, 2, 1) } });
+            var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
 
-            var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
-
-            foreach (var d in result)
-            {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
-            }
-
+            Console.WriteLine(result.Length);
             Console.ReadKey();
         }
     }
