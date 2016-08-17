@@ -66,21 +66,14 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository.Set(signal, mvpDomain);
         }
 
-        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
+        public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
-            var signal = signalsRepository.Get(signalId);
-
-            if (signal == null)
-            {
-                throw new SignalIsNullException();
-            }
-            else
-            {
-                var mvp = this.missingValuePolicyRepository.Get(signal);
-
-                return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+            var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
+            if (missingValuePolicy == null)
+                return null;
+            return TypeAdapter.Adapt(missingValuePolicy, missingValuePolicy.GetType(), missingValuePolicy.GetType().BaseType)
                     as MissingValuePolicy.MissingValuePolicyBase;
-            }
+            
         }
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -89,7 +82,7 @@ namespace Domain.Services.Implementation
             var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
             var ListOfData = data.OrderBy(x => x.Timestamp).ToList();
 
-            var MVP = GetMissingValuePolicy(signalId);
+            var MVP = GetMissingValuePolicy(signal);
 
             if(MVP is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
             {
