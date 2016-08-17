@@ -135,7 +135,6 @@ namespace WebService.Tests
                 signalsWebService.GetData(1, new DateTime(), new DateTime());
             }
 
-
             [TestMethod]
             public void RepositoryWithSignal_SetData_DataSaved()
             {
@@ -516,22 +515,6 @@ namespace WebService.Tests
                 }
             }
 
-
-
-
-            private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
-            {
-                var list = data.ToList();
-                if (list[0].Value == 1 && list[1].Value == 2 & list[2].Value == 3)
-                    return true;
-                else
-                    return false;
-            }
-
-  
-
-            
-
             [TestMethod]
             public void RepositoryWithSignalAndNoData_GetData_ReturnEmptyCollection()
             {
@@ -546,6 +529,7 @@ namespace WebService.Tests
 
                 Assert.IsTrue(item.Count() == 0);
             }
+
             [TestMethod]
             public void RepositoryWithSignalAndData_GetData_ReturnSortedCollection()
             {
@@ -640,7 +624,6 @@ namespace WebService.Tests
                 }
             }
 
-
             [TestMethod]
             public void GivenASignalAndDatum_WhenGetDataWithArgmunetsLessThanFrom_ReturnEmptyResult()
             {
@@ -670,6 +653,10 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
                 Assert.IsNull(result);
             }
+
+           
+
+
 
 
             private Dto.Signal SignalWith(
@@ -701,6 +688,17 @@ namespace WebService.Tests
                     Path = path
                 };
             }
+
+            private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
+            {
+                var list = data.ToList();
+                if (list[0].Value == 1 && list[1].Value == 2 & list[2].Value == 3)
+                    return true;
+                else
+                    return false;
+            }
+
+
 
             private void GiveNoSignalData()
             {
