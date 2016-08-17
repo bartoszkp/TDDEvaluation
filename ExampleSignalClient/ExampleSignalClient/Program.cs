@@ -9,19 +9,18 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
+            client.SetData(1, new Datum[] {
+                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+            });
 
-            Console.WriteLine("Sygnały w 'root':");
-            foreach (var r in result.Signals)
-            {
-                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
-            }
-            Console.WriteLine("Ścieżki podrzędne w 'root':");
-            foreach (var s in result.SubPaths)
-            {
-                Console.WriteLine(string.Join("/", s.Components));
-            }
+            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
 
+            foreach (var d in result)
+            {
+                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
+            }
             Console.ReadKey();
         }
     }

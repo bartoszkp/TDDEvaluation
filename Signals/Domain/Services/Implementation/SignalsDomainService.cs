@@ -75,11 +75,12 @@ namespace Domain.Services.Implementation
         {
             var data =  this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            if (GetMissingValuePolicy(signal) != null && GetMissingValuePolicy(signal).GetType().Name.Contains("NoneQualityMissingValuePolicy"))
+            var mvp = GetMissingValuePolicy(signal);
+            if (mvp != null && mvp.GetType().Name.Contains("NoneQualityMissingValuePolicy"))
             {
                 return CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
             }
-            else return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            else return data;
         }
 
         private IEnumerable<Datum<T>> CheckMissingValues<T>(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -118,15 +119,22 @@ namespace Domain.Services.Implementation
             List<Datum<T>> list = new List<Datum<T>>();
             for (DateTime d = fromIncludedUtc; d < toExcludedUtc; d = dateTimeStep(d))
             {
-                if (data.Any(time => time.Timestamp == d))
-                {
-                    list.Add(data.First(t => t.Timestamp == d));
-                }
-                else list.Add(new Datum<T>() { Quality = Quality.None, Timestamp = d, Value = default(T) });
+                FillMissingRecord(data, d, ref list);
+            }
+            if (list.Count == 0 && fromIncludedUtc == toExcludedUtc)
+            {
+                FillMissingRecord(data, fromIncludedUtc, ref list);
             }
             return list;
         }
-
+        private void FillMissingRecord<T>(IEnumerable<Datum<T>> data, DateTime dateTime, ref List<Datum<T>> list)
+        {
+            if (data.Any(time => time.Timestamp == dateTime))
+            {
+                list.Add(data.First(t => t.Timestamp == dateTime));
+            }
+            else list.Add(new Datum<T>() { Quality = Quality.None, Timestamp = dateTime, Value = default(T) });
+        }
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase policy)
         {
             if (policy != null)
