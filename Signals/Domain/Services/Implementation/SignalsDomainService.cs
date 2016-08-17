@@ -48,7 +48,10 @@ namespace Domain.Services.Implementation
         public PathEntry GetPathEntry(Path path)
         {
             var prefixedSignals = signalsRepository.GetAllWithPathPrefix(path);
-            return null;
+
+            var pathEntry = new PathEntry(prefixedSignals, null);
+
+            return pathEntry;
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> domain_data)
