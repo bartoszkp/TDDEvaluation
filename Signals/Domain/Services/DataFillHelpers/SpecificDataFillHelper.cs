@@ -51,46 +51,29 @@ namespace DataAccess.DataFillHelpers
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
-            if (data.Count == 0)
+            if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                while (currentDate < toExcluded)
+                data.Add(new Datum<T>()
                 {
-                    data.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = currentDate
-                    });
-
-
-                    currentDate = currentDate.AddSeconds(1);
-
-                }
-
+                    Quality = Quality.Fair,
+                    Value = value,
+                    Timestamp = currentDate
+                });
                 return;
             }
 
-
-
             while (currentDate < toExcluded)
             {
-                if (data.Single(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                     data.Add(new Datum<T>()
                     {
                         Quality = Quality.Fair,
                         Value = value,
                         Timestamp = currentDate
                     });
-                }
 
                 currentDate = currentDate.AddSeconds(1);
-
             }
-
-
-
-
 
 
         }
@@ -100,39 +83,28 @@ namespace DataAccess.DataFillHelpers
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
-            if (data.Count == 0)
+            if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                while (currentDate < toExcluded)
+                data.Add(new Datum<T>()
                 {
-                    data.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = currentDate
-                    });
-
-
-                    currentDate = currentDate.AddMonths(1);
-
-                }
-
+                    Quality = Quality.Fair,
+                    Value = value,
+                    Timestamp = currentDate
+                });
                 return;
             }
 
             while (currentDate < toExcluded)
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
                     data.Add(new Datum<T>()
                     {
                         Quality = Quality.Fair,
                         Value = value,
                         Timestamp = currentDate
                     });
-                }
 
                 currentDate = currentDate.AddMonths(1);
-
             }
         }
 
@@ -141,39 +113,28 @@ namespace DataAccess.DataFillHelpers
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
-            if (data.Count == 0)
+            if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                while (currentDate < toExcluded)
+                data.Add(new Datum<T>()
                 {
-                    data.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = currentDate
-                    });
-
-
-                    currentDate = currentDate.AddDays(7);
-
-                }
-
+                    Quality = Quality.Fair,
+                    Value = value,
+                    Timestamp = currentDate
+                });
                 return;
             }
 
             while (currentDate < toExcluded)
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
                     data.Add(new Datum<T>()
                     {
                         Quality = Quality.Fair,
                         Value = value,
                         Timestamp = currentDate
                     });
-                }
 
                 currentDate = currentDate.AddDays(7);
-
             }
         }
 
@@ -182,40 +143,31 @@ namespace DataAccess.DataFillHelpers
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
-            if (data.Count == 0)
+            if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                while (currentDate < toExcluded)
+                data.Add(new Datum<T>()
                 {
-                    data.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = currentDate
-                    });
-
-
-                    currentDate = currentDate.AddYears(7);
-
-                }
-
+                    Quality = Quality.Fair,
+                    Value = value,
+                    Timestamp = currentDate
+                });
                 return;
             }
 
             while (currentDate < toExcluded)
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
                     data.Add(new Datum<T>()
                     {
                         Quality = Quality.Fair,
                         Value = value,
                         Timestamp = currentDate
                     });
-                }
 
-                currentDate = currentDate.AddYears(7);
-
+                currentDate = currentDate.AddYears(1);
             }
+
+
         }
 
         private static void FillDayGranularityData<T>(List<Datum<T>> data, T value,
@@ -223,39 +175,28 @@ namespace DataAccess.DataFillHelpers
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
-            if (data.Count == 0)
+            if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                while (currentDate < toExcluded)
+                data.Add(new Datum<T>()
                 {
-                    data.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = currentDate
-                    });
-
-
-                    currentDate = currentDate.AddDays(1);
-
-                }
-
+                    Quality = Quality.Fair,
+                    Value = value,
+                    Timestamp = currentDate
+                });
                 return;
             }
 
             while (currentDate < toExcluded)
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
                     data.Add(new Datum<T>()
                     {
                         Quality = Quality.Fair,
                         Value = value,
                         Timestamp = currentDate
                     });
-                }
 
                 currentDate = currentDate.AddDays(1);
-
             }
         }
 
@@ -264,39 +205,28 @@ namespace DataAccess.DataFillHelpers
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
-            if (data.Count == 0)
+            if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                while (currentDate < toExcluded)
+                data.Add(new Datum<T>()
                 {
-                    data.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = currentDate
-                    });
-
-
-                    currentDate = currentDate.AddHours(7);
-
-                }
-
+                    Quality = Quality.Fair,
+                    Value = value,
+                    Timestamp = currentDate
+                });
                 return;
             }
 
             while (currentDate < toExcluded)
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
                     data.Add(new Datum<T>()
                     {
                         Quality = Quality.Fair,
                         Value = value,
                         Timestamp = currentDate
                     });
-                }
 
-                currentDate = currentDate.AddHours(7);
-
+                currentDate = currentDate.AddHours(1);
             }
         }
 
@@ -306,39 +236,28 @@ namespace DataAccess.DataFillHelpers
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
-            if (data.Count == 0)
+            if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                while (currentDate < toExcluded)
+                data.Add(new Datum<T>()
                 {
-                    data.Add(new Datum<T>()
-                    {
-                        Quality = Quality.None,
-                        Value = default(T),
-                        Timestamp = currentDate
-                    });
-
-
-                    currentDate = currentDate.AddMinutes(7);
-
-                }
-
+                    Quality = Quality.Fair,
+                    Value = value,
+                    Timestamp = currentDate
+                });
                 return;
             }
 
             while (currentDate < toExcluded)
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
                     data.Add(new Datum<T>()
                     {
                         Quality = Quality.Fair,
                         Value = value,
                         Timestamp = currentDate
                     });
-                }
 
-                currentDate = currentDate.AddMinutes(7);
-
+                currentDate = currentDate.AddMinutes(1);
             }
         }
     }

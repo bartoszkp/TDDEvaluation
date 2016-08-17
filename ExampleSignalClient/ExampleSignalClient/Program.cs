@@ -9,7 +9,7 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
             
-                        Random random = new Random();
+              /*          Random random = new Random();
 
                         var id = client.Add(new Signal()
                         {
@@ -34,19 +34,19 @@ namespace ExampleSignalClient
                             Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
                         }
 
-                        Console.ReadKey();
+                        Console.ReadKey();*/
                         
-/*
+
             var signal = client.Add(new Signal()
             {
                 DataType = DataType.Decimal,
                 Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "signal243222sfsdffdsfsd" } }
+                Path = new Path() { Components = new[] { "ffdsfsd" } }
             });
 
             var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
 
-            Console.WriteLine(result.Length);*/
+            Console.WriteLine(result.Length);
 
             Console.ReadKey();
 

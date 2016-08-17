@@ -52,10 +52,7 @@ namespace WebService.Tests
 
 
             signalsDataRepoMock.Setup(s => s.GetData<int>(signal, timestamp, timestamp))
-                .Returns(new List<Datum<int>>()
-                {
-                    new Datum<int>() {Quality = Quality.None,Value = 0,Timestamp = timestamp }
-                });
+                .Returns(new List<Datum<int>>());
 
             var result = signalsWebService.GetData(1, timestamp, timestamp);
 

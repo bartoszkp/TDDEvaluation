@@ -50,8 +50,8 @@ namespace WebService.Tests
             var signal = new Signal()
             {
                 Id = 1,
-                DataType = Domain.DataType.Integer,
-                Granularity = Domain.Granularity.Month
+                DataType = DataType.Integer,
+                Granularity = Granularity.Month
             };
 
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns(signal);
