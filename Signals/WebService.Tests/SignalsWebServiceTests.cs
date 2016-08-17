@@ -226,6 +226,30 @@ namespace WebService.Tests
 
                 Assert.AreEqual(new DateTime(2000, 3, 1), result.ElementAt(1).Timestamp);
             }
+            [TestMethod]
+            public void GivenData_WhenGettingSignalDataWithTheSameDateTame_ReturnData()
+            {
+                int signalId = 1;
+
+                var testDatumData = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double> { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                    new Domain.Datum<double> { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }
+                };
+
+                GivenData(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Double,
+                    granularity: Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")),
+                    testDatumData);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.IsTrue(result.Count() != 0);
+            }
 
             [TestMethod]
             [ExpectedException(typeof(SignalNotFoundException))]
