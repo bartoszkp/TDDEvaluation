@@ -1123,7 +1123,7 @@ namespace WebService.Tests
                 {
                         new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (double)1.5 },
                         new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1),  Value = (double)2.0},
-                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1),  Value = default(double)}
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1),  Value = (double)42.42}
                 };
 
                 var firstTimestamp = new DateTime(2000, 1, 1);
