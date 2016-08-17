@@ -640,27 +640,36 @@ namespace WebService.Tests
                 }
             }
 
+
             [TestMethod]
-            public void RepositoryWithSignalAndData2_GetData_ReturnSortedCollection()
+            public void GivenASignalAndDatum_WhenGetDataWithArgmunetsLessThanFrom_ReturnEmptyResult()
             {
-                GiveNoSignalData();
-
-                var item = new List<Dto.Datum>()
+                var existingSignal = new Signal()
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp =new DateTime(2000,1,1), Value = 1.0 },
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000,2,1), Value = 2.0 },
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000,3,1), Value = 3.0 }
+                    Id = 1111,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("signal")
                 };
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1)},
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1)},
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1)}
+                };
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
-                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
-                    .Returns(new Signal() { DataType = DataType.Double });
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
 
-                signalsWebService.SetData(1, item);
-                signalDataRepositoryMock.Verify(x => x.SetData<double>(
-                   It.Is<IEnumerable<Datum<double>>>(d => DataDtoCompareDouble(d))));
+                GivenASignal(existingSignal);
 
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
+                Assert.IsNull(result);
             }
-
 
 
             private Dto.Signal SignalWith(
