@@ -514,7 +514,7 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
 
-                signalsWebService.GetData(1, System.DateTime.MinValue, System.DateTime.MaxValue);
+                signalsWebService.GetData(1, new DateTime(), new DateTime());
             }
 
             [TestMethod]
@@ -525,7 +525,7 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal());
 
-                signalsWebService.GetData(id, System.DateTime.MinValue, System.DateTime.MaxValue);
+                signalsWebService.GetData(id, new DateTime(), new DateTime());
 
                 signalsRepositoryMock.Verify(srm => srm.Get(id), Times.Once);
             }
@@ -539,9 +539,9 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Setup(srm => srm.Get(nonExistingId)).Returns((Domain.Signal)null);
 
-                signalsWebService.GetData(nonExistingId, System.DateTime.MinValue, System.DateTime.MaxValue);
+                signalsWebService.GetData(nonExistingId, new DateTime(), new DateTime());
             }
-    
+
             [TestMethod]
             public void GivenFromDateLaterThanToDate_WhenGettingData_ReturnsEmtptyDataScope()
             {
@@ -568,9 +568,9 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
 
-                signalsWebService.GetData(id, DateTime.MinValue, DateTime.MaxValue);
+                signalsWebService.GetData(id, new DateTime(), new DateTime());
 
-                VerifyGetDataCallOnSignalsDataRepositoryMock<int>(signal, DateTime.MinValue, DateTime.MaxValue);
+                VerifyGetDataCallOnSignalsDataRepositoryMock<int>(signal, new DateTime(), new DateTime());
             }
 
             [TestMethod]
@@ -601,10 +601,11 @@ namespace WebService.Tests
                 SetupWebService();
                 int id = 6;
 
-                DateTime dateFrom = new DateTime(2001, 1, 1);
-                DateTime dateTo = new DateTime(2001, 1, 7);
+                DateTime dateFrom = new DateTime(2000, 1, 1);
+                DateTime dateTo = new DateTime(2000, 1, 3);
 
-                var signal = SignalWith(DataType.Integer, Granularity.Month, Path.FromString("root/signalInt"), id);
+                var signal = SignalWith(DataType.Integer, Granularity.Day, Path.FromString("root/signalInt"), id);
+
                 var expectedData = new Dto.Datum[] 
                 {
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (int)2 },
@@ -621,7 +622,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(id, dateFrom, dateTo);
 
-                AssertDataIsEqual(result, expectedData);
+                DatumArraysAreEqual(result.ToArray(), expectedData);
             }
 
             [TestMethod]
@@ -629,28 +630,28 @@ namespace WebService.Tests
             {
                 SetupWebService();
                 int id = 6;
-                DateTime dateFrom = new DateTime(2001, 1, 1);
-                DateTime dateTo = new DateTime(2001, 1, 7);
+                DateTime dateFrom = new DateTime(2000, 1, 1);
+                DateTime dateTo = new DateTime(2000, 1, 2);
 
-                var signalDouble = SignalWith(DataType.Double, Granularity.Month, Path.FromString("root/signal"), id);
-                var expectedDataDouble = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (double)2.5 } };
+                var signal = SignalWith(DataType.Double, Granularity.Day, Path.FromString("root/signal"), id);
+                var expectedData = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (double)2.5 } };
                 var dataReturnedDouble = new Domain.Datum<double>[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)2.5 } };
-                SetupRepositoryMocks_CallGetData_CompareReturnedData<double>(signalDouble, expectedDataDouble, dataReturnedDouble, dateFrom, dateTo);
+                SetupRepositoryMocks_CallGetData_CompareReturnedData<double>(signal, expectedData, dataReturnedDouble, dateFrom, dateTo);
 
-                var signalDecimal = SignalWith(DataType.Decimal, Granularity.Month, Path.FromString("root/signal"), id);
-                var expectedDataDecimal = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = (decimal)2.5m } };
+                signal.DataType = DataType.Decimal;
+                expectedData[0].Value = (decimal)2.5m;
                 var dataReturnedDecimal = new Domain.Datum<decimal>[] { new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (decimal)2.5m } };
-                SetupRepositoryMocks_CallGetData_CompareReturnedData<decimal>(signalDecimal, expectedDataDecimal, dataReturnedDecimal, dateFrom, dateTo);
+                SetupRepositoryMocks_CallGetData_CompareReturnedData<decimal>(signal, expectedData, dataReturnedDecimal, dateFrom, dateTo);
 
-                var signalBoolean = SignalWith(DataType.Boolean, Granularity.Month, Path.FromString("root/signal"), id);
-                var expectedDataBoolean = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = true } };
+                signal.DataType = DataType.Boolean;
+                expectedData[0].Value = true;
                 var dataReturnedBoolean = new Domain.Datum<bool>[] { new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = true } };
-                SetupRepositoryMocks_CallGetData_CompareReturnedData<bool>(signalBoolean, expectedDataBoolean, dataReturnedBoolean, dateFrom, dateTo);
+                SetupRepositoryMocks_CallGetData_CompareReturnedData<bool>(signal, expectedData, dataReturnedBoolean, dateFrom, dateTo);
 
-                var signalString = SignalWith(DataType.String, Granularity.Month, Path.FromString("root/signal"), id);
-                var expectedDataString = new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 1), Value = "aa" } };
+                signal.DataType = DataType.String;
+                expectedData[0].Value = "aa";
                 var dataReturnedString = new Domain.Datum<string>[] { new Datum<string>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "aa" } };
-                SetupRepositoryMocks_CallGetData_CompareReturnedData<string>(signalString, expectedDataString, dataReturnedString, dateFrom, dateTo);
+                SetupRepositoryMocks_CallGetData_CompareReturnedData<string>(signal, expectedData, dataReturnedString, dateFrom, dateTo);
             }
 
             [TestMethod]
@@ -831,14 +832,13 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenAData_WhenGettingData_FillingDataWithNoneQualityMissingPolicy()
             {
-                Dto.Datum[] datumArray = new Dto.Datum[]{
-                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 5, 1), Value = (int) 5},
-                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (int) 4},
-                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int) 2} };
-
                 SetupWebService();
 
                 var signal = GetDefaultSignal_IntegerMonth();
+
+                Dto.Datum[] datumArray = new Dto.Datum[]{
+                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (int) 5},
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int) 2} };
 
                 int signalId = 3;
                 signalsRepositoryMock
@@ -853,12 +853,32 @@ namespace WebService.Tests
                     .Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(datumArray.ToDomain<IEnumerable<Domain.Datum<int>>>());
                 
-                var returnedData = signalsWebService.GetData(signalId,new DateTime(2000,2,1), new DateTime(2000,7,1));
+                IEnumerable<Dto.Datum> returnedData = signalsWebService.GetData(signalId,new DateTime(2000,2,1), new DateTime(2000,6,1));
 
                 missingValuePolicyRepositoryMock.Setup(x => x.Get(signal)).Returns(new NoneQualityMissingValuePolicyInteger());
 
-                int expectedArrayLength = 5;
+                int expectedArrayLength = 4;
                 Assert.AreEqual(expectedArrayLength,returnedData.ToArray().Length);
+
+                Dto.Datum[] expectedResult = new Dto.Datum[]{
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (int)5 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = default(int) } };
+
+                DatumArraysAreEqual(expectedResult.ToArray(),returnedData.ToArray());
+            }
+
+            private void DatumArraysAreEqual(Dto.Datum[] expected,Dto.Datum[] actual)
+            {
+                Assert.AreEqual(expected.Length,actual.Length);
+
+                for (int i = 0; i < expected.Length; ++i)
+                {
+                    Assert.AreEqual(expected.ElementAt(i).Quality,actual.ElementAt(i).Quality);
+                    Assert.AreEqual(expected.ElementAt(i).Timestamp, actual.ElementAt(i).Timestamp);
+                    Assert.AreEqual(expected.ElementAt(i).Value, actual.ElementAt(i).Value);
+                }
             }
 
             private void SetupMock_GetAllWithPathPrefix(Signal[] signal,Path path)
@@ -911,7 +931,7 @@ namespace WebService.Tests
             {
                 SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<T>(signal.Id.Value, signal, fromIncludedUtc, toExcludedUtc, dataReturnedByMock);
                 var result = signalsWebService.GetData(signal.Id.Value, fromIncludedUtc, toExcludedUtc);
-                AssertDataIsEqual(result, expectedData);
+                DatumArraysAreEqual(result.ToArray(), expectedData.ToArray());
             }
 
             private void SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<T>(int id, Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, IEnumerable<Domain.Datum<T>> dataReturned)
@@ -919,17 +939,6 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
 
                 signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<T>(It.IsAny<Signal>(), fromIncludedUtc, toExcludedUtc)).Returns(dataReturned);
-            }
-
-            private void AssertDataIsEqual(IEnumerable<Dto.Datum> data1, IEnumerable<Dto.Datum> data2)
-            {
-                Assert.AreEqual(data1.Count(), data2.Count());
-                for (int i = 0; i < data1.Count(); i++)
-                {
-                    Assert.AreEqual(data1.ElementAt(i).Quality, data2.ElementAt(i).Quality);
-                    Assert.AreEqual(data1.ElementAt(i).Timestamp, data2.ElementAt(i).Timestamp);
-                    Assert.AreEqual(data1.ElementAt(i).Value, data2.ElementAt(i).Value);
-                }
             }
             
             private void VerifyGetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)

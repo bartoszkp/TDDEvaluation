@@ -33,7 +33,8 @@ namespace Domain.Services.Implementation
 
             Signal addedSignal = this.signalsRepository.Add(newSignal);
 
-            SetMissingValuePolicyDependsOnSignalDatatype(newSignal);
+            var policy = SetNoneQualityMissingValuePolicy(newSignal);
+            this.missingValuePolicyRepository.Set(addedSignal, policy);
 
             return addedSignal;
         }
@@ -89,28 +90,123 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+            var policy = SetNoneQualityMissingValuePolicy(signal);
+
+            return DataFilledWithMissingValues<T>(data, signal, policy ,fromIncludedUtc,toExcludedUtc);
         }
-        
-        private void SetMissingValuePolicyDependsOnSignalDatatype(Signal signal)
+
+        private IEnumerable<Domain.Datum<T>> DataFilledWithMissingValues<T>(IEnumerable<Domain.Datum<T>> data, 
+            Signal signal, MissingValuePolicyBase policy, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            List<Domain.Datum<T>> filledList = new List<Datum<T>>();
+            var array = data.OrderBy(x => x.Timestamp).ToArray();
+            int indexOfArray = 0;
+            DateTime lastIterativeTime;
+
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                for (; indexOfArray < array.Length; ++indexOfArray)
+                {
+                    if (array[indexOfArray].Timestamp == fromIncludedUtc)
+                    {
+                        filledList.Add(array[indexOfArray]);
+                        return filledList;
+                    }
+                }
+            }
+            for (DateTime iterativeTime = fromIncludedUtc; iterativeTime<toExcludedUtc;)
+            {
+                if (indexOfArray < array.Length && array[indexOfArray].Timestamp >= iterativeTime)
+                {
+                    lastIterativeTime = iterativeTime;
+                    AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime);
+
+                    if (array[indexOfArray].Timestamp < iterativeTime)
+                    {
+                        filledList.Add(array.ElementAt(indexOfArray));
+                        ++indexOfArray;
+                    }
+                    else
+                    {
+                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
+                    }
+                }
+                else
+                {
+                    lastIterativeTime = iterativeTime;
+                    AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime);
+                    filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
+                }
+            }
+            return filledList;
+        }
+
+        private Domain.Datum<T> GetDatumFilledWithMissingValuePolicy<T>(MissingValuePolicyBase policy,Signal signal, 
+            DateTime timestamp)
+        {
+            if(policy is NoneQualityMissingValuePolicy<T>)
+            {
+                return new Datum<T>()
+                {
+                    Id = 0,
+                    Signal = signal,
+                    Timestamp = timestamp,
+                    Value = default(T),
+                    Quality = Quality.None
+                };
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private void AddTimeBasedOnGranulatity(Granularity granularity,ref DateTime dateTime)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    dateTime = dateTime.AddSeconds(1);
+                    return;
+                case Granularity.Minute:
+                    dateTime = dateTime.AddMinutes(1);
+                    return;
+                case Granularity.Hour:
+                    dateTime = dateTime.AddHours(1);
+                    return;
+                case Granularity.Day:
+                    dateTime = dateTime.AddDays(1);
+                    return;
+                case Granularity.Week:
+                    dateTime = dateTime.AddDays(7);
+                    return;
+                case Granularity.Month:
+                    dateTime = dateTime.AddMonths(1);
+                    return;
+                case Granularity.Year:
+                    dateTime = dateTime.AddYears(1);
+                    return;
+
+                default: throw new NotImplementedException();
+            }
+        }
+
+        private MissingValuePolicyBase SetNoneQualityMissingValuePolicy(Signal signal)
         {
             switch (signal.DataType)
             {
                 case DataType.Boolean:
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>());
-                    break;
+                    return new NoneQualityMissingValuePolicy<bool>();
                 case DataType.Decimal:
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>());
-                    break;
+                    return new NoneQualityMissingValuePolicy<decimal>();
                 case DataType.Double:
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>());
-                    break;
+                    return new NoneQualityMissingValuePolicy<double>();
                 case DataType.Integer:
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>());
-                    break;
+                    return new NoneQualityMissingValuePolicy<int>();
                 case DataType.String:
-                    this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>());
-                    break;
+                    return new NoneQualityMissingValuePolicy<string>();
                 default:
                     throw new TypeUnsupportedException();
             }
