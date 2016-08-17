@@ -663,6 +663,29 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(d => d.GetAllWithPathPrefix(prefix.ToDomain<Domain.Path>()));
             }
 
+            [TestMethod]
+            public void GivenSignalsWithTheSamePath_GettingPathEntry_ReturnsNotNull()
+            {
+                var path = new Dto.Path() { Components = new[] { "root" } };
+                var path_domain = path.ToDomain<Domain.Path>();
+
+                var signals = new Signal[] {
+                    SignalWith(1, DataType.Boolean, Granularity.Day,   path_domain),
+                    SignalWith(2, DataType.Double,  Granularity.Week,  path_domain),
+                    SignalWith(3, DataType.String,  Granularity.Month, path_domain)
+                };
+
+                foreach(Signal s in signals)
+                    GivenASignal(s);
+
+                signalsRepositoryMock
+                    .Setup(s => s.GetAllWithPathPrefix(path_domain))
+                    .Returns(signals);
+
+                var result = signalsWebService.GetPathEntry(path);
+                Assert.IsNotNull(result);                
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
