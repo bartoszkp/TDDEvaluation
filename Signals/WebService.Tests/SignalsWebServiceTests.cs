@@ -800,6 +800,31 @@ namespace WebService.Tests
                 this.signalsWebService.Add(signal);
             }
 
+            [TestMethod]
+            public void GivenAData_WhenGettingDataWithTwoTheSameTimestamps_ReturningOnlyOneResult()
+            {
+                SetupWebService();
+                int id = 4;
+
+                var dataDto = new Dto.Datum[] { new Dto.Datum() {
+                    Quality = Dto.Quality.Good,
+                    Timestamp = new DateTime(2000, 1, 1),
+                    Value = (int)2 } };
+
+                var signalDomain = GetDefaultSignal_IntegerMonth();
+
+                this.signalsRepositoryMock.Setup(x => x.Get(id)).Returns(signalDomain);
+
+                this.signalsDataRepositoryMock
+                    .Setup(x => x.GetData<int>(signalDomain, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1)))
+                    .Returns(dataDto.ToDomain<IEnumerable<Domain.Datum<int>>>());
+
+                var returnedData = this.signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                int expectedLength = 1;
+                Assert.AreEqual(expectedLength, returnedData.ToArray().Length);
+            }
+
             private void SetupMock_GetAllWithPathPrefix(Signal[] signal,Path path)
             {
                 this.signalsRepositoryMock
