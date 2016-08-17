@@ -782,6 +782,17 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()), Times.Once);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingPathEntry_ReturnsIt()
+            {
+                GivenASignal(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b")));
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
+
+                Assert.IsTrue(result.Signals.Count() == 1);
+                CollectionAssert.AreEqual(new[] { "a", "b" }, result.Signals.First().Path.Components.ToArray());
+            }
+
             #endregion
 
             private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
