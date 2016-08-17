@@ -28,6 +28,11 @@ namespace Domain.Services.Implementation
 
         public Signal Add(Signal newSignal)
         {
+            if(newSignal.Id.HasValue)
+            {
+                throw new IdNotNullException();
+            }
+
             var signal = this.signalsRepository.Add(newSignal);
             if(missingValuePolicyRepository == null)
             {

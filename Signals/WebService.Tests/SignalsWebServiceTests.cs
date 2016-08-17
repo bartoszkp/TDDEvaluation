@@ -243,7 +243,7 @@ namespace WebService.Tests
 
                 Signal signal = new Signal()
                 {
-                    Id = 1,
+                    
                     DataType = Domain.DataType.Integer,
                     Granularity = Domain.Granularity.Day,
                     Path = Domain.Path.FromString("example/path"),
@@ -256,19 +256,17 @@ namespace WebService.Tests
                     .Setup(srm => srm.GetData<int>(signal, fromIncludedDate, toExcludedDate))
                     .Returns(data);
 
-                signalsRepositoryMock
-                    .Setup(srm => srm.Add(signal))
-                    .Returns(signal);
-                signalDomainService.Add(signal);
+                GivenRepositoryThatAssigns(1);
+                var resultSignal = signalDomainService.Add(signal);
 
                 signalsRepositoryMock
-                    .Setup(srm => srm.Get(signal.Id.Value))
+                    .Setup(srm => srm.Get(resultSignal.Id.Value))
                     .Returns(signal);
 
                 signalDomainService.SetData(1, data.AsEnumerable());
                 data.RemoveAt(2);
 
-                var result = signalDomainService.GetData<int>(signal.Id.Value, fromIncludedDate, toExcludedDate);
+                var result = signalDomainService.GetData<int>(resultSignal.Id.Value, fromIncludedDate, toExcludedDate);
 
                 CollectionAssert.AreEqual(data, result.ToList<Datum<int>>());
             }
@@ -284,7 +282,6 @@ namespace WebService.Tests
 
                 Signal signal = new Signal()
                 {
-                    Id = 1,
                     DataType = Domain.DataType.Integer,
                     Granularity = Domain.Granularity.Day,
                     Path = Domain.Path.FromString("example/path"),
@@ -299,20 +296,18 @@ namespace WebService.Tests
                     .Setup(srm => srm.GetData<int>(signal, fromIncludedDate, toExcludedDate))
                     .Returns(sorted);
 
-                signalsRepositoryMock
-                    .Setup(srm => srm.Add(signal))
-                    .Returns(signal);
-                signalDomainService.Add(signal);
+                GivenRepositoryThatAssigns(1);
+                var resultSignal = signalDomainService.Add(signal);
 
                 signalsRepositoryMock
-                    .Setup(srm => srm.Get(signal.Id.Value))
+                    .Setup(srm => srm.Get(resultSignal.Id.Value))
                     .Returns(signal);
 
                 signalDomainService.SetData(1, data.AsEnumerable());
                 data.RemoveAt(2);
                 sorted.RemoveAt(2);
 
-                var result = signalDomainService.GetData<int>(signal.Id.Value, fromIncludedDate, toExcludedDate);
+                var result = signalDomainService.GetData<int>(resultSignal.Id.Value, fromIncludedDate, toExcludedDate);
 
                 CollectionAssert.AreEqual(sorted, result.ToList<Datum<int>>());
             }
@@ -651,7 +646,7 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    Id = 1,
+                    //Id = 1,
                     DataType = DataType.Double,
                     Granularity = Granularity.Day
                 };
@@ -683,7 +678,7 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    Id = 1,
+                    //Id = 1,
                     DataType = DataType.Integer,
                     Granularity = Granularity.Day
                 };
@@ -715,7 +710,7 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    Id = 1,
+                    //Id = 1,
                     DataType = DataType.Decimal,
                     Granularity = Granularity.Day
                 };
@@ -747,7 +742,7 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    Id = 1,
+                    //Id = 1,
                     DataType = DataType.Boolean,
                     Granularity = Granularity.Day
                 };
@@ -779,7 +774,7 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    Id = 1,
+                    //Id = 1,
                     DataType = DataType.String,
                     Granularity = Granularity.Day
                 };
@@ -1464,14 +1459,13 @@ namespace WebService.Tests
                 var existingSignal = new Signal()
                 {
                     DataType = DataType.Double,
-                    Granularity = Granularity.Day
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("root")
                 };
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
-                signalsRepositoryMock
-                    .Setup(srm => srm.Add(existingSignal))
-                    .Returns(existingSignal);
+                GivenRepositoryThatAssigns(1);
 
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
 
