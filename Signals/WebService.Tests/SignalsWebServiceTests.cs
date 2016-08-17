@@ -1073,7 +1073,11 @@ namespace WebService.Tests
                 List<Signal> signalsList = new List<Signal>()
                 {
                     new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/s1")},
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s2") }
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("s0") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s2") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s3") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/subsub/s4") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s5") }
                 };
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -1093,8 +1097,9 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(signalsList.First().ToDto<Dto.Signal>().Path.Components.ToArray(),
                     result.Signals.First().Path.Components.ToArray());
 
-                Assert.AreEqual(1, result.SubPaths.Count());
+                Assert.AreEqual(2, result.SubPaths.Count());
                 CollectionAssert.AreEqual(new[] { "root", "sub" }, result.SubPaths.First().Components.ToArray());
+                CollectionAssert.AreEqual(new[] { "root", "subsub" }, result.SubPaths.Last().Components.ToArray());
             }
 
             //Bug fixing
