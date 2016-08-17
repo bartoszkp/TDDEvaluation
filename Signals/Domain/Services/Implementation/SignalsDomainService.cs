@@ -137,7 +137,7 @@ namespace Domain.Services.Implementation
             List<Path> subPaths = new List<Path>();
             foreach(var signal in signals)
             {
-                if (signal.Path.Length > pathDomain.Length + 1)
+                if (signal.Path.Length > pathDomain.Length + 1 && !subPaths.Contains(signal.Path.GetPrefix(pathDomain.Length + 1)))
                     subPaths.Add(signal.Path.GetPrefix(pathDomain.Length + 1));
             }
             
