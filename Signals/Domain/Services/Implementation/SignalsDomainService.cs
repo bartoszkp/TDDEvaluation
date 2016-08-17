@@ -86,9 +86,6 @@ namespace Domain.Services.Implementation
                 dataDomainOrderedList.ElementAt(i).Signal = signal;
             }
 
-            if (dataDomain.Count() > 1)
-                dataDomainOrderedList = AddMissingData(dataDomainOrderedList);
-
             this.signalsDataRepository.SetData<T>(dataDomainOrderedList);
         }
 
@@ -153,14 +150,7 @@ namespace Domain.Services.Implementation
         {
             if(policy is NoneQualityMissingValuePolicy<T>)
             {
-                return new Datum<T>()
-                {
-                    Id = 0,
-                    Signal = signal,
-                    Timestamp = timestamp,
-                    Value = default(T),
-                    Quality = Quality.None
-                };
+                return Domain.Datum<T>.CreateNone(signal, timestamp);
             }
             else
             {
@@ -216,198 +206,6 @@ namespace Domain.Services.Implementation
                     throw new TypeUnsupportedException();
             }
         }
-        
-        private List<Datum<T>> AddMissingData<T>(List<Datum<T>> dataDomainList)
-        {       
-            dataDomainList = AddDataDependOnGranurality(dataDomainList);
-
-            return dataDomainList.OrderBy( l => l.Timestamp).ToList();
-        }
-
-
-        private List<Datum<T>> AddDataDependOnGranurality<T>(List<Datum<T>> dataDomainList)
-        {
-            List<Datum<T>> missingDatas = new List<Datum<T>>();
-
-            if (dataDomainList.First().Signal.Granularity == Granularity.Second)
-            {
-                for (int i = 0; i < dataDomainList.Count - 1; i++)
-                {
-                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddSeconds(-1)) != 0)
-                    {
-                        int addingAmountOfTime = 0;
-                        do
-                        {
-                            addingAmountOfTime++;
-
-                            missingDatas.Add(new Datum<T>()
-                            {
-                                Id = 0,
-                                Quality = Quality.None,
-                                Timestamp = dataDomainList[i].Timestamp.AddSeconds(addingAmountOfTime),
-                                Signal = dataDomainList[i].Signal,
-                                Value = default(T)
-                            });
-
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddSeconds(-1)) < 0);
-
-                    }
-                }
-            }
-
-            if (dataDomainList.First().Signal.Granularity == Granularity.Minute)
-            {
-                for (int i = 0; i < dataDomainList.Count - 1; i++)
-                {
-                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddMinutes(-1)) != 0)
-                    {
-                        int addingAmountOfTime = 0;
-                        do
-                        {
-                            addingAmountOfTime++;
-
-                            missingDatas.Add(new Datum<T>()
-                            {
-                                Id = 0,
-                                Quality = Quality.None,
-                                Timestamp = dataDomainList[i].Timestamp.AddMinutes(addingAmountOfTime),
-                                Signal = dataDomainList[i].Signal,
-                                Value = default(T)
-                            });
-
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddMinutes(-1)) < 0);
-                    }
-                }
-            }
-
-            if (dataDomainList.First().Signal.Granularity == Granularity.Hour)
-            {
-                for (int i = 0; i < dataDomainList.Count - 1; i++)
-                {
-                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddHours(-1)) != 0)
-                    {
-                        int addingAmountOfTime = 0;
-                        do
-                        {
-                            addingAmountOfTime++;
-
-                            missingDatas.Add(new Datum<T>()
-                            {
-                                Id = 0,
-                                Quality = Quality.None,
-                                Timestamp = dataDomainList[i].Timestamp.AddHours(addingAmountOfTime),
-                                Signal = dataDomainList[i].Signal,
-                                Value = default(T)
-                            });
-
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddHours(-1)) < 0);
-                    }
-                }
-            }
-
-            if (dataDomainList.First().Signal.Granularity == Granularity.Day)
-            {
-                for (int i = 0; i < dataDomainList.Count - 1; i++)
-                {
-                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddDays(-1)) != 0)
-                    {
-                        int addingAmountOfTime = 0;
-                        do
-                        {
-                            addingAmountOfTime++;
-
-                            missingDatas.Add(new Datum<T>()
-                            {
-                                Id = 0,
-                                Quality = Quality.None,
-                                Timestamp = dataDomainList[i].Timestamp.AddDays(addingAmountOfTime),
-                                Signal = dataDomainList[i].Signal,
-                                Value = default(T)
-                            });
-
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddDays(-1)) < 0);
-                    }
-                }
-            }
-
-            if (dataDomainList.First().Signal.Granularity == Granularity.Week)
-            {
-                for (int i = 0; i < dataDomainList.Count - 1; i++)
-                {
-                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddDays(-7)) != 0)
-                    {
-                        int addingAmountOfTime = 0;
-                        do
-                        {
-                            addingAmountOfTime += 7;
-
-                            missingDatas.Add(new Datum<T>()
-                            {
-                                Id = 0,
-                                Quality = Quality.None,
-                                Timestamp = dataDomainList[i].Timestamp.AddDays(addingAmountOfTime),
-                                Signal = dataDomainList[i].Signal,
-                                Value = default(T)
-                            });
-
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddDays(-7)) < 0);
-                    }
-                }
-            }
-
-            if (dataDomainList.First().Signal.Granularity == Granularity.Month)
-            {
-                for (int i = 0; i < dataDomainList.Count - 1; i++)
-                {
-                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddMonths(-1)) != 0)
-                    {
-                        int addingAmountOfTime = 0;
-                        do
-                        {
-                            addingAmountOfTime++;
-
-                            missingDatas.Add(new Datum<T>()
-                            {
-                                Id = 0,
-                                Quality = Quality.None,
-                                Timestamp = dataDomainList[i].Timestamp.AddMonths(addingAmountOfTime),
-                                Signal = dataDomainList[i].Signal,
-                                Value = default(T)
-                            });
-
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddMonths(-1)) < 0);
-                    }
-                }
-            }
-
-            if (dataDomainList.First().Signal.Granularity == Granularity.Year)
-            {
-                for (int i = 0; i < dataDomainList.Count - 1; i++)
-                {
-                    if (dataDomainList[i].Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddYears(-1)) != 0)
-                    {
-                        int addingAmountOfTime = 0;
-                        do
-                        {
-                            addingAmountOfTime++;
-
-                            missingDatas.Add(new Datum<T>()
-                            {
-                                Id = 0,
-                                Quality = Quality.None,
-                                Timestamp = dataDomainList[i].Timestamp.AddYears(addingAmountOfTime),
-                                Signal = dataDomainList[i].Signal,
-                                Value = default(T)
-                            });
-
-                        } while (missingDatas.Last().Timestamp.CompareTo(dataDomainList[i + 1].Timestamp.AddYears(-1)) < 0);
-                    }
-                }
-            }
-
-            dataDomainList.AddRange(missingDatas);
-            return dataDomainList;
-        }
 
         public PathEntry GetByPrefixPath(Path path)
         {
@@ -449,28 +247,7 @@ namespace Domain.Services.Implementation
                 }
             }
 
-            //var distincedList = listOfPaths.GroupBy(x => x).Select(w => w.First()).ToArray();
-
             return new Domain.PathEntry(listOfSignals, listOfPaths.Distinct());
-        }
-
-        private class CompareSameLengthPaths : IEqualityComparer<Path>
-        {
-            public bool Equals(Path path1, Path path2)
-            {
-                int size = path1.Components.ToArray().Length;
-                for (int i = 0; i < size; ++i)
-                {
-                    if (path1.Components.ElementAt(i) != path2.Components.ElementAt(i))
-                        return true;
-                }
-                return false;
-            }
-
-            public int GetHashCode(Path path)
-            {
-                return path.Components.ToArray().Length;
-            }
         }
 
         private bool PathEquals(Path expected, Path actual)
