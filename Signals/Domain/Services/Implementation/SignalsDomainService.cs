@@ -63,7 +63,7 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Domain.Signal signal, MissingValuePolicyBase mvpDomain)
         {
-            
+            this.missingValuePolicyRepository.Set(signal, mvpDomain);
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
