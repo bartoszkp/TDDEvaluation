@@ -63,7 +63,7 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Domain.Signal signal, MissingValuePolicyBase mvpDomain)
         {
-            this.missingValuePolicyRepository.Set(signal, mvpDomain);
+            
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
@@ -233,6 +233,7 @@ namespace Domain.Services.Implementation
                 return returnList;
 
             }
+            
             return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
 
@@ -245,7 +246,10 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData<T>(datum);
         }
 
-
+        public IEnumerable<Signal> GetPathEntry(Path pathDto)
+        {
+            return this.signalsRepository.GetAllWithPathPrefix(pathDto);
+        }
 
 
 
@@ -280,5 +284,7 @@ namespace Domain.Services.Implementation
             }
             return returnList;
         }
+
+        
     }
 }
