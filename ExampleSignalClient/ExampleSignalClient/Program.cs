@@ -8,7 +8,7 @@ namespace ExampleSignalClient
         static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-            /*
+            
                         Random random = new Random();
 
                         var id = client.Add(new Signal()
@@ -18,7 +18,7 @@ namespace ExampleSignalClient
                             Path = new Path() { Components = new[] { "x" + random.Next(100), "y" + random.Next(100) } }
                         }).Id;
 
-                        //client.SetMissingValuePolicy(id.GetValueOrDefault(), new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
+                        client.SetMissingValuePolicy(id.GetValueOrDefault(), new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
 
 
 
@@ -35,8 +35,8 @@ namespace ExampleSignalClient
                         }
 
                         Console.ReadKey();
-                        */
-
+                        
+/*
             var signal = client.Add(new Signal()
             {
                 DataType = DataType.Decimal,
@@ -46,7 +46,7 @@ namespace ExampleSignalClient
 
             var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
 
-            Console.WriteLine(result.Length);
+            Console.WriteLine(result.Length);*/
 
             Console.ReadKey();
 
