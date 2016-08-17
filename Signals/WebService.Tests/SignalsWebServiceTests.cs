@@ -769,6 +769,23 @@ namespace WebService.Tests
                     It.IsAny<IEnumerable<Datum<string>>>()));
             }
 
+            [TestMethod]
+            public void GivenASignalWithDatum_WhenSet_SignalIdIsNotNull()
+            {
+                Domain.Signal signal = this.SignalWith(1, Domain.DataType.String, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
+
+                SetupSettingData(signal);
+
+                signalsWebService.SetData(1, new List<Datum>()
+                {
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = DateTime.Now, Value = null }
+                });
+
+                signalsDataRepositoryMock.Verify(x => x.SetData<string>(
+                    It.Is<IEnumerable<Datum<string>>>(z => z.First().Signal != null)));
+
+            }
+
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {

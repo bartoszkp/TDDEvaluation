@@ -9,23 +9,39 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var newSignal = new Signal()
+            var signal1 = new Signal()
             {
-                DataType = DataType.String,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "stringSignal2" } }
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Day,
+                Path = new Path() { Components = new[] { "signal12" } }
+            };
+            var signal2 = new Signal()
+            {
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Day,
+                Path = new Path() { Components = new[] { "signal22 " } }
             };
 
-            var id = client.Add(newSignal).Id.Value;
+            var signalId1 = client.Add(signal1).Id.Value;
+            var signalId2 = client.Add(signal2).Id.Value;
 
-            client.SetData(id, new[] { new Datum() { Quality = Quality.Good, Value = null, Timestamp = new DateTime(2000, 1, 1) } });
+            client.SetData(
+                signalId1,
+                 new Datum[] { new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = false } });
+            client.SetData(
+                signalId2,
+                new Datum[] { new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = true } });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+            var data1 = client.GetData(signalId1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+            var data2 = client.GetData(signalId2, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
 
-            foreach (var d in result)
+            foreach (var d in data1)
             {
-                Console.WriteLine(d.Quality);
-                Console.WriteLine(d.Value ?? "null");
+                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
+            }
+            foreach (var d in data2)
+            {
+                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
             }
 
             Console.ReadKey();
