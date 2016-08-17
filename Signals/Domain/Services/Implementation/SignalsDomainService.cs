@@ -108,13 +108,13 @@ namespace Domain.Services.Implementation
                 this.signalsDataRepository.SetData<T>(datum);
                 return;
             }
-
-            foreach(var d in datum)
+            var ListOfDatum = datum.ToList();
+            foreach(var d in ListOfDatum)
             {
                 d.Signal = signal;
             }
 
-            this.signalsDataRepository.SetData<T>(datum);
+            this.signalsDataRepository.SetData<T>(ListOfDatum);
         }
 
         
