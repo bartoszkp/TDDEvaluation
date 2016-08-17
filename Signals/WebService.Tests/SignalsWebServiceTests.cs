@@ -1194,8 +1194,8 @@ namespace WebService.Tests
                         new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 3),  Value = (double)42.42}
                 };
 
-                var firstTimestamp = new DateTime(2000, 1, 1);
-                var lastTimestamp = new DateTime(2000, 4, 1);
+                var firstTimestamp = new DateTime(2000, 1, 1, 1, 1, 1);
+                var lastTimestamp = new DateTime(2000, 1, 1, 1, 1, 4);
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 

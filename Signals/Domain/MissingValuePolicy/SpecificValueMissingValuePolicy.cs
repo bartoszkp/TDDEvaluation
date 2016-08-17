@@ -22,8 +22,25 @@ namespace Domain.MissingValuePolicy
             var dateTimeList = new List<DateTime>();
 
             var timestamp = fromIncludedUtc;
-
-            if(key == Granularity.Month)
+            if(key == Granularity.Second)
+            {
+                int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
+                int index = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    if (dataDictionary.ContainsKey(timestamp))
+                    {
+                        dateTimeList.Add(data.ElementAt(index).Timestamp);
+                        index++;
+                    }
+                    else
+                    {
+                        dateTimeList.Add(timestamp);
+                    }
+                    timestamp = granularitytoDateTime[key](timestamp);
+                }
+            }
+            else if(key == Granularity.Month)
             {
                 int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
                 int index = 0;
@@ -41,6 +58,7 @@ namespace Domain.MissingValuePolicy
                     timestamp = granularitytoDateTime[key](timestamp);
                 }
             }
+
             return dateTimeList
                 .Select(d => dataDictionary.ContainsKey(d) ? dataDictionary[d] : new Datum<T>()
                 {
@@ -56,6 +74,7 @@ namespace Domain.MissingValuePolicy
         {
             return new Dictionary<Granularity, Func<DateTime, DateTime>>
             {
+                {Granularity.Second, time => time.AddSeconds(1) },
                 {Granularity.Month, time => time.AddMonths(1) }
             };
         }
