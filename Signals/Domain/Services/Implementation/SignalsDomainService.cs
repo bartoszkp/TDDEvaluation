@@ -106,60 +106,9 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public IEnumerable<Datum<object>> GetData(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> GetData<T>(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var newDatum = new List<Datum<object>>();
-
-            try
-            {
-                switch (getSignal.DataType)
-                {
-                    case DataType.Double:
-                        var result1 = this.signalsDataRepository.GetData<double>(getSignal, fromIncludedUtc, toExcludedUtc);
-                        foreach (var f in result1)
-                        {
-                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
-                        }
-                        return newDatum;
-
-                    case DataType.Decimal:
-                        var result2 = this.signalsDataRepository.GetData<decimal>(getSignal, fromIncludedUtc, toExcludedUtc);
-                        foreach (var f in result2)
-                        {
-                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
-                        }
-                        return newDatum;
-
-                    case DataType.Integer:
-                        var result3 = this.signalsDataRepository.GetData<int>(getSignal, fromIncludedUtc, toExcludedUtc);
-                        foreach (var f in result3)
-                        {
-                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
-                        }
-                        return newDatum;
-
-                    case DataType.String:
-                        var result4 = this.signalsDataRepository.GetData<string>(getSignal, fromIncludedUtc, toExcludedUtc);
-                        foreach (var f in result4)
-                        {
-                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
-                        }
-                        return newDatum;
-
-                    case DataType.Boolean:
-                        var result5 = this.signalsDataRepository.GetData<bool>(getSignal, fromIncludedUtc, toExcludedUtc);
-                        foreach (var f in result5)
-                        {
-                            newDatum.Add(new Datum<object>() { Id = f.Id, Quality = f.Quality, Signal = f.Signal, Timestamp = f.Timestamp, Value = f.Value });
-                        }
-                        return newDatum;
-                    default: return null;
-                }
-            }
-            catch (Exception)
-            {
-                throw new InvalidValueType();
-            }
+            return this.signalsDataRepository.GetData<T>(getSignal, fromIncludedUtc, toExcludedUtc);
         }
 
         public void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase)

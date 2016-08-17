@@ -14,10 +14,10 @@ namespace Domain.Services
 
         void SetData(IEnumerable<Datum<object>> newDomainDatum);
 
-        IEnumerable<Datum<object>> GetData(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
-
         void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase);
 
         MissingValuePolicy.MissingValuePolicyBase GetMVP(Signal domainSignal);
+
+        IEnumerable<Datum<T>> GetData<T>(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }
