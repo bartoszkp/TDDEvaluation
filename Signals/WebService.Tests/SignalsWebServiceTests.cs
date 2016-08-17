@@ -683,6 +683,20 @@ namespace WebService.Tests
                 Assert.IsNotNull(result.SubPaths);
             }
 
+            [TestMethod]
+            public void GivenSignalsInDifferentSubpaths_GettingPathEntry_ReturnsPathEntryWithSignalsInAskedPath()
+            {
+                var path = new Dto.Path() { Components = new[] { "root" } };
+                var signals = GivenMultipleSignals(path, true);
+
+                var result = signalsWebService.GetPathEntry(path).Signals.ToArray();
+                const int number_of_signals_in_path = 3;
+
+                Assert.AreEqual(number_of_signals_in_path, result.Length);
+                foreach (var signal in result)
+                    CollectionAssert.AreEqual(signal.Path.Components.ToArray(), path.Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
