@@ -134,9 +134,16 @@ namespace Domain.Services.Implementation
                     directPathSignals.Add(signal);
             }
 
+            List<Path> subPaths = new List<Path>();
+            foreach(var signal in signals)
+            {
+                if (signal.Path.Length > pathDomain.Length + 1)
+                    subPaths.Add(signal.Path.GetPrefix(pathDomain.Length + 1));
+            }
+
             
 
-            return new PathEntry(directPathSignals.AsEnumerable<Signal>().ToArray(), null);
+            return new PathEntry(directPathSignals.AsEnumerable<Signal>().ToArray(), subPaths.AsEnumerable<Path>().ToArray());
         }
     }
 }
