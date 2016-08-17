@@ -12,12 +12,12 @@ namespace Domain.Services
 
         Signal Get(Path pathDto);
 
-        void SetData(IEnumerable<Datum<object>> newDomainDatum);
-
         void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase);
 
         MissingValuePolicy.MissingValuePolicyBase GetMVP(Signal domainSignal);
 
         IEnumerable<Datum<T>> GetData<T>(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+
+        void SetData<T>(Signal setDataSignal, IEnumerable<Datum<T>> enumerable);
     }
 }

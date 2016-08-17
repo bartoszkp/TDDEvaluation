@@ -83,17 +83,27 @@ namespace WebService
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var setDataSignal = this.signalsDomainService.GetById(signalId);
-
             if (signalId == 0 || setDataSignal == null) throw new InvalidSignalId();
 
-            var newDomainDatum = new List<Domain.Datum<object>>();
-
-            foreach (Datum d in data)
+            switch(setDataSignal.DataType)
             {
-                var domainDatum = d.ToDomain<Domain.Datum<object>>();
-                newDomainDatum.Add(new Domain.Datum<object> { Signal = setDataSignal, Quality = domainDatum.Quality, Timestamp = domainDatum.Timestamp, Value = domainDatum.Value });
+                case Domain.DataType.Double:
+                    this.signalsDomainService.SetData(setDataSignal, data.Select(d => d.ToDomain<Domain.Datum<double>>()).ToArray());
+                    break;
+                case Domain.DataType.Decimal:
+                    this.signalsDomainService.SetData(setDataSignal, data.Select(d => d.ToDomain<Domain.Datum<decimal>>()).ToArray());
+                    break;
+                case Domain.DataType.String:
+                    this.signalsDomainService.SetData(setDataSignal, data.Select(d => d.ToDomain<Domain.Datum<string>>()).ToArray());
+                    break;
+                case Domain.DataType.Integer:
+                    this.signalsDomainService.SetData(setDataSignal, data.Select(d => d.ToDomain<Domain.Datum<Int32>>()).ToArray());
+                    break;
+                case Domain.DataType.Boolean:
+                    this.signalsDomainService.SetData(setDataSignal, data.Select(d => d.ToDomain<Domain.Datum<bool>>()).ToArray());
+                    break;
+                default: throw new NotImplementedException();
             }
-            this.signalsDomainService.SetData(newDomainDatum);
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
