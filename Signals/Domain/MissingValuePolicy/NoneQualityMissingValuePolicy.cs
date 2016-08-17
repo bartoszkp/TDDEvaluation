@@ -7,52 +7,132 @@ namespace Domain.MissingValuePolicy
 {
     public class NoneQualityMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public virtual IEnumerable<Domain.Datum<T>> SetMissingValue(IEnumerable<Domain.Datum<T>> datums)
+        public virtual IEnumerable<Domain.Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            List<Domain.Datum<T>> datumsList = datums.ToList();
+            if (fromIncludedUtc > toExcludedUtc) return new List<Datum<T>>();
 
-            Domain.Signal signal = datumsList.First()?.Signal;
-
-            Domain.Granularity granularity = signal.Granularity;
-
-            DateTime timeStampMin = datumsList.Min(d => d.Timestamp);
-            DateTime timeStampMax = datumsList.Max(d => d.Timestamp);
-
-            DateTime currentTimeSamp = timeStampMin;
-            while (currentTimeSamp != timeStampMax)
+            else if (fromIncludedUtc == toExcludedUtc)
             {
-                currentTimeSamp = AddGranular(currentTimeSamp, granularity);
-                var currentDatum = (from x in datumsList
-                                    where x.Timestamp == currentTimeSamp
-                                    select x).FirstOrDefault();
+                List<Datum<T>> datumWithTimestampEqualFromAndToUtc = new List<Datum<T>>();
 
-                if (currentDatum == null)
+                foreach (var datum in datums)
                 {
-                    Domain.Datum<T> missingDatum = new Domain.Datum<T>()
-                    {
-                        Quality = Domain.Quality.None,
-                        Value = default(T),
-                        Timestamp = currentTimeSamp,
-                    };
-                    datumsList.Add(missingDatum);
+                    if (datum.Timestamp == fromIncludedUtc) datumWithTimestampEqualFromAndToUtc.Add(datum);
                 }
+
+                return datumWithTimestampEqualFromAndToUtc;
             }
 
-            return datumsList;
-        }
-        private DateTime AddGranular(DateTime timeStamp, Domain.Granularity granularity)
-        {
-            switch (granularity)
+            else
             {
-                case Domain.Granularity.Second: { return timeStamp.AddSeconds(1); }
-                case Domain.Granularity.Minute: { return timeStamp.AddMinutes(1); }
-                case Domain.Granularity.Hour: { return timeStamp.AddHours(1); }
-                case Domain.Granularity.Day: { return timeStamp.AddDays(1); }
-                case Domain.Granularity.Week: { return timeStamp.AddDays(7); }
-                case Domain.Granularity.Month: { return timeStamp.AddMonths(1); }
-                case Domain.Granularity.Year: { return timeStamp.AddYears(1); }
-                default: return default(DateTime);
+                List<Datum<T>> filledList = new List<Datum<T>>();
+
+                Granularity granularity = signal.Granularity;
+
+                DateTime tmp = fromIncludedUtc;
+
+                switch (granularity)
+                {
+                    case Granularity.Second:
+
+                        while (tmp < toExcludedUtc)
+                        {
+                            AddToTheListSuitableDatum( filledList, tmp, datums);
+
+                            tmp = tmp.AddSeconds(1);
+                        }
+
+                        break;
+
+                    case Granularity.Minute:
+
+                        while (tmp < toExcludedUtc)
+                        {
+                            AddToTheListSuitableDatum( filledList, tmp, datums);
+
+                            tmp = tmp.AddMinutes(1);
+                        }
+
+                        break;
+
+                    case Granularity.Hour:
+
+                        while (tmp < toExcludedUtc)
+                        {
+                            AddToTheListSuitableDatum( filledList, tmp, datums);
+
+                            tmp = tmp.AddHours(1);
+                        }
+
+                        break;
+
+                    case Granularity.Day:
+
+                        while (tmp < toExcludedUtc)
+                        {
+                            AddToTheListSuitableDatum( filledList, tmp, datums);
+
+                            tmp = tmp.AddDays(1);
+                        }
+
+                        break;
+
+                    case Granularity.Week:
+
+                        while (tmp < toExcludedUtc)
+                        {
+                            AddToTheListSuitableDatum(filledList, tmp, datums);
+
+                            tmp = tmp.AddDays(7);
+                        }
+
+                        break;
+
+                    case Granularity.Month:
+
+                        while (tmp < toExcludedUtc)
+                        {
+                            AddToTheListSuitableDatum( filledList, tmp, datums);
+
+                            tmp = tmp.AddMonths(1);
+                        }
+
+                        break;
+
+                    case Granularity.Year:
+
+                        while (tmp < toExcludedUtc)
+                        {
+                            AddToTheListSuitableDatum( filledList, tmp, datums);
+
+                            tmp = tmp.AddYears(1);
+                        }
+
+                        break;
+
+                    default: break;
+
+                }
+
+                return filledList;
             }
+        }
+
+        private void AddToTheListSuitableDatum( List<Datum<T>> filledList, DateTime tmp, IEnumerable<Domain.Datum<T>> datums)
+        {
+            Datum<T> newDatum = new Datum<T>()
+            {
+                Quality = Quality.None,
+                Timestamp = tmp,
+                Value = default(T)
+            };
+
+            foreach (var datum in datums)
+            {
+                if (newDatum.Timestamp == datum.Timestamp) newDatum = datum;
+            }
+
+            filledList.Add(newDatum);
         }
     }
 }

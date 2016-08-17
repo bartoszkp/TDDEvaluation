@@ -95,9 +95,11 @@ namespace WebService
 
             var specificQualityMvp = this.signalsDomainService.GetMissingValuePolicy(signal.Id.Value) as Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
 
-            if (noneQualityMvp != null)  result = noneQualityMvp?.SetMissingValue(result);
+            if (noneQualityMvp != null)  result = noneQualityMvp.SetMissingValue(signal, result, fromIncludedUtc, toExcludedUtc);
 
-            if (specificQualityMvp != null) result = specificQualityMvp.SetMissingValue(result, fromIncludedUtc, toExcludedUtc);
+            if (specificQualityMvp != null) result = specificQualityMvp.SetMissingValue(signal, result, fromIncludedUtc, toExcludedUtc);
+
+            if (result == null) return null;
 
             result = result.OrderBy(dat => dat.Timestamp).ToArray();
 
