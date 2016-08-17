@@ -752,6 +752,24 @@ namespace WebService.Tests
             }
 
             #endregion
+            #region Issue #9 (Feature: SetMissingValuePolicy)
+
+            [TestMethod]
+            public void GivenASignalWithSpecificMVP_WhenGettingDatum_ReturnsIt()
+            {
+                var id = 1;
+                var data = SetupGetDataDatum(id, MakeData(Dto.Quality.Fair, new DateTime(2016, 2, 1), (double)3.0));
+                var mvp = new SpecificValueMissingValuePolicyDouble() { Quality = Domain.Quality.Fair, Value = 45.0 };
+                missingValuePolicyRepositoryMock.Setup(f => f.Get(It.IsAny<Domain.Signal>())).Returns(mvp);
+
+                var result = signalsWebService.GetData(id, new DateTime(2016, 1, 1), new DateTime(2016, 3, 1));
+
+                Assert.IsTrue(CompareDatumArrays(result, new Datum[] {
+                    new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 3},
+                    new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 2, 1), Value = 45} }));
+            }
+
+            #endregion
 
             private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
             {
