@@ -19,5 +19,7 @@ namespace Domain.Services
         MissingValuePolicyBase GetMissingValuePolicy(int signalId);
 
         Signal GetByPath(Path domainPath);
+
+        IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);
     }
 }

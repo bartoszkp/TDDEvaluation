@@ -54,7 +54,37 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            throw new NotImplementedException();
+            var result = new PathEntry();
+           var signals= signalsDomainService.GetAllWithPathPrefix(pathDto.ToDomain<Domain.Path>());
+
+            var newSignalList = new List<Signal>();
+            var newPathList = new List<Path>();
+
+            var pathCount = pathDto.Components.Count();
+            
+
+            foreach (var i in signals)
+            {
+                if (i.Path.Components.Count() == pathDto.Components.Count() + 1)
+                    newSignalList.Add(i.ToDto<Dto.Signal>());
+                else 
+                {
+
+                    var c = pathDto.Components.ToList();
+                    c.Add(i.Path.Components.ToArray()[pathCount]);
+
+                    if (newPathList.FindIndex(x=> x.Components.ToArray()[pathCount] == c[pathCount])<0)
+                    newPathList.Add(new Path() { Components = c });
+                   
+                }
+            }
+
+            result.Signals = newSignalList;
+            result.SubPaths = newPathList;
+
+
+
+            return result;
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)

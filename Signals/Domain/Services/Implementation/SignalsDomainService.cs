@@ -190,5 +190,11 @@ namespace Domain.Services.Implementation
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicyBase;
         }
+
+        public IEnumerable<Signal> GetAllWithPathPrefix(Path prefix)
+        {
+            return signalsRepository.GetAllWithPathPrefix(prefix);
+
+        }
     }
 }
