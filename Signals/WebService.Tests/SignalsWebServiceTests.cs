@@ -1488,6 +1488,7 @@ namespace WebService.Tests
 
                 GivenASignal(new Signal()
                 {
+                    Id = 1,
                     DataType = DataType.String
                 });
 
@@ -1500,6 +1501,10 @@ namespace WebService.Tests
 
                 signalsDataRepositoryMock
                     .Setup(sdrm => sdrm.SetData<string>(It.IsAny<IEnumerable<Datum<string>>>()));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
                 signalsWebService.SetData(1, existingDatum.ToDto<IEnumerable<Dto.Datum>>());
 
