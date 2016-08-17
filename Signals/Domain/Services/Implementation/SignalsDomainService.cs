@@ -27,15 +27,17 @@ namespace Domain.Services.Implementation
         }
 
 
-        public Signal Add(Signal newSignal, MissingValuePolicyBase policy)
-        {
-            var res = this.signalsRepository.Add(newSignal);
-            try
-            {
-                missingValuePolicyRepository.Set(newSignal, policy);
-            }
-            catch { }
-            return res;
+        public Signal Add(Signal newSignal)
+        { 
+            if (newSignal.Id.HasValue)
+                throw new IdNotNullException();
+
+            newSignal = signalsRepository.Add(newSignal);
+            var type = DataTypeUtils.GetNativeType(newSignal.DataType);
+            var mvp = typeof(NoneQualityMissingValuePolicy<>).MakeGenericType(type);
+            missingValuePolicyRepository.Set(newSignal, (MissingValuePolicyBase)Activator.CreateInstance(mvp));
+
+            return newSignal;
         }
 
         public Signal GetById(int signalId)

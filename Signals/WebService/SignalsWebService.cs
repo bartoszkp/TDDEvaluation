@@ -37,15 +37,9 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
-            if (signalDto.Id.HasValue) throw new Domain.Exceptions.IdNotNullException();
-
             var signal = signalDto.ToDomain<Domain.Signal>();
 
-            var policy = new NoneQualityMissingValuePolicy();
-            policy.DataType = signal.ToDto<Dto.Signal>().DataType;
-
-            var result = signalsDomainService.Add(signal,policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
-            return result.ToDto<Dto.Signal>();
+            return signalsDomainService.Add(signal).ToDto<Dto.Signal>();
         }
 
         public void Delete(int signalId)
