@@ -75,9 +75,7 @@ namespace Domain.Services.Implementation
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
         {
             var signal = GetById(signalId);
-
-            signalsDataRepository.DeleteData<T>(signal);
-
+            
             foreach(var item in data)
             {
                 item.Signal = signal;

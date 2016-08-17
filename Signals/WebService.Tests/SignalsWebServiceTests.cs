@@ -646,7 +646,6 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    //Id = 1,
                     DataType = DataType.Double,
                     Granularity = Granularity.Day
                 };
@@ -678,7 +677,6 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    //Id = 1,
                     DataType = DataType.Integer,
                     Granularity = Granularity.Day
                 };
@@ -710,7 +708,6 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    //Id = 1,
                     DataType = DataType.Decimal,
                     Granularity = Granularity.Day
                 };
@@ -742,7 +739,6 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    //Id = 1,
                     DataType = DataType.Boolean,
                     Granularity = Granularity.Day
                 };
@@ -774,7 +770,6 @@ namespace WebService.Tests
             {
                 var existingSignal = new Domain.Signal()
                 {
-                    //Id = 1,
                     DataType = DataType.String,
                     Granularity = Granularity.Day
                 };
@@ -1435,23 +1430,7 @@ namespace WebService.Tests
 
                 }
             }
-
-            [TestMethod]
-            public void GivenASignal_WhenSettingData_RepositoryDeleteDataIsCalled()
-            {
-                MockSetup();
-
-                Datum<double>[] dataToSet = new Datum<double>[] {
-                        new Datum<double>() { Id = 1, Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                        new Datum<double>() { Id = 2, Quality = Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
-                        new Datum<double>() { Id = 3, Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 },
-                        };
-
-                signalDomainService.SetData(1, dataToSet);
-
-                signalsDataRepositoryMock.Verify(sr => sr.DeleteData<double>(It.IsAny<Domain.Signal>()));
-            }
-
+            
             [TestMethod]
             [ExpectedException(typeof(IdNotNullException))]
             public void GivenASignal_WhenAddinASignalWithSameId_ThrowsException()
