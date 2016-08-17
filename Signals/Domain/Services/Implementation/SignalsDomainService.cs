@@ -33,28 +33,17 @@ namespace Domain.Services.Implementation
                 throw new IdNotNullException();
             }
 
-            var dbItem = this.signalsRepository.Add(newSignal);
-
-            switch (dbItem.DataType)
+            var result = this.signalsRepository.Add(newSignal);
+            var dataTypeSwitch = new Dictionary<DataType, Action>
             {
-                case Domain.DataType.Boolean:
-                    this.SetMissingValuePolicy(dbItem, new NoneQualityMissingValuePolicy<bool>());
-                    break;
-                case Domain.DataType.Decimal:
-                    this.SetMissingValuePolicy(dbItem, new NoneQualityMissingValuePolicy<decimal>());
-                    break;
-                case Domain.DataType.Double:
-                    this.SetMissingValuePolicy(dbItem, new NoneQualityMissingValuePolicy<double>());
-                    break;
-                case Domain.DataType.Integer:
-                    this.SetMissingValuePolicy(dbItem, new NoneQualityMissingValuePolicy<int>());
-                    break;
-                case Domain.DataType.String:
-                    SetMissingValuePolicy(dbItem, new NoneQualityMissingValuePolicy<string>());
-                    break;
-            }
-
-            return dbItem;
+                { DataType.Boolean,()=>missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<bool>()) },
+                { DataType.Decimal, () =>missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<decimal>())},
+                { DataType.Double,() =>missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<double>())},
+                { DataType.Integer,()=>missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<int>())},
+                { DataType.String, ()=>missingValuePolicyRepository.Set(result, new NoneQualityMissingValuePolicy<string>())}
+            };
+            dataTypeSwitch[newSignal.DataType].Invoke();
+            return result;
         }
 
         public Signal GetById(int signalId)

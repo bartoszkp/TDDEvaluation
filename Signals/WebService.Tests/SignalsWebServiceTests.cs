@@ -142,9 +142,9 @@ namespace WebService.Tests
 
                 var item = new List<Dto.Datum>()
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = 1.0 },
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = 2.0 },
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = 3.0 }
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp =new DateTime(2000,1,1), Value = 1.0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000,2,1), Value = 2.0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000,3,1), Value = 3.0 }
                 };
 
                 signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
@@ -157,6 +157,7 @@ namespace WebService.Tests
 
                 signalDataRepositoryMock.Verify(x => x.SetData<double>(
                     It.Is<IEnumerable<Datum<double>>>(d => DataDtoCompareDouble(d))));
+                
 
             }
 
@@ -171,25 +172,7 @@ namespace WebService.Tests
 
   
 
-            [TestMethod]
-            public void RepositoryWithSignalAndData_GetData_DataReturned()
-            {
-                GiveNoSignalData();
-
-                missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
-
-                signalDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<Datum<double>>()
-                    {
-                        new Datum<double>(),
-                        new Datum<double>()
-                    });
-
-                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
-                    .Returns(new Signal() { DataType = DataType.Double });
-
-                var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
-            }
+            
 
             [TestMethod]
             public void RepositoryWithSignalAndNoData_GetData_ReturnEmptyCollection()
@@ -264,10 +247,30 @@ namespace WebService.Tests
                 var ListOfItems = signalsWebService.GetData(1, startDate, endDate);
 
                 Assert.AreEqual(ListOfItems.Count(), 5);
+            }
 
+            [TestMethod]
+            public void RepositoryWithSignalAndData2_GetData_ReturnSortedCollection()
+            {
+                GiveNoSignalData();
+
+                var item = new List<Dto.Datum>()
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp =new DateTime(2000,1,1), Value = 1.0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000,2,1), Value = 2.0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000,3,1), Value = 3.0 }
+                };
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
+                    .Returns(new Signal() { DataType = DataType.Double });
+
+                signalsWebService.SetData(1, item);
+                signalDataRepositoryMock.Verify(x => x.SetData<double>(
+                   It.Is<IEnumerable<Datum<double>>>(d => DataDtoCompareDouble(d))));
 
             }
-           
+
+
 
             private Dto.Signal SignalWith(
                 int? id = null,
