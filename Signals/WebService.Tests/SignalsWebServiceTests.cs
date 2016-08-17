@@ -179,19 +179,6 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
             }
 
-
-            [TestMethod]
-            public void GivenNoData_WhenGettingData_ReturnsEmptyCollection()
-            {
-                int signalId = 1;
-                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day, Domain.Path.FromString("x/y")));
-
-                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
-
-                Assert.AreEqual(0, result.Count());
-            }
-
-
             [TestMethod]
             public void GivenAMissingValuePolicy_WhenGettingMissingValuePolicy_ReturnsIt()
             {

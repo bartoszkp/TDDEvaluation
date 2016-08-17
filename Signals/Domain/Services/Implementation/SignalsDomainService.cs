@@ -77,13 +77,12 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-
-            //if(fromIncludedUtc == toExcludedUtc)
-            //{
-
-            //}
-
-            var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp);
+            List<Datum<T>> result;
+            result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp).ToList();
+            if (result.Count == 0)
+            {
+                result = new List<Datum<T>>() { new Datum<T>() };
+            }
 
             TimeSpan span = toExcludedUtc.Subtract(fromIncludedUtc);
 
@@ -190,7 +189,7 @@ namespace Domain.Services.Implementation
                         }
                     }
                     
-                    result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp);
+                    result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp).ToList();
                 } 
             }
 
