@@ -45,6 +45,12 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(path);
         }
 
+        public PathEntry GetPathEntry(Path path)
+        {
+            var prefixedSignals = signalsRepository.GetAllWithPathPrefix(path);
+            return null;
+        }
+
         public void SetData<T>(IEnumerable<Datum<T>> domain_data)
         {
             this.signalsDataRepository.SetData(domain_data);
@@ -145,5 +151,6 @@ namespace Domain.Services.Implementation
                     throw new NotImplementedException();
             }
         }
+        
     }
 }
