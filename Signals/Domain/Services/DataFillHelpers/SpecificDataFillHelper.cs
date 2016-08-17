@@ -53,12 +53,13 @@ namespace DataAccess.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.Fair,
-                    Value = value,
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.Fair,
+                        Value = value,
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -85,12 +86,13 @@ namespace DataAccess.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.Fair,
-                    Value = value,
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.Fair,
+                        Value = value,
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -115,12 +117,13 @@ namespace DataAccess.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.Fair,
-                    Value = value,
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.Fair,
+                        Value = value,
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -145,12 +148,13 @@ namespace DataAccess.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.Fair,
-                    Value = value,
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.Fair,
+                        Value = value,
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -177,12 +181,13 @@ namespace DataAccess.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.Fair,
-                    Value = value,
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.Fair,
+                        Value = value,
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -207,12 +212,13 @@ namespace DataAccess.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.Fair,
-                    Value = value,
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.Fair,
+                        Value = value,
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -238,12 +244,13 @@ namespace DataAccess.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.Fair,
-                    Value = value,
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.Fair,
+                        Value = value,
+                        Timestamp = currentDate
+                    });
                 return;
             }
 

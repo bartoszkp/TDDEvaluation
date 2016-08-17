@@ -54,12 +54,13 @@ namespace Domain.Services.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T),
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -87,12 +88,13 @@ namespace Domain.Services.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T),
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -117,12 +119,13 @@ namespace Domain.Services.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T),
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -149,12 +152,13 @@ namespace Domain.Services.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T),
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -180,12 +184,13 @@ namespace Domain.Services.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T),
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -210,12 +215,13 @@ namespace Domain.Services.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T),
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
@@ -240,12 +246,13 @@ namespace Domain.Services.DataFillHelpers
 
             if (DateTime.Compare(fromIncluded, toExcluded) == 0)
             {
-                data.Add(new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T),
-                    Timestamp = currentDate
-                });
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                    data.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = currentDate
+                    });
                 return;
             }
 
