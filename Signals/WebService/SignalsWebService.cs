@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -90,7 +91,7 @@ namespace WebService
         {
             Signal signal = GetById(signalId);
             if (signal == null)
-                throw new Domain.Exceptions.NoSuchSignalException();
+                throw new NoSuchSignalException();
             switch (signal.DataType)
             {
                 case (DataType.Boolean):

@@ -59,6 +59,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="NoneQualityDataFillTests.cs" />
     <Compile Include="GetDataTests.cs" />
     <Compile Include="PathEntryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

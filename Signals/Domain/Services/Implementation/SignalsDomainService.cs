@@ -72,6 +72,7 @@ namespace Domain.Services.Implementation
             var mvp = missingValuePolicyRepository.Get(signal);
             if (mvp == null)
                 return null;
+
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
