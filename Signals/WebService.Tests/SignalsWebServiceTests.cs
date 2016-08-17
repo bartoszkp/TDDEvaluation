@@ -667,7 +667,7 @@ namespace WebService.Tests
             public void GivenSignalsWithTheSamePath_GettingPathEntry_ReturnsNotNull()
             {
                 var path = new Dto.Path() { Components = new[] { "root" } };
-                var signals = GivenMultipleSignalsWithTheSamePath(path);
+                var signals = GivenMultipleSignals(path);
 
                 var result = signalsWebService.GetPathEntry(path);
                 Assert.IsNotNull(result);                
@@ -764,17 +764,28 @@ namespace WebService.Tests
                     .Returns(existingSignal);
             }
 
-            private List<Signal> GivenMultipleSignalsWithTheSamePath(Dto.Path path)
+            private List<Signal> GivenMultipleSignals(Dto.Path path, bool addSubSignals = false)
             {
                 GivenNoSignals();
 
                 var path_domain = path.ToDomain<Domain.Path>();
+                int id = 1;
 
                 var signals = new List<Signal> {
-                    SignalWith(1, DataType.Boolean, Granularity.Day,   path_domain),
-                    SignalWith(2, DataType.Double,  Granularity.Week,  path_domain),
-                    SignalWith(3, DataType.String,  Granularity.Month, path_domain)
+                    SignalWith(id++, DataType.Boolean, Granularity.Day,   path_domain),
+                    SignalWith(id++, DataType.Double,  Granularity.Week,  path_domain),
+                    SignalWith(id++, DataType.String,  Granularity.Month, path_domain)
                 };
+
+                signalsRepositoryMock
+                    .Setup(s => s.GetAllWithPathPrefix(path_domain))
+                    .Returns(signals);
+
+                if(addSubSignals)
+                {
+                    signals.Add(SignalWith(id++, DataType.String,  Granularity.Month, path_domain + "sub1"));
+                    signals.Add(SignalWith(id++, DataType.Decimal, Granularity.Year,  path_domain + "sub2"));
+                }
 
                 foreach (Signal existingSignal in signals)
                 {
@@ -785,10 +796,6 @@ namespace WebService.Tests
                         .Setup(sr => sr.Get(existingSignal.Path))
                         .Returns(existingSignal);
                 }
-
-                signalsRepositoryMock
-                    .Setup(s => s.GetAllWithPathPrefix(path_domain))
-                    .Returns(signals);
 
                 return signals;
             }
