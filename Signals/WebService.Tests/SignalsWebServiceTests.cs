@@ -641,6 +641,17 @@ namespace WebService.Tests
                 signalsWebService.Add(sig);
             }
 
+            [TestMethod]
+            public void GivenASignalOfStrings_SettingDataOfNullValue_DoesNotThrow()
+            {
+                int id = 1;
+                Dto.Datum[] dtoData;
+                GivenASignalAndDataOf(DataType.String, null, out dtoData, id, 10);
+
+                signalsWebService.SetData(id, dtoData);
+                signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<string>>>()));                
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()

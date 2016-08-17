@@ -8,32 +8,24 @@ namespace ExampleSignalClient
         static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-
+            
             var newSignal = new Signal()
             {
-                DataType = DataType.Double,
+                DataType = DataType.String,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "signal1" } }
+                Path = new Path() { Components = new[] { "root", "stringSignal2" } }
             };
 
             var id = client.Add(newSignal).Id.Value;
+            
+            client.SetData(1, new[] { new Datum() { Quality = Quality.Good, Value = null, Timestamp = new DateTime(2000, 1, 1) } });
 
-            newSignal = new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "signal2" } },
-                Id = id
-            };
+            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
 
-            try
+            foreach (var d in result)
             {
-                client.Add(newSignal);
-                Console.WriteLine("Signal with duplicate ID didn't throw - WRONG");
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Failed to add duplicate ID - OK");
+                Console.WriteLine(d.Quality);
+                Console.WriteLine(d.Value ?? "null");
             }
 
             Console.ReadKey();
