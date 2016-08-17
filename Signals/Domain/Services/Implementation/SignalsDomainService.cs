@@ -173,5 +173,53 @@ namespace Domain.Services.Implementation
 
             return DataTypeUtils.GetNativeType(dataType.Value);
         }
-    }
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            IEnumerable<Signal> allSignalsWithPathPrefix = signalsRepository.GetAllWithPathPrefix(path);
+
+            int numberOfPathComponents = path.Components.Count();
+
+            List<Signal> signalsFromSubdirectory = GetSignalsFromSubdirectory(allSignalsWithPathPrefix, numberOfPathComponents);
+            List<Path> pathsFromSubdirectory = GetPathsFromSubdirectory(allSignalsWithPathPrefix, numberOfPathComponents);
+            
+            return new PathEntry(signalsFromSubdirectory, pathsFromSubdirectory);
+        }
+
+
+        private List<Signal> GetSignalsFromSubdirectory(IEnumerable<Signal> allSignals, int numberOfPathComponents)
+        {
+            List<Signal> returnSignals = new List<Signal>();
+
+            List<Signal> signalsWithGivenPathPrefix = allSignals.ToList();
+
+            for (int i = 0; i < signalsWithGivenPathPrefix.Count(); i++)
+            {
+                if (numberOfPathComponents - signalsWithGivenPathPrefix[i].Path.Components.Count() == -1)
+                    returnSignals.Add(signalsWithGivenPathPrefix[i]);
+            }
+
+            return returnSignals;
+        }
+
+        private List<Path> GetPathsFromSubdirectory(IEnumerable<Signal> allSignals, int numberOfPathComponents)
+        {
+            List<Signal> returnSignalsPaths = new List<Signal>();
+
+            List<Signal> signalsWithGivenPathPrefix = allSignals.ToList();
+
+            for (int i = 0; i < signalsWithGivenPathPrefix.Count(); i++)
+            {
+                if (numberOfPathComponents - signalsWithGivenPathPrefix[i].Path.Components.Count() < -1)
+                    returnSignalsPaths.Add(signalsWithGivenPathPrefix[i]);
+            }
+
+            var signalsPaths = returnSignalsPaths.Select(signal =>
+               Path.FromString(signal.Path.Components.ElementAt(numberOfPathComponents - 1)) + signal.Path.Components.ElementAt(numberOfPathComponents))
+                  .Distinct()
+                  .Select(p => p);
+
+            return signalsPaths.ToList();
+        }
+    } 
 }
