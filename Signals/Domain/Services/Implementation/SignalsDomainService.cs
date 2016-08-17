@@ -127,7 +127,16 @@ namespace Domain.Services.Implementation
             if (signals == null)
                 return null;
 
-            return new PathEntry(signals, null);
+            List<Signal> directPathSignals = new List<Signal>();
+            foreach(var signal in signals)
+            {
+                if (signal.Path.Length == pathDomain.Length + 1)
+                    directPathSignals.Add(signal);
+            }
+
+            
+
+            return new PathEntry(directPathSignals.AsEnumerable<Signal>().ToArray(), null);
         }
     }
 }
