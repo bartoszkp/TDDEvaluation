@@ -1459,7 +1459,7 @@ namespace WebService.Tests
                 };
 
                 var firstTimestamp = new DateTime(2000, 1, 1, 1, 1, 1);
-                var lastTimestamp = new DateTime(2000, 1, 15, 1, 1, 1);
+                var lastTimestamp = new DateTime(2000, 1, 22, 1, 1, 1);
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
