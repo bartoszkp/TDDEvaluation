@@ -93,43 +93,44 @@ namespace WebService
         public void SetData(int signalId, IEnumerable<Datum> datum)
         {
             var signal = this.signalsDomainService.GetById(signalId);
-            
+
             if (signal == null)
             {
                 throw new KeyNotFoundException();
             }
 
-            var data = datum?.OrderBy(dt => dt.Timestamp).ToArray();
-            string typeName = signal.DataType.GetNativeType().Name;
+                var data = datum?.OrderBy(dt => dt.Timestamp).ToArray();
+                string typeName = signal.DataType.GetNativeType().Name;
 
-            switch (typeName)
-            {
-                case "Int32":
-                    GenericSetDataCall<int>(signal, data);
-                    break;
-                case "Double":
-                    GenericSetDataCall<double>(signal, data);
-                    break;
-                case "Decimal":
-                    GenericSetDataCall<decimal>(signal, data);
-                    break;
-                case "Boolean":
-                    GenericSetDataCall<bool>(signal, data);
-                    break;
-                case "String":
-                    GenericSetDataCall<string>(signal, data);
-                    break;
+                switch (typeName)
+                {
+                    case "Int32":
+                        GenericSetDataCall<int>(signal, data);
+                        break;
+                    case "Double":
+                        GenericSetDataCall<double>(signal, data);
+                        break;
+                    case "Decimal":
+                        GenericSetDataCall<decimal>(signal, data);
+                        break;
+                    case "Boolean":
+                        GenericSetDataCall<bool>(signal, data);
+                        break;
+                    case "String":
+                        GenericSetDataCall<string>(signal, data);
+                        break;
+                }
             }
-        }
+        
 
         private void GenericSetDataCall<T>(Domain.Signal signal, Datum[] data)
-        {
+        { 
             this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<T>>>().ToArray());
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            var signalDomain = this.signalsDomainService.GetById(signalId);
+           var signalDomain = this.signalsDomainService.GetById(signalId);
            return this.signalsDomainService.GetMissingValuePolicy(signalDomain).ToDto<MissingValuePolicy>();
         }
 

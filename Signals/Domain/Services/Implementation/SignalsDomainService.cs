@@ -120,6 +120,20 @@ namespace Domain.Services.Implementation
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUTC, toExcludedUTC);
 
+            var timestampBegin = fromIncludedUTC;
+            var timestampEnd = toExcludedUTC;
+            var dateTimeComparator = DateTime.Compare(timestampBegin, timestampEnd);
+
+            if(dateTimeComparator > 0)
+            {
+                for (int i = 0; i < data.Count(); i++)
+                {
+                    data.ToList().RemoveAt(i);
+                } 
+
+                return this.signalsDataRepository.GetData<T>(signal, timestampBegin, timestampEnd);
+            }
+
             var missingValuePolicy = GetMissingValuePolicy(signal)
                 as MissingValuePolicy.MissingValuePolicy<T>;
 
