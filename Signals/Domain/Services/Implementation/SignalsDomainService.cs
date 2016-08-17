@@ -79,16 +79,16 @@ namespace Domain.Services.Implementation
 
             var mvp = GetMissingValuePolicy(signalId);
 
-            if (mvp != null && mvp.GetType().GetGenericTypeDefinition() == typeof(NoneQualityMissingValuePolicy<>))
-                resultArray = FillArray(resultArray, signal, fromIncludedUtc, toExcludedUtc);
+            if (mvp != null)
+                resultArray = FillArray(resultArray, signal, fromIncludedUtc, toExcludedUtc, mvp);
 
             return resultArray;
         }
 
-        private Datum<T>[] FillArray<T>(Datum<T>[] array, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        private Datum<T>[] FillArray<T>(Datum<T>[] array, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, MissingValuePolicyBase policy)
         {
             var empty = array.Length < 1;
-            
+
             DateTime tmp;
             var dateModifier = DateModifier(signal.Granularity);
             var filledArray = new Datum<T>[NumberOfPeriods(fromIncludedUtc, toExcludedUtc, signal.Granularity)];
@@ -103,11 +103,29 @@ namespace Domain.Services.Implementation
                     j = (j + 1) % array.Length;
                 }
                 else
-                    filledArray[i] = Datum<T>.CreateNone(signal, tmp);
+                    filledArray[i] = ValueFromMVP<T>(policy, signal, tmp);
                 tmp = dateModifier(tmp);
             }
 
             return filledArray;
+        }
+
+        public Datum<T> ValueFromMVP<T>(MissingValuePolicyBase policy, Signal signal, DateTime timestamp)
+        {
+            if (policy is SpecificValueMissingValuePolicy<T>)
+            {
+                var specificPolicy = policy as SpecificValueMissingValuePolicy<T>;
+                return new Datum<T>
+                {
+                    Quality = specificPolicy.Quality,
+                    Value = specificPolicy.Value,
+                    Signal = signal,
+                    Timestamp = timestamp
+                };
+            }
+            else
+                return Datum<T>.CreateNone(signal, timestamp);
+
         }
 
         private Func<DateTime, DateTime> DateModifier(Granularity granularity)
@@ -171,7 +189,7 @@ namespace Domain.Services.Implementation
 
             signalsDataRepository.SetData(enumerable.ToList());
         }
-        
+
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
         {
             var signal = signalsRepository.Get(signalId);
