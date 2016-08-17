@@ -95,16 +95,18 @@ namespace Domain.Services.Implementation
                                 {
                                         var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                         returnList.Add(addingItem);
+                                        checkedDateTime = checkedDateTime.AddMinutes(1);
                                 }
                                 break;
                             }
                         case Granularity.Month:
                             {
-                                int countOfListelement = toExcludedUtc.Month - fromIncludedUtc.Month + 1;
+                                int countOfListelement = toExcludedUtc.Month - fromIncludedUtc.Month;
                                 for (int i = 0; i < countOfListelement; i++)
                                 {
                                     var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                     returnList.Add(addingItem);
+                                    checkedDateTime = checkedDateTime.AddMonths(1);
                                 }
                                     break;
                             }
@@ -115,6 +117,7 @@ namespace Domain.Services.Implementation
                                 {
                                     var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                     returnList.Add(addingItem);
+                                    checkedDateTime = checkedDateTime.AddHours(1);
                                 }
                                 break;
                             }
@@ -125,17 +128,19 @@ namespace Domain.Services.Implementation
                                 {
                                     var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                     returnList.Add(addingItem);
+                                    checkedDateTime = checkedDateTime.AddDays(1);
                                 }
                                 break;
                             }
                         case Granularity.Second:
                             {
-                                TimeSpan difference = toExcludedUtc - fromIncludedUtc;
+                                TimeSpan difference = toExcludedUtc - toExcludedUtc;
                                 double countOfListelement = (toExcludedUtc-fromIncludedUtc).TotalSeconds;
                                 for (int i = 0; i < countOfListelement; i++)
                                 {
                                     var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                     returnList.Add(addingItem);
+                                    checkedDateTime = checkedDateTime.AddSeconds(1);
                                 }
                                 break;
                             }
@@ -146,6 +151,7 @@ namespace Domain.Services.Implementation
                                 {
                                     var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                     returnList.Add(addingItem);
+                                    checkedDateTime = checkedDateTime.AddDays(7);
                                 }
                                 break;
                             }
@@ -156,15 +162,16 @@ namespace Domain.Services.Implementation
                                 {
                                     var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                     returnList.Add(addingItem);
+                                    checkedDateTime = checkedDateTime.AddYears(1);
                                 }
                                 break;
                             }
                     }
                     return returnList;
                 }
-                
                 switch (signal.Granularity)
                 {
+                    
                     case Granularity.Minute:
                         {
                             int countElementOfList = toExcludedUtc.Minute - fromIncludedUtc.Minute;

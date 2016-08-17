@@ -79,22 +79,22 @@ namespace WebService
                     }
                 case Domain.DataType.Decimal:
                     {
-                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        return signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)
                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 case Domain.DataType.Double:
                     {
-                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 case Domain.DataType.Integer:
                     {
-                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        return signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 case Domain.DataType.String:
                     {
-                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        return signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)
                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 default:

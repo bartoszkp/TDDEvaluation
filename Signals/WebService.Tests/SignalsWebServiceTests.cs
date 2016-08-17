@@ -561,7 +561,7 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
 
-                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
 
                 var existingSortedDatum = existingDatum.OrderBy(x => x.Timestamp);
 
@@ -678,10 +678,10 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
                 GivenASignal(existingSignal);
                 var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
-                Assert.AreEqual(59, result.Count());
+                Assert.AreEqual(60, result.Count());
             }
 
-
+            
 
 
             private Dto.Signal SignalWith(
