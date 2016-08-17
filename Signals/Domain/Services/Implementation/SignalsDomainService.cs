@@ -140,9 +140,7 @@ namespace Domain.Services.Implementation
                 if (signal.Path.Length > pathDomain.Length + 1)
                     subPaths.Add(signal.Path.GetPrefix(pathDomain.Length + 1));
             }
-
             
-
             return new PathEntry(directPathSignals.AsEnumerable<Signal>().ToArray(), subPaths.AsEnumerable<Path>().ToArray());
         }
     }

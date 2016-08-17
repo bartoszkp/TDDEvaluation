@@ -1068,33 +1068,6 @@ namespace WebService.Tests
             }
             
             [TestMethod]
-            public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathEntryWithListOfSignalsFromMainDirectory()
-            {
-                List<Signal> signalsList = new List<Signal>()
-                {
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/s1")},
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s2") }
-                };
-
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-
-                signalsRepositoryMock
-                    .Setup(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()))
-                    .Returns(signalsList.AsEnumerable);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
-
-                Assert.AreEqual(1, result.Signals.Count());
-                Assert.AreEqual(signalsList.First().ToDto<Dto.Signal>().DataType, result.Signals.First().DataType);
-                CollectionAssert.AreEqual(signalsList.First().ToDto<Dto.Signal>().Path.Components.ToArray(),
-                    result.Signals.First().Path.Components.ToArray());
-            }
-
-            [TestMethod]
             public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathWithCollectionOfSignalsFromMainDirectoryAndSubpathsFromMainDirectory()
             {
                 List<Signal> signalsList = new List<Signal>()
@@ -1121,7 +1094,7 @@ namespace WebService.Tests
                     result.Signals.First().Path.Components.ToArray());
 
                 Assert.AreEqual(1, result.SubPaths.Count());
-                CollectionAssert.AreEqual(new[] { "sub", "s2" }, result.SubPaths.First().Components.ToArray());
+                CollectionAssert.AreEqual(new[] { "root", "sub" }, result.SubPaths.First().Components.ToArray());
             }
 
             //Bug fixing
