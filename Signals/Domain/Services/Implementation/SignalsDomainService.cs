@@ -139,6 +139,8 @@ namespace Domain.Services.Implementation
 
             if (fromIncludedUtc == toExcludedUtc)
                 return 1;
+            if (toExcludedUtc < fromIncludedUtc)
+                return 0;
 
             switch (granularity)
             {
