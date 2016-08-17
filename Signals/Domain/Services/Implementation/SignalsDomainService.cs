@@ -109,15 +109,24 @@ namespace Domain.Services.Implementation
         public PathEntry GetPathEntry(Path path)
         {
             var signals = signalsRepository.GetAllWithPathPrefix(path);
-
-            var result = new List<Signal>();
+            var pathDeep = path.Components.Count();
+            var resultSignals = new List<Signal>();
+            var resultSubPaths = new List<Path>();
+            
             foreach(var s in signals)
             {
-                if (s.Path.Components.Count() == path.Components.Count() + 1)
-                    result.Add(s);
+                if (s.Path.Components.Count() > pathDeep + 1)
+                    resultSubPaths.Add(GetSubPath(s, pathDeep + 1));
+                else
+                    resultSignals.Add(s);
             }
 
-            return new PathEntry(result, null);
+            return new PathEntry(resultSignals, resultSubPaths);
+        }
+
+        private Path GetSubPath(Signal signal, int deep)
+        {
+            return Path.FromString(string.Join("/", signal.Path.Components.Take(deep).ToArray()));
         }
     }
 }
