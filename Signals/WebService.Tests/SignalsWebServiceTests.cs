@@ -43,6 +43,7 @@ namespace WebService.Tests
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
                 GivenNoSignals();
+                MakeAMissingValuePolicyRepositoryMock();
 
                 var result = signalsWebService.Add(new Dto.Signal());
 
@@ -53,6 +54,7 @@ namespace WebService.Tests
             public void GivenNoSignals_WhenAddingASignal_ReturnsTheSameSignalExceptForId()
             {
                 GivenNoSignals();
+                MakeAMissingValuePolicyRepositoryMock();
 
                 var result = signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Decimal,
@@ -68,6 +70,7 @@ namespace WebService.Tests
             public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
             {
                 GivenNoSignals();
+                MakeAMissingValuePolicyRepositoryMock();
 
                 signalsWebService.Add(SignalWith(
                     dataType: Dto.DataType.Decimal,
@@ -85,6 +88,7 @@ namespace WebService.Tests
             {
                 var signalId = 1;
                 GivenNoSignals();
+                MakeAMissingValuePolicyRepositoryMock();
                 GivenRepositoryThatAssigns(id: signalId);
 
                 var result = signalsWebService.Add(SignalWith(
