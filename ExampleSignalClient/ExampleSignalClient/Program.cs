@@ -9,62 +9,44 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
             /*
+                        Random random = new Random();
+
                         var id = client.Add(new Signal()
                         {
-                            DataType = DataType.Decimal,
+                            DataType = DataType.Double,
                             Granularity = Granularity.Month,
-                            Path = new Path() { Components = new [] {"x","y"}}
+                            Path = new Path() { Components = new[] { "x" + random.Next(100), "y" + random.Next(100) } }
                         }).Id;
+
+                        //client.SetMissingValuePolicy(id.GetValueOrDefault(), new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
 
 
 
                         client.SetData(id.GetValueOrDefault(), new Datum[] {
-                            new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                            new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
-                            new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
+                                        new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                                        new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
 
-                        var result = client.GetData(id.GetValueOrDefault(), new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                        var result = client.GetData(id.GetValueOrDefault(), new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 
                         foreach (var d in result)
                         {
-                            Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
+                            Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
                         }
 
                         Console.ReadKey();
-                       */
-/*
-            Path[] paths = new[] { new Path() { Components = new[] { "root", "s1" } },
-                                               new Path() { Components = new[] { "s0" } },
-                                               new Path() { Components = new[] { "root", "podkatalog","s2" } },
-                                               new Path() { Components = new[] { "root", "podkatalog2","s3" } },
-                                               new Path() { Components = new[] { "root", "podkatalog","podkatalog","s4" } } };
+                        */
 
-            Random random = new Random();
-
-            for (int i = 0; i < paths.Length; i++)
+            var signal = client.Add(new Signal()
             {
-                client.Add(new Signal()
-                {
-                    DataType = DataType.Decimal,
-                    Granularity = Granularity.Month,
-                    Path = paths[i]
-                });
-            }
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Second,
+                Path = new Path() { Components = new[] { "signal243222" } }
+            });
 
-    */
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
+            var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
 
-            Console.WriteLine("Sygnały w 'root':");
-            foreach (var r in result.Signals)
-            {
-                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
-            }
-            Console.WriteLine("Ścieżki podrzędne w 'root':");
-            foreach (var s in result.SubPaths)
-            {
-                Console.WriteLine(string.Join("/", s.Components));
-            }
-
+            Console.WriteLine(result.Length);
 
             Console.ReadKey();
 

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class SignalWithThisIdNonExistException : Exception
+    public class NoSuchSignalException : Exception
     {
-        public SignalWithThisIdNonExistException()
-            :base ("Signal with this id non exist")
+        public NoSuchSignalException()
+            :base ("Signal with this id does not exist")
         {
 
         }

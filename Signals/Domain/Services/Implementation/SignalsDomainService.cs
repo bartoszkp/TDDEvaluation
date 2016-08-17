@@ -6,6 +6,8 @@ using Domain.Infrastructure;
 using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
+using DataAccess.DataFillHelpers;
+using Domain.Services.DataFillHelpers;
 
 namespace Domain.Services.Implementation
 {
@@ -65,7 +67,7 @@ namespace Domain.Services.Implementation
             var signal = signalsRepository.Get(signalId);
             if (signal == null)
             {
-                throw new SignalWithThisIdNonExistException();
+                throw new NoSuchSignalException();
             }
             var mvp = missingValuePolicyRepository.Get(signal);
             if (mvp == null)
@@ -79,7 +81,7 @@ namespace Domain.Services.Implementation
             var signal = signalsRepository.Get(signalId);
             if (signal == null)
             {
-                throw new SignalWithThisIdNonExistException();
+                throw new NoSuchSignalException();
             }
             missingValuePolicyRepository.Set(signal, policy);
         }
@@ -88,21 +90,33 @@ namespace Domain.Services.Implementation
         {
             Signal signal = GetById(signalId);
             if (signal == null)
-                throw new SignalWithThisIdNonExistException();
+                throw new NoSuchSignalException();
 
-            var datums = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-            IEnumerable<Datum<T>> sortedDatums = datums.OrderBy(datum => datum.Timestamp);
+            var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var sortedDatums = data?.OrderBy(datum => datum.Timestamp).ToList();
 
-            sortedDatums = FillMissingData(signal.Granularity, sortedDatums, fromIncludedUtc, toExcludedUtc);
+            var mvp = GetMissingValuePolicyBase(signalId);
 
-            return sortedDatums;
+            if (mvp is SpecificValueMissingValuePolicy<T>)
+            {
+                var specificMvp = mvp as SpecificValueMissingValuePolicy<T>;
+                SpecificDataFillHelper.FillMissingData(signal.Granularity, sortedDatums,specificMvp.Value,fromIncludedUtc,toExcludedUtc);
+            }
+
+            else if (mvp is NoneQualityMissingValuePolicy<T>)
+            {
+                NoneQualityDataFillHelper.FillMissingData(signal.Granularity, sortedDatums, fromIncludedUtc, toExcludedUtc);
+                //sortedDatums = FillMissingData(signal.Granularity, sortedDatums, fromIncludedUtc, toExcludedUtc).ToList();
+            }
+
+            return sortedDatums.OrderBy(datum => datum.Timestamp);
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> dataDomain)
         {
             Signal signal = GetById(signalId);
             if (signal == null)
-                throw new SignalWithThisIdNonExistException();
+                throw new NoSuchSignalException();
 
             var datums = new Datum<T>[dataDomain.Count()];
             int i = 0;
@@ -128,9 +142,6 @@ namespace Domain.Services.Implementation
         private IEnumerable<Datum<T>> FillMissingData<T>(Domain.Granularity granularity, IEnumerable<Datum<T>> sortedDatums,
             DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-
-
-
             List<Datum<T>> sortedDatumsList = new List<Datum<T>>();
             sortedDatumsList = sortedDatums.ToList();
 
@@ -522,6 +533,8 @@ namespace Domain.Services.Implementation
 
             return subPaths;
         }
+
+        
 
     }
 }

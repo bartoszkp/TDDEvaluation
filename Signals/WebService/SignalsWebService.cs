@@ -90,7 +90,7 @@ namespace WebService
         {
             Signal signal = GetById(signalId);
             if (signal == null)
-                throw new Domain.Exceptions.SignalWithThisIdNonExistException();
+                throw new Domain.Exceptions.NoSuchSignalException();
             switch (signal.DataType)
             {
                 case (DataType.Boolean):
@@ -127,7 +127,7 @@ namespace WebService
         {
             Signal signal = GetById(signalId);
             if (signal == null)
-                throw new Domain.Exceptions.SignalWithThisIdNonExistException();
+                throw new Domain.Exceptions.NoSuchSignalException();
             switch (signal.DataType)
             {
                 case (DataType.Boolean):

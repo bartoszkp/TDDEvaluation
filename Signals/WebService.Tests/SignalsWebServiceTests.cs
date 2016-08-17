@@ -149,7 +149,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisIdNonExistException))]
+            [ExpectedException(typeof(Domain.Exceptions.NoSuchSignalException))]
             public void WhenGettingMissingValuePolicyForNonExistSignal_ThrowSignalWithThisIdNonExistException()
             {
                 int signalId = 249;
@@ -225,7 +225,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisIdNonExistException))]
+            [ExpectedException(typeof(Domain.Exceptions.NoSuchSignalException))]
             public void WhenSettingMissingValuePolicyForNonExistSignal_ThrowSignalWithThisIdNonExistException()
             {
                 int signalId = 249;
@@ -234,7 +234,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisIdNonExistException))]
+            [ExpectedException(typeof(Domain.Exceptions.NoSuchSignalException))]
             public void WhenGettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException()
             {
                 int signalId = 78;
@@ -275,7 +275,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.SignalWithThisIdNonExistException))]
+            [ExpectedException(typeof(Domain.Exceptions.NoSuchSignalException))]
             public void WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException()
             {
                 int signalId = 546;
