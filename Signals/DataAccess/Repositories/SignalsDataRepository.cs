@@ -51,6 +51,7 @@ namespace DataAccess.Repositories
                 query = query.Add(Restrictions.Le(timestampPropertyName, toExcludedUtc));
             }
 
+
             return query
                 .List()
                 .Cast<Datum<T>>();
