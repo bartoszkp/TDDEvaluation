@@ -288,6 +288,31 @@ namespace WebService.Tests
             }
         }
 
+        [TestMethod]
+        public void SpecificValueMissingValuePolicyIsSet_GettingData_FillsMissingData_WithSpecificPolicy()
+        {
+            SetupMocksSpecificPolicy();
+
+            var expectedDatumsResult = new Dto.Datum[]
+            {
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 12.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 13.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 3, 1), Value = 14.5 },
+            };
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+            int i = 0;
+            foreach (var datum in result)
+            {
+                Assert.AreEqual(expectedDatumsResult[i].Quality, datum.Quality);
+                Assert.AreEqual(expectedDatumsResult[i].Timestamp, datum.Timestamp);
+                Assert.AreEqual(expectedDatumsResult[i].Value, datum.Value);
+
+                i++;
+            }
+        }
+
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
@@ -319,6 +344,41 @@ namespace WebService.Tests
             signalsRepoMock
                 .Setup(sdrm => sdrm.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
                 .Returns(domainSignalsToReturn);
+        }
+
+        private void SetupMocksSpecificPolicy()
+        {
+            var exampleSignal = new Domain.Signal()
+            {
+                Id = 1,
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = Domain.Path.FromString("example/path"),
+            };
+
+            SetupWebService(exampleSignal);
+
+            missingValueRepoMock
+                .Setup(mvrm => mvrm.Get(It.IsAny<Domain.Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble());
+                
+                /*(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>()
+                {
+                    Id = 1,
+                    Quality = Quality.Good,
+                    Signal = exampleSignal,
+                    Value = 13.5,
+                });*/
+
+            var datums = new Datum<double>[]
+            {
+                new Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 12.5 },
+                new Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 3, 1), Value = 14.5 },
+            };
+
+            signalsDataRepoMock
+                .Setup(srm => srm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(datums);
         }
 
         private Mock<ISignalsDataRepository> signalsDataRepoMock;
