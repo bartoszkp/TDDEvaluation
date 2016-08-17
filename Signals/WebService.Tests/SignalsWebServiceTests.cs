@@ -148,7 +148,7 @@ namespace WebService.Tests
             public void GivenData_WhenGettingData_ReturnsIt()
             {
                 int signalId = 1;
-                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day, Domain.Path.FromString("x/y")));
+                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y")));
                 GivenData(signalId,  new Domain.Datum<double>[] {
                     new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
                     new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
@@ -323,7 +323,7 @@ namespace WebService.Tests
             public void GivenData_WhenGettingData_DataIsReturnedOrderedByTimestampAscending()
             {
                 int signalId = 1;
-                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day, Domain.Path.FromString("x/y")));
+                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y")));
                 GivenData(signalId, new Domain.Datum<double>[] {
                     new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
                     new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
@@ -347,14 +347,14 @@ namespace WebService.Tests
                 int signalId = 1;
                 var signal = SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("x/y"));
 
-                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day, Domain.Path.FromString("x/y")));
+                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y")));
                 GivenData(signalId, new Domain.Datum<double>[] {
                     new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 },
                     new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
                     new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 }
                 });
 
-                signalsWebService.GetData(signalId, DateTime.MinValue, DateTime.MaxValue);
+                signalsWebService.GetData(signalId, new DateTime(2000,1,1), new DateTime(2000,1,3));
                 missingValuePolicyRepositoryMock.Verify(mvp => mvp.Get(It.Is<Domain.Signal>(s => s.Id == signalId)), Times.Once);
             }
 

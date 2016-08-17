@@ -87,38 +87,53 @@ namespace Domain.Services.Implementation
             }
 
             var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
+            var date = fromIncludedUtc;
 
-            if (missingValuePolicy is NoneQualityMissingValuePolicy<T>)
-            {
-                var date = fromIncludedUtc;
-
-                for (int i = 0; i < result.Count(); i++)
+                while(date<toExcludedUtc)
                 {
-                    if (date == toExcludedUtc) break;
                     var datum = (from x in result
                                  where x.Timestamp == date
                                  select x).FirstOrDefault();
 
                     if (datum == null)
                     {
-                        var tempDatum = new Domain.Datum<T>()
-                        {
-                            Quality = Quality.None,
-                            Signal = signal,
-                            Timestamp = date,
-                            Value = default(T)
-                        };
-                        result.Add(tempDatum);
+                      Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy); 
+                      result.Add(tempDatum);
                     }
                     date = AddTime(signal.Granularity, date);
                 }
-
-            }
-
+            
             if (skipFirst == true) return result.OrderBy(x => x.Timestamp).Skip(1);
             return result.OrderBy(x => x.Timestamp);
         }
 
+        private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy)
+        {
+            if(missingValuePolicy is NoneQualityMissingValuePolicy<T>)
+            {
+                return new Datum<T>
+                {
+                    Quality = Quality.None,
+                    Signal = signal,
+                    Timestamp = date,
+                    Value = default(T)
+                };
+            }
+            if(missingValuePolicy is SpecificValueMissingValuePolicy<T>)
+            {
+                return new Datum<T>
+                {
+                    Quality = (missingValuePolicy as SpecificValueMissingValuePolicy<T>).Quality,
+                    Signal = signal,
+                    Timestamp = date,
+                    Value = (missingValuePolicy as SpecificValueMissingValuePolicy<T>).Value
+                };
+            }
+            return new Datum<T>();
+        }
+
+
+        
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
             var result = this.missingValuePolicyRepository.Get(signal);
