@@ -785,10 +785,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingPathEntry_ReturnsIt()
             {
-                GivenNoSignals();
-                signalsRepositoryMock
-                    .Setup(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
-                    .Returns(new[] { SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b")) });
+                SetupGetAllWithPathPrefix(new[] { SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b")) });
 
                 var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
 
@@ -799,15 +796,10 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingPathEntries_ReturnsIt()
             {
-                GivenNoSignals();
-                var signals = new Domain.Signal[]
-                {
+                SetupGetAllWithPathPrefix(new[] {
                     SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b")),
                     SignalWith(2, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/c"))
-                };
-                signalsRepositoryMock
-                    .Setup(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
-                    .Returns(signals);
+                });
 
                 var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
 
@@ -822,10 +814,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingSubPathEntry_ReturnsIt()
             {
-                GivenNoSignals();
-                signalsRepositoryMock
-                    .Setup(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
-                    .Returns(new[] { SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")) });
+                SetupGetAllWithPathPrefix(new[] { SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")) });
 
                 var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
 
@@ -836,20 +825,27 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGettingSubPathEntries_RemoveDuplicates()
             {
-                GivenNoSignals();
-                signalsRepositoryMock
-                     .Setup(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
-                     .Returns(new[] 
-                        { SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")),
-                          SignalWith(2, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/d"))
-                        });
+                SetupGetAllWithPathPrefix(new[] {
+                    SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")),
+                    SignalWith(2, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/d"))
+                });
 
                 var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
+
                 Assert.IsTrue(result.SubPaths.Count() == 1);
                 CollectionAssert.AreEqual(new[] { "a", "b" }, result.SubPaths.First().Components.ToArray());
             }
 
             #endregion
+
+            private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
+            {
+                GivenNoSignals();
+
+                signalsRepositoryMock
+                    .Setup(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
+                    .Returns(signals);
+            }
 
             private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
             {
