@@ -758,9 +758,10 @@ namespace WebService.Tests
             public void GivenASignalWithSpecificMVP_WhenGettingDatum_ReturnsIt()
             {
                 var id = 1;
-                var data = SetupGetDataDatum(id, MakeData(Dto.Quality.Fair, new DateTime(2016, 2, 1), (double)3.0));
-                var mvp = new SpecificValueMissingValuePolicyDouble() { Quality = Domain.Quality.Fair, Value = 45.0 };
-                missingValuePolicyRepositoryMock.Setup(f => f.Get(It.IsAny<Domain.Signal>())).Returns(mvp);
+                SetupGetDataDatum(id, MakeData(Dto.Quality.Fair, new DateTime(2016, 2, 1), (double)3.0));
+                missingValuePolicyRepositoryMock
+                    .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new SpecificValueMissingValuePolicyDouble() { Quality = Domain.Quality.Fair, Value = 45.0 });
 
                 var result = signalsWebService.GetData(id, new DateTime(2016, 1, 1), new DateTime(2016, 3, 1));
 
