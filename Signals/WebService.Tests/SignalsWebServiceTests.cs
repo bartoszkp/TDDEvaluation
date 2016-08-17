@@ -307,6 +307,67 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GetData_NoData_SpecificValueMissingValuePolicyShouldReturnData()
+            {
+                var signalId = 1;
+                var signal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") };
+
+                GivenASignal(signal);
+                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(Enumerable.Empty<Datum<double>>);
+
+                GivenMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>()
+                {
+                    Signal = signal,
+                    Id = signalId
+                });
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+
+                Assert.AreEqual(5, result.Count());
+            }
+
+            [TestMethod]
+            public void GetData_ThreeMissingPoints_SpecificValueMissingValuePolicyShouldFillMissingData()
+            {
+                int signalId = 1;
+                var signal = SignalWith(signalId, DataType.Integer, Granularity.Day, Path.FromString("x/y"));
+
+
+                var data = new Domain.Datum<int>[] {
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = (int)2 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 4), Value = (int)1 },
+                };
+
+                GivenASignal(signal);
+                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(data);
+
+                GivenMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
+                {
+                    Quality = Quality.Good,
+                    Value = 30,
+                    Signal = signal,
+                    Id = signalId
+                });
+
+                var expectedResult = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = 30 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 30},
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 4), Value = (int)1 }
+                };
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
+
+                AssertDataDtoEquals(expectedResult, result);
+            }
+
+
+
+
+
+
+            [TestMethod]
             public void GetData_EqualTimestamps_ReturnSingleDatum()
             {
                 int signalId = 1;
