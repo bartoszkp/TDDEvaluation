@@ -67,12 +67,12 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => new Signal() { Id = 1, DataType = s.DataType, Granularity = s.Granularity, Path = s.Path });
-                
+
                 var sig = signalsWebService.Add(new Dto.Signal() {
                     DataType = Dto.DataType.Double,
                     Granularity = Dto.Granularity.Month,
                     Path = new Dto.Path() { Components = new[] { "root", "signal" } }
-                    });
+                });
 
                 missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
             }
@@ -191,7 +191,7 @@ namespace WebService.Tests
                     id: signalId,
                     dataType: DataType.Double,
                     granularity: Granularity.Second,
-                    path: Domain.Path.FromString("root/signal")), 
+                    path: Domain.Path.FromString("root/signal")),
                     testDatumData);
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 3, 1));
@@ -201,7 +201,7 @@ namespace WebService.Tests
                 Assert.AreEqual(lastValue, result.Last().Value);
                 Assert.AreEqual(lastTimestamp, result.Last().Timestamp);
             }
-            
+
             [TestMethod]
             public void GivenData_WhenGettingSignalData_ReturnsDataWithEmptyDataDefaultValues()
             {
@@ -325,11 +325,74 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "root", "signal" }, result.Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPathEntry_CalledRepository()
+            {
+                GivenASignal(SignalWith());
+                signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root" } });
+                signalsRepositoryMock.Verify(s => s.GetAllWithPathPrefix(It.IsAny<Path>()));
+            }
+            [TestMethod]
+            public void GivenASignal_WhenGettingByPathEntry_ReturnCorrectSignalsAndFolders()
+            {
+                GivenASignal(SignalWith());
+
+                List<string> correctSubPath = new List<string>() { "podkatalog", "podkatalog2" };
+                List<Dto.Signal> correctSignals = new List<Dto.Signal> { SignalWith(id: 0, path: new Dto.Path() { Components = new[] { "root", "s1" } })};
+                setupGetByPathEntry(new List<string>() { "root/s1"
+                                                        , "root/podkatalog/s2"
+                                                        , "root/podkatalog/s3"
+                                                        , "root/podkatalog/podpodkatalog/s4"
+                                                        , "root/podkatalog2/s5" });
+
+                Dto.Path path = new Dto.Path() { Components = new[] { "root" } };
+                Dto.PathEntry result = signalsWebService.GetPathEntry(path);
+                List<Dto.Signal> resultSignals = result.Signals.ToList();
+                List<Dto.Path> resultSubPath = result.SubPaths.ToList();
+
+                CollectionAssert.AreEqual(correctSignals.Select(s => new { path = s.Path.ToString(), granularity = s.Granularity, dataType = s.DataType }).ToArray(), 
+                                          resultSignals.Select (s => new { path = s.Path.ToString(), granularity = s.Granularity, dataType = s.DataType }).ToArray());
+
+                CollectionAssert.AreEqual(correctSubPath, resultSubPath.Select(s => s.Components.Last()).ToList());
+
+            }
+
+            private void setupGetByPathEntry(IEnumerable<string> paths)
+            {
+                paths = paths.ToList();
+                IEnumerable<Signal> signals = paths.Select((s, i) => new Signal() { Id = i,
+                                                                                    DataType = DataType.Boolean,
+                                                                                    Granularity = Granularity.Month,
+                                                                                    Path = Path.FromString(s) });
+
+                signalsRepositoryMock.Setup(s => s.GetAllWithPathPrefix(It.IsAny<Path>())).Returns(signals);
+            }
+
+            private Signal SignalWith()
+            {
+                return new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("x/y"),
+                };
+            }
+            private Signal SignalWith(DataType dataType)
+            {
+                return new Signal()
+                {
+                    Id = 1,
+                    DataType = dataType,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("x/y"),
+                };
+            }
 
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
-                Dto.Granularity granularity = Dto.Granularity.Day,
+                Dto.Granularity granularity = Dto.Granularity.Month,
                 Dto.Path path = null)
             {
                 return new Dto.Signal()

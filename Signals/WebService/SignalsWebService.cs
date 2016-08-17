@@ -54,7 +54,8 @@ namespace WebService
         public PathEntry GetPathEntry(Path pathDto)
         {
             Domain.Path pathDomain = pathDto.ToDomain<Domain.Path>();
-            IEnumerable<Dto.Signal> signalsDto = signalsDomainService.GetPathEntry(pathDomain)?.ToDto<IEnumerable<Dto.Signal>>();
+            IEnumerable<Domain.Signal> signalsDomain = signalsDomainService.GetPathEntry(pathDomain).ToArray();
+            IEnumerable<Dto.Signal> signalsDto = signalsDomain?.ToDto<IEnumerable<Dto.Signal>>();
             Dto.PathEntry pathEntry = new PathEntry()
             {
                 Signals = signalsDto.Where<Dto.Signal>(s => s.Path.Components.Count() == 2).Select(signal => signal),
