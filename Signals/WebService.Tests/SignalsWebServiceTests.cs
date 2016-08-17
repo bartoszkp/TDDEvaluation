@@ -654,7 +654,32 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
-           
+            [TestMethod]
+            public void GivenASignal_GetData_ReturnAllNoneQualityMissingValueElements()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 999,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Second,
+                    Path = Domain.Path.FromString("signal")
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                GivenASignal(existingSignal);
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
+                Assert.AreEqual(59, result.Count());
+            }
 
 
 
