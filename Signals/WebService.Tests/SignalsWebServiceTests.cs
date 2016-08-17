@@ -127,7 +127,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(InvalidOperationException))]
+            [ExpectedException(typeof(IdNotNullException))]
             public void EmptyRepository_GetData_SignalDesentExistException()
             {
                 GiveNoSignalData();
