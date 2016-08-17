@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -204,6 +205,26 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(srm => srm.Get(1));
                 missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
 
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(SignalIsNullException))]
+            public void GivenASignal_SetMissingValuePolicyWhenSignalNonExist_ReturnException()
+            {
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+
+                GivenASignal(SignalWith(
+                    1, DataType.Double, Granularity.Day, Path.FromString("root/signal1")));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                
+                signalsWebService.SetMissingValuePolicy(2, policy);
+                
             }
 
             private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
