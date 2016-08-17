@@ -47,11 +47,12 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path path)
         {
-            var prefixedSignals = signalsRepository.GetAllWithPathPrefix(path);
+            var prefixedSignals = signalsRepository.GetAllWithPathPrefix(path);            
             var subpaths = new List<Path>();
 
-            var pathEntry = new PathEntry(prefixedSignals, subpaths);
+            var signals = prefixedSignals.Where(s => s.Path.Components.ToArray().SequenceEqual(path.Components.ToArray()));
 
+            var pathEntry = new PathEntry(signals, subpaths);
             return pathEntry;
         }
 
