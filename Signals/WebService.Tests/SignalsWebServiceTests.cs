@@ -806,9 +806,11 @@ namespace WebService.Tests
                 SetupWebService();
                 int id = 4;
 
+                DateTime timestamp = new DateTime(2000, 1, 1);
+
                 var dataDto = new Dto.Datum[] { new Dto.Datum() {
                     Quality = Dto.Quality.Good,
-                    Timestamp = new DateTime(2000, 1, 1),
+                    Timestamp = timestamp,
                     Value = (int)2 } };
 
                 var signalDomain = GetDefaultSignal_IntegerMonth();
@@ -816,10 +818,10 @@ namespace WebService.Tests
                 this.signalsRepositoryMock.Setup(x => x.Get(id)).Returns(signalDomain);
 
                 this.signalsDataRepositoryMock
-                    .Setup(x => x.GetData<int>(signalDomain, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1)))
+                    .Setup(x => x.GetData<int>(signalDomain, timestamp, timestamp))
                     .Returns(dataDto.ToDomain<IEnumerable<Domain.Datum<int>>>());
 
-                var returnedData = this.signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+                var returnedData = this.signalsWebService.GetData(id, timestamp, timestamp);
 
                 int expectedLength = 1;
                 Assert.AreEqual(expectedLength, returnedData.ToArray().Length);
