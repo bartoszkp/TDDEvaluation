@@ -20,7 +20,7 @@ namespace Domain.MissingValuePolicy
         private void List(IEnumerable<Datum<T>> data, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var key = signal.Granularity;
-
+            
             dateTimeList = new List<DateTime>();
 
             granularityToDateTime = Dictionary();
