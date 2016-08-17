@@ -736,6 +736,32 @@ namespace WebService.Tests
 
                 Assert.AreEqual(0, result.Count());
             }
+
+            [TestMethod]
+            public void GivenASignalAndSpecificValueMVP_WhenGettingData_ReturnsCorrectData()
+            {
+                var dummyId = 1;
+                var dummySignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("root/signal")
+                };
+                GivenASignal(dummySignal);
+
+                signalsMissingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble() {Quality = Quality.Fair, Value = 5.0 });
+
+                var result = signalsWebService.GetData(dummyId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                Assert.AreEqual(2, result.Count());
+                foreach (var datum in result)
+                {
+                    Assert.AreEqual(5.0, datum.Value);
+                    Assert.AreEqual(Dto.Quality.Fair, datum.Quality);
+                }
+            }
         }
     }
 }
