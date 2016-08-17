@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using DataAccess.GenericInstantiations;
 using Domain.MissingValuePolicy;
 using System;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -624,6 +625,20 @@ namespace WebService.Tests
                     timeChange(2)
                 },
                 result.Select(datum => datum.Timestamp).ToArray());
+            }
+
+            [ExpectedException(typeof(IdNotNullException))]
+            [TestMethod]
+            public void GivenNoSignals_AddingASignalWithAnId_ThrowsIdNotNullException()
+            {
+                GivenNoSignals();
+                int signalId = 5;
+                var sig = SignalWith(Dto.DataType.Boolean, 
+                    Dto.Granularity.Day, 
+                    new Dto.Path() { Components = new[] { "root", "signal" } });
+
+                sig.Id = signalId;
+                signalsWebService.Add(sig);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

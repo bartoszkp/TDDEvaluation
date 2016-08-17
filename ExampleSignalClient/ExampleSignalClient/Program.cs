@@ -9,33 +9,34 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var sig = new Signal()
+            var newSignal = new Signal()
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "defaultPolicy" } }
+                Path = new Path() { Components = new[] { "root", "signal1" } }
             };
 
-            client.Add(sig);
+            var id = client.Add(newSignal).Id.Value;
 
-            client.SetMissingValuePolicy(1, new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
-
-            client.SetData(1, new Datum[]
+            newSignal = new Signal()
             {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
-            });
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "signal2" } },
+                Id = id
+            };
 
-            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
-
-            foreach (var d in result)
+            try
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                client.Add(newSignal);
+                Console.WriteLine("Signal with duplicate ID didn't throw - WRONG");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Failed to add duplicate ID - OK");
             }
 
             Console.ReadKey();
-
-
         }
     }
 }
