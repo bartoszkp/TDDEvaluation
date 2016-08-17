@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using DataAccess.Infrastructure;
+using Domain.Exceptions;
 using Domain.Infrastructure;
 using Domain.Services;
 using Dto;
@@ -37,6 +38,9 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
+            if (signalDto.Id != null)
+                throw new IdNotNullException();
+
             var signal = signalDto.ToDomain<Domain.Signal>();
 
             var result = signalsDomainService.Add(signal);
