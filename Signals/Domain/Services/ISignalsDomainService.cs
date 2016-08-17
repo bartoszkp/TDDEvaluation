@@ -18,6 +18,6 @@ namespace Domain.Services
 
         IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
-        void SetData<T>(IEnumerable<Datum<T>> domianModel);
+        void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum);
     }
 }

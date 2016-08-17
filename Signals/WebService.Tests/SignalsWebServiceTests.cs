@@ -260,6 +260,43 @@ namespace WebService.Tests
                     && existingSignal.Path == s.Path))));
             }
 
+
+            [TestMethod]
+            [ExpectedException(typeof(SignalIsNullException))]
+            public void GivenASignal_GetMissingValuePolicyWhenSignalNonExist_ReturnException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingPolicy = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
+                {
+                    Id = 1,
+                    Quality = Domain.Quality.Bad,
+                    Value = (double)1.5
+                };
+
+                int wrongId = 3;
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble());
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);      
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.GetMissingValuePolicy(wrongId).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
+
+            }
+            
             private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
             {
                 var list = data.ToList();

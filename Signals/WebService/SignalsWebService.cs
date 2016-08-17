@@ -117,66 +117,19 @@ namespace WebService
         {
             var signal = signalsDomainService.GetById(signalId);
             if (signal == null)
-                throw new InvalidOperationException("Signal dosen't exist");
+                throw new IdNotNullException();
 
-            switch (signal.DataType)
-            {
-                case Domain.DataType.Decimal:
-                    {
-                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<decimal>>>()
-                            .ToList();
-                        foreach (var item in domianModel)
-                        {
-                            item.Signal = signal;
-                        }
-                        signalsDomainService.SetData<decimal>(domianModel);
-                        break;
-                    }
-                case Domain.DataType.Boolean:
-                    {
-                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<bool>>>()
-                            .ToList();
-                        foreach (var item in domianModel)
-                        {
-                            item.Signal = signal;
-                        }
-                        signalsDomainService.SetData<bool>(domianModel);
-                        break;
-                    }
-                case Domain.DataType.Double:
-                    {
-                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<double>>>()
-                            .ToList();
-                        foreach (var item in domianModel)
-                        {
-                            item.Signal = signal;
-                        }
-                        signalsDomainService.SetData<double>(domianModel);
-                        break;
-                    }
-                case Domain.DataType.Integer:
-                    {
-                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<int>>>()
-                            .ToList();
-                        foreach (var item in domianModel)
-                        {
-                            item.Signal = signal;
-                        }
-                        signalsDomainService.SetData<int>(domianModel);
-                        break;
-                    }
-                case Domain.DataType.String:
-                    {
-                        var domianModel = data.ToDomain<IEnumerable<Domain.Datum<string>>>()
-                            .ToList();
-                        foreach (var item in domianModel)
-                        {
-                            item.Signal = signal;
-                        }
-                        signalsDomainService.SetData<string>(domianModel);
-                        break;
-                    }
-            }
+            if (data.First().Value.GetType() == typeof(int))
+                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<int>>>());
+            else if (data.First().Value.GetType() == typeof(double))
+                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
+            else if (data.First().Value.GetType() == typeof(bool))
+                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<bool>>>());
+            else if (data.First().Value.GetType() == typeof(string))
+                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<string>>>());
+            else if (data.First().Value.GetType() == typeof(decimal))
+                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<decimal>>>());
+                
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)

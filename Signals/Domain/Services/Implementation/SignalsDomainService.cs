@@ -208,9 +208,13 @@ namespace Domain.Services.Implementation
             return ListOfData;
         }
 
-        public void SetData<T>(IEnumerable<Datum<T>> domianModel)
+        public void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum)
         {
-            signalsDataRepository.SetData(domianModel);
+            foreach (var d in datum)
+            {
+                d.Signal = signal;
+            }
+            this.signalsDataRepository.SetData<T>(datum);
         }
     }
 }
