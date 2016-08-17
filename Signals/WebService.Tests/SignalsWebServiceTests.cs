@@ -585,7 +585,7 @@ namespace WebService.Tests
             //-------------------------------------------------------------------------
 
             [TestMethod]
-            public void GivenASignalWithData_WhenGettingDataWithIdenticalFromAndToDates_ReturnsASingleItem()
+            public void GivenASignalWithData_WhenGettingDataWithIdenticalFromAndToDates_ReturnsTheCorrectItem()
             {
                 var dummyId = 1;
                 var dummySignal = new Signal()
@@ -606,8 +606,11 @@ namespace WebService.Tests
                     .Returns(new Datum<double>[] { new Datum<double> { Value = 10.0, Signal = dummySignal, Quality = Quality.Fair, Timestamp = date, Id = 1 } });
 
                 var result = signalsWebService.GetData(dummyId, date, date);
+                var datum = result.Single();
 
-                Assert.AreEqual(1, result.Count());
+                Assert.AreEqual(Dto.Quality.Fair, datum.Quality);
+                Assert.AreEqual(10.0, datum.Value);
+                Assert.AreEqual(date, datum.Timestamp);
             }
 
             [TestMethod]
@@ -680,6 +683,24 @@ namespace WebService.Tests
                 GivenASignal(dummySignal);
 
                 signalsWebService.SetData(dummyId, new[] { new Dto.Datum { Value = null } });
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingData_RepositoryIsCalledWithSignalReferences()
+            {
+                var dummyId = 1;
+                var dummySignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("root/signal")
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(dummyId, new[] { new Dto.Datum { Value = 10.0 } });
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData(It.Is<IEnumerable<Datum<double>>>(enumerable => enumerable.All(d => d.Signal != null))));
             }
         }
     }
