@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -60,61 +61,32 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var signal = this.GetById(signalId);
+            var signal = this.signalsDomainService.GetById(signalId);
 
             if (signal == null)
-                throw new ArgumentException("Signal with given Id not found.");
+                throw new CouldntGetASignalException();
 
-            var signalDomain = signal.ToDomain<Domain.Signal>();
             var dataDto = new List<Datum>();
 
-            if (signal.DataType == DataType.Integer)
+            switch (signal.DataType)
             {
-                var dataDomain = this.signalsDomainService.GetData<int>(signalDomain, fromIncludedUtc, toExcludedUtc);
-
-                for (int i = 0; i < dataDomain.Count(); i++)
-                {
-                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
-                }
+                case Domain.DataType.Boolean:
+                    return this.signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Domain.DataType.Integer:
+                    return this.signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Domain.DataType.Double:
+                    return this.signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Domain.DataType.Decimal:
+                    return this.signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                case Domain.DataType.String:
+                    return this.signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)
+                        .ToArray().ToDto<IEnumerable<Dto.Datum>>();
+                default: throw new TypeUnloadedException();
             }
-            else if (signal.DataType == DataType.Double)
-            {
-                var dataDomain = this.signalsDomainService.GetData<double>(signalDomain, fromIncludedUtc, toExcludedUtc);
-
-                for (int i = 0; i < dataDomain.Count(); i++)
-                {
-                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
-                }
-            }
-            else if (signal.DataType == DataType.Decimal)
-            {
-                var dataDomain = this.signalsDomainService.GetData<decimal>(signalDomain, fromIncludedUtc, toExcludedUtc);
-
-                for (int i = 0; i < dataDomain.Count(); i++)
-                {
-                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
-                }
-            }
-            else if (signal.DataType == DataType.Boolean)
-            {
-                var dataDomain = this.signalsDomainService.GetData<bool>(signalDomain, fromIncludedUtc, toExcludedUtc);
-
-                for (int i = 0; i < dataDomain.Count(); i++)
-                {
-                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
-                }
-            }
-            else if (signal.DataType == DataType.String)
-            {
-                var dataDomain = this.signalsDomainService.GetData<string>(signalDomain, fromIncludedUtc, toExcludedUtc);
-
-                for (int i = 0; i < dataDomain.Count(); i++)
-                {
-                    dataDto.Add(dataDomain.ElementAt(i).ToDto<Dto.Datum>());
-                }
-            }
-
-            return dataDto;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

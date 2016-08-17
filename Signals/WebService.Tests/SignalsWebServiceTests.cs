@@ -530,8 +530,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(System.ArgumentException))]
-            public void GivenNonExistingId_WhenGettingData_ThrowsArgumentException()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNonExistingId_WhenGettingData_ThrowsCouldntGetASignalException()
             {
                 SetupWebService();
                 int nonExistingId = 12;
@@ -838,7 +838,7 @@ namespace WebService.Tests
                 {
                     Path = Domain.Path.FromString("x/y/z"),
                     Granularity = Granularity.Month,
-                    DataType = DataType.Double
+                    DataType = DataType.Integer
                 };
             }
 
