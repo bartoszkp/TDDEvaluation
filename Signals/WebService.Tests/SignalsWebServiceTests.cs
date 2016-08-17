@@ -18,6 +18,7 @@ namespace WebService.Tests
         {
             private ISignalsWebService signalsWebService;
 
+
             
 
             [TestMethod]
@@ -430,6 +431,31 @@ namespace WebService.Tests
                     Assert.AreEqual(expectedArray[i].Value, resultArray[i].Value);
                 }
 
+            }
+
+            [TestMethod]
+            public void GivenASignalWithSetSVMVPAndNotSetData_WhenGettingDataOfTheSignalByGivingTwoSameDatesAsParameters_ReturnedIsOneDatum()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var dummySignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Month, Path = Path.FromString("root/signal") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(dummySignal.Id.Value)).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Components.ToArray() == dummySignal.Path.Components.ToArray()))).Returns(dummySignal);
+
+                signalsDataRepositoryMock.Setup(sdr => sdr.GetData<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(new Datum<decimal>[] { });
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
+                    (s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path))))
+                .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDecimal() { Quality = Quality.Good, Value = 5M });
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(1, result.ToArray().Length);
             }
 
             private void SetupDataRepository<T>()
