@@ -819,6 +819,20 @@ namespace WebService.Tests
                 }, result.Signals.ToArray().Select(s => s.Path).ToArray()));
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingSubPathEntry_ReturnsIt()
+            {
+                GivenNoSignals();
+                signalsRepositoryMock
+                    .Setup(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
+                    .Returns(new[] { SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")) });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
+
+                Assert.IsTrue(result.SubPaths.Count() == 1);
+                CollectionAssert.AreEqual(new[] { "a", "b" }, result.SubPaths.First().Components.ToArray());
+            }
+
             #endregion
 
             private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
