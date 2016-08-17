@@ -84,6 +84,8 @@ namespace WebService
         {
             var setDataSignal = this.signalsDomainService.GetById(signalId);
 
+            if (signalId == 0 || setDataSignal == null) throw new InvalidSignalId();
+
             var newDomainDatum = new List<Domain.Datum<object>>();
 
             foreach (Datum d in data)
