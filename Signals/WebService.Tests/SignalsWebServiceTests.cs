@@ -549,26 +549,42 @@ namespace WebService.Tests
             [TestMethod]
             public void RepositoryWithSignalAndData_GetData_ReturnSortedCollection()
             {
-                GiveNoSignalData();
-
-                var dbList = new List<Datum<double>>()
+                var existingSignal = new Domain.Signal()
                 {
-                        new Datum<double>() { Timestamp = new DateTime(2000, 2, 1) },
-                        new Datum<double>() { Timestamp = new DateTime(2000, 1, 1) }
+                    Id = 1,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("root/signal1")
                 };
 
-                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>()))
-                    .Returns(new Signal() { DataType = DataType.Double });
+                var existingDatum = new Dto.Datum[]
+                {
 
-                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.IsAny<Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
 
-                signalDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(dbList);
+                var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
-                var item = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+                var existingSortedDatum = existingDatum.OrderBy(x => x.Timestamp);
 
-                Assert.AreEqual(item.First().Timestamp, dbList[1].Timestamp);
+                for (int i = 0; i < result.Count(); i++)
+                {
+                    Assert.AreEqual(existingSortedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
+                }
             }
 
             [TestMethod]
