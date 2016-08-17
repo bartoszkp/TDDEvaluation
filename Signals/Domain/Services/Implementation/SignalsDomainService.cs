@@ -121,7 +121,7 @@ namespace Domain.Services.Implementation
                     resultSignals.Add(s);
             }
 
-            return new PathEntry(resultSignals, resultSubPaths);
+            return new PathEntry(resultSignals, resultSubPaths.Distinct());
         }
 
         private Path GetSubPath(Signal signal, int deep)
