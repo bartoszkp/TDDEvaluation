@@ -51,48 +51,16 @@ namespace Domain.MissingValuePolicy
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalMinutes;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+                case Granularity.Day:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays;
+                    CreateDateTimeList(data, timestamp, key, count);
+                    break;
                 case Granularity.Month:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
 
             }
-            //if (key == Granularity.Second)
-            //{
-            //    int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
-            //    int index = 0;
-            //    for (int i = 0; i < count; i++)
-            //    {
-            //        if (dataDictionary.ContainsKey(timestamp))
-            //        {
-            //            dateTimeList.Add(data.ElementAt(index).Timestamp);
-            //            index++;
-            //        }
-            //        else
-            //        {
-            //            dateTimeList.Add(timestamp);
-            //        }
-            //        timestamp = granularityToDateTime[key](timestamp);
-            //    }
-            //}
-            //else if (key == Granularity.Month)
-            //{
-            //    int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
-            //    int index = 0;
-            //    for (int i = 0; i < count; i++)
-            //    {
-            //        if (dataDictionary.ContainsKey(timestamp))
-            //        {
-            //            dateTimeList.Add(data.ElementAt(index).Timestamp);
-            //            index++;
-            //        }
-            //        else
-            //        {
-            //            dateTimeList.Add(timestamp);
-            //        }
-            //        timestamp = granularityToDateTime[key](timestamp);
-            //    }
-            //}
         }
 
         private void CreateDateTimeList(IEnumerable<Datum<T>> data, DateTime timestamp, Granularity key, int count)
@@ -123,6 +91,7 @@ namespace Domain.MissingValuePolicy
             {
                 {Granularity.Second, time => time.AddSeconds(1) },
                 {Granularity.Minute, time => time.AddMinutes(1) },
+                {Granularity.Day, time => time.AddDays(1) },
                 {Granularity.Month, time => time.AddMonths(1) }
             };
         }

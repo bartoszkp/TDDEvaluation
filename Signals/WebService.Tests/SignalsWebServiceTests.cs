@@ -1317,18 +1317,18 @@ namespace WebService.Tests
                 var existingDatum = new Dto.Datum[]
                 {
                         new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)1.5 },
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 2, 1, 1),  Value = (double)2.0 }
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2, 1, 1, 1),  Value = (double)2.0 }
                 };
 
                 var filledDatum = new Dto.Datum[]
                 {
                         new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)1.5 },
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 2, 1, 1),  Value = (double)2.0},
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 3, 1, 1),  Value = (double)42.42}
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2, 1, 1, 1),  Value = (double)2.0},
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3, 1, 1, 1),  Value = (double)42.42}
                 };
 
                 var firstTimestamp = new DateTime(2000, 1, 1, 1, 1, 1);
-                var lastTimestamp = new DateTime(2000, 1, 1, 4, 1, 1);
+                var lastTimestamp = new DateTime(2000, 1, 4, 1, 1, 1);
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
