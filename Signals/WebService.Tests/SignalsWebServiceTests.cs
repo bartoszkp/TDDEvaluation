@@ -711,6 +711,31 @@ namespace WebService.Tests
 
                 signalsWebService.Add(new Dto.Signal { Id = 1 });
             }
+
+            [TestMethod]
+            public void GivenASignalAndData_WhenGettingDataWithToDateLessThanFromDate_ReturnEmptyIEnumerable()
+            {
+                var dummyId = 1;
+                var dummySignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("root/signal")
+                };
+                GivenASignal(dummySignal);
+
+                signalsMissingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<double>(dummySignal, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new[] { new Datum<double> { Value = 1.0 } });
+
+                var result = signalsWebService.GetData(dummyId, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(0, result.Count());
+            }
         }
     }
 }
