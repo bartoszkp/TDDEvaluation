@@ -8,60 +8,29 @@ namespace ExampleSignalClient
         static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-             
-            /*client.Add(new Signal()
+
+            if (client.GetById(1) == null)
+                client.Add(new Signal()
+                {
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Hour,
+                    Path = new Path() { Components = new[] { "s0" } }
+                });//*/
+
+            //client.SetMissingValuePolicy(1, new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
+            client.SetMissingValuePolicy(1, new NoneQualityMissingValuePolicy() { DataType = DataType.Double });
+
+            client.SetData(1, new Datum[]
             {
-                DataType = DataType.Double,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "s0" } }
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = (double)2.5 }
             });
 
-            client.Add(new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "root", "s1" } }
-            });
+            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
 
-            client.Add(new Signal()
+            foreach (var d in result)
             {
-                DataType = DataType.Double,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "root", "s2" } }
-            });
-
-            client.Add(new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "root", "katalog0", "s3" } }
-            });
-
-            client.Add(new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "root", "katalog1", "s4" } }
-            });
-
-            client.Add(new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "root", "katalog1", "katalog2", "s4" } }
-            });*/
-
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
-
-            Console.WriteLine("Sygnały w 'root':");
-            foreach (var r in result.Signals)
-            {
-                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
-            }
-            Console.WriteLine("Ścieżki podrzędne w 'root':");
-            foreach (var s in result.SubPaths)
-            {
-                Console.WriteLine(string.Join("/", s.Components));
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
             }
 
             Console.ReadKey();

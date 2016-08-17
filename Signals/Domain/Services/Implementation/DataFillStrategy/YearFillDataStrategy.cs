@@ -1,5 +1,4 @@
-﻿using Domain.Services.Implementation.DataFillStrategy.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,10 +14,9 @@ namespace Domain.Services.Implementation.DataFillStrategy
             this.missingValuePolicy = mvp;
         }
 
-        public override void FillMissingData<T>(List<Datum<T>> datum, DateTime after, DateTime before)
+        protected override void incrementData(ref DateTime date)
         {
-            if (this.missingValuePolicy is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
-                NoneQualityYearDataFill.FillData(datum, after, before);
+            date = date.AddYears(1);
         }
     }
 }

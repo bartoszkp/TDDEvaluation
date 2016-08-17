@@ -88,13 +88,6 @@
     <Compile Include="Repositories\ISignalsDataRepository.cs" />
     <Compile Include="Repositories\ISignalsRepository.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\DayFillDataStrategy.cs" />
-    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityDayDataFill.cs" />
-    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityHourDataFill.cs" />
-    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityMinuteDataFill.cs" />
-    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityMonthDataFill.cs" />
-    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualitySecondDataFill.cs" />
-    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityWeekDataFill.cs" />
-    <Compile Include="Services\Implementation\DataFillStrategy\Helpers\NoneQuality\NoneQualityYearDataFill.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\HourFillDataStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\MinuteDataFillStrategy.cs" />
     <Compile Include="Services\Implementation\DataFillStrategy\MonthFillDataStrategy.cs" />
@@ -107,6 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\Implementation\DataFillStrategy\Helpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
