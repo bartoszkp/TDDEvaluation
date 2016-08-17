@@ -743,6 +743,20 @@ namespace WebService.Tests
                 
             }
 
+            [TestMethod]
+            public void GivenASignalWithEmptyDatum_WhenSet_ReturnNull()
+            {
+                Domain.Signal signal = this.SignalWith(1, Domain.DataType.Double, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
+
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
+
+                signalsWebService.SetData(1, new List<Datum>());
+
+
+
+
+            }
+
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
