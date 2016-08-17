@@ -667,12 +667,7 @@ namespace WebService.Tests
             public void GivenSignalsWithTheSamePath_GettingPathEntry_ReturnsNotNull()
             {
                 var path = new Dto.Path() { Components = new[] { "root" } };
-                var path_domain = path.ToDomain<Domain.Path>();
-                var signals = GivenMultipleSignalsWithTheSamePath(path_domain);
-
-                signalsRepositoryMock
-                    .Setup(s => s.GetAllWithPathPrefix(path_domain))
-                    .Returns(signals);
+                var signals = GivenMultipleSignalsWithTheSamePath(path);
 
                 var result = signalsWebService.GetPathEntry(path);
                 Assert.IsNotNull(result);                
@@ -769,11 +764,13 @@ namespace WebService.Tests
                     .Returns(existingSignal);
             }
 
-            private Signal[] GivenMultipleSignalsWithTheSamePath(Domain.Path path_domain)
+            private List<Signal> GivenMultipleSignalsWithTheSamePath(Dto.Path path)
             {
                 GivenNoSignals();
 
-                var signals = new Signal[] {
+                var path_domain = path.ToDomain<Domain.Path>();
+
+                var signals = new List<Signal> {
                     SignalWith(1, DataType.Boolean, Granularity.Day,   path_domain),
                     SignalWith(2, DataType.Double,  Granularity.Week,  path_domain),
                     SignalWith(3, DataType.String,  Granularity.Month, path_domain)
@@ -788,6 +785,10 @@ namespace WebService.Tests
                         .Setup(sr => sr.Get(existingSignal.Path))
                         .Returns(existingSignal);
                 }
+
+                signalsRepositoryMock
+                    .Setup(s => s.GetAllWithPathPrefix(path_domain))
+                    .Returns(signals);
 
                 return signals;
             }
