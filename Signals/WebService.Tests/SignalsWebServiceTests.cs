@@ -260,7 +260,6 @@ namespace WebService.Tests
                     && existingSignal.Path == s.Path))));
             }
 
-
             [TestMethod]
             [ExpectedException(typeof(SignalIsNullException))]
             public void GivenASignal_GetMissingValuePolicyWhenSignalNonExist_ReturnException()
@@ -296,7 +295,6 @@ namespace WebService.Tests
                 signalsWebService.GetMissingValuePolicy(wrongId).ToDomain<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>();
 
             }
-
 
             [TestMethod]
             public void DatumTypeOfDouble_WhenSettingData_RepoIsCalled()
@@ -474,7 +472,6 @@ namespace WebService.Tests
                 }
             }
 
-
             [TestMethod]
             public void DatumTypeOfString_WhenSettingData_RepoIsCalled()
             {
@@ -518,6 +515,9 @@ namespace WebService.Tests
                     i++;
                 }
             }
+
+
+
 
             private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
             {

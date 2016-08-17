@@ -67,44 +67,34 @@ namespace WebService
             var signal = this.signalsDomainService.GetById(signalId);
 
             if (signal == null)
-                throw new InvalidOperationException("Signal dosen't exist");
+                throw new IdNotNullException();
 
             switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
                     {
-                        var item = signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .OrderBy(x => x.Timestamp).ToList();
-
-                        return item?.ToDto<IEnumerable<Dto.Datum>>();
+                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 case Domain.DataType.Decimal:
                     {
-                        var item = signalsDomainService.GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .OrderBy(x => x.Timestamp).ToList();
-
-                        return item?.ToDto<IEnumerable<Dto.Datum>>();
+                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 case Domain.DataType.Double:
                     {
-                        var item = signalsDomainService.GetData<double>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .OrderBy(x => x.Timestamp).ToList();
-
-                        return item?.ToDto<IEnumerable<Dto.Datum>>();
+                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 case Domain.DataType.Integer:
                     {
-                        var item = signalsDomainService.GetData<int>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .ToList().OrderBy(x => x.Timestamp);
-
-                        return item?.ToDto<IEnumerable<Dto.Datum>>();
+                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 case Domain.DataType.String:
                     {
-                        var item = signalsDomainService.GetData<string>(signalId, fromIncludedUtc, toExcludedUtc)
-                            .OrderBy(x => x.Timestamp).ToList();
-
-                        return item?.ToDto<IEnumerable<Dto.Datum>>();
+                        return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                     }
                 default:
                     {

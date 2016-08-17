@@ -75,137 +75,79 @@ namespace Domain.Services.Implementation
                     as MissingValuePolicy.MissingValuePolicyBase;
             
         }
-
-        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        
+        public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var signal = this.GetById(signalId);
-            var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-            var ListOfData = data.OrderBy(x => x.Timestamp).ToList();
 
-            var MVP = GetMissingValuePolicy(signal);
-
-            if(MVP is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
+            if (GetMissingValuePolicy(signal) == null)
             {
-                for(int i = 0; i < ListOfData.Count - 1; i++)
+                var gettingList = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+                var returnList = new List<Datum<T>>();
+                DateTime checkedDateTime = fromIncludedUtc;
+                switch (signal.Granularity)
                 {
-                    switch(signal.Granularity)
-                    {
-                        case Granularity.Day:
-                            {
-                                var time = ListOfData[i + 1].Timestamp - ListOfData[i].Timestamp;
-                                for(int y = 0; y <= time.TotalDays; y++)
-                                {
-                                    var newItem = new Datum<T>()
-                                    {
-                                        Quality = Quality.None,
-                                        Timestamp = ListOfData[i].Timestamp.AddDays(1.0),
-                                        Value = default(T)
-                                    };
-                                    ListOfData.Insert(i + 1, newItem);
-                                    i++;
-                                } 
-                            }
+                    case Granularity.Minute:
+                        {
+                            int countElementOfList = toExcludedUtc.Minute - fromIncludedUtc.Minute;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            returnList=createListDatum<T>(countElementOfList, checkedDateTime, gettingList, returnList,Granularity.Minute);
                             break;
-                        case Granularity.Hour:
-                            {
-                                var time = ListOfData[i + 1].Timestamp - ListOfData[i].Timestamp;
-                                for (int y = 0; y <= time.TotalHours; y++)
-                                {
-                                    var newItem = new Datum<T>()
-                                    {
-                                        Quality = Quality.None,
-                                        Timestamp = ListOfData[i].Timestamp.AddHours(1.0),
-                                        Value = default(T)
-                                    };
-                                    ListOfData.Insert(i + 1, newItem);
-                                    i++;
-                                }
-                            }
+                        }
+                    case Granularity.Month:
+                        {
+                            int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            returnList = createListDatum<T>(countElementOfList, checkedDateTime, gettingList, returnList,Granularity.Month);
                             break;
-                        case Granularity.Minute:
-                            {
-                                var time = ListOfData[i + 1].Timestamp - ListOfData[i].Timestamp;
-                                for (int y = 0; y <= time.TotalMinutes; y++)
-                                {
-                                    var newItem = new Datum<T>()
-                                    {
-                                        Quality = Quality.None,
-                                        Timestamp = ListOfData[i].Timestamp.AddMinutes(1.0),
-                                        Value = default(T)
-                                    };
-                                    ListOfData.Insert(i + 1, newItem);
-                                    i++;
-                                }
-                            }
+                        }
+                    case Granularity.Hour:
+                        {
+                            int countElementOfList = toExcludedUtc.Hour - fromIncludedUtc.Hour;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            returnList = createListDatum<T>(countElementOfList, checkedDateTime, gettingList, returnList,Granularity.Hour);
                             break;
-                        case Granularity.Month:
-                            {
-                                var time = ListOfData[i + 1].Timestamp.Month - ListOfData[i].Timestamp.Month + (12 * (ListOfData[i + 1].Timestamp.Year - ListOfData[i].Timestamp.Year)) - 1;
-                                for (int y = 0; y <= time - 1; y++)
-                                {
-                                    var newItem = new Datum<T>()
-                                    {
-                                        Quality = Quality.None,
-                                        Timestamp = ListOfData[i].Timestamp.AddMonths(1),
-                                        Value = default(T)
-                                    };
-                                    ListOfData.Insert(i + 1, newItem);
-                                    i++;
-                                }
-                            }
+                        }
+                    case Granularity.Day:
+                        {
+                            int countElementOfList = toExcludedUtc.Day - fromIncludedUtc.Day;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            returnList = createListDatum<T>(countElementOfList, checkedDateTime, gettingList, returnList, Granularity.Day);
                             break;
-                        case Granularity.Second:
-                            {
-                                var time = ListOfData[i + 1].Timestamp - ListOfData[i].Timestamp;
-                                for (int y = 0; y <= time.TotalSeconds; y++)
-                                {
-                                    var newItem = new Datum<T>()
-                                    {
-                                        Quality = Quality.None,
-                                        Timestamp = ListOfData[i].Timestamp.AddSeconds(1.0),
-                                        Value = default(T)
-                                    };
-                                    ListOfData.Insert(i + 1, newItem);
-                                    i++;
-                                }
-                            }
+                        }
+                    case Granularity.Second:
+                        {
+                            int countElementOfList = toExcludedUtc.Second - fromIncludedUtc.Second;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            returnList = createListDatum<T>(countElementOfList, checkedDateTime, gettingList, returnList, Granularity.Second);
                             break;
-                        case Granularity.Week:
-                            {
-                                var time = ListOfData[i + 1].Timestamp - ListOfData[i].Timestamp;
-                                for (int y = 0; y <= time.TotalDays / 7; y++)
-                                {
-                                    var newItem = new Datum<T>()
-                                    {
-                                        Quality = Quality.None,
-                                        Timestamp = ListOfData[i].Timestamp.AddDays(7.0),
-                                        Value = default(T)
-                                    };
-                                    ListOfData.Insert(i + 1, newItem);
-                                    i++;
-                                }
-                            }
+                        }
+                    case Granularity.Week:
+                        {
+                            int countElementOfList = toExcludedUtc.DayOfYear / 7 - fromIncludedUtc.Second / 7;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            createListDatum<T>(countElementOfList, checkedDateTime, gettingList, returnList,Granularity.Week);
                             break;
-                        case Granularity.Year:
-                            {
-                                var time = ListOfData[i + 1].Timestamp.Year - ListOfData[i].Timestamp.Year;
-                                for (int y = 0; y <= time; y++)
-                                {
-                                    var newItem = new Datum<T>()
-                                    {
-                                        Quality = Quality.None,
-                                        Timestamp = ListOfData[i].Timestamp.AddYears(1),
-                                        Value = default(T)
-                                    };
-                                    ListOfData.Insert(i + 1, newItem);
-                                    i++;
-                                }
-                            }
+                        }
+                    case Granularity.Year:
+                        {
+                            int countElementOfList = toExcludedUtc.Year - fromIncludedUtc.Year;
+                            if (countElementOfList + 1 == gettingList.Length)
+                                return gettingList;
+                            createListDatum<T>(countElementOfList, checkedDateTime, gettingList, returnList,Granularity.Year);
                             break;
-                    }
+                        }
                 }
+
+                return returnList;
+
             }
-            return ListOfData;
+            return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum)
@@ -215,6 +157,42 @@ namespace Domain.Services.Implementation
                 d.Signal = signal;
             }
             this.signalsDataRepository.SetData<T>(datum);
+        }
+
+
+
+
+
+
+
+
+
+
+        public List<Datum<T>> createListDatum<T>(int countElementOfList, DateTime checkedDateTime, Datum<T>[] gettingList, List<Datum<T>> returnList, Granularity granularity)
+        {
+            for (int i = 0; i < countElementOfList; i++)
+            {
+                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                if (xx == null)
+                {
+                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                    returnList.Add(addingItem);
+                }
+                else
+                    returnList.Add(xx);
+                var addTimeSpan = new Dictionary<Granularity, Action>
+                {
+                    {Granularity.Day,() => checkedDateTime = checkedDateTime.AddDays(1)},
+                    {Granularity.Hour,() => checkedDateTime = checkedDateTime.AddHours(1)},
+                    {Granularity.Minute,() => checkedDateTime = checkedDateTime.AddMinutes(1)},
+                    {Granularity.Month,() => checkedDateTime = checkedDateTime.AddMonths(1)},
+                    {Granularity.Second,() => checkedDateTime = checkedDateTime.AddSeconds(1)},
+                    {Granularity.Week,() => checkedDateTime = checkedDateTime.AddDays(7)},
+                    {Granularity.Year,() => checkedDateTime = checkedDateTime.AddYears(1)}
+                };
+                addTimeSpan[granularity].Invoke();
+            }
+            return returnList;
         }
     }
 }
