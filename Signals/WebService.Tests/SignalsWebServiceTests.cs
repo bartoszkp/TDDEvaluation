@@ -212,7 +212,7 @@ namespace WebService.Tests
             private void SetDataCalledVerify<T>()
             {
                 signalsWebService.SetData(1, GetDtoDatum<T>());
-                signalDataRepository.Verify(s => s.SetData<T>(It.IsAny<IEnumerable<Domain.Datum<T>>>()));
+                signalsDataRepositoryMock.Verify(s => s.SetData<T>(It.IsAny<IEnumerable<Domain.Datum<T>>>()));
             }
 
             [TestMethod]
@@ -229,7 +229,7 @@ namespace WebService.Tests
             {
                 GivenASignal(SignalWith(DataType.Double));
                 signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
-                signalDataRepository.Verify(s => s.GetData<double>(It.IsAny<Domain.Signal>(),
+                signalsDataRepositoryMock.Verify(s => s.GetData<double>(It.IsAny<Domain.Signal>(),
                                                                    It.IsAny<DateTime>(),
                                                                    It.IsAny<DateTime>()
                                                                    ));
@@ -253,6 +253,7 @@ namespace WebService.Tests
 
                 Assert.IsNotNull(result[0].Value);
             }
+
             [TestMethod]
             public void GivenASignal_WhenGetData_ReturnDatumsWithMissingValues()
             {
@@ -294,6 +295,7 @@ namespace WebService.Tests
 
                 missingValuePolicyRepositoryMock.Verify(s => s.Set(It.IsAny<Domain.Signal>(), It.IsAny<MissingValuePolicyBase>()));
             }
+
             [TestMethod]
             public void GivenASignal_WhenAddNewSignal_SetNoneQualityMissingValuePolicyForDefault()
             {
@@ -308,12 +310,95 @@ namespace WebService.Tests
                 Assert.AreEqual("NoneQualityMissingValuePolicy", mvp.GetType().Name);
             }
 
-           
-            
+            [TestMethod]
+            public void GivenASignalWithSetNoneQualityMVP_WhenGettingDataWhenThereIsSingleDatumOfSignalInTheMiddleOfTheRange_RetrunedIsFilledArray()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Month, Path = Path.FromString("root/signal") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(dummySignal.Id.Value)).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Components.ToArray() == dummySignal.Path.Components.ToArray()))).Returns(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
+                    (s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path))))
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal());
+
+                signalsDataRepositoryMock.Setup(sdr => sdr.GetData<decimal>(It.Is<Signal>
+                    (s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path))
+                    , new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)))
+                .Returns(new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2000, 2, 1), Quality = Quality.Fair, Value = 10M } });
+
+                var expectedArray = new Dto.Datum[] { new Dto.Datum() { Timestamp = new DateTime(2000, 1, 1), Quality = Dto.Quality.None, Value = default(decimal) },
+                                                      new Dto.Datum() { Timestamp = new DateTime(2000, 2, 1), Quality = Dto.Quality.Fair, Value = 10M },
+                                                      new Dto.Datum() { Timestamp = new DateTime(2000, 3, 1), Quality = Dto.Quality.None, Value = default(decimal) } };
+
+                var resultArray = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)).ToArray();
+
+                for (int i = 0; i < resultArray.Length; i++)
+                {
+                    Assert.AreEqual(expectedArray[i].Timestamp, resultArray[i].Timestamp);
+                    Assert.AreEqual(expectedArray[i].Quality, resultArray[i].Quality);
+                    Assert.AreEqual(expectedArray[i].Value, resultArray[i].Value);
+                }
+            }
+
+            [TestMethod]
+            public void GivenASignalWithSetNoneQualityMVP_WhenGettingDataWhenToDatetimeIsLessThanFromDatetime_ReturnedIsBlankListOfData()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var dummySignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Hour, Path = Path.FromString("root/signal") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(dummySignal.Id.Value)).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Components.ToArray() == dummySignal.Path.Components.ToArray()))).Returns(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
+                    (s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path))))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal());
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(1999, 1, 1));
+            }
+
+            [TestMethod]
+            public void GivenASignalWithSetNoneQualityMVPAndNoSetData_WhenGettingDataWhenTheGetDataTimeRangeIsCorrect_ReturnedIsNotBlankArray()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var dummySignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Month, Path = Path.FromString("root/signal") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(dummySignal.Id.Value)).Returns(dummySignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Components.ToArray() == dummySignal.Path.Components.ToArray()))).Returns(dummySignal);
+
+                signalsDataRepositoryMock.Setup(sdr => sdr.GetData<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(new Datum<decimal>[] { });
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
+                  (s => s.Id == dummySignal.Id && s.DataType == dummySignal.DataType && s.Granularity == dummySignal.Granularity && s.Path.Equals(dummySignal.Path))))
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal());
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1));
+
+                Assert.IsFalse(result.ToArray().Length == 0);
+            }
+
+
+
+
 
             private void SetupDataRepository<T>()
             {
-                signalDataRepository
+                signalsDataRepositoryMock
                     .Setup(s => s.GetData<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(GetDomainDatum<T>);
             }
@@ -393,7 +478,7 @@ namespace WebService.Tests
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
-                signalDataRepository = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsRepositoryMock
@@ -404,7 +489,7 @@ namespace WebService.Tests
                         return s;
                     });
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepository.Object, missingValuePolicyRepositoryMock.Object);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
@@ -427,7 +512,7 @@ namespace WebService.Tests
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
-            private Mock<ISignalsDataRepository> signalDataRepository;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
         }
     }
