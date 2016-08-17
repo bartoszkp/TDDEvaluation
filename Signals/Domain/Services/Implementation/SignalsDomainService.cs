@@ -77,11 +77,16 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void SetData<T>(IEnumerable<Datum<T>> dataDomain)
+        public void SetData<T>(Signal signal, IEnumerable<Datum<T>> dataDomain)
         {
             List<Datum<T>> dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToList();          
 
-            if(dataDomain.Count() > 1)
+            for(int i = 0; i < dataDomain.Count(); ++i)
+            {
+                dataDomainOrderedList.ElementAt(i).Signal = signal;
+            }
+
+            if (dataDomain.Count() > 1)
                 dataDomainOrderedList = AddMissingData(dataDomainOrderedList);
 
             this.signalsDataRepository.SetData<T>(dataDomainOrderedList);

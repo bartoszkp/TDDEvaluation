@@ -10,7 +10,7 @@ namespace Domain.Services
         Signal Get(Path pathDomain);
         void SetMissingValuePolicy(int signalId, Domain.MissingValuePolicy.MissingValuePolicyBase policy);
         Domain.MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(int signalId);
-        void SetData<T>(IEnumerable<Datum<T>> dataDomain);
+        void SetData<T>(Signal signal, IEnumerable<Datum<T>> dataDomain);
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
         PathEntry GetByPrefixPath(Path path);
     }

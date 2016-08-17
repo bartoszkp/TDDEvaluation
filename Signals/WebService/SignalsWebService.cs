@@ -96,66 +96,87 @@ namespace WebService
             if (signal == null)
                 throw new ArgumentException("Signal with given Id not found.");
 
-            if (signal.DataType == DataType.Integer)
+            Domain.Signal signalDomain = signal.ToDomain<Domain.Signal>();
+
+            switch (signal.DataType)
             {
-                var dataDomain = new List<Domain.Datum<int>>();
-
-                for (int i = 0; i < data.Count(); i++)
-                {
-                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<int>>());
-                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
-                }
-
-                this.signalsDomainService.SetData(dataDomain);
+                case DataType.Boolean:
+                    this.signalsDomainService.SetData(signalDomain, data.ToDomain<IEnumerable<Domain.Datum<bool>>>());
+                    break;
+                case DataType.Integer:
+                    this.signalsDomainService.SetData(signalDomain, data.ToDomain<IEnumerable<Domain.Datum<int>>>());
+                    break;
+                case DataType.Double:
+                    this.signalsDomainService.SetData(signalDomain, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
+                    break;
+                case DataType.Decimal:
+                    this.signalsDomainService.SetData(signalDomain, data.ToDomain<IEnumerable<Domain.Datum<decimal>>>());
+                    break;
+                case DataType.String:
+                    this.signalsDomainService.SetData(signalDomain, data.ToDomain<IEnumerable<Domain.Datum<string>>>());
+                    break;
             }
-            else if (signal.DataType == DataType.Double)
-            {
-                var dataDomain = new List<Domain.Datum<double>>();
 
-                for (int i = 0; i < data.Count(); i++)
-                {
-                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<double>>());
-                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
-                }
+            //if (signal.DataType == DataType.Integer)
+            //{
+            //    var dataDomain = new List<Domain.Datum<int>>();
 
-                this.signalsDomainService.SetData(dataDomain);
-            }
-            else if (signal.DataType == DataType.Decimal)
-            {
-                var dataDomain = new List<Domain.Datum<decimal>>();
+            //    for (int i = 0; i < data.Count(); i++)
+            //    {
+            //        dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<int>>());
+            //        dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+            //    }
 
-                for (int i = 0; i < data.Count(); i++)
-                {
-                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<decimal>>());
-                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
-                }
+            //    this.signalsDomainService.SetData(dataDomain);
+            //}
+            //else if (signal.DataType == DataType.Double)
+            //{
+            //    var dataDomain = new List<Domain.Datum<double>>();
 
-                this.signalsDomainService.SetData(dataDomain);
-            }
-            else if (signal.DataType == DataType.Boolean)
-            {
-                var dataDomain = new List<Domain.Datum<bool>>();
+            //    for (int i = 0; i < data.Count(); i++)
+            //    {
+            //        dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<double>>());
+            //        dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+            //    }
 
-                for (int i = 0; i < data.Count(); i++)
-                {
-                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<bool>>());
-                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
-                }
+            //    this.signalsDomainService.SetData(dataDomain);
+            //}
+            //else if (signal.DataType == DataType.Decimal)
+            //{
+            //    var dataDomain = new List<Domain.Datum<decimal>>();
 
-                this.signalsDomainService.SetData(dataDomain);
-            }
-            else if (signal.DataType == DataType.String)
-            {
-                var dataDomain = new List<Domain.Datum<string>>();
+            //    for (int i = 0; i < data.Count(); i++)
+            //    {
+            //        dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<decimal>>());
+            //        dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+            //    }
 
-                for (int i = 0; i < data.Count(); i++)
-                {
-                    dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<string>>());
-                    dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
-                }
+            //    this.signalsDomainService.SetData(dataDomain);
+            //}
+            //else if (signal.DataType == DataType.Boolean)
+            //{
+            //    var dataDomain = new List<Domain.Datum<bool>>();
 
-                this.signalsDomainService.SetData(dataDomain);
-            }
+            //    for (int i = 0; i < data.Count(); i++)
+            //    {
+            //        dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<bool>>());
+            //        dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+            //    }
+
+            //    this.signalsDomainService.SetData(dataDomain);
+            //}
+            //else if (signal.DataType == DataType.String)
+            //{
+            //    var dataDomain = new List<Domain.Datum<string>>();
+
+            //    for (int i = 0; i < data.Count(); i++)
+            //    {
+            //        dataDomain.Add(data.ElementAt(i).ToDomain<Domain.Datum<string>>());
+            //        dataDomain.ElementAt(i).Signal = signal.ToDomain<Domain.Signal>();
+            //    }
+
+            //    this.signalsDomainService.SetData(dataDomain);
+            //}
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
