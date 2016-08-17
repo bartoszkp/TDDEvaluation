@@ -242,38 +242,7 @@ namespace WebService.Tests
                 signalsWebService.GetData(signalId, System.DateTime.MinValue, System.DateTime.Today);
             }
 
-            [TestMethod]
-            public void WhenGettingDataForExistSignal_ReturnsData()
-            {
-                var signal = new Domain.Signal()
-                {
-                    Id = 978,
-                    DataType = DataType.Double,
-                    Granularity = Granularity.Week,
-                    Path = Path.FromString("ghf/vbc")
-                };
-                prepareDataRepository(signal.Id.Value, signal);
-                var enumerable = new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1), Value = (double)1 },
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2000, 1, 8), Value = (double)1.5 }};
-                signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData<double>(
-                        It.Is<Domain.Signal>(s => s == signal),
-                        It.Is<System.DateTime>(dt => dt == new DateTime(2000, 1, 1)),
-                        It.Is<System.DateTime>(dt => dt == new DateTime(2000, 1, 15))))
-                    .Returns(enumerable.ToDomain<System.Collections.Generic.IEnumerable<Datum<double>>>);
-                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 15));
-
-                int i = 0;
-                foreach (var d in result)
-                {
-                    Assert.AreEqual(enumerable[i].Quality, d.Quality);
-                    Assert.AreEqual(enumerable[i].Timestamp, d.Timestamp);
-                    Assert.AreEqual(enumerable[i].Value, d.Value);
-                    ++i;
-                }
-            }
-
+            
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.NoSuchSignalException))]
             public void WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException()
@@ -354,28 +323,7 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
             }
 
-            [TestMethod]
-            public void GivenNoSignal_WhenGettingData_ReturnsCompletedData_WithFilledMissingData()
-            {
-                var from = new DateTime(2000, 1, 1, 4, 30, 30);
-                var to = new DateTime(2000, 1, 4, 4, 30, 30);
-
-                var expectedResult = new List<Dto.Datum>();
-                expectedResult = prepareExpectedResult();
-
-                SetupGetRepositories(from, to, expectedResult);
-
-                var result = signalsWebService.GetData(1, from, to);
-
-                int i = 0;
-                foreach (var d in result)
-                {
-                    Assert.AreEqual(expectedResult[i].Quality, d.Quality);
-                    Assert.AreEqual(expectedResult[i].Timestamp, d.Timestamp);
-                    Assert.AreEqual(expectedResult[i].Value, d.Value);
-                    ++i;
-                }
-            }
+            
             
 
             private void SetupGetRepositories(DateTime fromIncluded, DateTime toExcluded, List<Dto.Datum> expectedResult)

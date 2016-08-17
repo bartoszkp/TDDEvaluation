@@ -75,31 +75,13 @@ namespace WebService.Tests
 
         }
 
-
-        [TestMethod]
-        [ExpectedException(typeof(NoSuchSignalException))]
-        public void SignalNotInDatabase_GetData_ThrowsException()
-        {
-            SetupWebService();
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns((Signal)null);
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
-        }
-
-
-
-
+        
 
         private void SetupWebService()
         {
             var signalsDomainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, mvpRepoMock.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
         }
-
-
-
-
-
-
 
 
         private Mock<ISignalsRepository> signalsRepoMock = new Mock<ISignalsRepository>();

@@ -41,7 +41,7 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Decimal,
                 Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "signal243222" } }
+                Path = new Path() { Components = new[] { "signal243222sfsdffdsfsd" } }
             });
 
             var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
