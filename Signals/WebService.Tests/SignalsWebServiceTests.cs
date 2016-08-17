@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System;
 using DataAccess.GenericInstantiations;
 using Domain.Exceptions;
+using Dto.MissingValuePolicy;
 
 namespace WebService.Tests
 {
@@ -825,6 +826,39 @@ namespace WebService.Tests
 
                 int expectedLength = 1;
                 Assert.AreEqual(expectedLength, returnedData.ToArray().Length);
+            }
+
+            [TestMethod]
+            public void GivenAData_WhenGettingData_FillingDataWithNoneQualityMissingPolicy()
+            {
+                Dto.Datum[] datumArray = new Dto.Datum[]{
+                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 5, 1), Value = (int) 5},
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (int) 4},
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int) 2} };
+
+                SetupWebService();
+
+                var signal = GetDefaultSignal_IntegerMonth();
+
+                int signalId = 3;
+                signalsRepositoryMock
+                    .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
+                    .Returns<int>(z => {
+                        var signal2 = signal;
+                        signal.Id = signalId;
+                        return signal;
+                        });
+
+                signalsDataRepositoryMock
+                    .Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datumArray.ToDomain<IEnumerable<Domain.Datum<int>>>());
+                
+                var returnedData = signalsWebService.GetData(signalId,new DateTime(2000,2,1), new DateTime(2000,7,1));
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(signal)).Returns(new NoneQualityMissingValuePolicyInteger());
+
+                int expectedArrayLength = 5;
+                Assert.AreEqual(expectedArrayLength,returnedData.ToArray().Length);
             }
 
             private void SetupMock_GetAllWithPathPrefix(Signal[] signal,Path path)
