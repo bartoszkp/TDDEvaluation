@@ -1495,6 +1495,55 @@ namespace WebService.Tests
                         && passedData.First().Timestamp == existingDatum.First().Timestamp
                     ))));
             }
+
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenGettingDatumFromRangeInWhichLastTimestampIsLessThanFirstTimestamp_ReturnsEmptyCollection()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+                
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1),  Value = default(double) },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1),  Value = (double)2.0},
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1),  Value = default(double)}
+                };
+
+                var firstTimestamp = new DateTime(2000, 4, 1);
+                var lastTimestamp = new DateTime(2000, 1, 1);
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(existingSignal, firstTimestamp, lastTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+
+                Assert.IsTrue(result.Count() == 0);
+            }
         }
     }
 }
