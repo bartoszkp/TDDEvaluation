@@ -16,6 +16,7 @@ namespace WebService.Tests
         public class SignalsWebServiceTests
         {
             private ISignalsWebService signalsWebService;
+            private SignalsDomainService signalDomainService;
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
@@ -526,7 +527,73 @@ namespace WebService.Tests
                 
                 VerifySettingGenericData<double>(datum);
             }
-            
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_ReturnsCorrectDataWchihIsSorted()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                List<Domain.Datum<int>> data = new List<Domain.Datum<int>>();
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Fair,
+                    Timestamp = new DateTime(2000, 4, 4),
+                    Value = 12,
+                });
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Good,
+                    Timestamp = new DateTime(2000, 3, 3),
+                    Value = 10,
+                });
+
+                data.Add(new Domain.Datum<int>()
+                {
+                    Quality = Domain.Quality.Poor,
+                    Timestamp = new DateTime(2000, 2, 2),
+                    Value = 14,
+                });
+
+                Signal signal = new Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                var sorted = data.OrderBy(d => d.Timestamp).ToList();
+
+                var fromIncludedDate = new DateTime(2000, 1, 2);
+                var toExcludedDate = new DateTime(2000, 5, 4);
+
+                signalsDataRepositoryMock
+                    .Setup(srm => srm.GetData<int>(signal, fromIncludedDate, toExcludedDate))
+                    .Returns(sorted);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Add(signal))
+                    .Returns(signal);
+                signalDomainService.Add(signal);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(signal.Id.Value))
+                    .Returns(signal);
+
+                signalDomainService.SetData(signal, data.AsEnumerable());
+                data.RemoveAt(2);
+                sorted.RemoveAt(2);
+
+                var result = signalDomainService.GetData<int>(signal, fromIncludedDate, toExcludedDate);
+
+                CollectionAssert.AreEqual(sorted, result.ToList<Datum<int>>());
+            }
+
             [TestMethod]
             public void GivenASignal_WhenAddingASignal_NoneQualityMissingValuePolicyIsSet()
             {
