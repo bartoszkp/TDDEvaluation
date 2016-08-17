@@ -16,7 +16,7 @@ namespace ExampleSignalClient
             //    Path = new Path() { Components = new[] { "signal" } }
             //});
 
-            client.SetData(1, new[] { new Datum() { Quality = Quality.Good, Value = 1, Timestamp = new DateTime(2000, 2, 1) } });
+            client.SetData(1, new[] { new Datum() { Quality = Quality.Good, Value = 1, Timestamp = new DateTime(2000, 1, 1) } });
 
             var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 

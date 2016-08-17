@@ -9,12 +9,8 @@ namespace Domain.Services
 
         Signal GetById(int signalId);
 
-        void SetData(int signalId, IEnumerable<Datum<bool>> data);
-        void SetData(int signalId, IEnumerable<Datum<decimal>> data);
-        void SetData(int signalId, IEnumerable<Datum<double>> data);
-        void SetData(int signalId, IEnumerable<Datum<int>> data);
-        void SetData(int signalId, IEnumerable<Datum<string>> data);
-
+        void SetData<T>(int signalId, IEnumerable<Datum<T>> data);
+        
         IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
         Signal GetByPath(Path path);
