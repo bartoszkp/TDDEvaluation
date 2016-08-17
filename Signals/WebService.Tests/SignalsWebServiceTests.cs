@@ -751,10 +751,19 @@ namespace WebService.Tests
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
 
                 signalsWebService.SetData(1, new List<Datum>());
+            }
 
+            [TestMethod]
+            public void GiveenASignalWithNullValueDatum_WhenSet_AddData()
+            {
+                Domain.Signal signal = this.SignalWith(1, Domain.DataType.String, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
 
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
 
-
+                signalsWebService.SetData(1, new List<Datum>()
+                {
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = DateTime.Now, Value = null }
+                });
             }
 
 
