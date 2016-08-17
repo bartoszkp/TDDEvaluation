@@ -105,6 +105,12 @@ namespace Domain.Services.Implementation
             if (granuality == Granularity.Year) return date.AddYears(1);
             return date;
         }
-      
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            signalsRepository.GetAllWithPathPrefix(path);
+
+            return null;
+        }
     }
 }
