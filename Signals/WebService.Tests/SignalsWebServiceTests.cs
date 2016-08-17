@@ -668,15 +668,7 @@ namespace WebService.Tests
             {
                 var path = new Dto.Path() { Components = new[] { "root" } };
                 var path_domain = path.ToDomain<Domain.Path>();
-
-                var signals = new Signal[] {
-                    SignalWith(1, DataType.Boolean, Granularity.Day,   path_domain),
-                    SignalWith(2, DataType.Double,  Granularity.Week,  path_domain),
-                    SignalWith(3, DataType.String,  Granularity.Month, path_domain)
-                };
-
-                foreach(Signal s in signals)
-                    GivenASignal(s);
+                var signals = GivenMultipleSignalsWithTheSamePath(path_domain);
 
                 signalsRepositoryMock
                     .Setup(s => s.GetAllWithPathPrefix(path_domain))
@@ -775,6 +767,29 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Path))
                     .Returns(existingSignal);
+            }
+
+            private Signal[] GivenMultipleSignalsWithTheSamePath(Domain.Path path_domain)
+            {
+                GivenNoSignals();
+
+                var signals = new Signal[] {
+                    SignalWith(1, DataType.Boolean, Granularity.Day,   path_domain),
+                    SignalWith(2, DataType.Double,  Granularity.Week,  path_domain),
+                    SignalWith(3, DataType.String,  Granularity.Month, path_domain)
+                };
+
+                foreach (Signal existingSignal in signals)
+                {
+                    signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+                    signalsRepositoryMock
+                        .Setup(sr => sr.Get(existingSignal.Path))
+                        .Returns(existingSignal);
+                }
+
+                return signals;
             }
 
             private void GivenRepositoryThatAssigns(int id)
