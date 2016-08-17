@@ -54,6 +54,27 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            List<Datum<T>> datumList = new List<Datum<T>>();
+
+            if (GetMVP(getSignal) is Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
+            {
+                if (fromIncludedUtc > toExcludedUtc) return datumList;
+
+                var tempDatum = this.signalsDataRepository.GetData<T>(getSignal, fromIncludedUtc, toExcludedUtc);
+                
+                do
+                {
+                    var datum = tempDatum.Select(d => d.Timestamp == fromIncludedUtc).First() ? tempDatum.First(d => d.Timestamp == fromIncludedUtc) : null;
+                    if (datum == null) datumList.Add(new Datum<T>() { Signal = getSignal, Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) });
+                    else datumList.Add(datum);
+                    
+                    fromIncludedUtc = AddTimpestamp(getSignal, fromIncludedUtc);
+                }
+                while (fromIncludedUtc < toExcludedUtc);
+
+                return datumList;
+            }
+
             return this.signalsDataRepository.GetData<T>(getSignal, fromIncludedUtc, toExcludedUtc);
         }
 
@@ -67,6 +88,21 @@ namespace Domain.Services.Implementation
             var result = this.missingValuePolicyRepository.Get(domainSignal);
             if (result == null) return null;
             else return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        private DateTime AddTimpestamp(Signal signal, DateTime datetime)
+        {
+            switch(signal.Granularity)
+            {
+                case Granularity.Day: return datetime = datetime.AddDays(1);
+                case Granularity.Hour: return datetime = datetime.AddHours(1);
+                case Granularity.Minute: return datetime = datetime.AddMinutes(1);
+                case Granularity.Month: return datetime = datetime.AddMonths(1);
+                case Granularity.Second: return datetime = datetime.AddSeconds(1);
+                case Granularity.Week: return datetime = datetime.AddDays(7);
+                case Granularity.Year: return datetime = datetime.AddYears(1);
+                default: return datetime;
+            }
         }
 
         private void SetDefaultMVPForSignal(Signal signal)
@@ -102,5 +138,6 @@ namespace Domain.Services.Implementation
         {
             this.signalsDataRepository.SetData(datum.Select(d => { d.Signal = setDataSignal; return d; }).ToList());
         }
+
     }
 }
