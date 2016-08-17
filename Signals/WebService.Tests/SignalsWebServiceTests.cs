@@ -665,6 +665,22 @@ namespace WebService.Tests
                     signalsRepositoryMock.Setup(sr => sr.Get(signal.Path)).Returns(signal);
                 }
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataOfStringThatIsNull_DoesNotThrow()
+            {
+                var dummyId = 1;
+                var dummySignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.String,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("root/signal")
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(dummyId, new[] { new Dto.Datum { Value = null } });
+            }
         }
     }
 }
