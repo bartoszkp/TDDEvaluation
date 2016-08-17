@@ -2,6 +2,7 @@
 using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
+using Domain.Exceptions;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -1454,6 +1455,36 @@ namespace WebService.Tests
                 signalDomainService.SetData(1, dataToSet);
 
                 signalsDataRepositoryMock.Verify(sr => sr.DeleteData<double>(It.IsAny<Domain.Signal>()));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IdNotNullException))]
+            public void GivenASignal_WhenAddinASignalWithSameId_ThrowsException()
+            {
+                var existingSignal = new Signal()
+                {
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Add(existingSignal))
+                    .Returns(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.Add(existingSignal.ToDto<Dto.Signal>());
+
+                signalsWebService.Add(new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Double,
+                    Granularity = Dto.Granularity.Day,
+                    Id = result.Id
+                });
             }
         }
     }
