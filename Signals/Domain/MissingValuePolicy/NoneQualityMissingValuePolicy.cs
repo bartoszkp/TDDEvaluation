@@ -27,7 +27,7 @@ namespace Domain.MissingValuePolicy
 
             int count = 0;
 
-            var timestamp = data.First().Timestamp;
+            var timestamp = fromIncludedUtc;
 
             switch (key)
             {

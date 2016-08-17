@@ -1239,39 +1239,39 @@ namespace WebService.Tests
             //    }
             //}
 
-            //[TestMethod]
-            //public void GivenASignalAndDatum_WhenGettingSingleData_ReturnsThisData()
-            //{
-            //    var existingSignal = new Signal()
-            //    {
-            //        Id = 1,
-            //        DataType = DataType.Double
-            //    };
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenGettingSingleData_ReturnsThisData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double
+                };
 
-            //    List<Datum<double>> datumList = new List<Datum<double>> { new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } };
+                List<Datum<double>> datumList = new List<Datum<double>> { new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } };
 
-            //    signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
-            //    GivenASignal(existingSignal);
+                GivenASignal(existingSignal);
 
-            //    signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
-            //    DateTime date = new DateTime(2000, 1, 1);
+                DateTime date = new DateTime(2000, 1, 1);
 
-            //    signalsDataRepositoryMock
-            //        .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), date, date))
-            //        .Returns(datumList.AsEnumerable<Datum<double>>);
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), date, date))
+                    .Returns(datumList.AsEnumerable<Datum<double>>);
 
-            //    var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
 
-            //    signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
-            //    var result = signalsWebService.GetData(1, date, date);
+                var result = signalsWebService.GetData(1, date, date);
 
-            //    Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Quality, result.First().Quality);
-            //    Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Timestamp, result.First().Timestamp);
-            //    Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Value, result.First().Value);
-            //}
+                Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Quality, result.First().Quality);
+                Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Timestamp, result.First().Timestamp);
+                Assert.AreEqual(datumList.First().ToDto<Dto.Datum>().Value, result.First().Value);
+            }
 
             //[TestMethod]
             //public void GetPathEntry_DoesNotThrow()
