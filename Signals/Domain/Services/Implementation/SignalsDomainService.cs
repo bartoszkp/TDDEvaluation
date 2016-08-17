@@ -56,7 +56,9 @@ namespace Domain.Services.Implementation
         {
             List<Datum<T>> datumList = new List<Datum<T>>();
 
-            if (GetMVP(getSignal) is Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
+            var MVP = GetMVP(getSignal);
+
+            if (MVP is Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
             {
                 if (fromIncludedUtc > toExcludedUtc) return datumList;
 
@@ -65,12 +67,36 @@ namespace Domain.Services.Implementation
                 do
                 {
                     Datum<T> datum;
-                    try { datum = tempDatum.Select(d => d.Timestamp == fromIncludedUtc).First() ? tempDatum.First(d => d.Timestamp == fromIncludedUtc) : null;}
+                    try { datum = tempDatum.Any(d => d.Timestamp == fromIncludedUtc) ? tempDatum.First(d => d.Timestamp == fromIncludedUtc) : null;}
                     catch { datum = null;}
 
                     if (datum == null) datumList.Add(new Datum<T>() { Signal = getSignal, Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) });
                     else datumList.Add(datum);
                     
+                    fromIncludedUtc = AddTimpestamp(getSignal, fromIncludedUtc);
+                }
+                while (fromIncludedUtc < toExcludedUtc);
+
+                return datumList;
+            }
+
+            if(MVP is Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
+            {
+                var SvMVP = (SpecificValueMissingValuePolicy<T>)MVP;
+
+                if (fromIncludedUtc > toExcludedUtc) return datumList;
+
+                var tempDatum = this.signalsDataRepository.GetData<T>(getSignal, fromIncludedUtc, toExcludedUtc);
+
+                do
+                {
+                    Datum<T> datum;
+                    try { datum = tempDatum.Any(d => d.Timestamp == fromIncludedUtc) ? tempDatum.First(d => d.Timestamp == fromIncludedUtc) : null; }
+                    catch { datum = null; }
+
+                    if (datum == null) datumList.Add(new Datum<T>() { Signal = getSignal, Quality = SvMVP.Quality, Timestamp = fromIncludedUtc, Value = SvMVP.Value });
+                    else datumList.Add(datum);
+
                     fromIncludedUtc = AddTimpestamp(getSignal, fromIncludedUtc);
                 }
                 while (fromIncludedUtc < toExcludedUtc);
