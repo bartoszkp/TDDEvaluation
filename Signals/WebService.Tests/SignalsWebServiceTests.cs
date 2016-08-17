@@ -1453,7 +1453,7 @@ namespace WebService.Tests
 
                 signalDomainService.SetData(1, dataToSet);
 
-                signalsDataRepositoryMock.Verify(sr => sr.DeleteData<Domain.Signal>(It.IsAny<Domain.Signal>()));
+                signalsDataRepositoryMock.Verify(sr => sr.DeleteData<double>(It.IsAny<Domain.Signal>()));
             }
         }
     }
