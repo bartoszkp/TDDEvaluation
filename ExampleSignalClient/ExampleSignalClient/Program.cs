@@ -9,12 +9,12 @@ namespace ExampleSignalClient
         static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-
+            
             var newSignal = new Signal()
             {
                 DataType = DataType.String,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "stringSignal2" } }
+                Path = new Path() { Components = new[] { "root", "stringSignal22" } }
             };
 
             var id = client.Add(newSignal).Id.Value;

@@ -717,7 +717,6 @@ namespace WebService.Tests
             }
 
             #endregion
-
             #region Issue #14 (Bug: SetData)
 
             [TestMethod]
@@ -730,6 +729,24 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = null } });
             }
 
+            #endregion
+            #region Issue #11 (Bug: Add)
+            
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
+            public void GivenNoSignals_WhenAddingSignalWithId_ExpectException()
+            {
+                GivenNoSignals();
+
+                var signal = new Dto.Signal() { Id = 1,
+                    DataType = Dto.DataType.Decimal,
+                    Granularity = Dto.Granularity.Hour,
+                    Path = new Dto.Path() { Components = new[] { "a" } }
+                };
+
+                signalsWebService.Add(signal);
+            }
+            
             #endregion
 
             private void SetupGetDataDatum(int id)
