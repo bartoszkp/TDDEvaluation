@@ -138,7 +138,11 @@ namespace Domain.Services.Implementation
 
                 return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
             }
-            return null;
+            else
+                missingValuePolicy = GetMissingValuePolicy(signal)
+                as MissingValuePolicy.MissingValuePolicy<T>;
+
+                return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
         }
     }
 }
