@@ -162,8 +162,7 @@ namespace Domain.Services.Implementation
         {
             var signal = GetById(signalId);
 
-            foreach (var item in enumerable)
-                item.Signal = signal;
+            enumerable = enumerable.Select(datum => { datum.Signal = signal; return datum; });
 
             signalsDataRepository.SetData(enumerable.ToList());
         }
