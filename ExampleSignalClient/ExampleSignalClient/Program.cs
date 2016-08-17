@@ -9,12 +9,12 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            //client.Add(new Signal() {Path=new Path() {Components=new[] {"s0" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root","s1" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root","podkatalog","s2" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog", "s3" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root","podkatalog","podpodkatalog","s4" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root","podkatalog2","s5" } } });
+            client.Add(new Signal() { Path = new Path() { Components = new[] { "s0" } } });
+            client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "s1" } } });
+            client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog", "s2" } } });
+            client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog", "s3" } } });
+            client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog", "podpodkatalog", "s4" } } });
+            client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog2", "s5" } } });
 
             var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
 
@@ -28,7 +28,7 @@ namespace ExampleSignalClient
             {
                 Console.WriteLine(string.Join("/", s.Components));
             }
-
+            
             Console.ReadKey();
         }
     }
