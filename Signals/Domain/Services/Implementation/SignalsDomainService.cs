@@ -117,6 +117,8 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUTC, DateTime toExcludedUTC)
         {
+            MissingValuePolicy<T> missingValuePolicy;
+
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUTC, toExcludedUTC);
 
@@ -129,15 +131,14 @@ namespace Domain.Services.Implementation
                 for (int i = 0; i < data.Count(); i++)
                 {
                     data.ToList().RemoveAt(i);
-                } 
+                }
 
-                return this.signalsDataRepository.GetData<T>(signal, timestampBegin, timestampEnd);
-            }
-
-            var missingValuePolicy = GetMissingValuePolicy(signal)
+                missingValuePolicy = GetMissingValuePolicy(signal)
                 as MissingValuePolicy.MissingValuePolicy<T>;
 
-            return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
+                return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
+            }
+            return null;
         }
     }
 }
