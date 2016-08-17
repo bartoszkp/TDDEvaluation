@@ -108,9 +108,16 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path path)
         {
-            signalsRepository.GetAllWithPathPrefix(path);
+            var signals = signalsRepository.GetAllWithPathPrefix(path);
 
-            return null;
+            var result = new List<Signal>();
+            foreach(var s in signals)
+            {
+                if (s.Path.Components.Count() == path.Components.Count() + 1)
+                    result.Add(s);
+            }
+
+            return new PathEntry(result, null);
         }
     }
 }
