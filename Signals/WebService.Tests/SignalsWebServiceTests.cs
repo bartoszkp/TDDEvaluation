@@ -770,6 +770,19 @@ namespace WebService.Tests
             }
 
             #endregion
+            #region Issue #8 (Feature: GetPathEntry)
+
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingPathEntry_FuncIsCalled()
+            {
+                GivenNoSignals();
+
+                signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
+
+                signalsRepositoryMock.Verify(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()), Times.Once);
+            }
+
+            #endregion
 
             private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
             {
