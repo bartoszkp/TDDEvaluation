@@ -13,52 +13,10 @@ namespace Domain.MissingValuePolicy
 
         public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var dataDictionary = data.ToDictionary(d => d.Timestamp, d => d);
+            dataDictionary = data.ToDictionary(d => d.Timestamp, d => d);
 
-            var key = signal.Granularity;
-
-            var granularitytoDateTime = Dictionary();
-
-            var dateTimeList = new List<DateTime>();
-
-            var timestamp = fromIncludedUtc;
-            if(key == Granularity.Second)
-            {
-                int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
-                int index = 0;
-                for (int i = 0; i < count; i++)
-                {
-                    if (dataDictionary.ContainsKey(timestamp))
-                    {
-                        dateTimeList.Add(data.ElementAt(index).Timestamp);
-                        index++;
-                    }
-                    else
-                    {
-                        dateTimeList.Add(timestamp);
-                    }
-                    timestamp = granularitytoDateTime[key](timestamp);
-                }
-            }
-            else if(key == Granularity.Month)
-            {
-                int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
-                int index = 0;
-                for(int i = 0; i < count; i++)
-                {
-                    if (dataDictionary.ContainsKey(timestamp))
-                    {
-                        dateTimeList.Add(data.ElementAt(index).Timestamp);
-                        index++;
-                    }
-                    else
-                    {
-                        dateTimeList.Add(timestamp);
-                    }
-                    timestamp = granularitytoDateTime[key](timestamp);
-                }
-            }
-
+            List(data, signal, fromIncludedUtc, toExcludedUtc);
+            
             return dateTimeList
                 .Select(d => dataDictionary.ContainsKey(d) ? dataDictionary[d] : new Datum<T>()
                 {
@@ -69,6 +27,90 @@ namespace Domain.MissingValuePolicy
                     Quality = this.Quality
                 });
         }
+
+        private void List(IEnumerable<Datum<T>> data, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+
+            var key = signal.Granularity;
+
+            granularityToDateTime = Dictionary();
+
+            dateTimeList = new List<DateTime>();
+
+            int count = 0;
+
+            var timestamp = fromIncludedUtc;
+
+            switch (key)
+            {
+                case Granularity.Second:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
+                    CreateDateTimeList(data, timestamp, key, count);
+                    break;
+                case Granularity.Month:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
+                    CreateDateTimeList(data, timestamp, key, count);
+                    break;
+            }
+            //if (key == Granularity.Second)
+            //{
+            //    int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
+            //    int index = 0;
+            //    for (int i = 0; i < count; i++)
+            //    {
+            //        if (dataDictionary.ContainsKey(timestamp))
+            //        {
+            //            dateTimeList.Add(data.ElementAt(index).Timestamp);
+            //            index++;
+            //        }
+            //        else
+            //        {
+            //            dateTimeList.Add(timestamp);
+            //        }
+            //        timestamp = granularityToDateTime[key](timestamp);
+            //    }
+            //}
+            //else if (key == Granularity.Month)
+            //{
+            //    int count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
+            //    int index = 0;
+            //    for (int i = 0; i < count; i++)
+            //    {
+            //        if (dataDictionary.ContainsKey(timestamp))
+            //        {
+            //            dateTimeList.Add(data.ElementAt(index).Timestamp);
+            //            index++;
+            //        }
+            //        else
+            //        {
+            //            dateTimeList.Add(timestamp);
+            //        }
+            //        timestamp = granularityToDateTime[key](timestamp);
+            //    }
+            //}
+        }
+
+        private void CreateDateTimeList(IEnumerable<Datum<T>> data, DateTime timestamp, Granularity key, int count)
+        {
+            int index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (dataDictionary.ContainsKey(timestamp))
+                {
+                    dateTimeList.Add(data.ElementAt(index).Timestamp);
+                    index++;
+                }
+                else
+                {
+                    dateTimeList.Add(timestamp);
+                }
+                timestamp = granularityToDateTime[key](timestamp);
+            }
+        }
+
+        private Dictionary<DateTime, Datum<T>> dataDictionary;
+        private Dictionary<Granularity, Func<DateTime, DateTime>> granularityToDateTime;
+        private List<DateTime> dateTimeList;
 
         private Dictionary<Granularity, Func<DateTime, DateTime>> Dictionary()
         {
