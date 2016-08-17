@@ -269,8 +269,14 @@ namespace WebService
 
                     domainDatum.Quality = item.Quality.ToDomain<Domain.Quality>();
                     domainDatum.Timestamp = item.Timestamp;
-                    domainDatum.Value = Convert.ToString(item.Value);
-
+                    if (item.Value == null)
+                    {
+                        domainDatum.Value = null;
+                    }
+                    else
+                    {
+                        domainDatum.Value = Convert.ToString(item.Value);
+                    }
                     domainDatumList.Add(domainDatum);
                 }
 
