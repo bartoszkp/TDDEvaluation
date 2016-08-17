@@ -12,7 +12,7 @@ namespace Domain.Services
 
         Signal Get(Path newPath);
 
-        void SetMissingValuePolicy(int signalId, MissingValuePolicyBase mvpDomain);
+        void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase mvpDomain);
 
         MissingValuePolicyBase GetMissingValuePolicy(int signalId);
 

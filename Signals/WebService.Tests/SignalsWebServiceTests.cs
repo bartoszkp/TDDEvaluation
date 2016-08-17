@@ -185,6 +185,8 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(mvpr => mvpr.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
             }
 
+
+
             private bool DataDtoCompareDouble(IEnumerable<Datum<double>> data)
             {
                 var list = data.ToList();

@@ -61,25 +61,8 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(newPath);
         }
 
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase mvpDomain)
+        public void SetMissingValuePolicy(Domain.Signal signal, MissingValuePolicyBase mvpDomain)
         {
-            var signal = signalsRepository.Get(signalId);
-
-            if (signal == null)
-            {
-                throw new SignalIsNullException();
-            }
-
-            this.missingValuePolicyRepository.Set(signal, mvpDomain);
-        }
-
-        public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase mvpDomain)
-        {
-            if (signal == null)
-            {
-                throw new SignalIsNullException();
-            }
-
             this.missingValuePolicyRepository.Set(signal, mvpDomain);
         }
 
