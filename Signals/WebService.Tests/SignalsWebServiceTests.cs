@@ -25,6 +25,7 @@ namespace WebService.Tests
             public void Add_NoneQualityMissingValuePolicyShouldBeTheDefault_SetMissingPolicyCalled()
             {
                 var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer, Granularity = Domain.Granularity.Month, Path = Domain.Path.FromString("x/y") };
+                var signalDto = new Dto.Signal() { DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "x", "y" } } };
 
                 MakeMocks();
                 MakeASignalsWebService();
@@ -33,7 +34,7 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
                 missingValuePolicyRepositoryMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
 
-                signalsWebService.Add(signal.ToDto<Dto.Signal>());
+                signalsWebService.Add(signalDto);
 
                 missingValuePolicyRepositoryMock.Verify(x => x.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
             }
