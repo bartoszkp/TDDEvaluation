@@ -124,7 +124,6 @@ namespace Domain.Services.Implementation
             var r = GetMissingValuePolicy(signalId);
             var time = fromIncludedUtc;
 
-
             if (r.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
             {
                 while (time < toExcludedUtc)
