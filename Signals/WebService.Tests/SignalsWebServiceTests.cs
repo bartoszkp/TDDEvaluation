@@ -661,7 +661,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingDatum_ReturnsDefault()
             {
                 var id = 1;
-                SetupGetDataDatum(id);
+                SetupGetDataDatum(id, new Datum[] { });
 
                 var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(2000, 8, 1));
 
@@ -675,21 +675,10 @@ namespace WebService.Tests
             #region Issue #16 (Bug: GetData)
 
             [TestMethod]
-            public void GivenASignal_WhenGettingDatumWithSameTimestamp_ReturnsEmpty()
-            {
-                var id = 1;
-                SetupGetDataDatum(id);
-
-                var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
-
-                Assert.IsTrue(result.Count() == 0);
-            }
-
-            [TestMethod]
             public void GivenASignal_WhenGettingDatumWithInvalidRange_ReturnsEmpty()
             {
                 var id = 1;
-                SetupGetDataDatum(id);
+                SetupGetDataDatum(id, new Datum[] { });
 
                 var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(1999, 1, 1));
 
@@ -747,15 +736,35 @@ namespace WebService.Tests
 
                 signalsWebService.Add(signal);
             }
-            
+
+            #endregion
+            #region Issue #10 (Feature: GetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDatumWithSameTimestamp_ReturnsIt()
+            {
+                var id = 1;
+                var data = SetupGetDataDatum(id);
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.IsTrue(CompareDatum(data.FirstOrDefault(), result.FirstOrDefault()));
+            }
+
             #endregion
 
-            private void SetupGetDataDatum(int id)
+            private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
             {
                 MakeMocks();
-                var signal = SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
+                var signal = SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
                 GivenASignal(signal);
-                SetupDataRepositoryMock<double>(signal, MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 0.0));
+
+                if(datum == null)
+                    datum = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), (double)0.0);
+
+                SetupDataRepositoryMock<double>(signal, datum);
+
+                return datum;
             }
 
             private bool CompareDatumArrays(IEnumerable<Datum> a, Datum[] b)
@@ -771,7 +780,7 @@ namespace WebService.Tests
             private bool CompareDatum(Datum a, Datum b)
             {
                 return a.Value.GetType() == b.Value.GetType() &&
-                    a.Value == b.Value &&
+                    a.Value.ToString() == b.Value.ToString() &&
                     a.Quality == b.Quality &&
                     a.Timestamp == b.Timestamp;
             }
