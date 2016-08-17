@@ -51,7 +51,7 @@ namespace ExampleSignalClient
             //    Path = new Signals.Path() { Components = new[] { "root", "podkatalog2", "s5" } }
             //});
 
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
+            var result = client.GetPathEntry(new Path() { Components = new[] { "roo" } });
 
             Console.WriteLine("Sygnały w 'root':");
             foreach (var r in result.Signals)
