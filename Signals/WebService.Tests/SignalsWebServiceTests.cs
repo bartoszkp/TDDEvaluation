@@ -793,6 +793,22 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "a", "b" }, result.Signals.First().Path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingPathEntries_ReturnsIt()
+            {
+                GivenASignal(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b")));
+                GetSignalSetup(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/c")));
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
+
+                Assert.IsTrue(result.Signals.Count() == 2);
+                Assert.IsTrue(ComparePathArray(new Dto.Path[]
+                {
+                    new Dto.Path() { Components = new[] { "a", "b" } },
+                    new Dto.Path() { Components = new[] { "a", "c" } }
+                }, result.Signals.ToArray().Select(s => s.Path).ToArray()));
+            }
+
             #endregion
 
             private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
@@ -815,6 +831,17 @@ namespace WebService.Tests
 
                 foreach (Datum d in a)
                     if (b.Where(f => CompareDatum(f, d)) == null) return false;
+
+                return true;
+            }
+
+            private bool ComparePathArray(Dto.Path[] a, Dto.Path[] b)
+            {
+                if (a.Count() != b.Count()) return false;
+
+                for(int i=0; i<a.Count(); i++)
+                    if (string.Join("/", a[i].Components.ToArray()) != string.Join("/", b[i].Components.ToArray()))
+                        return false;
 
                 return true;
             }
@@ -903,7 +930,11 @@ namespace WebService.Tests
             private void GivenASignal(Domain.Signal existingSignal)
             {
                 GivenNoSignals();
+                GetSignalSetup(existingSignal);
+            }
 
+            private void GetSignalSetup(Domain.Signal existingSignal)
+            {
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
                     .Returns(existingSignal);
