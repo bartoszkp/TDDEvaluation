@@ -47,10 +47,15 @@ namespace Domain.MissingValuePolicy
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+                case Granularity.Minute:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalMinutes;
+                    CreateDateTimeList(data, timestamp, key, count);
+                    break;
                 case Granularity.Month:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+
             }
             //if (key == Granularity.Second)
             //{
@@ -117,6 +122,7 @@ namespace Domain.MissingValuePolicy
             return new Dictionary<Granularity, Func<DateTime, DateTime>>
             {
                 {Granularity.Second, time => time.AddSeconds(1) },
+                {Granularity.Minute, time => time.AddMinutes(1) },
                 {Granularity.Month, time => time.AddMonths(1) }
             };
         }

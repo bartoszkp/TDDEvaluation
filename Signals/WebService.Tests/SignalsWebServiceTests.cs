@@ -1243,7 +1243,7 @@ namespace WebService.Tests
                 {
                     Id = 1,
                     DataType = DataType.Double,
-                    Granularity = Granularity.Month,
+                    Granularity = Granularity.Minute,
                     Path = Domain.Path.FromString("root/signal1")
                 };
 
