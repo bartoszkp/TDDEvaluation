@@ -94,9 +94,7 @@ namespace WebService
                         ?.ToDto<IEnumerable<Dto.Datum>>();
                 default:
                     return null;
-
             }
-
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
@@ -105,8 +103,6 @@ namespace WebService
 
             if (signal == null)
                 throw new NoSuchSignalException("Could not get data for not existing signal");
-
-            
 
             switch (signal.DataType)
             {
@@ -135,7 +131,6 @@ namespace WebService
                     signalsDomainService.SetData(domainStringData, signal.ToDomain<Domain.Signal>());
                     break;
             }
-
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
