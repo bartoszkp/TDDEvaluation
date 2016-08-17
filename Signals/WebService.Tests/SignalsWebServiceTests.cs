@@ -697,6 +697,23 @@ namespace WebService.Tests
                     CollectionAssert.AreEqual(signal.Path.Components.ToArray(), path.Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenSignalsInDifferentSubpaths_GettingPathEntry_ReturnsPathEntryWithSignalsInAskedPathAndAllSubpaths()
+            {
+                var path = new Dto.Path() { Components = new[] { "root" } };
+                var signals = GivenMultipleSignals(path, true);
+
+                var result = signalsWebService.GetPathEntry(path).SubPaths.ToArray();
+                var subpaths = new Path[] {
+                    path.ToDomain<Domain.Path>() + "sub1",
+                    path.ToDomain<Domain.Path>() + "sub2"
+                };
+                
+                Assert.AreEqual(subpaths.Length, result.Length);
+                for(int i = 0; i < subpaths.Length; ++i)
+                    CollectionAssert.AreEqual(subpaths[i].Components.ToArray(),result[i].Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
