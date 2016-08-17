@@ -165,7 +165,7 @@ namespace Domain.Services.Implementation
             foreach (var item in enumerable)
                 item.Signal = signal;
 
-            signalsDataRepository.SetData(enumerable);
+            signalsDataRepository.SetData(enumerable.ToList());
         }
         
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)

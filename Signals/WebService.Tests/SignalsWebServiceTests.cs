@@ -280,7 +280,7 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenSettingDataOfTheSignalAndGettingTheData_GotIsNotNullData()
             {
-                GivenASignal(new Signal { Id = 1 });
+                GivenASignal(new Signal { Id = 1, DataType = DataType.Double });
 
                 signalsDataRepositoryMock.Setup(sdr => sdr.GetData<double>(It.Is<Signal>(signal => signal.Id == 1), new DateTime(2015, 1, 1), new DateTime(2017, 1, 1)))
                     .Returns(new Datum<double>[] { new Datum<double>() { Timestamp = new DateTime(2016, 1, 1), Value = 10.0, Quality = Quality.Fair } });

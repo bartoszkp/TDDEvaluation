@@ -81,24 +81,27 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
+            var signal = signalsDomainService.GetById(signalId);
+            if (signal == null)
+                throw new ArgumentException();
 
-            else
+            switch (signal.DataType)
             {
-                Type type = null;
-
-                foreach (var item in data)
-                {
-                    type = item.Value.GetType();
-                }
-                
-                if (type == typeof(bool)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<bool>>>().ToArray());
-                else if (type == typeof(int)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray());
-                else if (type == typeof(double)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray());
-                else if (type == typeof(decimal)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<decimal>>>().ToArray());
-                else if (type == typeof(string)) signalsDomainService.SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<string>>>().ToArray());
-                else throw new ArgumentException("Type of the 'data' parameter's signals must be bool, int, double, decimal or string.");
-
+                case Domain.DataType.Boolean:
+                    signalsDomainService.SetData(signalId, data.Select(d => d.ToDomain<Domain.Datum<bool>>()));
+                    break;
+                case Domain.DataType.Integer:
+                    signalsDomainService.SetData(signalId, data.Select(d => d.ToDomain<Domain.Datum<int>>()));
+                    break;
+                case Domain.DataType.Double:
+                    signalsDomainService.SetData(signalId, data.Select(d => d.ToDomain<Domain.Datum<double>>()));
+                    break;
+                case Domain.DataType.Decimal:
+                    signalsDomainService.SetData(signalId, data.Select(d => d.ToDomain<Domain.Datum<decimal>>()));
+                    break;
+                case Domain.DataType.String:
+                    signalsDomainService.SetData(signalId, data.Select(d => d.ToDomain<Domain.Datum<string>>()));
+                    break;
             }
         }
 
