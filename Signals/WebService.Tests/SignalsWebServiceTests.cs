@@ -1480,6 +1480,37 @@ namespace WebService.Tests
                     Id = result.Id
                 });
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithNullValue_RepositorySetShouldBeCalledWithDataWithNullValue()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(new Signal()
+                {
+                    DataType = DataType.String
+                });
+
+                var existingDatum = new Datum<string>[]
+                {
+                    new Datum<string>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = null }
+                };
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<string>(It.IsAny<IEnumerable<Datum<string>>>()));
+
+                signalsWebService.SetData(1, existingDatum.ToDto<IEnumerable<Dto.Datum>>());
+
+                signalsDataRepositoryMock
+                    .Verify(sdrm => sdrm.SetData<string>(It.Is<IEnumerable<Domain.Datum<string>>>(passedData =>
+                    (
+                        passedData.First().Quality == existingDatum.First().Quality
+                        && passedData.First().Value == existingDatum.First().Value
+                        && passedData.First().Timestamp == existingDatum.First().Timestamp
+                    ))));
+            }
         }
     }
 }
