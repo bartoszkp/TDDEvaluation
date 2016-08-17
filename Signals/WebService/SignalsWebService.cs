@@ -37,6 +37,8 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
+            if (signalDto.Id.HasValue) throw new Domain.Exceptions.IdNotNullException();
+
             var signal = signalDto.ToDomain<Domain.Signal>();
 
             var policy = new NoneQualityMissingValuePolicy();
