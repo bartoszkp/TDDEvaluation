@@ -43,6 +43,22 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(IdNotNullException))]
+            public void WhenSettingAnIdForSignal_ThrowsIdNotNullException()
+            {
+                var domainService = new SignalsDomainService(null, null, null);
+                signalsWebService = new SignalsWebService(domainService);
+
+                signalsWebService.Add(new Dto.Signal()
+                {
+                    Id = 2,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "example", "path" } }
+                });
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_PassesGivenSignalToRepositoryAdd()
             {
                 GivenNoSignals();
