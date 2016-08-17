@@ -833,6 +833,22 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "a", "b" }, result.SubPaths.First().Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingSubPathEntries_RemoveDuplicates()
+            {
+                GivenNoSignals();
+                signalsRepositoryMock
+                     .Setup(f => f.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
+                     .Returns(new[] 
+                        { SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")),
+                          SignalWith(2, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/d"))
+                        });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
+                Assert.IsTrue(result.SubPaths.Count() == 1);
+                CollectionAssert.AreEqual(new[] { "a", "b" }, result.SubPaths.First().Components.ToArray());
+            }
+
             #endregion
 
             private Datum[] SetupGetDataDatum(int id, Datum[] datum = null)
