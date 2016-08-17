@@ -758,12 +758,15 @@ namespace WebService.Tests
             {
                 Domain.Signal signal = this.SignalWith(1, Domain.DataType.String, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
 
-                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
+                SetupSettingData(signal);
 
                 signalsWebService.SetData(1, new List<Datum>()
                 {
                     new Datum() { Quality = Dto.Quality.Good, Timestamp = DateTime.Now, Value = null }
                 });
+
+                signalsDataRepositoryMock.Verify(x => x.SetData<string>(
+                    It.IsAny<IEnumerable<Datum<string>>>()));
             }
 
 

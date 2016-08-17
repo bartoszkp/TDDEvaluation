@@ -101,7 +101,12 @@ namespace WebService
             if (data.Count() == 0)
                 return;
 
-            if (data.First().Value.GetType() == typeof(int))
+            if (data.First().Value == null)
+            {
+                this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<string>>>());
+                return;
+            }
+            else if (data.First().Value.GetType() == typeof(int))
             {
                 this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<int>>>());
                 return;
