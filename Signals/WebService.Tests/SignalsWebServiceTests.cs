@@ -673,6 +673,16 @@ namespace WebService.Tests
                 Assert.IsNotNull(result);                
             }
 
+            [TestMethod]
+            public void GivenSignalsInDifferentSubpaths_GettingPathEntry_ReturnsPathEntryWithNotNullSubpaths()
+            {
+                var path = new Dto.Path() { Components = new[] { "root" } };
+                var signals = GivenMultipleSignals(path, true);
+
+                var result = signalsWebService.GetPathEntry(path);
+                Assert.IsNotNull(result.SubPaths);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
