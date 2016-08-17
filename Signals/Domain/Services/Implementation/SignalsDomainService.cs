@@ -75,12 +75,7 @@ namespace Domain.Services.Implementation
         {
             var data =  this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            var mvp = GetMissingValuePolicy(signal);
-            if (mvp != null && mvp.GetType().Name.Contains("NoneQualityMissingValuePolicy"))
-            {
-                return CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
-            }
-            else return data;
+            return CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
         }
 
         private IEnumerable<Datum<T>> CheckMissingValues<T>(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -90,50 +85,60 @@ namespace Domain.Services.Implementation
             switch(signal.Granularity)
             {
                 case Granularity.Second:
-                    return FillMissingRecords(dt => dt.AddSeconds(1), data, fromIncludedUtc, toExcludedUtc);
+                    return FillMissingRecords(dt => dt.AddSeconds(1), signal, data, fromIncludedUtc, toExcludedUtc);
 
                 case Granularity.Minute:
-                    return FillMissingRecords(dt => dt.AddMinutes(1), data, fromIncludedUtc, toExcludedUtc);
+                    return FillMissingRecords(dt => dt.AddMinutes(1), signal, data, fromIncludedUtc, toExcludedUtc);
 
                 case Granularity.Hour:
-                    return FillMissingRecords(dt => dt.AddHours(1), data, fromIncludedUtc, toExcludedUtc);
+                    return FillMissingRecords(dt => dt.AddHours(1), signal, data, fromIncludedUtc, toExcludedUtc);
 
                 case Granularity.Day:
-                    return FillMissingRecords(dt => dt.AddDays(1), data, fromIncludedUtc, toExcludedUtc);
+                    return FillMissingRecords(dt => dt.AddDays(1), signal, data, fromIncludedUtc, toExcludedUtc);
 
                 case Granularity.Week:
-                    return FillMissingRecords(dt => dt.AddDays(7), data, fromIncludedUtc, toExcludedUtc);
+                    return FillMissingRecords(dt => dt.AddDays(7), signal, data, fromIncludedUtc, toExcludedUtc);
 
                 case Granularity.Month:
-                    return FillMissingRecords(dt => dt.AddMonths(1), data, fromIncludedUtc, toExcludedUtc);
+                    return FillMissingRecords(dt => dt.AddMonths(1), signal, data, fromIncludedUtc, toExcludedUtc);
 
                 case Granularity.Year:
-                    return FillMissingRecords(dt => dt.AddYears(1), data, fromIncludedUtc, toExcludedUtc);
+                    return FillMissingRecords(dt => dt.AddYears(1), signal, data, fromIncludedUtc, toExcludedUtc);
 
                 default: return null;
             }
         }
 
-        public IEnumerable<Datum<T>> FillMissingRecords<T>(Func<DateTime, DateTime> dateTimeStep, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> FillMissingRecords<T>(Func<DateTime, DateTime> dateTimeStep, Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             List<Datum<T>> list = new List<Datum<T>>();
             for (DateTime d = fromIncludedUtc; d < toExcludedUtc; d = dateTimeStep(d))
             {
-                FillMissingRecord(data, d, ref list);
+                FillMissingRecord(data, signal, d, ref list);
             }
             if (list.Count == 0 && fromIncludedUtc == toExcludedUtc)
             {
-                FillMissingRecord(data, fromIncludedUtc, ref list);
+                FillMissingRecord(data, signal, fromIncludedUtc, ref list);
             }
             return list;
         }
-        private void FillMissingRecord<T>(IEnumerable<Datum<T>> data, DateTime dateTime, ref List<Datum<T>> list)
+        private void FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, ref List<Datum<T>> list)
         {
+            var mvp = GetMissingValuePolicy(signal);
+
+            Quality quality = Quality.None;
+            T value = default(T);
+
+            if (mvp is NoneQualityMissingValuePolicy<T>)
+                        { quality = Quality.None; value = default(T); }
+            if (mvp is SpecificValueMissingValuePolicy<T>)
+                        { var SpecificMvp = mvp as SpecificValueMissingValuePolicy<T>; quality = SpecificMvp.Quality; value = SpecificMvp.Value; }
+            
             if (data.Any(time => time.Timestamp == dateTime))
             {
                 list.Add(data.First(t => t.Timestamp == dateTime));
             }
-            else list.Add(new Datum<T>() { Quality = Quality.None, Timestamp = dateTime, Value = default(T) });
+            else list.Add(new Datum<T>() { Quality = quality, Timestamp = dateTime, Value = value});
         }
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase policy)
         {
@@ -141,7 +146,8 @@ namespace Domain.Services.Implementation
             {
                 if (policy.Id.HasValue)
                     throw new IdNotNullException();
-
+                if (policy.NativeDataType != signal.DataType.GetNativeType())
+                    throw new TypeMismatchException();
                 policy.Signal = signal;
             }
             this.missingValuePolicyRepository.Set(signal, policy);
