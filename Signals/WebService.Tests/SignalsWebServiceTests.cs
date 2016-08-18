@@ -573,6 +573,21 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenSignals_GivenPathWithMoreThan1Component_WhenGettingPathEntry_PathEntryWithCorrectSubPathsIsReturned()
+            {
+                GivenSignals(new List<Signal>()
+                {
+                    new Signal() { Path = Path.FromString("root/s1") },
+                    new Signal() { Path = Path.FromString("root/s1/s2") },
+                    new Signal() { Path = Path.FromString("root/s1/s3") }
+                });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root", "s1" } });
+
+                Assert.AreEqual(0, result.SubPaths.Count());
+            }
+
+            [TestMethod]
             public void GivenASignalWithIncompleteDataAndSpecificMissingValuePolicy_WhenGettingData_CorrectAmountOfDataIsReturned()
             {
                 int signalId = 5;
