@@ -287,7 +287,7 @@ namespace Domain.Services.Implementation
             else
             {
                 var items = signalsRepository.GetAllWithPathPrefix(path);
-                return new PathEntry();
+                return new PathEntry(items, null);
             }
 
         }

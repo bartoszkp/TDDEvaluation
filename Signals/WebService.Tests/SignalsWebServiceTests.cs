@@ -833,19 +833,24 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenAPathEntryOfSignal_WhenGetPathEntry_GetSignal()
             {
-                var signal = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y"));
+                var path = Domain.Path.FromString("z/y");
+
+
+                var signal = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, path);
 
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
 
-                signalsRepositoryMock.Setup(x => x.GetAllWithPathPrefix(It.Is<Domain.Path>(z => z == signal.Path)))
+                signalsRepositoryMock.Setup(x => x.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
                     .Returns(new List<Domain.Signal>()
                 {
                     signal
                 });
 
-                var item = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a" } });
+                var item = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "z" } });
 
-                Assert.AreEqual(item.Signals.First(), signal);
+                var dbitem = item.Signals.First();
+
+                Assert.AreEqual(dbitem.Id, signal.Id);
             }
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
