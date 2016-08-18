@@ -21,5 +21,6 @@ namespace Domain.Services
 
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
+        PathEntry GetPathEntry(Path path);
     }
 }

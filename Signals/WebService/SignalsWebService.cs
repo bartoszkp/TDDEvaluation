@@ -61,7 +61,11 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            throw new NotImplementedException();
+            Domain.Path path = pathDto.ToDomain<Domain.Path>();
+
+            var result = signalsDomainService.GetPathEntry(path);
+
+            return result.ToDto<Dto.PathEntry>();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)

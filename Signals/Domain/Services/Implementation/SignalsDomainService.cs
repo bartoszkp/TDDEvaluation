@@ -84,5 +84,30 @@ namespace Domain.Services.Implementation
         {
             return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
         }
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            var allSignalsWithGivenPathPrefix = signalsRepository.GetAllWithPathPrefix(path);
+
+            List<Signal> signals = new List<Signal>();
+
+            List<Path> subPaths = new List<Path>();
+
+            foreach (var signal in allSignalsWithGivenPathPrefix)
+            {
+                if (signal.Path.Components.Count() == path.Components.Count() + 1) signals.Add(signal);
+
+                else
+                {
+                    var subPath = Path.FromString(path.Components.ToArray()[0] + "/" + signal.Path.Components.ToArray()[path.Components.Count()]);
+
+                    if (!subPaths.Contains(subPath)) subPaths.Add(subPath);
+                }
+            }
+
+            var pathEntry = new PathEntry(signals, subPaths);
+
+            return pathEntry;            
+        }
     }
 }
