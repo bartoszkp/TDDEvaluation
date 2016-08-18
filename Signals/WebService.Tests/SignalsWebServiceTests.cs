@@ -504,6 +504,201 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsEmtyCollection_WhenFirstTimestampIsLaterThanSecond()
+            {
+                var genericInstance = new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble();
+
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 }
+                };
+
+                var firstTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
+                var lastTimestamp = existingDatum.First().Timestamp;
+                var dateTimeComparator = DateTime.Compare(firstTimestamp, lastTimestamp);
+
+                SetupGettingData<double>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+                bool mainResult;
+
+                mainResult = AssertGettingGenericDataWithEmptDatum(existingDatum, dateTimeComparator, result);
+
+                Assert.IsFalse(mainResult);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingIntegerDataForSpecificSignal_ReturnsEmtyCollection_WhenFirstTimestampIsLaterThanSecond()
+            {
+                var genericInstance = new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger();
+
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (int)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 }
+                };
+
+                var firstTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
+                var lastTimestamp = existingDatum.First().Timestamp;
+                var dateTimeComparator = DateTime.Compare(firstTimestamp, lastTimestamp);
+
+                SetupGettingData<int>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+                bool mainResult;
+
+                mainResult = AssertGettingGenericDataWithEmptDatum(existingDatum, dateTimeComparator, result);
+
+                Assert.IsFalse(mainResult);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsEmtyCollection_WhenFirstTimestampIsLaterThanSecond()
+            {
+                var genericInstance = new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal();
+
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Decimal,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (decimal)1.45 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (decimal)1.5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (decimal)2.66 }
+                };
+
+                var firstTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
+                var lastTimestamp = existingDatum.First().Timestamp;
+                var dateTimeComparator = DateTime.Compare(firstTimestamp, lastTimestamp);
+
+                SetupGettingData<decimal>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+                bool mainResult;
+
+                mainResult = AssertGettingGenericDataWithEmptDatum(existingDatum, dateTimeComparator, result);
+
+                Assert.IsFalse(mainResult);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsEmtyCollection_WhenFirstTimestampIsLaterThanSecond()
+            {
+                var genericInstance = new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString();
+
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.String,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (string)"raz" },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (string)"dwa" },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (string)"trzy" }
+                };
+
+                var firstTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
+                var lastTimestamp = existingDatum.First().Timestamp;
+                var dateTimeComparator = DateTime.Compare(firstTimestamp, lastTimestamp);
+
+                SetupGettingData<string>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+                bool mainResult;
+
+                mainResult = AssertGettingGenericDataWithEmptDatum(existingDatum, dateTimeComparator, result);
+
+                Assert.IsFalse(mainResult);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsEmtyCollection_WhenFirstTimestampIsLaterThanSecond()
+            {
+                var genericInstance = new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyBoolean();
+
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (bool)true },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (bool)false },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (bool)true }
+                };
+
+                var firstTimestamp = existingDatum.Last().Timestamp.AddMonths(1);
+                var lastTimestamp = existingDatum.First().Timestamp;
+                var dateTimeComparator = DateTime.Compare(firstTimestamp, lastTimestamp);
+
+                SetupGettingData<bool>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyBoolean(),
+                    firstTimestamp,
+                    lastTimestamp);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+                bool mainResult;
+
+                mainResult = AssertGettingGenericDataWithEmptDatum(existingDatum, dateTimeComparator, result);
+
+                Assert.IsFalse(mainResult);
+            }
+
+            [TestMethod]
             public void GivenASignalAndNotSortedDatum_WhenSettingData_RepositorySetWithSortedDataIsCalled()
             {
                 var existingSignal = new Domain.Signal()
@@ -763,7 +958,36 @@ namespace WebService.Tests
                     index++;
                 }
             }
-            
+
+            private bool AssertGettingGenericDataWithEmptDatum(Dto.Datum[] existingDatum, int dateTimeComparator, IEnumerable<Dto.Datum> result)
+            {
+                if (dateTimeComparator > 0)
+                {
+                    for (int i = 0; i < existingDatum.Count(); i++)
+                    {
+                        existingDatum.ToList().RemoveAt(i);
+                    }
+
+                    existingDatum.ToArray();
+
+                    return false;
+                }
+                else
+                {
+                    int index = 0;
+                    foreach (var ed in existingDatum)
+                    {
+                        Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
+                        Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
+                        Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
+                        index++;
+                    }
+
+                    return true;
+                }
+
+            }
+
             private void SetupSignalsWebServiceAndMissingValue()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
