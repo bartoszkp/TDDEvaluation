@@ -170,39 +170,31 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            var signal = GetById(signalId);
+            var signal = GetById(signalId).ToDomain<Domain.Signal>();
 
             if (signal == null)
                 throw new Domain.Exceptions.SettingNotExistingSignalDataException();
 
-            if (signal.DataType == Dto.DataType.Boolean)
-            {
-                var sortedDomainData = data.OrderBy(d => d.Timestamp).ToArray();
+            var sortedDomainData = data.OrderBy(d => d.Timestamp).ToArray();
 
+            if (signal.DataType.GetNativeType() == typeof(bool))
+            {
                 signalsDomainService.SetData<bool>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<bool>>>().ToArray());
             }
-            else if (signal.DataType == Dto.DataType.Decimal)
+            else if (signal.DataType.GetNativeType() == typeof(decimal))
             {
-                var sortedDomainData = data.OrderBy(d => d.Timestamp).ToArray();
-
                 signalsDomainService.SetData<decimal>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<decimal>>>().ToArray());
             }
-            else if (signal.DataType == Dto.DataType.Double)
+            else if (signal.DataType.GetNativeType() == typeof(double))
             {
-                var sortedDomainData = data.OrderBy(d => d.Timestamp).ToArray();
-
                 signalsDomainService.SetData(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray());
             }
-            else if (signal.DataType == Dto.DataType.Integer)
+            else if (signal.DataType.GetNativeType() == typeof(int))
             {
-                var sortedDomainData = data.OrderBy(d => d.Timestamp).ToArray();
-
                 signalsDomainService.SetData<int>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray());
             }
-            else if (signal.DataType == Dto.DataType.String)
+            else if (signal.DataType.GetNativeType() == typeof(string))
             {
-                var sortedDomainData = data.OrderBy(d => d.Timestamp).ToArray();
-
                 signalsDomainService.SetData<string>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<string>>>().ToArray());
             }
         }
