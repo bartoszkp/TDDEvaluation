@@ -800,6 +800,13 @@ namespace WebService.Tests
 
             }
             
+            [TestMethod]
+            public void GivenNoSignals_WhenGetPathEntry_ReturnNull()
+            {
+                var items = signalsWebService.GetPathEntry(new Dto.Path());
+
+                Assert.IsNull(items);
+            }
 
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
