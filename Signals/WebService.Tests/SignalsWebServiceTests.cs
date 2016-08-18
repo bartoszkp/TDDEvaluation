@@ -725,6 +725,20 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new[] { "a", "b" }, result.SubPaths.First().Components.ToArray());
             }
 
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingSubPathEntries_IgnoresSignalAtPath()
+            {
+                SetupGetAllWithPathPrefix(new[] {
+                    SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b")),
+                    SignalWith(2, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c"))
+                });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a", "b" } });
+
+                Assert.IsTrue(result.Signals.Count() == 1);
+                CollectionAssert.AreEqual(new[] { "a", "b", "c" }, result.Signals.First().Path.Components.ToArray());
+            }
+
             #endregion
             #region Issue #9 (Feature: SetMissingValuePolicy)
 
