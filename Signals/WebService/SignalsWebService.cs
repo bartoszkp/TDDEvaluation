@@ -51,7 +51,10 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            return null;
+            if (pathDto == null)
+                return null;
+            else
+                return new PathEntry();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
