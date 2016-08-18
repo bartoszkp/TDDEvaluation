@@ -9,26 +9,27 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            client.Add(new Signal() { DataType = DataType.Double, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "root" } } });
+            client.Add(new Signal() { DataType = DataType.Double, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "s0" } } });
+            client.Add(new Signal() { DataType = DataType.Double, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "root", "s1" } } });
+            client.Add(new Signal() { DataType = DataType.Double, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "root", "podkatalog", "s2" } } });
+            client.Add(new Signal() { DataType = DataType.Double, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "root", "podkatalog", "s3" } } });
+            client.Add(new Signal() { DataType = DataType.Double, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "root", "podkatalog", "podpodkatalog", "s4" } } });
+            client.Add(new Signal() { DataType = DataType.Double, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "root", "podkatalog2", "s5" } } });
 
-            //client.SetMissingValuePolicy(1, new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
+            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
 
-            client.SetData(1, new Datum[]
+            Console.WriteLine("Sygnały w 'root':");
+            foreach (var r in result.Signals)
             {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 6, 1), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
-            });
-
-            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
-
-            foreach (var d in result)
+                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+            }
+            Console.WriteLine("Ścieżki podrzędne w 'root':");
+            foreach (var s in result.SubPaths)
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                Console.WriteLine(string.Join("/", s.Components));
             }
 
-            Console.ReadKey(); ;
+            Console.ReadKey();
         }
     }
 }

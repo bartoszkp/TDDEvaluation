@@ -54,28 +54,26 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            List<Datum<T>> datumList = new List<Datum<T>>();
-
             var MVP = GetMVP(getSignal);
 
             if (MVP is Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
             {
-                GetDataOverMVP(datumList, getSignal, fromIncludedUtc, toExcludedUtc, Quality.None, default(T));
-                return datumList;
+                return GetDataOverMVP(getSignal, fromIncludedUtc, toExcludedUtc, Quality.None, default(T));
             }
 
             if(MVP is Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
             {
                 var SvMVP = (SpecificValueMissingValuePolicy<T>)MVP;
-                GetDataOverMVP(datumList, getSignal, fromIncludedUtc, toExcludedUtc, SvMVP.Quality, SvMVP.Value);
-                return datumList;
+                return GetDataOverMVP(getSignal, fromIncludedUtc, toExcludedUtc, SvMVP.Quality, SvMVP.Value);
             }
 
             return this.signalsDataRepository.GetData<T>(getSignal, fromIncludedUtc, toExcludedUtc);
         }
 
-        private List<Datum<T>> GetDataOverMVP<T>(List<Datum<T>> datumList, Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc, Quality quality, T value )
+        private List<Datum<T>> GetDataOverMVP<T>(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc, Quality quality, T value )
         {
+            List<Datum<T>> datumList = new List<Datum<T>>();
+
             if (fromIncludedUtc > toExcludedUtc) return datumList;
 
             var tempDatum = this.signalsDataRepository.GetData<T>(getSignal, fromIncludedUtc, toExcludedUtc);
@@ -157,5 +155,13 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData(datum.Select(d => { d.Signal = setDataSignal; return d; }).ToList());
         }
 
+        public PathEntry GetPathEntry(Path pathDomain)
+        {
+            List<Domain.Signal> signalList = signalsRepository.GetAllWithPathPrefix(pathDomain).ToList();
+            List<Domain.Path> pathList = new List<Path>();
+            
+            signalList.ForEach(p => { pathList.Add(p.Path); });
+            return new PathEntry(signalList, pathList);
+        }
     }
 }
