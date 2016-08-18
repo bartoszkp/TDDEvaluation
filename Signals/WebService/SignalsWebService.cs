@@ -64,7 +64,9 @@ namespace WebService
             var signal = this.signalsDomainService.GetById(signalId);
 
             if (signal == null)
+            {
                 throw new CouldntGetASignalException();
+            }
 
             var dataDto = new List<Datum>();
 
@@ -94,7 +96,9 @@ namespace WebService
             var signal = this.GetById(signalId);
 
             if (signal == null)
-                throw new ArgumentException("Signal with given Id not found.");
+            {
+                throw new CouldntGetASignalException();
+            }
 
             Domain.Signal signalDomain = signal.ToDomain<Domain.Signal>();
 

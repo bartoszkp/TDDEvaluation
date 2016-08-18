@@ -29,7 +29,9 @@ namespace Domain.Services.Implementation
         public Signal Add(Signal newSignal)
         {
             if (newSignal.Id != null)
+            {
                 throw new IdNotNullException();
+            }
 
             Signal addedSignal = this.signalsRepository.Add(newSignal);
 
@@ -56,7 +58,9 @@ namespace Domain.Services.Implementation
             var signal = this.GetById(signalId);
 
             if (signal == null)
-                throw new ArgumentException("Signal with given Id not found.");
+            {
+                throw new CouldntGetASignalException();
+            }
 
             this.missingValuePolicyRepository.Set(signal, policy);
         }
@@ -66,12 +70,16 @@ namespace Domain.Services.Implementation
             var signal = this.GetById(signalId);
 
             if (signal == null)
+            {
                 throw new CouldntGetASignalException();
+            }
 
             var mvp = this.missingValuePolicyRepository.Get(signal);
 
             if (mvp == null)
+            {
                 throw new CouldntGetMissingValuePolicyException();
+            }
 
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
@@ -79,7 +87,7 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> dataDomain)
         {
-            List<Datum<T>> dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToList();          
+            Datum<T>[] dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToArray();          
 
             for(int i = 0; i < dataDomain.Count(); ++i)
             {
@@ -250,13 +258,13 @@ namespace Domain.Services.Implementation
             List<Signal> listOfSignals = new List<Signal>();
             List<Path> listOfPaths = new List<Path>();
 
-            int prefixCount = prefix.Components.ToArray().Length;
+            int prefixCount = prefix.Components.Count();
 
             var array = signals.ToArray();
 
             foreach(var signal in array)
             {
-                if (signal.Path.Components.ToArray().Length - 1 == prefixCount)
+                if (signal.Path.Components.Count() - 1 == prefixCount)
                 {
                     if (PathEquals(signal.Path, prefix))
                     {
@@ -281,7 +289,7 @@ namespace Domain.Services.Implementation
 
         private bool PathEquals(Path expected, Path actual)
         {
-            int actualCount = actual.Components.ToArray().Length;
+            int actualCount = actual.Components.Count();
             for (int i = 0; i < actualCount; ++i)
             {
                 if (!expected.Components.ElementAt(i).Equals(actual.Components.ElementAt(i)))
