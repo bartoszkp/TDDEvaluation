@@ -13,7 +13,7 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Decimal,
                 Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "signal1211" } }
+                Path = new Path() { Components = new[] { "signal21" } }
             });
 
             var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));

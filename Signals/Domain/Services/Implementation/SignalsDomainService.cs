@@ -212,8 +212,10 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Second:
                         {
-                            int countElementOfList = toExcludedUtc.Second - fromIncludedUtc.Second;
-                            if (countElementOfList + 1 == gettingList.Length)
+                            var time = toExcludedUtc - fromIncludedUtc;
+
+                            int countElementOfList = (int)time.TotalSeconds;
+                            if (countElementOfList + 1 == gettingList?.Length)
                                 return gettingList;
                             for (int i = 0; i < countElementOfList; i++)
                             {
