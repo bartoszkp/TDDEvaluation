@@ -659,122 +659,6 @@ namespace WebService.Tests
                
             }
             #endregion
-            #region Issue #13 (Bug: GetData)
-
-            [TestMethod]
-            public void GivenASignal_WhenGettingDatum_ReturnsDefault()
-            {
-                var id = 1;
-                SetupGetDataDatum(id, new Datum[] { });
-
-                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(2000, 8, 1));
-
-                Assert.IsTrue(CompareDatumArrays(result, new Datum[] {
-                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = 0},
-                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0},
-                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = 0} }));
-            }
-
-            #endregion
-            #region Issue #16 (Bug: GetData)
-
-            [TestMethod]
-            public void GivenASignal_WhenGettingDatumWithInvalidRange_ReturnsEmpty()
-            {
-                var id = 1;
-                SetupGetDataDatum(id, new Datum[] { });
-
-                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(1999, 1, 1));
-
-                Assert.IsTrue(result.Count() == 0);
-            }
-
-            #endregion
-            #region Issue #15 (Bug: SetData)
-
-            [TestMethod]
-            public void GivenASignal_WhenSettingDataWithEmptyDatum_ExpectNoException()
-            {
-                var id = 1;
-                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
-
-                signalsWebService.SetData(id, new Datum[0]);
-            }
-
-            [TestMethod]
-            public void GivenASignal_WhenSettingDataWithNull_ExpectNoException()
-            {
-                var id = 1;
-                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
-
-                signalsWebService.SetData(id, null);
-            }
-
-            #endregion
-            #region Issue #14 (Bug: SetData)
-
-            [TestMethod]
-            public void GivenASignal_WhenSettingDataWithNullValue_ExpectNoException()
-            {
-                var id = 1;
-                MakeMocks();
-                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
-
-                signalsWebService.SetData(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = null } });
-            }
-
-            #endregion
-            #region Issue #11 (Bug: Add)
-            
-            [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
-            public void GivenNoSignals_WhenAddingSignalWithId_ExpectException()
-            {
-                GivenNoSignals();
-
-                var signal = new Dto.Signal() { Id = 1,
-                    DataType = Dto.DataType.Decimal,
-                    Granularity = Dto.Granularity.Hour,
-                    Path = new Dto.Path() { Components = new[] { "a" } }
-                };
-
-                signalsWebService.Add(signal);
-            }
-
-            #endregion
-            #region Issue #10 (Feature: GetData)
-
-            [TestMethod]
-            public void GivenASignal_WhenGettingDatumWithSameTimestamp_ReturnsIt()
-            {
-                var id = 1;
-                var data = SetupGetDataDatum(id);
-
-                var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
-
-                Assert.IsTrue(CompareDatum(data.FirstOrDefault(), result.FirstOrDefault()));
-            }
-
-            #endregion
-            #region Issue #9 (Feature: SetMissingValuePolicy)
-
-            [TestMethod]
-            public void GivenASignalWithSpecificMVP_WhenGettingDatum_ReturnsIt()
-            {
-                var id = 1;
-                SetupGetDataDatum(id, MakeData(Dto.Quality.Fair, new DateTime(2016, 2, 1), (double)3.0));
-                missingValuePolicyRepositoryMock
-                    .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new SpecificValueMissingValuePolicyDouble() { Quality = Domain.Quality.Fair, Value = 45.0 });
-
-                var result = signalsWebService.GetData(id, new DateTime(2016, 1, 1), new DateTime(2016, 3, 1));
-
-                Assert.IsTrue(CompareDatumArrays(result, new Datum[] {
-                    new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 3},
-                    new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 2, 1), Value = 45} }));
-            }
-
-            #endregion
             #region Issue #8 (Feature: GetPathEntry)
 
             [TestMethod]
@@ -842,7 +726,125 @@ namespace WebService.Tests
             }
 
             #endregion
+            #region Issue #9 (Feature: SetMissingValuePolicy)
 
+            [TestMethod]
+            public void GivenASignalWithSpecificMVP_WhenGettingDatum_ReturnsIt()
+            {
+                var id = 1;
+                SetupGetDataDatum(id, MakeData(Dto.Quality.Fair, new DateTime(2016, 2, 1), (double)3.0));
+                missingValuePolicyRepositoryMock
+                    .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new SpecificValueMissingValuePolicyDouble() { Quality = Domain.Quality.Fair, Value = 45.0 });
+
+                var result = signalsWebService.GetData(id, new DateTime(2016, 1, 1), new DateTime(2016, 3, 1));
+
+                Assert.IsTrue(CompareDatumArrays(result, new Datum[] {
+                    new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 3},
+                    new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 2, 1), Value = 45} }));
+            }
+
+            #endregion
+            #region Issue #10 (Feature: GetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDatumWithSameTimestamp_ReturnsIt()
+            {
+                var id = 1;
+                var data = SetupGetDataDatum(id);
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.IsTrue(CompareDatum(data.FirstOrDefault(), result.FirstOrDefault()));
+            }
+
+            #endregion
+            #region Issue #11 (Bug: Add)
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
+            public void GivenNoSignals_WhenAddingSignalWithId_ExpectException()
+            {
+                GivenNoSignals();
+
+                var signal = new Dto.Signal()
+                {
+                    Id = 1,
+                    DataType = Dto.DataType.Decimal,
+                    Granularity = Dto.Granularity.Hour,
+                    Path = new Dto.Path() { Components = new[] { "a" } }
+                };
+
+                signalsWebService.Add(signal);
+            }
+
+            #endregion
+            #region Issue #13 (Bug: GetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDatum_ReturnsDefault()
+            {
+                var id = 1;
+                SetupGetDataDatum(id, new Datum[] { });
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(2000, 8, 1));
+
+                Assert.IsTrue(CompareDatumArrays(result, new Datum[] {
+                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = 0},
+                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0},
+                        new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = 0} }));
+            }
+
+            #endregion
+            #region Issue #14 (Bug: SetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithNullValue_ExpectNoException()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = null } });
+            }
+
+            #endregion
+            #region Issue #15 (Bug: SetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithEmptyDatum_ExpectNoException()
+            {
+                var id = 1;
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[0]);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithNull_ExpectNoException()
+            {
+                var id = 1;
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, null);
+            }
+
+            #endregion
+            #region Issue #16 (Bug: GetData)
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDatumWithInvalidRange_ReturnsEmpty()
+            {
+                var id = 1;
+                SetupGetDataDatum(id, new Datum[] { });
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(1999, 1, 1));
+
+                Assert.IsTrue(result.Count() == 0);
+            }
+
+            #endregion
+            
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
             {
                 GivenNoSignals();
