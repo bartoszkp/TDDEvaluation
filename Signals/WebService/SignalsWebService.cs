@@ -177,26 +177,31 @@ namespace WebService
 
             var sortedDomainData = data.OrderBy(d => d.Timestamp).ToArray();
 
-            if (signal.DataType.GetNativeType() == typeof(bool))
+            var typename = signal.DataType.GetNativeType().Name;
+
+            switch (typename)
             {
-                signalsDomainService.SetData<bool>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<bool>>>().ToArray());
+                case "Int32":
+                    GenericSetDataCall<int>(signalId, sortedDomainData);
+                    break;
+                case "Double":
+                    GenericSetDataCall<double>(signalId, sortedDomainData);
+                    break;
+                case "Decimal":
+                    GenericSetDataCall<decimal>(signalId, sortedDomainData);
+                    break;
+                case "Boolean":
+                    GenericSetDataCall<bool>(signalId, sortedDomainData);
+                    break;
+                case "String":
+                    GenericSetDataCall<string>(signalId, sortedDomainData);
+                    break;
             }
-            else if (signal.DataType.GetNativeType() == typeof(decimal))
-            {
-                signalsDomainService.SetData<decimal>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<decimal>>>().ToArray());
-            }
-            else if (signal.DataType.GetNativeType() == typeof(double))
-            {
-                signalsDomainService.SetData(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<double>>>().ToArray());
-            }
-            else if (signal.DataType.GetNativeType() == typeof(int))
-            {
-                signalsDomainService.SetData<int>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray());
-            }
-            else if (signal.DataType.GetNativeType() == typeof(string))
-            {
-                signalsDomainService.SetData<string>(signalId, sortedDomainData.ToDomain<IEnumerable<Domain.Datum<string>>>().ToArray());
-            }
+        }
+
+        private void GenericSetDataCall<T>(int signalId, Datum[] datum)
+        {
+            signalsDomainService.SetData<T>(signalId, datum.ToDomain<IEnumerable<Domain.Datum<T>>>().ToArray());
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
