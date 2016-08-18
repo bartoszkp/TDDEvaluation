@@ -154,7 +154,7 @@ namespace Domain.Services.Implementation
                 {
                     signalsInDir.Add(signal);
                 }
-                else
+                else if (signalPathComponentsCount - 1 > pathDomainComponentsCount)
                 {
                     subPaths.Add(Path.FromString(Path.JoinComponents(signal.Path.Components.Take(pathDomainComponentsCount + 1))));
                 }
