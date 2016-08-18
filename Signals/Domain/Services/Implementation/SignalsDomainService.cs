@@ -122,7 +122,7 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             
-            if(GetMissingValuePolicy(signal)==null)
+            if(GetMissingValuePolicy(signal)!=null)
             {
                 var gettingList = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
                 var returnList = new List<Datum<T>>();

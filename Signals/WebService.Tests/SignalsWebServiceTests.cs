@@ -608,7 +608,7 @@ namespace WebService.Tests
             private void SetupSignalsDataRepositoryAndSignalsRepository(Domain.Signal existingSignal, Datum[] existingDatum)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 signalsDataRepositoryMock
                     .Setup(sdrm => sdrm.GetData<double>(
                         existingSignal,
@@ -618,7 +618,7 @@ namespace WebService.Tests
 
                 GivenASignal(existingSignal);
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
@@ -786,6 +786,8 @@ namespace WebService.Tests
 
             }
 
+            
+
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
@@ -803,6 +805,8 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = existingListDatum[2], Value = (double)3.1 }
                 };
                 SetupSignalsDataRepositoryAndSignalsRepository(existingSignal, existingDatum);
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
 
                 var result = signalsWebService.GetData(existingSignal.Id.Value, existingDatum.First().Timestamp, existingDatum.Last().Timestamp);
 
