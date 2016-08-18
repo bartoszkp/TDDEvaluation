@@ -801,7 +801,7 @@ namespace WebService.Tests
             }
             
             [TestMethod]
-            public void GivenNoSignals_WhenGetPathEntry_ReturnNull()
+            public void GivenNullPath_WhenGetPathEntry_ReturnNull()
             {
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y")));
 
@@ -819,6 +819,8 @@ namespace WebService.Tests
 
                 Assert.IsNotNull(items);
             }
+
+
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
