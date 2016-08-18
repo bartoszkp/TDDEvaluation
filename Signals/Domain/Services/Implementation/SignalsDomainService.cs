@@ -279,5 +279,17 @@ namespace Domain.Services.Implementation
             }
             return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            if (path == null)
+                return null;
+            else
+            {
+                var items = signalsRepository.GetAllWithPathPrefix(path);
+                return new PathEntry();
+            }
+
+        }
     }
 }

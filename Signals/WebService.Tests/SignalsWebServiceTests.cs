@@ -815,7 +815,7 @@ namespace WebService.Tests
             {
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y")));
 
-                var items = signalsWebService.GetPathEntry(new Dto.Path());
+                var items = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a", "y" } });
 
                 Assert.IsNotNull(items);
             }
@@ -825,7 +825,7 @@ namespace WebService.Tests
             {
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y")));
 
-                var items = signalsWebService.GetPathEntry(new Dto.Path());
+                var items = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "a", "y" } });
 
                 signalsRepositoryMock.Verify(x => x.GetAllWithPathPrefix(It.IsAny<Domain.Path>()));
             }
