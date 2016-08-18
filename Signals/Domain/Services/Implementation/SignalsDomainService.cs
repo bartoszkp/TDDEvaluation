@@ -44,26 +44,26 @@ namespace Domain.Services.Implementation
             switch (typeName)
             {
                 case "Int32":
-                    GenericSetCall<int>(signal);
+                    SetDefaultMissingValuePolicyToNoneQualityMissingValuePolicy<int>(signal);
                     break;
                 case "Double":
-                    GenericSetCall<double>(signal);
+                    SetDefaultMissingValuePolicyToNoneQualityMissingValuePolicy<double>(signal);
                     break;
                 case "Decimal":
-                    GenericSetCall<decimal>(signal);
+                    SetDefaultMissingValuePolicyToNoneQualityMissingValuePolicy<decimal>(signal);
                     break;
                 case "Boolean":
-                    GenericSetCall<bool>(signal);
+                    SetDefaultMissingValuePolicyToNoneQualityMissingValuePolicy<bool>(signal);
                     break;
                 case "String":
-                    GenericSetCall<string>(signal);
+                    SetDefaultMissingValuePolicyToNoneQualityMissingValuePolicy<string>(signal);
                     break;
             }
             return signal;
         }
 
 
-        private void GenericSetCall<T>(Signal signal)
+        private void SetDefaultMissingValuePolicyToNoneQualityMissingValuePolicy<T>(Signal signal)
         {
             this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<T>());
         }
