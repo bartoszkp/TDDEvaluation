@@ -127,21 +127,31 @@ namespace Domain.Services.Implementation
             if (signals == null)
                 return null;
 
-            List<Signal> directPathSignals = new List<Signal>();
-            foreach(var signal in signals)
-            {
-                if (signal.Path.Length == pathDomain.Length + 1)
-                    directPathSignals.Add(signal);
-            }
+            var directPathSignals = signals
+                .Where(s => s.Path.Length == pathDomain.Length + 1)
+                .Select(s => s)
+                .ToArray();
 
-            List<Path> subPaths = new List<Path>();
-            foreach(var signal in signals)
-            {
-                if (signal.Path.Length > pathDomain.Length + 1 && !subPaths.Contains(signal.Path.GetPrefix(pathDomain.Length + 1)))
-                    subPaths.Add(signal.Path.GetPrefix(pathDomain.Length + 1));
-            }
+            //List<Signal> directPathSignals = new List<Signal>();
+            //foreach(var signal in signals)
+            //{
+            //    if (signal.Path.Length == pathDomain.Length + 1)
+            //        directPathSignals.Add(signal);
+            //}
+
+            var subPaths = signals
+                .Where(s => s.Path.Length > pathDomain.Length + 1)
+                .Select(s => s.Path.GetPrefix(pathDomain.Length + 1))
+                .ToArray();
+
+            //List<Path> subPaths = new List<Path>();
+            //foreach(var signal in signals)
+            //{
+            //    if (signal.Path.Length > pathDomain.Length + 1 && !subPaths.Contains(signal.Path.GetPrefix(pathDomain.Length + 1)))
+            //        subPaths.Add(signal.Path.GetPrefix(pathDomain.Length + 1));
+            //}
             
-            return new PathEntry(directPathSignals.AsEnumerable<Signal>().ToArray(), subPaths.AsEnumerable<Path>().ToArray());
+            return new PathEntry(directPathSignals, subPaths.AsEnumerable<Path>().ToArray());
         }
     }
 }
