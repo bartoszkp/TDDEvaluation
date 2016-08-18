@@ -226,12 +226,8 @@ namespace Domain.Services.Implementation
                     signalToAdd = signal;
                     signalsToAdd.Add(signalToAdd);
                 }
-            }
 
-            foreach (var signal in signals)
-            {
                 Path pathToAdd = signal.Path.GetPrefix(path.Length + 1);
-
                 if (!subPaths.Contains(pathToAdd) && pathToAdd.ToString() != signal.Path.ToString())
                 {
                     subPaths.Add(pathToAdd);
