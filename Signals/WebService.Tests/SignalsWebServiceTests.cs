@@ -803,6 +803,8 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoSignals_WhenGetPathEntry_ReturnNull()
             {
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y")));
+
                 var items = signalsWebService.GetPathEntry(new Dto.Path());
 
                 Assert.IsNull(items);
