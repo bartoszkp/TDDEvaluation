@@ -32,7 +32,7 @@ namespace WebService.Tests
 
 
         [TestMethod]
-        public void SignalExists_GetData_WithSameTimestaps_DataReturned()
+        public void SignalExists_GetData_WithSameTimestaps_SingleDatumReturned()
         {
             SetupWebService();
 
@@ -50,7 +50,7 @@ namespace WebService.Tests
 
             mvpRepoMock.Setup(m => m.Get(signal)).Returns(mvp.Object);
 
-
+            
             signalsDataRepoMock.Setup(s => s.GetData<int>(signal, timestamp, timestamp))
                 .Returns(new List<Datum<int>>());
 

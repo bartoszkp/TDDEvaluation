@@ -9,43 +9,36 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
+            /*Path[] paths = new[] { 
+                                                new Path() { Components = new[] { "root", "s1" } },
+                                                new Path() { Components = new[] { "root", "s1","s2" } } };
+
             Random random = new Random();
 
-            var id = client.Add(new Signal()
+            for (int i = 0; i < paths.Length; i++)
             {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "x" + random.Next(100), "y" + random.Next(100) } }
-            }).Id;
+                client.Add(new Signal()
+                {
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Month,
+                    Path = paths[i]
+                });
+            }
+            */
 
-            client.SetMissingValuePolicy(id.GetValueOrDefault(), new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
+            var result = client.GetPathEntry(new Path() { Components = new[] { "root","s1" } });
 
-
-
-            client.SetData(id.GetValueOrDefault(), new Datum[] {
-                                        new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
-                                        new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
-
-
-            var result = client.GetData(id.GetValueOrDefault(), new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
-
-            foreach (var d in result)
+            Console.WriteLine("Sygnały w 'root':");
+            foreach (var r in result.Signals)
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+            }
+            Console.WriteLine("Ścieżki podrzędne w 'root':");
+            foreach (var s in result.SubPaths)
+            {
+                Console.WriteLine(string.Join("/", s.Components));
             }
 
-
-            /*
-            var signal = client.Add(new Signal()
-            {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "ffdsfsd" } }
-            });
-
-            var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
-
-            Console.WriteLine(result.Length);*/
 
             Console.ReadKey();
 

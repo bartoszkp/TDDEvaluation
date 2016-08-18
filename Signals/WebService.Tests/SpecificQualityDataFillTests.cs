@@ -47,10 +47,6 @@ namespace WebService.Tests
 
 
 
-
-
-
-
         private void SetupWebService()
         {
             var signalsDomainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, mvpRepoMock.Object);
