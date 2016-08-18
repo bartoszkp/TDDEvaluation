@@ -48,10 +48,18 @@ namespace Domain.Services.Implementation
         public PathEntry GetPathEntry(Path path)
         {
             var prefixedSignals = signalsRepository.GetAllWithPathPrefix(path);
-            var subpaths = prefixedSignals
-                .Select(s => s.Path)
-                .Where(p => p.Components.Count() == path.Components.Count() + 1);
-            var signals = prefixedSignals.Where(s => s.Path.Components.ToArray().SequenceEqual(path.Components.ToArray()));
+                        
+            var subpaths_query = prefixedSignals
+                .Where(s => s.Path.Components.Count() > path.Components.Count() + 1)
+                .Select(s => s.Path.Components.Take(path.Components.Count() + 1))
+                .GroupBy(s => s.Last())
+                .Select(s => s.First());
+
+            var subpaths = new List<Path>();
+            foreach (var component_str in subpaths_query)            
+                subpaths.Add(Path.FromString(Path.JoinComponents(component_str)));
+
+            var signals = prefixedSignals.Where(s => s.Path.Components.Count() == path.Components.Count() + 1);
 
             var pathEntry = new PathEntry(signals, subpaths);
             return pathEntry;
