@@ -117,6 +117,8 @@ namespace Domain.Services.Implementation
             
             foreach(var s in signals)
             {
+                if (s.Path.ToString() == path.ToString()) continue;
+
                 if (s.Path.Components.Count() > pathDeep + 1)
                     resultSubPaths.Add(GetSubPath(s, pathDeep + 1));
                 else
