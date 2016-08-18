@@ -144,10 +144,10 @@ namespace Domain.Services.Implementation
             var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
             var signalsInDir = new List<Signal>();
             var subPaths = new List<Path>();
+            int pathDomainComponentsCount = path.Components.Count();
 
             foreach (var signal in allSignals)
             {
-                int pathDomainComponentsCount = path.Components.Count();
                 int signalPathComponentsCount = signal.Path.Components.Count();
 
                 if (signalPathComponentsCount - 1 == pathDomainComponentsCount)
