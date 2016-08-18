@@ -786,6 +786,18 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GivenASignalWithTimeRange_WhenGet_ReturnFilledCollection()
+            {
+                var signal = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("x/z"));
+
+                SetupSignalsDataRepositoryAndSignalsRepository(signal);
+
+                var collection = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
+
+                Assert.AreEqual(collection.Count(), 60);
+
+            }
             
 
 
@@ -821,6 +833,9 @@ namespace WebService.Tests
                     Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
                 }
             }
+
+
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
