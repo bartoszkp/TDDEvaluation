@@ -508,7 +508,7 @@ namespace WebService.Tests
 
             }
             [TestMethod]
-            public void GivenASignals_WhenGettingFiveSignalsWithPrefix_ItTwoPrefixes()
+            public void GivenASignals_WhenGettingFiveSignalsWithPrefix_ItReturnsTwoPrefixes()
             {
                 //arrange
                 List<Domain.Signal> signals = MakeSignals();
@@ -524,7 +524,47 @@ namespace WebService.Tests
                 CollectionAssert.AreEquivalent(new[] { "root", "podkatalog2" }, result.SubPaths.ToArray()[1].Components.ToArray());
 
             }
+            [TestMethod]
+            public void GivenASignals_WhenGettingSignalsWithPrefixThatSignalIsAlsoCatalog_ItReturnsThatSignal()
+            {
+                //arrange
+                var signals = new List<Domain.Signal>();
+                signals.Add(new Domain.Signal() { Path = Domain.Path.FromString("root/s5") });
+                signals.Add(new Domain.Signal() { Path = Domain.Path.FromString("root/s5/s4") });
+           
 
+                MakeASignalsRepositoryMockGetPathEntry(signals);
+                //act
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root" } });
+
+                //assert
+                Assert.AreEqual(1, result.SubPaths.Count());
+                Assert.AreEqual(1, result.Signals.Count());
+
+                CollectionAssert.AreEquivalent(new[] { "root", "s5" }, result.SubPaths.ToArray()[0].Components.ToArray());
+                CollectionAssert.AreEquivalent(new[] { "root", "s5" }, result.Signals.ToArray()[0].Path.Components.ToArray());
+            }
+            [TestMethod]
+            public void GivenASignals_WhenGettingSignalsWithPrefixThatIsFullSignalPath_ItReturnsThatSignal()
+            {
+                //arrange
+                var signals = new List<Domain.Signal>();
+                signals.Add(new Domain.Signal() { Path = Domain.Path.FromString("root/s5") });
+                signals.Add(new Domain.Signal() { Path = Domain.Path.FromString("root/s5/s4") });
+
+
+                MakeASignalsRepositoryMockGetPathEntry(signals);
+                //act
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root","s5" } });
+
+                //assert
+                Assert.AreEqual(0, result.SubPaths.Count());
+                Assert.AreEqual(1, result.Signals.Count());
+
+                CollectionAssert.AreEquivalent(new[] { "root", "s5","s4" }, result.Signals.ToArray()[0].Path.Components.ToArray());
+            }
             private List<Domain.Signal> MakeSignals()
             {
               var signals =new List<Domain.Signal>();
