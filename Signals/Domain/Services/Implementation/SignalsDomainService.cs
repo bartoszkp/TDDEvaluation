@@ -93,16 +93,6 @@ namespace Domain.Services.Implementation
             return mvp;
         }
 
-        private Signal MissingValuePolicySignal(int signalId)
-        {
-            var signal = this.signalsRepository.Get(signalId);
-
-            if (signal == null)
-                throw new SignalDoesntExistException();
-
-            return signal;
-        }
-
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
         {
             var signal = this.signalsRepository.Get(signalId);
@@ -121,45 +111,9 @@ namespace Domain.Services.Implementation
 
             var sortedList = result.OrderBy(x => x.Timestamp).ToList();
 
-            var r = GetMissingValuePolicy(signalId);
-            var time = fromIncludedUtc;
+            result = AddMissingDataDependOnMissingValuePolicy(sortedList, fromIncludedUtc, toExcludedUtc, signal);
 
-            if (r.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
-            {
-                while (time < toExcludedUtc)
-                {
-                    if (sortedList.FindIndex(x=>x.Timestamp==time)<0)
-                    {
-                     
-                        sortedList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
-                    }
-                    time = AddTime(signal.Granularity, time);
-                }
-            }
-            return sortedList.OrderBy(s=>s.Timestamp);
-        }
-
-        private  DateTime AddTime(Granularity granularity,DateTime time)
-        {
-            switch (granularity)
-            {
-                case Granularity.Second:
-                   return time.AddSeconds(1);
-                case Granularity.Minute:
-                    return time.AddMinutes(1);
-                case Granularity.Hour:
-                    return time.AddHours(1);
-                case Granularity.Day:
-                    return time.AddDays(1);
-                case Granularity.Week:
-                    return time.AddDays(7);
-                case Granularity.Month:
-                    return time.AddMonths(1);
-                case Granularity.Year:
-                    return time.AddYears(1);
-                default:
-                    return new DateTime();
-            }
+            return result.OrderBy(s=>s.Timestamp);
         }
 
         public Type GetDataTypeById(int signalId)
@@ -185,6 +139,83 @@ namespace Domain.Services.Implementation
             return new PathEntry(signalsFromSubdirectory, pathsFromSubdirectory);
         }
 
+
+        private Signal MissingValuePolicySignal(int signalId)
+        {
+            var signal = this.signalsRepository.Get(signalId);
+
+            if (signal == null)
+                throw new SignalDoesntExistException();
+
+            return signal;
+        }
+
+        private IEnumerable<Datum<T>> AddMissingDataDependOnMissingValuePolicy<T>
+            (List<Datum<T>> datumsList, DateTime fromIncludedUtc, DateTime toExcludedUtc, Signal signal)
+        {
+            var mvp = GetMissingValuePolicy(signal.Id.Value);
+            var time = fromIncludedUtc;
+
+            if (mvp is NoneQualityMissingValuePolicy<T>)
+                datumsList = AddNoneQualityMissingValuePolicy(datumsList, time, fromIncludedUtc, toExcludedUtc, signal.Granularity);
+
+            if (mvp is SpecificValueMissingValuePolicy<T>)
+                datumsList = AddSpecificQualityMissingValuePolicy(datumsList, time, fromIncludedUtc, toExcludedUtc, signal.Granularity, mvp);
+
+            return datumsList;
+        }
+
+        private List<Datum<T>> AddNoneQualityMissingValuePolicy<T>
+             (List<Datum<T>> datumsList, DateTime time, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity signalGranularity)
+        {
+            while (time < toExcludedUtc)
+            {
+                if (datumsList.FindIndex(x => x.Timestamp == time) < 0)
+                    datumsList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
+                time = AddTime(signalGranularity, time);
+            }
+
+            return datumsList;
+        }
+
+        private List<Datum<T>> AddSpecificQualityMissingValuePolicy<T>
+            (List<Datum<T>> datumsList, DateTime time, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity signalGranularity, MissingValuePolicyBase mvp)
+        {
+            var specifiedMvp = mvp as SpecificValueMissingValuePolicy<T>;
+            while (time < toExcludedUtc)
+            {
+                if (datumsList.FindIndex(x => x.Timestamp == time) < 0)
+                {
+                    datumsList.Add(new Datum<T>() { Quality = specifiedMvp.Quality, Timestamp = time, Value = specifiedMvp.Value });
+                }
+                time = AddTime(signalGranularity, time);
+            }
+
+            return datumsList;
+        }
+
+        private DateTime AddTime(Granularity granularity, DateTime time)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return time.AddSeconds(1);
+                case Granularity.Minute:
+                    return time.AddMinutes(1);
+                case Granularity.Hour:
+                    return time.AddHours(1);
+                case Granularity.Day:
+                    return time.AddDays(1);
+                case Granularity.Week:
+                    return time.AddDays(7);
+                case Granularity.Month:
+                    return time.AddMonths(1);
+                case Granularity.Year:
+                    return time.AddYears(1);
+                default:
+                    return new DateTime();
+            }
+        }
 
         private List<Signal> GetSignalsFromSubdirectory(IEnumerable<Signal> allSignals, int numberOfPathComponents)
         {
