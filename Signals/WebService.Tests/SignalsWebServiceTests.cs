@@ -694,7 +694,7 @@ namespace WebService.Tests
 
                 Assert.AreEqual(number_of_signals_in_path, result.Length);
                 foreach (var signal in result)
-                    CollectionAssert.AreEqual(signal.Path.Components.ToArray(), path.Components.ToArray());
+                    CollectionAssert.AreEqual(signal.Path.Components.Take(path.Components.Count()).ToArray(), path.Components.ToArray());
             }
 
             [TestMethod]
@@ -813,9 +813,9 @@ namespace WebService.Tests
                 int id = 1;
 
                 var signals = new List<Signal> {
-                    SignalWith(id++, DataType.Boolean, Granularity.Day,   path_domain),
-                    SignalWith(id++, DataType.Double,  Granularity.Week,  path_domain),
-                    SignalWith(id++, DataType.String,  Granularity.Month, path_domain)
+                    SignalWith(id++, DataType.Boolean, Granularity.Day,   path_domain + "s1"),
+                    SignalWith(id++, DataType.Double,  Granularity.Week,  path_domain + "s2"),
+                    SignalWith(id++, DataType.String,  Granularity.Month, path_domain + "s3")
                 };
 
                 signalsRepositoryMock
@@ -824,8 +824,8 @@ namespace WebService.Tests
 
                 if(addSubSignals)
                 {
-                    signals.Add(SignalWith(id++, DataType.String,  Granularity.Month, path_domain + "sub1"));
-                    signals.Add(SignalWith(id++, DataType.Decimal, Granularity.Year,  path_domain + "sub2"));
+                    signals.Add(SignalWith(id++, DataType.String,  Granularity.Month, (path_domain + "sub1") + "s4"));
+                    signals.Add(SignalWith(id++, DataType.Decimal, Granularity.Year,  (path_domain + "sub2") + "s5"));
                 }
 
                 foreach (Signal existingSignal in signals)
