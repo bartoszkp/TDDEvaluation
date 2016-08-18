@@ -21,7 +21,7 @@ namespace WebService
         void Delete(int signalId);
 
         [OperationContract]
-        IEnumerable<Signal> GetPathEntry(Path path);
+        PathEntry GetPathEntry(Path path);
 
         [OperationContract]
         IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);

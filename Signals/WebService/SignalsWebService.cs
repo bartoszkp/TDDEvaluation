@@ -57,11 +57,11 @@ namespace WebService
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Signal> GetPathEntry(Path pathDto)
+        public PathEntry GetPathEntry(Path pathDto)
         {
             var pathDomain = pathDto.ToDomain<Domain.Path>();
             var result = this.signalsDomainService.GetPathEntry(pathDomain);
-            return result.ToDto<IEnumerable<Signal>>();
+            return result.ToDto<Dto.PathEntry>();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
