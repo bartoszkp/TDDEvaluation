@@ -830,7 +830,7 @@ namespace WebService.Tests
                 
                 IEnumerable<Dto.Datum> returnedData = signalsWebService.GetData(signalId,new DateTime(2000,2,1), new DateTime(2000,6,1));
 
-                missingValuePolicyRepositoryMock.Setup(x => x.Get(signal)).Returns(new NoneQualityMissingValuePolicyInteger());
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(signal)).Returns(new SpecificValueyMissingValuePolicyInteger());
 
                 int expectedArrayLength = 4;
                 Assert.AreEqual(expectedArrayLength,returnedData.ToArray().Length);
@@ -842,6 +842,52 @@ namespace WebService.Tests
                     new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = default(int) } };
 
                 DatumArraysAreEqual(expectedResult.ToArray(),returnedData.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenAData_WhenGettingData_FillingDataWithSpecificValueMissingPolicy()
+            {
+                SetupWebService();
+
+                var signal = GetDefaultSignal_IntegerMonth();
+
+                Dto.Datum[] datumArray = new Dto.Datum[]{
+                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (int) 5},
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int) 2} };
+
+                int signalId = 3;
+                signalsRepositoryMock
+                    .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
+                    .Returns<int>(z => {
+                        var signal2 = signal;
+                        signal.Id = signalId;
+                        return signal;
+                    });
+
+                signalsDataRepositoryMock
+                    .Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datumArray.ToDomain<IEnumerable<Domain.Datum<int>>>());
+
+                IEnumerable<Dto.Datum> returnedData = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 6, 1));
+
+                var policy = new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
+                {
+                    Value = (int)42,
+                    Quality = Quality.Fair
+                };
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(signal)).Returns(policy);
+
+                int expectedArrayLength = 4;
+                Assert.AreEqual(expectedArrayLength, returnedData.ToArray().Length);
+
+                Dto.Datum[] expectedResult = new Dto.Datum[]{
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = (int)42 },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (int)5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = (int)42 } };
+
+                DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
             }
 
             private void DatumArraysAreEqual(Dto.Datum[] expected,Dto.Datum[] actual)
