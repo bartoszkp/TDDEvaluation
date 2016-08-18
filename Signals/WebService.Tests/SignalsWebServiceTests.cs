@@ -805,11 +805,20 @@ namespace WebService.Tests
             {
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y")));
 
-                var items = signalsWebService.GetPathEntry(new Dto.Path());
+                var items = signalsWebService.GetPathEntry(null);
 
                 Assert.IsNull(items);
             }
 
+            [TestMethod]
+            public void GivenEmptyPath_WhenGetPathEntry_ReturnEmptyPathEntry()
+            {
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y")));
+
+                var items = signalsWebService.GetPathEntry(new Dto.Path());
+
+                Assert.IsNotNull(items);
+            }
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
