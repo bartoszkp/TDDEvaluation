@@ -13,26 +13,50 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "asdfgew" } }
+                Path = new Path() { Components = new[] { "root/s1" } }
+            });
+            var signal2 = client.Add(new Signal()
+            {
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root/s1/s2" } }
+            });
+            var signal3 = client.Add(new Signal()
+            {
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root/s1/s2/s3" } }
             });
 
-            client.SetMissingValuePolicy(signal1.Id.Value, new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
+            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
+            var result2 = client.GetPathEntry(new Path() { Components = new[] { "root", "s1" } });
 
-            client.SetData(signal1.Id.Value, new Datum[]
+            Console.WriteLine("Sygnały w 'root':");
+            foreach (var r in result.Signals)
             {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
-            });
-
-            var result = client.GetData(signal1.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
-
-            foreach (var d in result)
+                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+            }
+            Console.WriteLine("Ścieżki podrzędne w 'root':");
+            foreach (var s in result.SubPaths)
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                Console.WriteLine(string.Join("/", s.Components));
+            }
+
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("Sygnały w 'root/s1':");
+            foreach (var r in result2.Signals)
+            {
+                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+            }
+            Console.WriteLine("Ścieżki podrzędne w 'root/s1':");
+            foreach (var s in result2.SubPaths)
+            {
+                Console.WriteLine(string.Join("/", s.Components));
             }
 
             Console.ReadKey();
-
         }
     }
 }
