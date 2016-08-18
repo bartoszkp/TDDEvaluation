@@ -820,7 +820,15 @@ namespace WebService.Tests
                 Assert.IsNotNull(items);
             }
 
+            [TestMethod]
+            public void GivenAPathEntry_WhenGetPathEntry_RepositoryGetPrefixIsCaled()
+            {
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("z/y")));
 
+                var items = signalsWebService.GetPathEntry(new Dto.Path());
+
+                signalsRepositoryMock.Verify(x => x.GetAllWithPathPrefix(It.IsAny<Domain.Path>()));
+            }
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
