@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\CouldntGetASignalException.cs" />
+    <Compile Include="Exceptions\CouldntGetMissingValuePolicyException.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\TypeUnsupportedException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />

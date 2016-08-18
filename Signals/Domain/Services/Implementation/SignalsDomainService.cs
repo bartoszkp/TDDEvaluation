@@ -66,12 +66,12 @@ namespace Domain.Services.Implementation
             var signal = this.GetById(signalId);
 
             if (signal == null)
-                throw new ArgumentException("Signal with given Id not found.");
+                throw new CouldntGetASignalException();
 
             var mvp = this.missingValuePolicyRepository.Get(signal);
 
             if (mvp == null)
-                throw new ArgumentException("Argument does not exist");
+                throw new CouldntGetMissingValuePolicyException();
 
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
@@ -94,7 +94,7 @@ namespace Domain.Services.Implementation
         {
             var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            var policy = SetNoneQualityMissingValuePolicy(signal);
+            MissingValuePolicyBase policy = GetMissingValuePolicy(signal.Id.Value);
 
             return DataFilledWithMissingValues<T>(data, signal, policy ,fromIncludedUtc,toExcludedUtc);
         }
@@ -152,6 +152,16 @@ namespace Domain.Services.Implementation
             {
                 return Domain.Datum<T>.CreateNone(signal, timestamp);
             }
+            else if (policy is SpecificValueMissingValuePolicy<T>)
+            {
+                var specificPolicy = policy as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
+                return new Domain.Datum<T>()
+                {
+                    Quality = specificPolicy.Quality,
+                    Timestamp = timestamp,
+                    Value = specificPolicy.Value
+                };
+            }
             else
             {
                 throw new NotImplementedException();
@@ -202,6 +212,25 @@ namespace Domain.Services.Implementation
                     return new NoneQualityMissingValuePolicy<int>();
                 case DataType.String:
                     return new NoneQualityMissingValuePolicy<string>();
+                default:
+                    throw new TypeUnsupportedException();
+            }
+        }
+
+        private MissingValuePolicyBase SetSpecificValueMissingValuePolicy(Signal signal)
+        {
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    return new SpecificValueMissingValuePolicy<bool>();
+                case DataType.Decimal:
+                    return new SpecificValueMissingValuePolicy<decimal>();
+                case DataType.Double:
+                    return new SpecificValueMissingValuePolicy<double>();
+                case DataType.Integer:
+                    return new SpecificValueMissingValuePolicy<int>();
+                case DataType.String:
+                    return new SpecificValueMissingValuePolicy<string>();
                 default:
                     throw new TypeUnsupportedException();
             }
