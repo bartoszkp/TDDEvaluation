@@ -67,7 +67,7 @@ namespace WebService
             {
                 if (i.Path.Components.Count() == pathDto.Components.Count() + 1)
                     newSignalList.Add(i.ToDto<Dto.Signal>());
-                else 
+                else if(i.Path.Components.Count()>pathCount)
                 {
 
                     var c = pathDto.Components.ToList();
