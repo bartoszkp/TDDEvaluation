@@ -80,8 +80,6 @@ namespace Domain.Services.Implementation
 
         private IEnumerable<Datum<T>> CheckMissingValues<T>(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var newList = new List<Datum<T>>();
-
             switch(signal.Granularity)
             {
                 case Granularity.Second:
