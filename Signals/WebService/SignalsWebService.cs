@@ -64,42 +64,34 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var signal = GetById(signalId);
+            var signal = GetById(signalId).ToDomain<Domain.Signal>();
 
             if (signal == null)
                 throw new Domain.Exceptions.GettingDataOfNotExistingSignal();
 
-            if (signal.DataType == Dto.DataType.Boolean)
+            var typename = signal.DataType.GetNativeType().Name;
+
+            switch (typename)
             {
-                return signalsDomainService
-                    .GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc)
-                    .ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType == Dto.DataType.Decimal)
-            {
-                return signalsDomainService
-                    .GetData<decimal>(signalId, fromIncludedUtc, toExcludedUtc)
-                    .ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType == Dto.DataType.Double)
-            {
-                return signalsDomainService
-                    .GetData<double>(signalId, fromIncludedUtc, toExcludedUtc)
-                    .ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType == Dto.DataType.Integer)
-            {
-                return signalsDomainService
-                    .GetData<int>(signalId, fromIncludedUtc, toExcludedUtc)
-                    .ToDto<IEnumerable<Dto.Datum>>();
-            }
-            else if (signal.DataType == Dto.DataType.String)
-            {
-                return signalsDomainService
-                    .GetData<string>(signalId, fromIncludedUtc, toExcludedUtc)
-                    .ToDto<IEnumerable<Dto.Datum>>();
+                case "Int32":
+                    return GenericGetDataCall<int>(signalId, fromIncludedUtc, toExcludedUtc);
+                case "Double":
+                    return GenericGetDataCall<double>(signalId, fromIncludedUtc, toExcludedUtc);
+                case "Decimal":
+                    return GenericGetDataCall<decimal>(signalId, fromIncludedUtc, toExcludedUtc);
+                case "Boolean":
+                    return GenericGetDataCall<bool>(signalId, fromIncludedUtc, toExcludedUtc);
+                case "String":
+                    return GenericGetDataCall<string>(signalId, fromIncludedUtc, toExcludedUtc);
             }
             return null;
+        }
+
+        private IEnumerable<Datum> GenericGetDataCall<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            return signalsDomainService
+                    .GetData<T>(signalId, fromIncludedUtc, toExcludedUtc)
+                    .ToDto<IEnumerable<Dto.Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
