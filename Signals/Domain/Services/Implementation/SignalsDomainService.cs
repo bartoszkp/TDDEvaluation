@@ -121,8 +121,8 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            
-            if(GetMissingValuePolicy(signal)!=null)
+            var policy = GetMissingValuePolicy(signal);
+            if(policy != null)
             {
                 var gettingList = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
                 var returnList = new List<Datum<T>>();
@@ -141,7 +141,17 @@ namespace Domain.Services.Implementation
                                 Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
                                 if (xx == null)
                                 {
-                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
                                     returnList.Add(addingItem);
                                 }
                                 else
@@ -161,7 +171,17 @@ namespace Domain.Services.Implementation
                                 Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
                                 if (xx == null)
                                 {
-                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
                                     returnList.Add(addingItem);
                                 }
                                 else
@@ -181,7 +201,17 @@ namespace Domain.Services.Implementation
                                 Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
                                 if (xx == null)
                                 {
-                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
                                     returnList.Add(addingItem);
                                 }
                                 else
@@ -201,7 +231,17 @@ namespace Domain.Services.Implementation
                                 Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
                                 if (xx == null)
                                 {
-                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
                                     returnList.Add(addingItem);
                                 }
                                 else
@@ -223,7 +263,17 @@ namespace Domain.Services.Implementation
                                 Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
                                 if (xx == null)
                                 {
-                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
                                     returnList.Add(addingItem);
                                 }
                                 else
@@ -243,7 +293,17 @@ namespace Domain.Services.Implementation
                                 Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
                                 if (xx == null)
                                 {
-                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
                                     returnList.Add(addingItem);
                                 }
                                 else
