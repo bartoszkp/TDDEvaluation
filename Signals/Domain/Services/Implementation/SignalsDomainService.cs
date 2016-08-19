@@ -282,12 +282,22 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path path)
         {
+            var signals = signalsRepository.GetAllWithPathPrefix(path);
+            List<Signal> ListOfSignals = new List<Signal>();
+
             if (path == null)
                 return null;
             else
             {
-                var items = signalsRepository.GetAllWithPathPrefix(path);
-                return new PathEntry(items, null);
+                foreach (var item in signals)
+                {
+                    if (item.Path.Length == path.Length + 1)
+                    {
+                        ListOfSignals.Add(item);
+                        continue;
+                    }
+                }
+                return new PathEntry(ListOfSignals, null);
             }
 
         }
