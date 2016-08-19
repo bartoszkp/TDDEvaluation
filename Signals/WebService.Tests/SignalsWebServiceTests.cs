@@ -394,6 +394,25 @@ namespace WebService.Tests
 
 
             [TestMethod]
+            public void GivenASignalThatIsAFolder_WhenGettingPathEntry_ReturnsSignalAsSignalAndAsFolder()
+            {
+                GivenSignalsForPathEntry(new Signal[]
+                {
+                    new Signal() {Id = 1, Path = Domain.Path.FromString("root/s1") },
+                    new Signal() {Id = 2, Path = Domain.Path.FromString("root/s1/s2") }
+                }, Domain.Path.FromString("root"));
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                CollectionAssert.AreEqual(new string[] { "root", "s1" }, result.SubPaths.Single().Components.ToArray());
+                Assert.IsTrue(
+                    CompareSignals(
+                        new Dto.Signal() { Id = 1, Path = new Dto.Path() { Components = new string[] { "root", "s1" } } },
+                        result.Signals.Single()));
+            }
+
+
+            [TestMethod]
             public void GivenASignalWithSpecificValueMissingValuePolicy_WhenGettingData_MissingValuesHaveSpecificValue()
             {
                 var signal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x/y"));

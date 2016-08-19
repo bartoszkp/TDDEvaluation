@@ -9,23 +9,26 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var newSignal = new Signal()
+            client.Add(new Signal()
             {
-                DataType = DataType.String,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "stringSignal2" } }
-            };
-
-            var id = client.Add(newSignal).Id.Value;
-
-            client.SetData(id, new[] { new Datum() { Quality = Quality.Good, Value = null, Timestamp = new DateTime(2000, 1, 1) } });
-
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
-
-            foreach (var d in result)
+                Path = new Path() { Components = new string[] { "root", "s1" } }
+            });
+            client.Add(new Signal()
             {
-                Console.WriteLine(d.Quality);
-                Console.WriteLine(d.Value ?? "null");
+                Path = new Path() { Components = new string[] { "root", "s1", "s2" } }
+            });
+
+            var result = client.GetPathEntry(new Path() { Components = new[] { "root", "s1" } });
+
+            Console.WriteLine("Sygnały w 'root':");
+            foreach (var r in result.Signals)
+            {
+                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+            }
+            Console.WriteLine("Ścieżki podrzędne w 'root':");
+            foreach (var s in result.SubPaths)
+            {
+                Console.WriteLine(string.Join("/", s.Components));
             }
 
             Console.ReadKey();
