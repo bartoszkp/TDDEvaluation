@@ -23,8 +23,6 @@ namespace SignalsIntegrationTests
             TestsBase.ClassCleanup();
         }
 
-        //TODO: add SetData test with Dto.Datum when Value type doesn't match signal type
-
         //TODO: add test with SetData for different signals with the same data type (https://gitlab.tt.com.pl/TDDEvaluation/tdd4/issues/13)
 
         [TestMethod]
@@ -34,6 +32,17 @@ namespace SignalsIntegrationTests
             GivenASignalWith(Granularity.Second);
 
             client.SetData(signalId, new Dto.Datum[0]);
+        }
+
+        [TestMethod]
+        [TestCategory("issue2")]
+        public void GivenASignal_WhenSettingDataWithIncorrectType_ShouldThrow()
+        {
+            GivenASignalWith(DataType.Decimal, Granularity.Day);
+
+            var data = new[] { new Dto.Datum() { Value = (double)1, Quality = Dto.Quality.Good, Timestamp = new DateTime() } };
+
+            Assertions.AssertThrows(() => client.SetData(signalId, data));
         }
 
         [TestMethod]

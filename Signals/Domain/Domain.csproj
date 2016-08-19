@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\IncompatibleSignalDataType.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
+    <Compile Include="Exceptions\IncorrectDataType.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />

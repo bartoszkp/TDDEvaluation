@@ -98,6 +98,12 @@ namespace WebService
 
             for (int i = 0;i < dataArray.Length;++i)
             {
+                var dataType = dataArray[i].Value?.GetType();
+                if (dataType != null && !dataType.Equals(signal.DataType.GetNativeType()))
+                {
+                    throw new Domain.Exceptions.IncorrectDataType(dataType.Name, signal.DataType.ToString());
+                }
+
                 concreteData.SetValue(dataArray[i].ToDomain(concreteDatum), i);
             }
 
