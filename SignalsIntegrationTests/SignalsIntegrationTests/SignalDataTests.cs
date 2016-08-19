@@ -23,8 +23,6 @@ namespace SignalsIntegrationTests
             TestsBase.ClassCleanup();
         }
 
-        //TODO: add test with SetData for different signals with the same data type (https://gitlab.tt.com.pl/TDDEvaluation/tdd4/issues/13)
-
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenASignal_WhenSettingEmptyData_ShouldNotThrow()
@@ -43,6 +41,24 @@ namespace SignalsIntegrationTests
             var data = new[] { new Dto.Datum() { Value = (double)1, Quality = Dto.Quality.Good, Timestamp = new DateTime() } };
 
             Assertions.AssertThrows(() => client.SetData(signalId, data));
+        }
+
+        [TestMethod]
+        [TestCategory("issue2")]
+        public void GivenTwoSignalsWithData_WhenGettingData_ReturnsCorrectDataForBoth()
+        {
+            GivenASignalWith(DataType.Decimal, Granularity.Day);
+            GivenData(new Datum<decimal>() { Timestamp = UniversalBeginTimestamp, Value = 1.0m });
+            var signalId1 = signalId;
+            GivenASignalWith(DataType.Decimal, Granularity.Day);
+            GivenData(new Datum<decimal>() { Timestamp = UniversalBeginTimestamp, Value = 2.0m });
+            var signalId2 = signalId;
+
+            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp);
+            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp);
+
+            Assert.AreEqual(1.0m, result1.SingleOrDefault()?.Value);
+            Assert.AreEqual(2.0m, result2.SingleOrDefault()?.Value);
         }
 
         [TestMethod]
