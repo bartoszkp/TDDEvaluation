@@ -284,6 +284,7 @@ namespace Domain.Services.Implementation
         {
             var signals = signalsRepository.GetAllWithPathPrefix(path);
             List<Signal> ListOfSignals = new List<Signal>();
+            List<Path> SubPaths = new List<Path>();
 
             if (path == null)
                 return null;
@@ -296,8 +297,14 @@ namespace Domain.Services.Implementation
                         ListOfSignals.Add(item);
                         continue;
                     }
+                    if (item.Path.Length > path.Length)
+                    {
+                        var subpath = item.Path.GetPrefix(path.Length + 1);
+                        if (!SubPaths.Contains(subpath))
+                            SubPaths.Add(subpath);
+                    }
                 }
-                return new PathEntry(ListOfSignals, null);
+                return new PathEntry(ListOfSignals, SubPaths);
             }
 
         }
