@@ -10,21 +10,21 @@ namespace ExampleSignalClient
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
 
-            var newSignal6 = new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "s1" } }
-            };
-            client.Add(newSignal6);
+            //var newSignal6 = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "root", "s1" } }
+            //};
+            //client.Add(newSignal6);
 
-            var newSignal = new Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "s1", "s2" } }
-            };
-            client.Add(newSignal);
+            //var newSignal = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "root", "s1", "s2" } }
+            //};
+            //client.Add(newSignal);
 
 
             //var newSignal2 = new Signal()
@@ -60,7 +60,7 @@ namespace ExampleSignalClient
             //client.Add(newSignal5);
 
 
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root", "s1" } });
+            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
 
             Console.WriteLine("Sygnały w 'root':");
             foreach (var r in result.Signals)

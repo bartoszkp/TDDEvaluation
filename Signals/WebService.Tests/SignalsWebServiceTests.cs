@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿
+using System.Linq;
 using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
@@ -149,7 +150,7 @@ namespace WebService.Tests
             {
                 int signalId = 1;
                 GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y")));
-                GivenData(signalId,  new Domain.Datum<double>[] {
+                GivenData(signalId, new Domain.Datum<double>[] {
                     new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
                     new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
                     new Domain.Datum<double>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
@@ -372,12 +373,12 @@ namespace WebService.Tests
             {
                 int signalId = 1;
                 GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y")));
-                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), new DateTime(2000, 2, 1), new DateTime(2000, 2, 1))).Returns(Enumerable.Repeat(new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },1));
+                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), new DateTime(2000, 2, 1), new DateTime(2000, 2, 1))).Returns(Enumerable.Repeat(new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }, 1));
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1));
 
                 var expectedDataDto = Enumerable.Repeat(new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }, 1);
-                AssertDataDtoEquals(result,expectedDataDto);
+                AssertDataDtoEquals(result, expectedDataDto);
             }
 
             [TestMethod]
@@ -415,7 +416,7 @@ namespace WebService.Tests
                     new Domain.Datum<double>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 }
                 });
 
-                signalsWebService.GetData(signalId, new DateTime(2000,1,1), new DateTime(2000,1,3));
+                signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
                 missingValuePolicyRepositoryMock.Verify(mvp => mvp.Get(It.Is<Domain.Signal>(s => s.Id == signalId)), Times.Once);
             }
 
@@ -425,16 +426,16 @@ namespace WebService.Tests
             {
                 int signalId = 1;
                 var signal = SignalWith(signalId, DataType.Integer, Granularity.Day, Path.FromString("x/y"));
-           
+
 
                 var data = new Domain.Datum<int>[] {
                     new Domain.Datum<int>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = (int)2 },
                     new Domain.Datum<int>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 4), Value = (int)1 },
                 };
-            
+
                 GivenASignal(signal);
                 signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(data);
-                   
+
                 GivenMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>()
                 {
                     Signal = signal,
@@ -449,7 +450,7 @@ namespace WebService.Tests
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 4), Value = (int)1 }
                 };
 
-                var result = signalsWebService.GetData(signalId, new DateTime(2000,1,1), new DateTime(2000,1,5));
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
 
                 AssertDataDtoEquals(expectedResult, result);
             }
@@ -462,7 +463,7 @@ namespace WebService.Tests
                 var signal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") };
 
                 GivenASignal(signal);
-                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(),It.IsAny<DateTime>(), It.IsAny<DateTime>() )).Returns(Enumerable.Empty<Datum<double>>);
+                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(Enumerable.Empty<Datum<double>>);
 
                 GivenMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>()
                 {
@@ -470,7 +471,7 @@ namespace WebService.Tests
                     Id = signalId
                 });
 
-                var result = signalsWebService.GetData(1,new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
 
                 Assert.AreEqual(5, result.Count());
             }
@@ -487,8 +488,8 @@ namespace WebService.Tests
 
                 missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.Is<Domain.Signal>(s => s.DataType == DataType.Integer &&
                     s.Granularity == Granularity.Minute &&
-                    s.Path.ToString().Equals("root/signal1")), 
-                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()), 
+                    s.Path.ToString().Equals("root/signal1")),
+                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()),
                     Times.Once);
             }
 
@@ -508,11 +509,11 @@ namespace WebService.Tests
                 GivenASignal(new Signal() { Id = 1, DataType = DataType.Double, Granularity = Granularity.Day, Path = Path.FromString("root/s1") });
                 signalsRepositoryMock.Setup(x => x.GetAllWithPathPrefix(It.IsAny<Path>())).Returns(signals);
 
-                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new []{ "root" } });
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root" } });
 
                 Assert.AreEqual(string.Join("/", result.Signals.ToList()[0].Path.Components), "root/s1");
-                Assert.AreEqual(string.Join("/", result.SubPaths.ToList()[0].Components), "podkatalog");
-                Assert.AreEqual(string.Join("/", result.SubPaths.ToList()[1].Components), "podkatalog2");
+                Assert.AreEqual(string.Join("/", result.SubPaths.ToList()[0].Components), "root/podkatalog");
+                Assert.AreEqual(string.Join("/", result.SubPaths.ToList()[1].Components), "root/podkatalog2");
             }
 
             [TestMethod]
@@ -568,7 +569,7 @@ namespace WebService.Tests
 
             private bool DatumDomainEquals<T>(Domain.Datum<T> datum, Domain.Quality quality, DateTime timeStamp, T value, int signalId)
             {
-                return datum.Quality == quality && datum.Timestamp == timeStamp 
+                return datum.Quality == quality && datum.Timestamp == timeStamp
                     && datum.Value.Equals(value) && datum.Signal.Id == signalId;
             }
 
@@ -619,7 +620,7 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
                     .Returns<Domain.Signal>(s => s);
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, 
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
                     signalsDataRepositoryMock.Object,
                     missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
@@ -644,3 +645,4 @@ namespace WebService.Tests
         }
     }
 }
+
