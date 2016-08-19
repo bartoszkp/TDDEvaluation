@@ -175,14 +175,14 @@ namespace Domain.Services.Implementation
                 var signalPath = string.Join("/", FindSignals[i].Path.Components);
                 var domainPathString = string.Join("/", domainPath.Components);
 
-                if (signalPath.Length < domainPathString.Length + 1) continue;
+                if (signalPath.Length<domainPathString.Length+1) continue;
                 var pathWithoutDomainPath = signalPath.Remove(signalPath.IndexOf(domainPathString), domainPathString.Length + 1);
 
                 string[] Components = pathWithoutDomainPath.Split('/');
 
                 if (Components.Count() > 1)
                 {
-                    if (!subPaths.Contains(Path.FromString(domainPathString + "/" + Components[0]))) subPaths.Add(Path.FromString(domainPathString + "/" + Components[0]));
+                    if (!subPaths.Contains(Path.FromString(domainPathString+Components[0]))) subPaths.Add(Path.FromString(domainPathString+Components[0])); 
                 }
                 else
                 {
@@ -190,7 +190,7 @@ namespace Domain.Services.Implementation
                 }
             }
 
-            return new PathEntry(pathEntrySignals, subPaths);
+            return new PathEntry(pathEntrySignals,subPaths);
         }
     }
 }
