@@ -951,7 +951,7 @@ namespace WebService.Tests
             public void SpecificValueMissingValuePolicy_WhenGetData_FillInt()
             {
                 int value = 4;
-                var signal1 = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
+                var signal1 = SignalWith(1, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
 
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
 
