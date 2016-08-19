@@ -174,6 +174,8 @@ namespace Domain.Services.Implementation
             {
                 var signalPath = string.Join("/", FindSignals[i].Path.Components);
                 var domainPathString = string.Join("/", domainPath.Components);
+
+                if (signalPath.Length<domainPathString.Length+1) continue;
                 var pathWithoutDomainPath = signalPath.Remove(signalPath.IndexOf(domainPathString), domainPathString.Length + 1);
 
                 string[] Components = pathWithoutDomainPath.Split('/');

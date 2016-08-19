@@ -9,29 +9,29 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            //var newSignal = new Signal()
-            //{
-            //    DataType = DataType.Double,
-            //    Granularity = Granularity.Month,
-            //    Path = new Path() { Components = new[] { "s0" } }
-            //};
-            //client.Add(newSignal);
 
+            var newSignal6 = new Signal()
+            {
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "s1" } }
+            };
+            client.Add(newSignal6);
 
-            //var newSignal6 = new Signal()
-            //{
-            //    DataType = DataType.Double,
-            //    Granularity = Granularity.Month,
-            //    Path = new Path() { Components = new[] { "root","s1" } }
-            //};
-            //client.Add(newSignal6);
+            var newSignal = new Signal()
+            {
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "s1", "s2" } }
+            };
+            client.Add(newSignal);
 
 
             //var newSignal2 = new Signal()
             //{
             //    DataType = DataType.Double,
             //    Granularity = Granularity.Month,
-            //    Path = new Path() { Components = new[] { "root", "podkatalog","s2" } }
+            //    Path = new Path() { Components = new[] { "root", "podkatalog", "s2" } }
             //};
             //client.Add(newSignal2);
 
@@ -47,7 +47,7 @@ namespace ExampleSignalClient
             //{
             //    DataType = DataType.Double,
             //    Granularity = Granularity.Month,
-            //    Path = new Path() { Components = new[] { "root", "podkatalog", "podkatalog","s4" } }
+            //    Path = new Path() { Components = new[] { "root", "podkatalog", "podkatalog", "s4" } }
             //};
             //client.Add(newSignal4);
 
@@ -60,7 +60,7 @@ namespace ExampleSignalClient
             //client.Add(newSignal5);
 
 
-            var result = client.GetPathEntry(new Path() { Components = new[] { "s0" } });
+            var result = client.GetPathEntry(new Path() { Components = new[] { "root", "s1" } });
 
             Console.WriteLine("Sygnały w 'root':");
             foreach (var r in result.Signals)
