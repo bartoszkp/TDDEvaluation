@@ -9,16 +9,70 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var signal = client.Add(new Signal()
+            //var newSignal = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "s0" } }
+            //};
+            //client.Add(newSignal);
+
+
+            //var newSignal6 = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "root","s1" } }
+            //};
+            //client.Add(newSignal6);
+
+
+            //var newSignal2 = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "root", "podkatalog","s2" } }
+            //};
+            //client.Add(newSignal2);
+
+            //var newSignal3 = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "root", "podkatalog", "s3" } }
+            //};
+            //client.Add(newSignal3);
+
+            //var newSignal4 = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "root", "podkatalog", "podkatalog","s4" } }
+            //};
+            //client.Add(newSignal4);
+
+            //var newSignal5 = new Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "root", "podkatalog2", "s5" } }
+            //};
+            //client.Add(newSignal5);
+
+
+            var result = client.GetPathEntry(new Path() { Components = new[] { "s0" } });
+
+            Console.WriteLine("Sygnały w 'root':");
+            foreach (var r in result.Signals)
             {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "signal" } }
-            });
+                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
+            }
+            Console.WriteLine("Ścieżki podrzędne w 'root':");
+            foreach (var s in result.SubPaths)
+            {
+                Console.WriteLine(string.Join("/", s.Components));
+            }
 
-            var result = client.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
-
-            Console.WriteLine(result.Length);
             Console.ReadKey();
         }
     }

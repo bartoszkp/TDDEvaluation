@@ -32,6 +32,7 @@ namespace WebService
             var result = signalsDomainService.Get(path);
 
             return result?.ToDto<Dto.Signal>();
+
         }
 
         public Signal GetById(int signalId)
@@ -56,14 +57,15 @@ namespace WebService
 
         public PathEntry GetPathEntry(Path pathDto)
         {
-            throw new NotImplementedException();
+            return signalsDomainService.GetPathEntry(pathDto.ToDomain<Domain.Path>())?.ToDto<Dto.PathEntry>();
         }
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Domain.Signal domainSignal = GetById(signalId)?.ToDomain<Domain.Signal>();
 
-            if(domainSignal == null)
+
+            if (domainSignal == null)
                 throw new ArgumentException("A signal with the given Id does not exist");
 
             switch (domainSignal.DataType)
@@ -128,7 +130,7 @@ namespace WebService
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
             Domain.Signal signal = GetById(signalId)?.ToDomain<Domain.Signal>();
-            if(signal == null)
+            if (signal == null)
                 throw new ArgumentException("A signal with the given Id does not exist");
 
             var result = signalsDomainService.GetMissingValuePolicy(signal);

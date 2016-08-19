@@ -89,27 +89,27 @@ namespace Domain.Services.Implementation
             var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
             var date = fromIncludedUtc;
 
-                while(date<toExcludedUtc)
-                {
-                    var datum = (from x in result
-                                 where x.Timestamp == date
-                                 select x).FirstOrDefault();
+            while (date < toExcludedUtc)
+            {
+                var datum = (from x in result
+                             where x.Timestamp == date
+                             select x).FirstOrDefault();
 
-                    if (datum == null)
-                    {
-                      Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy); 
-                      result.Add(tempDatum);
-                    }
-                    date = AddTime(signal.Granularity, date);
+                if (datum == null)
+                {
+                    Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy);
+                    result.Add(tempDatum);
                 }
-            
+                date = AddTime(signal.Granularity, date);
+            }
+
             if (skipFirst == true) return result.OrderBy(x => x.Timestamp).Skip(1);
             return result.OrderBy(x => x.Timestamp);
         }
 
         private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy)
         {
-            if(missingValuePolicy is NoneQualityMissingValuePolicy<T>)
+            if (missingValuePolicy is NoneQualityMissingValuePolicy<T>)
             {
                 return new Datum<T>
                 {
@@ -119,7 +119,7 @@ namespace Domain.Services.Implementation
                     Value = default(T)
                 };
             }
-            if(missingValuePolicy is SpecificValueMissingValuePolicy<T>)
+            if (missingValuePolicy is SpecificValueMissingValuePolicy<T>)
             {
                 return new Datum<T>
                 {
@@ -133,7 +133,7 @@ namespace Domain.Services.Implementation
         }
 
 
-        
+
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
             var result = this.missingValuePolicyRepository.Get(signal);
@@ -163,5 +163,33 @@ namespace Domain.Services.Implementation
             return date;
         }
 
+        public PathEntry GetPathEntry(Path domainPath)
+        {
+            var FindSignals = signalsRepository.GetAllWithPathPrefix(domainPath).ToList();
+
+            List<Path> subPaths = new List<Path>();
+            List<Signal> pathEntrySignals = new List<Signal>();
+
+            for (int i = 0; i < FindSignals.Count(); i++)
+            {
+                var signalPath = string.Join("/", FindSignals[i].Path.Components);
+                var domainPathString = string.Join("/", domainPath.Components);
+                var pathWithoutDomainPath = signalPath.Remove(signalPath.IndexOf(domainPathString), domainPathString.Length + 1);
+
+                string[] Components = pathWithoutDomainPath.Split('/');
+
+                if (Components.Count() > 1)
+                {
+                    if (!subPaths.Contains(Path.FromString(Components[0]))) subPaths.Add(Path.FromString(Components[0])); 
+                    
+                }
+                else
+                {
+                    pathEntrySignals.Add(signalsRepository.Get(FindSignals[i].Path));
+                }
+            }
+
+            return new PathEntry(pathEntrySignals,subPaths);
+        }
     }
 }
