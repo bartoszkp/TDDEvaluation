@@ -923,7 +923,29 @@ namespace WebService.Tests
                 Assert.AreEqual(item.SubPaths.Count(), 1);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_SpecificValueMissingValuePolicyFill()
+            {
+                var signal1 = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
 
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble() { Value = (double)42.52 });
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new Datum<double>[]
+                        {
+                            new Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                            new Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                        });
+
+                var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                Assert.AreEqual(items.Count(), 3);
+                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, (double)42.52);
+
+            }
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
@@ -1113,6 +1135,7 @@ namespace WebService.Tests
 
             private void SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(Domain.Signal existingSignal)
             {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 missingValuePolicyRepositoryMock
                     .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
@@ -1123,7 +1146,7 @@ namespace WebService.Tests
                     .Setup(srm => srm.Get(existingSignal.Id.Value))
                     .Returns(existingSignal);
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
