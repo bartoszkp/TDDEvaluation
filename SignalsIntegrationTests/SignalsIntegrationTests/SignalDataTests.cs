@@ -93,26 +93,6 @@ namespace SignalsIntegrationTests
             });
         }
 
-        // TODO: duplicate of GivenNoData_ReturnsNoneQualityForTheWholeRange?
-        [TestMethod]
-        [TestCategory("issue6")]
-        public void SignalWithoutDataReturnsNoneQualityDatumsForEachTimerangeStep()
-        {
-            var signal = AddNewIntegerSignal(Granularity.Day);
-
-            const int numberOfDays = 5;
-            var timestamp = new DateTime(2019, 1, 1);
-            var receivedData = client.GetData(signal.Id.Value, timestamp, timestamp.AddDays(numberOfDays));
-
-            Assert.AreEqual(numberOfDays, receivedData.Length);
-            foreach (var datum in receivedData)
-            {
-                Assert.AreEqual(timestamp, datum.Timestamp);
-                Assert.AreEqual(Dto.Quality.None, datum.Quality);
-                timestamp = timestamp.AddDays(1);
-            }
-        }
-
         //TODO: ForAll...
         [TestMethod]
         [TestCategory("issue2")]
