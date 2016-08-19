@@ -899,6 +899,30 @@ namespace WebService.Tests
                 Assert.AreEqual(item.Signals.Count(), 2);
             }
 
+            [TestMethod]
+            public void GivenAPathEntryOfSignals_WhenGetPathEntry_ReturnSubdirectory()
+            {
+                var path = Domain.Path.FromString("root");
+
+                var signal1 = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("root/signal1"));
+                var signal2 = SignalWith(2, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("root/signal2"));
+                var signal3 = SignalWith(2, Domain.DataType.Double, Domain.Granularity.Second, Domain.Path.FromString("root/subdirectory/signal3"));
+
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
+
+                signalsRepositoryMock.Setup(x => x.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
+                    .Returns(new List<Domain.Signal>()
+                    {
+                        signal1,
+                        signal2,
+                        signal3
+                    });
+
+                var item = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root" } });
+
+                Assert.AreEqual(item.SubPaths.Count(), 1);
+            }
+
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
                 var existingSignal = new Domain.Signal()
