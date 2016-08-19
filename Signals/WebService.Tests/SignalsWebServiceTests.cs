@@ -947,6 +947,48 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void SpecificValueMissingValuePolicy_WhenGetData_FillInt()
+            {
+                int value = 4;
+                var signal1 = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
+
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger() { Value = value });
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(DetDefaultDatumCollection<int>(new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)));
+
+                var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                Assert.AreEqual(items.Count(), 3);
+                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, value);
+            }
+
+
+
+            private List<Datum<T>> DetDefaultDatumCollection<T>(DateTime startDate, DateTime endDate)
+            {
+                List<Datum<T>> ListOfitems = new List<Datum<T>>();
+                ListOfitems.Add(new Datum<T>()
+                {
+                    Id = 1,
+                    Quality = Domain.Quality.Fair,
+                    Timestamp = startDate,
+                    Value = default(T)
+                });
+                ListOfitems.Add(new Datum<T>()
+                {
+                    Id = 2,
+                    Quality = Domain.Quality.Fair,
+                    Timestamp = endDate,
+                    Value = default(T)
+                });
+                return ListOfitems;
+            }
+
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)
             {
                 var existingSignal = new Domain.Signal()
