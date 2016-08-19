@@ -18,9 +18,6 @@ namespace WebService.Tests
         {
             private ISignalsWebService signalsWebService;
 
-
-            
-
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
             public void GivenNoSignals_WhenAddingASignalWithId_ThrowIdNotNullException()
@@ -456,6 +453,109 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
 
                 Assert.AreEqual(1, result.ToArray().Length);
+            }
+
+            [TestMethod]
+            public void GivenNoSignals_WhenGettingAnyPathEntry_ReturnedIsPathEntryWithNoSignalsAndSubpaths()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "any path" } });
+
+                CollectionAssert.AreEqual(new Dto.Signal[] { }, result.Signals.ToArray());
+                CollectionAssert.AreEqual(new Dto.Path[] { }, result.SubPaths.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenOneSignal_WhenGettingPathEntryByPathWhichDoesNotExistInRepository_ReturnedIsPathEntryWithNoSignalsAndSubpaths()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsRepositoryMock.Setup(sr => sr.GetAllWithPathPrefix(It.Is<Path>(p => p.Equals("correctPath"))))
+                    .Returns(new Signal[] { new Signal() { Id = 1, Path = Path.FromString("correctPath/s1") } });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "incorrectPath" } });
+
+                CollectionAssert.AreEqual(new Dto.Signal[] { }, result.Signals.ToArray());
+                CollectionAssert.AreEqual(new Dto.Path[] { }, result.SubPaths.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenSignals_WhenGettingPathEntryByPathWhichExistsInRepository_ReturnedIsExpectedPathEntry()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsRepositoryMock.Setup(sr => sr.GetAllWithPathPrefix(It.Is<Path>(p => p.Equals(Path.FromString("correctPath")))))
+                    .Returns(new Signal[] { new Signal() { Id = 1, Path = Path.FromString("correctPath/s1") }, new Signal() { Id = 2, Path = Path.FromString("correctPath/s2") } });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "correctPath" } });
+
+                Assert.AreEqual(new Dto.Signal() { Id = 1, Path = new Dto.Path() { Components = new[] { "correctPath", "s1" } } }.Id, result.Signals.ToArray()[0].Id);
+                CollectionAssert.AreEqual(new Dto.Signal() { Id = 1, Path = new Dto.Path() { Components = new[] { "correctPath", "s1" } } }.Path.Components.ToArray()
+                    , result.Signals.ToArray()[0].Path.Components.ToArray());
+
+                Assert.AreEqual(new Dto.Signal() { Id = 2, Path = new Dto.Path() { Components = new[] { "correctPath", "s2" } } }.Id, result.Signals.ToArray()[1].Id);
+                CollectionAssert.AreEqual(new Dto.Signal() { Id = 2, Path = new Dto.Path() { Components = new[] { "correctPath", "s2" } } }.Path.Components.ToArray()
+                    , result.Signals.ToArray()[1].Path.Components.ToArray());
+
+                CollectionAssert.AreEqual(new Path[] { }, result.SubPaths.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenSignals_WhenGettingPathEntryByPathWhichContainsDelimitersAndExistsInRepository_ReturnedIsExpectedPathEntry()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsRepositoryMock.Setup(sr => sr.GetAllWithPathPrefix(It.Is<Path>(p => p.Equals(Path.FromString("correctPath/folder")))))
+                    .Returns(new Signal[] { new Signal() { Id = 1, Path = Path.FromString("correctPath/folder/s1") }, new Signal() { Id = 2, Path = Path.FromString("correctPath/folder/s2") } });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "correctPath", "folder" } });
+
+                Assert.AreEqual(new Dto.Signal() { Id = 1, Path = new Dto.Path() { Components = new[] { "correctPath", "folder", "s1" } } }.Id, result.Signals.ToArray()[0].Id);
+                CollectionAssert.AreEqual(new Dto.Signal() { Id = 1, Path = new Dto.Path() { Components = new[] { "correctPath", "folder", "s1" } } }.Path.Components.ToArray()
+                    , result.Signals.ToArray()[0].Path.Components.ToArray());
+
+                Assert.AreEqual(new Dto.Signal() { Id = 2, Path = new Dto.Path() { Components = new[] { "correctPath", "folder", "s2" } } }.Id, result.Signals.ToArray()[1].Id);
+                CollectionAssert.AreEqual(new Dto.Signal() { Id = 2, Path = new Dto.Path() { Components = new[] { "correctPath", "folder", "s2" } } }.Path.Components.ToArray()
+                    , result.Signals.ToArray()[1].Path.Components.ToArray());
+
+                CollectionAssert.AreEqual(new Path[] { }, result.SubPaths.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenSignals_WhenGettingPathEntryWhichEqualsOneOfSignalsPath_ReturnedIsExpectedPathEntry()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsRepositoryMock.Setup(sr => sr.GetAllWithPathPrefix(It.Is<Path>(p => p.Equals(Path.FromString("correctPath/s1")))))
+                    .Returns(new Signal[] { new Signal() { Id = 1, Path = Path.FromString("correctPath/s1") }, new Signal() { Id = 2, Path = Path.FromString("correctPath/s1/s2") } });
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "correctPath", "s1" } });
+
+                Assert.AreEqual(2, result.Signals.ToArray()[0].Id);
+                CollectionAssert.AreEqual(new string[] { "correctPath", "s1", "s2" }, result.Signals.ToArray()[0].Path.Components.ToArray());
+
+                CollectionAssert.AreEqual(new Path[] { }, result.SubPaths.ToArray());
             }
 
             private void SetupDataRepository<T>()

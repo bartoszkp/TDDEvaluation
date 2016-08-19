@@ -9,7 +9,7 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var result = client.GetPathEntry(new Path() { Components = new [] { "" } });
+            var result = client.GetPathEntry(new Path() { Components = new [] { "root", "s1" } });
 
             Console.WriteLine("Sygnały w 'root':");
             foreach (var r in result.Signals)

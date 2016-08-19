@@ -87,27 +87,34 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path path)
         {
-            var allSignalsWithGivenPathPrefix = signalsRepository.GetAllWithPathPrefix(path);
+            var allSignalsWithPathPrefix = signalsRepository.GetAllWithPathPrefix(path);
 
-            List<Signal> signals = new List<Signal>();
+            var signals = new List<Signal>();
 
-            List<Path> subPaths = new List<Path>();
+            var subPaths = new List<Path>();
 
-            foreach (var signal in allSignalsWithGivenPathPrefix)
+            foreach (var signal in allSignalsWithPathPrefix)
             {
-                if (signal.Path.Components.Count() == path.Components.Count() + 1) signals.Add(signal);
+                if (signal.Path.Components.Count() == path.Components.Count()) continue;
+
+                else if (signal.Path.Components.Count() == path.Components.Count() + 1) signals.Add(signal);
 
                 else
                 {
-                    var subPath = Path.FromString(path.Components.ToArray()[0] + "/" + signal.Path.Components.ToArray()[path.Components.Count()]);
+                    string pathToString = null;
 
-                    if (!subPaths.Contains(subPath)) subPaths.Add(subPath);
+                    foreach (var component in path.Components)
+                    {
+                        pathToString += component + "/";
+                    }
+
+                    var newSubPath = Path.FromString(pathToString + signal.Path.Components.ToArray()[path.Length]);
+
+                    if (!subPaths.Contains(newSubPath)) subPaths.Add(newSubPath);
                 }
             }
 
-            var pathEntry = new PathEntry(signals, subPaths);
-
-            return pathEntry;            
+            return new PathEntry(signals, subPaths);
         }
     }
 }
