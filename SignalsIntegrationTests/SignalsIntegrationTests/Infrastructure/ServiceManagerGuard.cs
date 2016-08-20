@@ -5,43 +5,41 @@ namespace SignalsIntegrationTests.Infrastructure
 {
     public class ServiceManagerGuard
     {
-        private static ServiceManager instance = null;
-        private static object paddle = new object();
+        private static ServiceManager instance = new ServiceManager();
         private static int counter = 0;
+        private static object paddle = new object();
 
         static ServiceManagerGuard()
         {
             ServiceManager.RebuildDatabase();
+            instance.StartService();
         }
 
-        private ServiceManagerGuard()
-        {
-        }
-
-        // TODO: restart if crashed and not running
         public static IDisposable Attach()
         {
-            lock (paddle)
-            {
-                if (instance == null)
-                {
-                    instance = new ServiceManager();
-                    instance.StartService();
-                }
+            return new ReferenceCounter();
+        }
 
-                return new ReferenceCounter();
+        public static void EnsureRunning()
+        {
+            if (!instance.IsAlive())
+            {
+                lock (paddle)
+                {
+                    if (!instance.IsAlive())
+                    {
+                        instance.RestartService();
+                    }
+                }
             }
         }
 
         private static void Detach()
         {
-            lock (paddle)
+            if (counter == 0)
             {
-                if (counter == 0)
-                {
-                    instance.StopService();
-                    instance = null;
-                }
+                instance.StopService();
+                instance = null;
             }
         }
 

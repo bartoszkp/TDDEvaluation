@@ -49,6 +49,26 @@ namespace SignalsIntegrationTests.Infrastructure
             serviceProcess = Process.Start(psi);
         }
 
+        public void RestartService()
+        {
+            if (serviceProcess != null)
+            {
+                if (!serviceProcess.HasExited)
+                {
+                    serviceProcess.Kill();
+                }
+
+                serviceProcess = null;
+            }
+
+            StartService();
+        }
+
+        public bool IsAlive()
+        {
+            return !serviceProcess.HasExited;
+        }
+
         public void StopService()
         {
             if (serviceProcess == null)
