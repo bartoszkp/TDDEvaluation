@@ -168,7 +168,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue7")]
-        public void GivenSingleSignalAtSecondSubLevel_ReadingTopLevel_ReturnsSecondLevelSubPath()
+        public void GivenSingleSignalAtSecondSubLevel_ReadingTopLevel_ReturnsFirstLevelSubPath()
         {
             var topLevel = Path.Root + "topLevelWithSingleDeepChild";
             var level1 = topLevel + "level1";
