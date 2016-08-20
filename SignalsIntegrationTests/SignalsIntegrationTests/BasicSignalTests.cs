@@ -138,7 +138,11 @@ namespace SignalsIntegrationTests
             var received2 = client.Get(newSignal2.Path.ToDto<Dto.Path>()).ToDomain<Domain.Signal>();
 
             Assert.AreEqual(newSignal1.Path, received1.Path);
+            Assert.AreEqual(newSignal1.Granularity, received1.Granularity);
+            Assert.AreEqual(newSignal1.DataType, received1.DataType);
             Assert.AreEqual(newSignal2.Path, received2.Path);
+            Assert.AreEqual(newSignal2.Granularity, received2.Granularity);
+            Assert.AreEqual(newSignal2.DataType, received2.DataType);
             Assert.AreNotEqual(received1.Id, received2.Id);
         }
 
