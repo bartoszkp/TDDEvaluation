@@ -147,6 +147,37 @@ namespace SignalsIntegrationTests
             });
         }
 
+        [TestMethod]
+        [TestCategory("issue6")]
+        public void GivenDatumsAtTheBigginingAndInTheMiddle_FillsRemainingRangesWithNoneQuality()
+        {
+            ForAllGranularitiesAndQualities((granularity, quality)
+               =>
+            {
+                GivenData(
+                    new Datum<T>()
+                    {
+                        Quality = OtherThan(quality),
+                        Timestamp = UniversalBeginTimestamp,
+                        Value = Value(1410)
+                    },
+                    new Datum<T>()
+                    {
+                        Quality = quality,
+                        Timestamp = UniversalMiddleTimestamp(granularity),
+                        Value = Value(42)
+                    });
+
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+                ThenResultEquals(DatumArray<T>
+                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .StartingWith(Value(1410), OtherThan(quality))
+                    .WithValueAt(Value(42), quality, UniversalMiddleTimestamp(granularity)));
+            });
+        }
+
+
         private void ForAllGranularitiesAndQualities(Action<Granularity, Quality> test)
         {
             foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
