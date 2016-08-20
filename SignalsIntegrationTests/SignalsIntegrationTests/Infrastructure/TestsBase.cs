@@ -117,7 +117,7 @@ namespace SignalsIntegrationTests.Infrastructure
             return client.Add(signal.ToDto<Dto.Signal>());
         }
 
-        protected void ForAllSignalTypesAndQualites(Action<DataType, Granularity, Quality, string> test)
+        protected void ForAllSignalTypesAndQualites(Action<DataType, Granularity, Quality> test)
         {
             foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
             {
@@ -125,21 +125,19 @@ namespace SignalsIntegrationTests.Infrastructure
                 {
                     foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
                     {
-                        var message = dataType.ToString() + ", " + granularity.ToString() + ", " + quality.ToString();
-                        test(dataType, granularity, quality, message);
+                        test(dataType, granularity, quality);
                     }
                 }
             }
         }
 
-        protected void ForAllSignalTypes(Action<DataType, Granularity, string> test)
+        protected void ForAllSignalTypes(Action<DataType, Granularity> test)
         {
             foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
             {
                 foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
                 {
-                    var message = dataType.ToString() + ", " + granularity.ToString();
-                    test(dataType, granularity, message);
+                    test(dataType, granularity);
                 }
             }
         }
@@ -151,12 +149,6 @@ namespace SignalsIntegrationTests.Infrastructure
         }
 
         protected int signalId;
-        protected Dictionary<DataType, object> values = new Dictionary<DataType, object>()
-            { { DataType.Boolean, true },
-              { DataType.Decimal, 42.0m },
-              { DataType.Double, 42.42 },
-              { DataType.Integer, 42 },
-              { DataType.String, "string" } };
 
         protected DateTime UniversalBeginTimestamp { get { return new DateTime(2018, 1, 1); } }
 

@@ -25,10 +25,11 @@ namespace SignalsIntegrationTests
         [TestCategory("issue5")]
         public void GivenANewSignal_WhenGettingMissingValuePolicy_NoneQualityMissingValuePolicyIsReturned()
         {
-            ForAllSignalTypes((dataType, granularity, message)
+            ForAllSignalTypes((dataType, granularity)
                =>
             {
                 GivenASignalWith(dataType, granularity);
+
                 ThenMissingValuePolicyHasType(typeof(Dto.MissingValuePolicy.NoneQualityMissingValuePolicy));
             });
         }
@@ -54,7 +55,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue3")]
         public void GivenASignal_WhenSettingNoneMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypes((dataType, granularity, message)
+            ForAllSignalTypes((dataType, granularity)
                 =>
             {
                 GivenASignalWith(dataType, granularity);
@@ -72,7 +73,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue3")]
         public void GivenASignal_WhenSettingSpecificValueMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypesAndQualites((dataType, granularity, quality, message)
+            ForAllSignalTypesAndQualites((dataType, granularity, quality)
                 =>
             {
                 GivenASignalWith(dataType, granularity);
@@ -87,7 +88,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue3")]
         public void GivenASignal_WhenSettingZeroOrderMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypes((dataType, granularity, message)
+            ForAllSignalTypes((dataType, granularity)
                 =>
             {
                 GivenASignalWith(dataType, granularity);
@@ -104,7 +105,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue3")]
         public void GivenASignal_WhenSettingFirstOrderMissingValuePolicy_PolicyIsChangedForSignal()
         {
-            ForAllSignalTypes((dataType, granularity, message)
+            ForAllSignalTypes((dataType, granularity)
                 =>
             {
                 if (dataType == DataType.String)

@@ -64,7 +64,7 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignal_WhenGettingDataWithReversedTimestamps_ReturnsEmpty()
         {
-            ForAllSignalTypes((dataType, granularity, message)
+            ForAllSignalTypes((dataType, granularity)
             =>
             {
                 GivenASignalWith(dataType, granularity);
