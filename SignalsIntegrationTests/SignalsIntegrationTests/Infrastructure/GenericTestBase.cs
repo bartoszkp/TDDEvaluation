@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using Domain;
 using Dto.Conversions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalsIntegrationTests.Infrastructure
 {
-    public class GenericTestBase<T> : TestsBase
+    [TestClass]
+    public abstract class GenericTestBase<T> : TestsBase
     {
         public void WhenReadingData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {

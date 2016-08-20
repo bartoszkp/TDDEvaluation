@@ -9,7 +9,7 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class SignalDataTests<T> : GenericTestBase<T>
+    public abstract class SignalDataTests<T> : GenericTestBase<T>
     {
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
