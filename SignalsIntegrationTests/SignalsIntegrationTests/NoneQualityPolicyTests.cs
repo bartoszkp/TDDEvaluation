@@ -151,7 +151,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class NoneQualityPolicyIntTests : NoneQualityPolicyTests<int>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -168,7 +167,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class NoneQualityPolicyDecimalTests : NoneQualityPolicyTests<decimal>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -185,7 +183,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class NoneQualityPolicyDoubleTests : NoneQualityPolicyTests<double>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -202,7 +199,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class NoneQualityPolicyBoolTests : NoneQualityPolicyTests<bool>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -219,7 +215,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class NoneQualityPolicyStringTests : NoneQualityPolicyTests<string>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Domain;
+using Domain.Infrastructure;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
@@ -8,7 +9,7 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class SignalDataTests : TestsBase
+    public class SignalDataTests<T> : GenericTestBase<T>
     {
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
@@ -26,54 +27,70 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignal_WhenSettingEmptyData_ShouldNotThrow()
         {
-            GivenASignalWith(Granularity.Second);
-
-            client.SetData(signalId, new Dto.Datum[0]);
+            ForAllGranularities(granularity
+                =>
+            {
+                client.SetData(signalId, new Dto.Datum[0]);
+            });
         }
 
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenASignal_WhenSettingDataWithIncorrectType_ShouldThrow()
         {
-            GivenASignalWith(DataType.Decimal, Granularity.Day);
+            ForAllGranularitiesAndQualities((granularity, quality)
+                =>
+            {
+                object value = typeof(T).Equals(typeof(double)) 
+                ? (decimal)1 as object
+                : (double)1 as object;
 
-            var data = new[] { new Dto.Datum() { Value = (double)1, Quality = Dto.Quality.Good, Timestamp = new DateTime() } };
+                var data = new[] { new Dto.Datum()
+                {
+                    Value = value,
+                    Quality = quality.ToDto<Dto.Quality>(),
+                    Timestamp = UniversalBeginTimestamp
+                } };
 
-            Assertions.AssertThrows(() => client.SetData(signalId, data));
+                Assertions.AssertThrows(() => client.SetData(signalId, data));
+            });
         }
 
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenTwoSignalsWithData_WhenGettingData_ReturnsCorrectDataForBoth()
         {
-            GivenASignalWith(DataType.Decimal, Granularity.Day);
-            GivenData(new Datum<decimal>() { Timestamp = UniversalBeginTimestamp, Value = 1.0m });
-            var signalId1 = signalId;
-            GivenASignalWith(DataType.Decimal, Granularity.Day);
-            GivenData(new Datum<decimal>() { Timestamp = UniversalBeginTimestamp, Value = 2.0m });
-            var signalId2 = signalId;
+            ForAllGranularitiesAndQualities((granularity, quality)
+            =>
+            {
+                GivenASignalWith(typeof(T).FromNativeType(), granularity);
+                GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(0), Quality = quality });
+                var signalId1 = signalId;
+                GivenASignalWith(typeof(T).FromNativeType(), granularity);
+                GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
+                var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp);
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp);
+                var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp);
+                var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp);
 
-            Assert.AreEqual(1.0m, result1.SingleOrDefault()?.Value);
-            Assert.AreEqual(2.0m, result2.SingleOrDefault()?.Value);
+                Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
+                Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
+            });
         }
 
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenASignalWithSingleDatum_WhenGettingData_ReturnsTheDatum()
         {
-            ForAllSignalTypesAndQualites((dataType, granularity, quality, message)
+            ForAllGranularitiesAndQualities((granularity, quality)
             =>
             {
-                GivenASignalWith(dataType, granularity);
-                var datum = GivenDatumFor(dataType, granularity, quality);
+                var datum = new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality };
+                GivenSingleDatum(datum);
 
-                var retrievedData = client.GetData(signalId, UniversalBeginTimestamp, UniversalBeginTimestamp)
-                    .SingleOrDefault();
+                WhenReadingData(UniversalBeginTimestamp, UniversalBeginTimestamp);
 
-                Assertions.AreEqual(datum, retrievedData, message);
+                Assertions.AreEqual(datum, whenReadingDataResult.SingleOrDefault());
             });
             }
 
@@ -81,99 +98,193 @@ namespace SignalsIntegrationTests
         [TestCategory("issue2")]
         public void GivenASignalWithUnorderedData_WhenGettingData_ReturnsDataSorted()
         {
-            ForAllSignalTypesAndQualites((dataType, granularity, quality, message)
+            ForAllGranularitiesAndQualities((granularity, quality)
             =>
             {
-                GivenASignalWith(dataType, granularity);
-                var data = GivenTwoUnsortedDatumsFor(dataType, granularity, quality);
+                var data = GivenTwoUnsortedDatumsFor(granularity, quality);
 
-                var retrievedData = client.GetData(signalId, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 2));
+                WhenReadingData(data.Min(d => d.Timestamp), data.Max(d => d.Timestamp).AddSteps(granularity, 1));
 
-                Assertions.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), retrievedData, message);
+                Assertions.AreEqual(data.OrderBy(d => d.Timestamp).ToArray(), whenReadingDataResult);
             });
         }
 
-        //TODO: ForAll...
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenSignalWithData_WhenSettingOverlappingData_DataIsOverwritten()
         {
-            var timestamp = new DateTime(2019, 1, 1);
+            ForAllGranularitiesAndQualities((granularity, quality)
+            =>
+            {
+                GivenData(new[] 
+                {
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 0), Value = Value(0), Quality = quality },
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1), Value = Value(1), Quality = quality },
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 2), Value = Value(2), Quality = quality },
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 3), Value = Value(3), Quality = quality }
+                });
 
-            GivenASignalWith(Granularity.Day);
+                client.SetData(
+                    signalId,
+                    new[] 
+                    {
+                        new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1), Value = Value(8), Quality = OtherThan(quality) },
+                        new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 2), Value = Value(9), Quality = OtherThan(quality) },
+                    }.ToDto<Dto.Datum[]>());
 
-            GivenData(new[] { new Datum<int>() { Timestamp = timestamp.AddDays(0), Value = 1, Quality = Quality.Fair },
-                              new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 2, Quality = Quality.Fair },
-                              new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 3, Quality = Quality.Fair },
-                              new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
-                            });
+                var expectedData = new[] 
+                {
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 0), Value = Value(0), Quality = quality },
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1), Value = Value(8), Quality = OtherThan(quality) },
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 2), Value = Value(9), Quality = OtherThan(quality) },
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 3), Value = Value(3), Quality = quality },
+                };
 
-            client.SetData(
-                signalId,
-                new[] { new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
-                        new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 9, Quality = Quality.Good},
-                      }.ToDto<Dto.Datum[]>());
 
-            var expectedData = new[] { new Datum<int>() { Timestamp = timestamp.AddDays(0), Value = 1, Quality = Quality.Fair },
-                                       new Datum<int>() { Timestamp = timestamp.AddDays(1), Value = 8, Quality = Quality.Good},
-                                       new Datum<int>() { Timestamp = timestamp.AddDays(2), Value = 9, Quality = Quality.Good},
-                                       new Datum<int>() { Timestamp = timestamp.AddDays(3), Value = 4, Quality = Quality.Fair },
-                                     };
+                WhenReadingData(UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 4));
 
-            var retrievedData = client.GetData(signalId, timestamp, timestamp.AddDays(4))
-                .ToDomain<Domain.Datum<int>[]>();
-
-            Assertions.AreEqual(expectedData, retrievedData);
+                Assertions.AreEqual(expectedData, whenReadingDataResult);
+            });
         }
 
-        //TODO: use Domain.Datum<T>, not Dto.Datum (null Values sometimes crash servers, bugs for strings are issued anyway already)
         [TestMethod]
         [TestCategory("issue2")]
         public void GivenASignal_WhenSettingDataWithDuplicateTimestamps_Throws()
         {
-            GivenASignalWith(Granularity.Day);
-
-            Assertions.AssertThrows(() => client.SetData(
-                signalId,
-                new[] { new Dto.Datum() { Timestamp = new DateTime(2000, 1, 1) },
-                        new Dto.Datum() { Timestamp = new DateTime(2000, 1, 1) } }));
-        }
-
-        private Dto.Datum GivenDatumFor(DataType dataType, Granularity granularity, Quality quality)
-        {
-            var datum = new Dto.Datum()
+            ForAllGranularities(granularity
+                =>
             {
-                Quality = quality.ToDto<Dto.Quality>(),
-                Timestamp = UniversalBeginTimestamp,
-                Value = values[dataType]
-            };
+                var data = new[]
+                {
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1) },
+                    new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(2) }
+                };
 
-            GivenSingleDatum(datum);
-
-            return datum;
+                Assertions.AssertThrows(() => client.SetData(
+                    signalId,
+                    data.ToDto<Dto.Datum[]>()));
+            });
         }
 
-        private Dto.Datum[] GivenTwoUnsortedDatumsFor(DataType dataType, Granularity granularity, Quality quality)
+        private void ForAllGranularitiesAndQualities(Action<Granularity, Quality> test)
+        {
+            foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
+            {
+                ForAllGranularities(granularity => test(granularity, quality));
+            }
+        }
+
+        private void ForAllGranularities(Action<Granularity> test)
+        {
+            foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
+            {
+                GivenASignalWith(typeof(T).FromNativeType(), granularity);
+
+                test(granularity);
+            }
+        }
+
+        private Datum<T>[] GivenTwoUnsortedDatumsFor(Granularity granularity, Quality quality)
         {
             var from = UniversalBeginTimestamp;
             var to = from.AddSteps(granularity, 1);
 
-            var data1 = new Dto.Datum()
+            var data1 = new Datum<T>()
             {
-                Quality = quality.ToDto<Dto.Quality>(),
+                Quality = quality,
                 Timestamp = to,
-                Value = values[dataType]
+                Value = Value(0)
             };
-            var data2 = new Dto.Datum()
+            var data2 = new Datum<T>()
             {
-                Quality = quality.ToDto<Dto.Quality>(),
+                Quality = quality,
                 Timestamp = from,
-                Value = values[dataType]
+                Value = Value(1)
             };
 
             GivenData(data1, data2);
 
             return new[] { data1, data2 };
+        }
+    }
+
+    [TestClass]
+    public class SignalDataTestsBoolean : SignalDataTests<bool>
+    {
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            SignalDataTests<bool>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            SignalDataTests<bool>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SignalDataTestsInteger : SignalDataTests<int>
+    {
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            SignalDataTests<int>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            SignalDataTests<int>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SignalDataTestsDouble : SignalDataTests<double>
+    {
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            SignalDataTests<double>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            SignalDataTests<double>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SignalDataTestsDecimal : SignalDataTests<decimal>
+    {
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            SignalDataTests<decimal>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            SignalDataTests<decimal>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SignalDataTestsString : SignalDataTests<string>
+    {
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            SignalDataTests<string>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            SignalDataTests<string>.ClassCleanup();
         }
     }
 }

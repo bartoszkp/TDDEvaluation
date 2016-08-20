@@ -7,7 +7,7 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class MissingValuePolicyBasic: TestsBase
+    public class MissingValuePolicyBasic : TestsBase
     {
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)

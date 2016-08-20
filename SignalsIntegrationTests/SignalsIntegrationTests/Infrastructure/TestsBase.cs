@@ -144,6 +144,12 @@ namespace SignalsIntegrationTests.Infrastructure
             }
         }
 
+        protected Quality OtherThan(Quality quality)
+        {
+            var values = Enum.GetValues(typeof(Quality));
+            return (Quality)values.GetValue(((int)quality + 1) % values.Length);
+        }
+
         protected int signalId;
         protected Dictionary<DataType, object> values = new Dictionary<DataType, object>()
             { { DataType.Boolean, true },
