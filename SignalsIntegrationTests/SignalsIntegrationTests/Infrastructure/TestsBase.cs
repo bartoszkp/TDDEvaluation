@@ -25,6 +25,7 @@ namespace SignalsIntegrationTests.Infrastructure
         public void InitializeClient()
         {
             client = new WS.SignalsWebServiceClient();
+            client.Endpoint.Binding.SendTimeout = new TimeSpan(0, 0, 5);
         }
 
         [TestCleanup]
