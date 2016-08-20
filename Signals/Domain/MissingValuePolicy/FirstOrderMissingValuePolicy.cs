@@ -18,7 +18,7 @@ namespace Domain.MissingValuePolicy
         {
             get
             {
-                return base.CompatibleNativeTypes.Except(new[] { typeof(string) });
+                return base.CompatibleNativeTypes.Except(new[] { typeof(string), typeof(bool) });
             }
         }
 

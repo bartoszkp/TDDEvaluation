@@ -51,6 +51,19 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("unassigned")]
+        public void RequestForSettingFirstOrderMissingValuePolicyForBooleanThrows()
+        {
+            var signalId = AddNewSignal(DataType.Boolean, Granularity.Day).Id.Value;
+
+            var firstOrderMissingValuePolicy
+                 = (new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<string>())
+                 .ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+
+            Assertions.AssertThrows(() => client.SetMissingValuePolicy(signalId, firstOrderMissingValuePolicy));
+        }
+
+        [TestMethod]
         [TestCategory("issue1")]
         public void AddingSignalSetsItsId()
         {

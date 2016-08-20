@@ -108,7 +108,7 @@ namespace SignalsIntegrationTests
             ForAllSignalTypes((dataType, granularity)
                 =>
             {
-                if (dataType == DataType.String)
+                if (dataType == DataType.String || dataType == DataType.Boolean)
                     return;
 
                 GivenASignalWith(dataType, granularity);
