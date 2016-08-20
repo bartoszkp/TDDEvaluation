@@ -35,7 +35,7 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        [TestCategory("issue2")]
+        [TestCategory("unassigned")]
         public void GivenASignal_WhenSettingDataWithIncorrectType_ShouldThrow()
         {
             ForAllGranularitiesAndQualities((granularity, quality)
