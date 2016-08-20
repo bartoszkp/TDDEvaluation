@@ -70,8 +70,8 @@ namespace SignalsIntegrationTests
                 GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
                 var signalId2 = signalId;
 
-                var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp);
-                var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp);
+                var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+                var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
                 Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
                 Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -88,7 +88,7 @@ namespace SignalsIntegrationTests
                 var datum = new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality };
                 GivenSingleDatum(datum);
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalBeginTimestamp);
+                WhenReadingData(UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
                 Assertions.AreEqual(datum, whenReadingDataResult.SingleOrDefault());
             });
