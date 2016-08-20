@@ -1,120 +1,292 @@
 ﻿using System;
+using System.Linq;
 using Domain;
+using Domain.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public class SpecificValuePolicyTests : MissingValuePolicyTestsBase<int>
+    public abstract class SpecificValuePolicyTests<T> : MissingValuePolicyTestsBase<T>
     {
-        private DateTime BeginTimestamp { get { return new DateTime(2020, 10, 12); } }
-
-        private DateTime EndTimestamp { get { return BeginTimestamp.AddDays(5); } }
-
-        private int SpecificValue { get { return 14; } }
+        private T SpecificValue { get { return Value(1410); } }
 
         private Quality SpecificQuality { get { return Quality.Fair; } }
 
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolicyTestsBase<int>.ClassInitialize(testContext);
+            MissingValuePolicyTestsBase<T>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolicyTestsBase<int>.ClassCleanup();
-        }
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            GivenASignalWith(Granularity.Day);
-
-            WithMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
-            {
-                Value = SpecificValue,
-                Quality = SpecificQuality
-            });
+            MissingValuePolicyTestsBase<T>.ClassCleanup();
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenNoData_ReturnsSpecificValueForTheWholeRange()
         {
-            GivenNoData();
+            ForAllGranularities(granularity
+               =>
+            {
+                GivenNoData();
 
-            WhenReadingData(BeginTimestamp, EndTimestamp);
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-            ThenResultEquals(DatumArray<int>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day));
+                ThenResultEquals(DatumArray<T>
+                    .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+            });
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithSpecificValue()
         {
-            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp });
+            ForAllGranularitiesAndQualities((granularity, quality)
+               =>
+            {
+                GivenSingleDatum(new Datum<T>()
+                {
+                    Quality = quality,
+                    Timestamp = UniversalBeginTimestamp,
+                    Value = Value(42)
+                });
 
-            WhenReadingData(BeginTimestamp, EndTimestamp);
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-            ThenResultEquals(DatumArray<int>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day)
-                .StartingWithGoodQualityValue(42));
+                ThenResultEquals(DatumArray<T>
+                    .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .StartingWith(Value(42), quality));
+            });
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenSingleDatumBeforeTheBeginning_ReturnsSpecificValueForTheWholeRange()
         {
-            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = BeginTimestamp.AddDays(-1) });
+            ForAllGranularitiesAndQualities((granularity, quality)
+             =>
+            {
+                GivenSingleDatum(new Datum<T>()
+                {
+                    Quality = quality,
+                    Timestamp = UniversalBeginTimestamp.AddSteps(granularity, -1),
+                    Value = Value(42)
+                });
 
-            WhenReadingData(BeginTimestamp, EndTimestamp);
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-            ThenResultEquals(DatumArray<int>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day));
+                ThenResultEquals(DatumArray<T>
+                    .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+            });
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenSingleDatumAtTheEnd_FillsRemainingRangeWithSpecificValue()
         {
-            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp.AddDays(-1) });
+            ForAllGranularitiesAndQualities((granularity, quality)
+             =>
+            {
+                GivenSingleDatum(new Datum<T>()
+                {
+                    Quality = quality,
+                    Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1),
+                    Value = Value(42)
+                });
 
-            WhenReadingData(BeginTimestamp, EndTimestamp);
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-            ThenResultEquals(DatumArray<int>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day)
-                .EndingWithGoodQualityValue(42));
+                ThenResultEquals(DatumArray<T>
+                    .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .EndingWith(Value(42), quality));
+            });
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenSingleDatumAfterTheEnd_ReturnsSpecificValueForTheWholeRange()
         {
-            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = EndTimestamp });
+            ForAllGranularitiesAndQualities((granularity, quality)
+              =>
+            {
+                GivenSingleDatum(new Datum<T>()
+                {
+                    Quality = quality,
+                    Timestamp = UniversalEndTimestamp(granularity),
+                    Value = Value(42)
+                });
 
-            WhenReadingData(BeginTimestamp, EndTimestamp);
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-            ThenResultEquals(DatumArray<int>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day));
+                ThenResultEquals(DatumArray<T>
+                    .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+            });
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenSingleDatumInTheMiddle_FillsRemainingRangesWithNoneQuality()
         {
-            var middleTimestamp = BeginTimestamp.AddDays(2);
+            ForAllGranularitiesAndQualities((granularity, quality)
+              =>
+            {
+                GivenSingleDatum(new Datum<T>()
+                {
+                    Quality = quality,
+                    Timestamp = UniversalMiddleTimestamp(granularity),
+                    Value = Value(42)
+                });
 
-            GivenSingleDatum(new Datum<int>() { Quality = Quality.Good, Value = 42, Timestamp = middleTimestamp });
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-            WhenReadingData(BeginTimestamp, EndTimestamp);
+                ThenResultEquals(DatumArray<T>
+                    .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithValueAt(Value(42), quality, UniversalMiddleTimestamp(granularity)));
+            });
+        }
 
-            ThenResultEquals(DatumArray<int>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, BeginTimestamp, EndTimestamp, Granularity.Day)
-                .WithSingleGoodQualityValueAt(42, middleTimestamp));
+        [TestMethod]
+        [TestCategory("issue8")]
+        public void GivenDatumsAtTheBigginingAndInTheMiddle_FillsRemainingRangesWithNoneQuality()
+        {
+            ForAllGranularitiesAndQualities((granularity, quality)
+               =>
+            {
+                GivenData(
+                    new Datum<T>()
+                    {
+                        Quality = OtherThan(quality),
+                        Timestamp = UniversalBeginTimestamp,
+                        Value = Value(1410)
+                    },
+                    new Datum<T>()
+                    {
+                        Quality = quality,
+                        Timestamp = UniversalMiddleTimestamp(granularity),
+                        Value = Value(42)
+                    });
+
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+                ThenResultEquals(DatumArray<T>
+                    .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .StartingWith(Value(1410), OtherThan(quality))
+                    .WithValueAt(Value(42), quality, UniversalMiddleTimestamp(granularity)));
+            });
+        }
+
+        private void ForAllGranularitiesAndQualities(Action<Granularity, Quality> test)
+        {
+            foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
+            {
+                ForAllGranularities(granularity => test(granularity, quality));
+            }
+        }
+
+        private void ForAllGranularities(Action<Granularity> test)
+        {
+            foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
+            {
+                GivenASignalWith(typeof(T).FromNativeType(), granularity);
+
+                WithMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T>()
+                {
+                    Quality = SpecificQuality,
+                    Value = SpecificValue
+                });
+
+                test(granularity);
+            }
+        }
+    }
+
+    [TestClass]
+    public class SpecificValuePolicyIntTests : SpecificValuePolicyTests<int>
+    {
+
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            FirstOrderPolicyTests<int>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            FirstOrderPolicyTests<int>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SpecificValuePolicyDecimalTests : SpecificValuePolicyTests<decimal>
+    {
+
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            FirstOrderPolicyTests<decimal>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            FirstOrderPolicyTests<decimal>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SpecificValuePolicyDoubleTests : SpecificValuePolicyTests<double>
+    {
+
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            FirstOrderPolicyTests<double>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            FirstOrderPolicyTests<double>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SpecificValuePolicyStringTests : SpecificValuePolicyTests<string>
+    {
+
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            FirstOrderPolicyTests<string>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            FirstOrderPolicyTests<string>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class SpecificValuePolicyBooleanTests : SpecificValuePolicyTests<bool>
+    {
+
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            FirstOrderPolicyTests<bool>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            FirstOrderPolicyTests<bool>.ClassCleanup();
         }
     }
 }
