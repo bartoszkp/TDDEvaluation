@@ -53,7 +53,7 @@ namespace SignalsIntegrationTests
             GivenASignalWith(DataType.String, Granularity.Hour);
             GivenData(new Dto.Datum() { Timestamp = timestamp });
 
-            var result = client.GetData(signalId, timestamp, timestamp)
+            var result = client.GetData(signalId, timestamp, timestamp.AddSteps(Granularity.Hour, 1))
                 .SingleOrDefault();
 
             Assert.IsNotNull(result);
