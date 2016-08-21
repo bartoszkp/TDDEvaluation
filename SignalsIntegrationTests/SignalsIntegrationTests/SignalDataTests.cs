@@ -96,6 +96,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue2")]
+        [TestCategory("issue14")]
         public void GivenASignalWithUnorderedData_WhenGettingData_ReturnsDataSorted()
         {
             ForAllGranularitiesAndQualities((granularity, quality)
