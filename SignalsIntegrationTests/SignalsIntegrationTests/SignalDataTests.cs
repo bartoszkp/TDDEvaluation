@@ -41,7 +41,7 @@ namespace SignalsIntegrationTests
             ForAllGranularitiesAndQualities((granularity, quality)
                 =>
             {
-                object value = typeof(T).Equals(typeof(double)) 
+                object value = typeof(T).Equals(typeof(double))
                 ? (decimal)1 as object
                 : (double)1 as object;
 
@@ -92,7 +92,23 @@ namespace SignalsIntegrationTests
 
                 Assertions.AreEqual(datum, whenReadingDataResult.SingleOrDefault());
             });
-            }
+        }
+
+        [TestMethod]
+        [TestCategory("issue17")]
+        public void GivenASignalWithSingleDatum_WhenGettingDataUsingSingleTimestamp_ReturnsTheDatum()
+        {
+            ForAllGranularitiesAndQualities((granularity, quality)
+            =>
+            {
+                var datum = new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(10), Quality = quality };
+                GivenSingleDatum(datum);
+
+                WhenReadingData(UniversalBeginTimestamp, UniversalBeginTimestamp);
+
+                Assertions.AreEqual(datum, whenReadingDataResult.SingleOrDefault());
+            });
+        }
 
         [TestMethod]
         [TestCategory("issue2")]
@@ -117,7 +133,7 @@ namespace SignalsIntegrationTests
             ForAllGranularitiesAndQualities((granularity, quality)
             =>
             {
-                GivenData(new[] 
+                GivenData(new[]
                 {
                     new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 0), Value = Value(0), Quality = quality },
                     new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1), Value = Value(1), Quality = quality },
@@ -127,13 +143,13 @@ namespace SignalsIntegrationTests
 
                 client.SetData(
                     signalId,
-                    new[] 
+                    new[]
                     {
                         new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1), Value = Value(8), Quality = OtherThan(quality) },
                         new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 2), Value = Value(9), Quality = OtherThan(quality) },
                     }.ToDto<Dto.Datum[]>());
 
-                var expectedData = new[] 
+                var expectedData = new[]
                 {
                     new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 0), Value = Value(0), Quality = quality },
                     new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 1), Value = Value(8), Quality = OtherThan(quality) },
