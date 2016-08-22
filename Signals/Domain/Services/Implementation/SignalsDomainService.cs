@@ -103,19 +103,19 @@ namespace Domain.Services.Implementation
                     j = (j + 1) % array.Length;
                 }
                 else
-                    filledArray[i] = ValueFromMVP<T>(policy, signal, tmp);
+                    ValueFromMVP(i, ref filledArray, policy, signal, tmp);
                 tmp = dateModifier(tmp);
             }
 
             return filledArray;
         }
 
-        public Datum<T> ValueFromMVP<T>(MissingValuePolicyBase policy, Signal signal, DateTime timestamp)
+        private void ValueFromMVP<T>(int current_index, ref Datum<T>[] filledArray, MissingValuePolicyBase policy, Signal signal, DateTime timestamp)
         {
             if (policy is SpecificValueMissingValuePolicy<T>)
             {
                 var specificPolicy = policy as SpecificValueMissingValuePolicy<T>;
-                return new Datum<T>
+                filledArray[current_index] = new Datum<T>
                 {
                     Quality = specificPolicy.Quality,
                     Value = specificPolicy.Value,
@@ -123,8 +123,19 @@ namespace Domain.Services.Implementation
                     Timestamp = timestamp
                 };
             }
+            else if(policy is ZeroOrderMissingValuePolicy<T>)
+            {
+                var previousDatum = filledArray[current_index - 1];
+                filledArray[current_index] = new Datum<T>()
+                {
+                    Quality = previousDatum.Quality,
+                    Signal = previousDatum.Signal,
+                    Value = previousDatum.Value,
+                    Timestamp = timestamp
+                };
+            }
             else
-                return Datum<T>.CreateNone(signal, timestamp);
+                filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
 
         }
 
