@@ -109,11 +109,37 @@ namespace Domain.Services.Implementation
 
                 var datum = getData.FirstOrDefault(d => dt <= d.Timestamp && next > d.Timestamp);
                 if (datum == null)
-                    datum = GenerateDatumFromPolicy(getMissingValuePolicy as MissingValuePolicy<T>, signal, dt);
+                    datum = GenerateDatumFromPolicy(getMissingValuePolicy as MissingValuePolicy<T>, signal, dt, result.LastOrDefault());
                 result.Add(datum);
 
                 dt = next;
             }
+            return result;
+        }
+
+        private Datum<T> GenerateDatumFromPolicy<T>(MissingValuePolicy<T> mvp, Signal signal, DateTime timestamp, Datum<T> lastDatum)
+        {
+            Datum<T> result = null;
+
+            if (mvp is SpecificValueMissingValuePolicy<T> || mvp is NoneQualityMissingValuePolicy<T>)
+            {
+                Datum<T> returnedDatum = new Datum<T>() {Signal = signal, Timestamp = timestamp};
+                result = mvp.FillMissingValue(returnedDatum);
+            }
+
+            if(mvp is ZeroOrderMissingValuePolicy<T>)
+            {             
+                if(lastDatum == null)
+                {
+                    result = new Datum<T>() { Quality = Quality.None, Timestamp = timestamp, Value = default(T) };
+                }
+                else
+                {
+                    result = lastDatum;
+                    result.Timestamp = timestamp;
+                }
+            }
+
             return result;
         }
 
@@ -152,17 +178,6 @@ namespace Domain.Services.Implementation
                 || (signal.Granularity == Granularity.Year 
                     && (dateTime.TimeOfDay.Ticks != 0 || DateTime.Compare(dateTime, new DateTime(dateTime.Year, 1, 1)) != 0)) )
                 throw new ArgumentException("DateTime is incorrect");
-        }
-
-        private Datum<T> GenerateDatumFromPolicy<T>(MissingValuePolicy<T> mvp, Signal signal, DateTime timestamp)
-        {
-            var result = new Datum<T>()
-            {
-                Signal = signal,
-                Timestamp = timestamp
-            };
-
-            return mvp.FillMissingValue(result);
         }
     }
 }
