@@ -99,7 +99,8 @@ namespace Domain.Services.Implementation
             var signal = GetById(signalId);
             Datum<T> secondaryItem = new Datum<T>() { Signal = signal, Timestamp = fromIncludedUtc };
             VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
-
+            secondaryItem = new Datum<T>() { Signal = signal, Timestamp = toExcludedUtc };
+            VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
