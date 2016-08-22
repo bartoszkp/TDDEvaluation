@@ -182,7 +182,10 @@ namespace Domain.Services.Implementation
 
                 if (Components.Count() > 1)
                 {
-                    if (!subPaths.Contains(Path.FromString(domainPathString+Components[0]))) subPaths.Add(Path.FromString(domainPathString+Components[0])); 
+                    if (!subPaths.Contains(Path.FromString(domainPathString + "//" + Components[0])))
+                    {
+                        subPaths.Add(Path.FromString(domainPathString + "//" + Components[0]));
+                    }
                 }
                 else
                 {
