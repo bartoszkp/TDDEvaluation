@@ -128,7 +128,7 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Week:
                         {
-                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0) || (item.Timestamp.Hour != 0)||(item.Timestamp.DayOfWeek== DayOfWeek.Monday))
+                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0) || (item.Timestamp.Hour != 0)||(item.Timestamp.DayOfWeek!= DayOfWeek.Monday))
                             {
                                 throw new TimestampHaveWrongFormatException();
                             }
