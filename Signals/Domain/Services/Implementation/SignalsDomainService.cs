@@ -102,6 +102,14 @@ namespace Domain.Services.Implementation
                             }
                             break;
                         }
+                    case Granularity.Minute:
+                        {
+                            if((item.Timestamp.Millisecond!=0)&&(item.Timestamp.Second!=0))
+                            {
+                                throw new TimestampHaveWrongFormatException();
+                            }
+                            break;
+                        }
                 }
             }
             if (fromIncludedUtc==toExcludedUtc)
