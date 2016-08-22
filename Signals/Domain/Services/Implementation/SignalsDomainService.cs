@@ -89,7 +89,7 @@ namespace Domain.Services.Implementation
         {
             foreach (var datum in dataDomain)
             {
-                if(datum.Timestamp.TimeOfDay.Ticks != 0 || datum.Timestamp.Day != 1)
+                if(!checkIfTimestampIsGoodBasedOnGranualityOfSignal(signal.Granularity,datum.Timestamp))
                 {
                     throw new ArgumentException("incorrect timestamp(s)");
                 }
@@ -105,6 +105,7 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData<T>(dataDomainOrderedList);
         }
 
+      
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
@@ -306,6 +307,43 @@ namespace Domain.Services.Implementation
                 }
             }
             return true;
+        }
+
+        private bool checkIfTimestampIsGoodBasedOnGranualityOfSignal(Granularity granularity, DateTime timestamp)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    if (timestamp.Millisecond != 0) return false;
+                    return true;
+
+                case Granularity.Minute:
+                    if (timestamp.Second != 0) return false;
+                    return true;
+
+                case Granularity.Hour:
+                    if (timestamp.Minute != 0) return false;
+                    return true;
+
+                case Granularity.Day:
+                    if (timestamp.Ticks != 0) return false;
+                    return true;
+
+                case Granularity.Week:
+                    if (timestamp.Ticks != 0 || timestamp.DayOfWeek == DayOfWeek.Monday) return false;
+                    return true;
+
+                case Granularity.Month:
+                    if (timestamp.Day != 1 || timestamp.Ticks != 0) return false;
+                    return true;
+
+                case Granularity.Year:
+                    if (timestamp.Month != 1 || timestamp.Ticks != 0) return false;
+                    return true;
+
+                default:
+                    return true;
+            }
         }
     }
 }
