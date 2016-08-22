@@ -128,7 +128,7 @@ namespace Domain.Services.Implementation
                 return data;
             }
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
-
+            
             return mvp.FillData(signal, data, fromIncludedUtc, toExcludedUtc).ToArray();
         }
 
