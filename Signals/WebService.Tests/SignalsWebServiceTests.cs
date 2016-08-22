@@ -388,6 +388,24 @@ namespace WebService.Tests
                 }
             }
 
+
+            [TestMethod]
+            public void SettingEmptyDataShouldNotThrow()
+            {
+                GiveNoSignalData();
+                var newSignal = new Domain.Signal()
+                {
+                    Id = 21243,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(newSignal);
+                signalsWebService.SetData(newSignal.Id.Value, new Dto.Datum[0]);
+            }
+
             #endregion
 
 
@@ -751,8 +769,6 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(s => s.GetAllWithPathPrefix(It.IsAny<Path>()));
             }
-
-
 
             private Dto.Signal SignalWith(
                 int? id = null,
