@@ -565,6 +565,160 @@ namespace WebService.Tests
 
                 CollectionAssert.AreEquivalent(new[] { "root", "s5","s4" }, result.Signals.ToArray()[0].Path.Components.ToArray());
             }
+
+            #region IsInvalid (Issue #12)
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
+            public void GivenASignal_WhenSettingSignalDataWithInvalidMilliseconds_ExpectedException()
+            {
+                var id = PrepareYearSignal();
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddMilliseconds(1), Value = 0 }});
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
+            public void GivenASignal_WhenSettingSignalDataWithInvalidSeconds_ExpectedException()
+            {
+                var id = PrepareYearSignal();
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddSeconds(1), Value = 0 }});
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
+            public void GivenASignal_WhenSettingSignalDataWithInvalidMinutes_ExpectedException()
+            {
+                var id = PrepareYearSignal();
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddMinutes(1), Value = 0 }});
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
+            public void GivenASignal_WhenSettingSignalDataWithInvalidHours_ExpectedException()
+            {
+                var id = PrepareYearSignal();
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddHours(1), Value = 0 }});
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
+            public void GivenASignal_WhenSettingSignalDataWithInvalidWeekDay_ExpectedException()
+            {
+                var id = 1;
+                GivenASignal(SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Week, Domain.Path.FromString("a/b")));
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp, Value = 0 }});
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
+            public void GivenASignal_WhenSettingSignalDataWithInvalidFirstDayOfMonth_ExpectedException()
+            {
+                var id = PrepareYearSignal();
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddDays(1), Value = 0 }});
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
+            public void GivenASignal_WhenSettingSignalDataWithInvalidMonths_ExpectedException()
+            {
+                var id = PrepareYearSignal();
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddMonths(1), Value = 0 }});
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
+            {
+                Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddMilliseconds(1)));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalDataWithInvalidSeconds_ExpectHandledExceptions()
+            {
+                Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddSeconds(1)));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalDataWithInvalidMinutes_ExpectHandledExceptions()
+            {
+                Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddMinutes(1)));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalDataWithInvalidHours_ExpectHandledExceptions()
+            {
+                Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddHours(1)));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalDataWithInvalidWeekDay_ExpectHandledExceptions()
+            {
+                var id = 1;
+                var dtCorrect = new DateTime(2016, 08, 22);
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Week, Domain.Path.FromString("a/b")));
+
+                Assert.IsTrue(IsTimestampThrowingException(id, dtCorrect.AddDays(-1), dtCorrect));
+                Assert.IsTrue(IsTimestampThrowingException(id, dtCorrect, dtCorrect.AddDays(1)));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalDataWithInvalidFirstDayOfMonth_ExpectHandledExceptions()
+            {
+                Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddDays(1)));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingSignalDataWithInvalidMonths_ExpectHandledExceptions()
+            {
+                Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddMonths(1)));
+            }
+
+            private bool CheckGetDataTimestamps(DateTime dtCorrect, DateTime dtWrong)
+            {
+                var id = PrepareYearSignal();
+
+                return IsTimestampThrowingException(id, dtWrong, dtCorrect.AddYears(1)) &&
+                       IsTimestampThrowingException(id, dtCorrect, dtWrong);
+            }
+
+            private int PrepareYearSignal()
+            {
+                var id = 1;
+                GivenASignal(SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Year, Domain.Path.FromString("a/b")));
+
+                return id;
+            }
+
+            private bool IsTimestampThrowingException(int id, DateTime dtStart, DateTime dtEnd)
+            {
+                try
+                {
+                    signalsWebService.GetData(id, dtStart, dtEnd);
+                    return false;
+                }
+                catch (Domain.Exceptions.DatetimeIsInvalidException)
+                {
+                    return true;
+                }
+            }
+
+            private DateTime _validTimestamp = new DateTime(2000, 1, 1, 0, 0, 0);
+
+            #endregion
+
             private List<Domain.Signal> MakeSignals()
             {
               var signals =new List<Domain.Signal>();
