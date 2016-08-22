@@ -90,7 +90,21 @@ namespace Domain.Services.Implementation
 
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-            if(missingValuePolicyRepository == null || fromIncludedUtc == toExcludedUtc)
+            if(fromIncludedUtc==toExcludedUtc)
+            {
+                List<Datum<T>> aa = new List<Datum<T>>();
+                int indeks = 0;
+                foreach(var x in data)
+                {
+                    if (fromIncludedUtc == x.Timestamp)
+                    {
+                        aa.Add(x);
+                        return aa;
+                    }
+                    indeks++;    
+                }
+            }
+            if(missingValuePolicyRepository == null)
             {
                 return data;
             }

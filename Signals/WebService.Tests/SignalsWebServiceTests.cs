@@ -1793,7 +1793,7 @@ namespace WebService.Tests
 
                 Assert.AreEqual(result.ElementAt(0).Quality, Dto.Quality.Good);
                 Assert.AreEqual(result.ElementAt(0).Timestamp, new DateTime(2000, 2, 1));
-                Assert.AreEqual(result.ElementAt(0).Value, 2);
+                Assert.AreEqual(result.ElementAt(0).Value, (double)2.0);
             }
 
             //Private methods
