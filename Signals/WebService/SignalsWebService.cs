@@ -89,6 +89,14 @@ namespace WebService
             return new Datum[] { new Datum()};
         }
 
+        private bool VerifyTimeStamp(Domain.Signal signal, DateTime timestamp)
+        {
+            if (signal.Granularity == Domain.Granularity.Year && timestamp != new DateTime(timestamp.Year, 1, 1))
+                return false;
+
+            return true;
+        }
+
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             if (data == null || data.Count() == 0) return;
@@ -103,7 +111,7 @@ namespace WebService
 
                 foreach (var d in data)
                 {
-                    if (result.Granularity == Domain.Granularity.Year && d.Timestamp != new DateTime(d.Timestamp.Year, 1, 1))
+                    if (!VerifyTimeStamp(result, d.Timestamp))
                         throw new ArgumentException();
                 }
 
