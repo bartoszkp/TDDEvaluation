@@ -72,6 +72,7 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
+            CheckTimestampCorrectness(data);
             this.signalsDataRepository.SetData(data);
         }
 
@@ -103,8 +104,68 @@ namespace Domain.Services.Implementation
                 date = AddTime(signal.Granularity, date);
             }
 
-            if (skipFirst == true) return result.OrderBy(x => x.Timestamp).Skip(1);
+
+            if (skipFirst == true)
+            {
+                CheckTimestampCorrectness(result.OrderBy(x => x.Timestamp).Skip(1).ToArray());
+                return result.OrderBy(x => x.Timestamp).Skip(1);
+            }
+
+            CheckTimestampCorrectness(result.OrderBy(x => x.Timestamp).ToArray());
             return result.OrderBy(x => x.Timestamp);
+        }
+
+        private void CheckTimestampCorrectness<T>(IEnumerable<Datum<T>> data)
+        {
+            foreach(var match in data)
+            {
+                switch (match.Signal.Granularity)
+                {
+                    case Granularity.Year:
+                        if (match.Timestamp.Month != 1)
+                        {
+                            throw new IncorrectDatumTimestampException();
+                        }
+                        goto case Granularity.Month;
+                    case Granularity.Month:
+                        if (match.Timestamp.Day != 1)
+                        {
+                            throw new IncorrectDatumTimestampException();
+                        }
+                        goto case Granularity.Week;
+                    case Granularity.Week:
+                        if (match.Timestamp.Day != 1)
+                        {
+                            throw new IncorrectDatumTimestampException();
+                        }
+                        goto case Granularity.Day;
+                    case Granularity.Day:
+                        if (match.Timestamp.Hour != 0)
+                        {
+                            throw new IncorrectDatumTimestampException();
+                        }
+                        goto case Granularity.Hour;
+                    case Granularity.Hour:
+                        if (match.Timestamp.Minute != 0)
+                        {
+                            throw new IncorrectDatumTimestampException();
+                        }
+                        goto case Granularity.Minute;
+                    case Granularity.Minute:
+                        if (match.Timestamp.Second != 0)
+                        {
+                            throw new IncorrectDatumTimestampException();
+                        }
+                        goto case Granularity.Second;
+                    case Granularity.Second:
+                        if (match.Timestamp.Millisecond != 0)
+                        {
+                            throw new IncorrectDatumTimestampException();
+                        }
+                        break;
+                    
+                }
+            }
         }
 
         private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy)
