@@ -73,6 +73,9 @@ namespace Domain.Services.Implementation
         {
             var signal = GetById(signalId);
 
+            if (!IsTimestampRegular(signal.Granularity, fromIncludedUtc))
+                throw new IncorrectTimestampException();
+
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             var resultArray = result.OrderBy(datum => datum.Timestamp).ToArray();
