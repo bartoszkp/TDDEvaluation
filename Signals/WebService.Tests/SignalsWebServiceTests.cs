@@ -751,7 +751,7 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(s => s.GetAllWithPathPrefix(It.IsAny<Path>()));
             }
-            
+
 
 
             private Dto.Signal SignalWith(

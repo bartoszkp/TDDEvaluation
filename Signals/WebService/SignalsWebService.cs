@@ -24,8 +24,8 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
@@ -112,17 +112,29 @@ namespace WebService
             if (signal == null)
                 throw new IdNotNullException();
 
-            if (data.First().Value.GetType() == typeof(int))
-                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<int>>>());
-            else if (data.First().Value.GetType() == typeof(double))
-                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
-            else if (data.First().Value.GetType() == typeof(bool))
-                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<bool>>>());
-            else if (data.First().Value.GetType() == typeof(string))
-                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<string>>>());
-            else if (data.First().Value.GetType() == typeof(decimal))
-                this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<decimal>>>());
-                
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Integer:
+                    this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<int>>>());
+                    return;
+
+                case Domain.DataType.Double:
+                    this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<double>>>());
+                    return;
+
+                case Domain.DataType.Boolean:
+                    this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<bool>>>());
+                    return;
+
+                case Domain.DataType.String:
+                    this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<string>>>());
+                    return;
+
+                case Domain.DataType.Decimal:
+                    this.signalsDomainService.SetData(signal, data.ToDomain<IEnumerable<Domain.Datum<decimal>>>());
+                    return;
+            }
+
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
@@ -138,7 +150,7 @@ namespace WebService
         {
             var missingValuePolicy = mvp.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             var signal = signalsDomainService.GetById(signalId);
-            if(signal == null)
+            if (signal == null)
             {
                 throw new SignalIsNullException();
             }

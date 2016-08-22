@@ -32,7 +32,7 @@ namespace Domain.Services.Implementation
             {
                 throw new IdNotNullException();
             }
-
+            
             var result = this.signalsRepository.Add(newSignal);
             var dataTypeSwitch = new Dictionary<DataType, Action>
             {
