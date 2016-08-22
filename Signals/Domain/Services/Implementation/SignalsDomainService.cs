@@ -165,19 +165,19 @@ namespace Domain.Services.Implementation
             var time = fromIncludedUtc;
 
             if (mvp is NoneQualityMissingValuePolicy<T>)
-                datumsList = AddNoneQualityMissingValuePolicy(datumsList, time, fromIncludedUtc, toExcludedUtc, signal.Granularity);
+                datumsList = AddNoneQualityMissingValuePolicy(datumsList, time, toExcludedUtc, signal.Granularity);
 
             if (mvp is SpecificValueMissingValuePolicy<T>)
-                datumsList = AddSpecificQualityMissingValuePolicy(datumsList, time, fromIncludedUtc, toExcludedUtc, signal.Granularity, mvp);
+                datumsList = AddSpecificQualityMissingValuePolicy(datumsList, time, toExcludedUtc, signal.Granularity, mvp);
 
             if (mvp is ZeroOrderMissingValuePolicy<T>)
-                datumsList = AddZeroOrderMissingValuePolicy(datumsList, time, fromIncludedUtc, toExcludedUtc, signal.Granularity);
+                datumsList = AddZeroOrderMissingValuePolicy(datumsList, time, toExcludedUtc, signal.Granularity);
 
             return datumsList;
         }
 
         private List<Datum<T>> AddZeroOrderMissingValuePolicy<T>
-             (List<Datum<T>> datumsList, DateTime time, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity signalGranularity)
+             (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Granularity signalGranularity)
         {
             while (time < toExcludedUtc)
             {
@@ -196,7 +196,7 @@ namespace Domain.Services.Implementation
         }
 
         private List<Datum<T>> AddNoneQualityMissingValuePolicy<T>
-             (List<Datum<T>> datumsList, DateTime time, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity signalGranularity)
+             (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Granularity signalGranularity)
         {
             while (time < toExcludedUtc)
             {
@@ -209,7 +209,7 @@ namespace Domain.Services.Implementation
         }
 
         private List<Datum<T>> AddSpecificQualityMissingValuePolicy<T>
-            (List<Datum<T>> datumsList, DateTime time, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity signalGranularity, MissingValuePolicyBase mvp)
+            (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Granularity signalGranularity, MissingValuePolicyBase mvp)
         {
             var specifiedMvp = mvp as SpecificValueMissingValuePolicy<T>;
             while (time < toExcludedUtc)
