@@ -1028,23 +1028,6 @@ namespace WebService.Tests
             #endregion
             #region Issue #19 (ZeroOrderMissingValuePolicy)
 
-
-            [TestMethod]
-            public void GivenASignalWithZeroOrderMvp_WhenGettingData_MissingDataIsNotNull()
-            {
-                var id = 1;
-                SetupGetDataDatum(id, new Datum[] { });
-                missingValuePolicyRepositoryMock
-                    .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new ZeroOrderMissingValuePolicyDouble());
-
-                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(2000, 8, 1));
-
-                foreach (var d in result)
-                    Assert.IsNotNull(d);
-            }
-
-
             [TestMethod]
             public void GivenASignalWithZeroOrderMvp_WhenGettingData_MissingDataIsPreviousValue()
             {

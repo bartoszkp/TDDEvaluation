@@ -11,7 +11,12 @@ namespace Domain.MissingValuePolicy
         {
             var previousData = otherData?.Where(d => d.Timestamp < timeStamp);
             if (previousData == null || previousData.Count() == 0)
-                return new Datum<T>();
+                return new Datum<T>()
+                {
+                    Value = default(T),
+                    Quality = Quality.None
+                };
+
 
             var previousDatum = previousData.Aggregate((a,b) => a.Timestamp > b.Timestamp ? a : b);
 
