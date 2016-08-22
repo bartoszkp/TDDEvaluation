@@ -786,8 +786,8 @@ namespace WebService.Tests
                 Assert.AreEqual("test1", result[1].Value);
                 Assert.AreEqual(new DateTime(2000, 1, 1), result[0].Timestamp);
                 Assert.AreEqual(new DateTime(2000, 2, 1), result[1].Timestamp);
-                Assert.AreEqual(Domain.Quality.Good, result[0].Quality);
-                Assert.AreEqual(Domain.Quality.Good, result[1].Quality);
+                Assert.AreEqual(Dto.Quality.Good, result[0].Quality);
+                Assert.AreEqual(Dto.Quality.Good, result[1].Quality);
 
             }
             private void GivenSignals(IEnumerable<Signal> signals)
