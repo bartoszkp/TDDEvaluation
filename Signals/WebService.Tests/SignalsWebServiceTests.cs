@@ -2135,6 +2135,8 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
             }
 
+
+
             //Private methods
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

@@ -84,6 +84,8 @@ namespace Domain.Services.Implementation
             signalsDataRepository.SetData(data);
         }
         
+        
+
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = GetById(signalId);
@@ -92,66 +94,7 @@ namespace Domain.Services.Implementation
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
             foreach (var item in data)
             {
-                switch (signal.Granularity)
-                {
-                    case Granularity.Second:
-                        {
-                            if(item.Timestamp.Millisecond != 0)
-                            {
-                                throw new TimestampHaveWrongFormatException();
-                            }
-                            break;
-                        }
-                    case Granularity.Minute:
-                        {
-                            if((item.Timestamp.Millisecond!=0)||(item.Timestamp.Second!=0))
-                            {
-                                throw new TimestampHaveWrongFormatException();
-                            }
-                            break;
-                        }
-                    case Granularity.Hour:
-                        {
-                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0))
-                            {
-                                throw new TimestampHaveWrongFormatException();
-                            }
-                            break;
-                        }
-                    case Granularity.Day:
-                        {
-                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0) || (item.Timestamp.Hour!=0))
-                            {
-                                throw new TimestampHaveWrongFormatException();
-                            }
-                            break;
-                        }
-                    case Granularity.Week:
-                        {
-                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0) || (item.Timestamp.Hour != 0)||(item.Timestamp.DayOfWeek!= DayOfWeek.Monday))
-                            {
-                                throw new TimestampHaveWrongFormatException();
-                            }
-                            break;
-                        }
-                    case Granularity.Month:
-                        {
-                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0) || (item.Timestamp.Hour != 0) || (item.Timestamp.Day!=1))
-                            {
-                                throw new TimestampHaveWrongFormatException();
-                            }
-                            break;
-                        }
-                    case Granularity.Year:
-                        {
-                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0) || (item.Timestamp.Hour != 0) || (item.Timestamp.Day != 1)||(item.Timestamp.Month!=1))
-                            {
-                                throw new TimestampHaveWrongFormatException();
-                            }
-                            break;
-                        }
-
-                }
+                VerifyTimeStamp<T>(signal.Granularity, item);
             }
             if (fromIncludedUtc==toExcludedUtc)
             {
@@ -216,6 +159,78 @@ namespace Domain.Services.Implementation
                 .ToArray();
             
             return new PathEntry(directPathSignals, subPaths.AsEnumerable<Path>().ToArray());
+        }
+
+
+
+
+
+
+
+
+        public void VerifyTimeStamp<T>(Granularity granularity, Datum<T> checkingElement)
+        {
+            var checkGranularity = new Dictionary<Granularity, Action>
+            {
+                {Granularity.Second, () => GranularitySecond<T>(checkingElement) },
+                {Granularity.Hour, () => GranularityHour<T>(checkingElement) },
+                {Granularity.Minute, () => GranularityMinute<T>(checkingElement) },
+                {Granularity.Day, () => GranularityDay<T>(checkingElement) },
+                {Granularity.Week, () => GranularityWeek<T>(checkingElement) },
+                {Granularity.Month, () => GranularityMonth<T>(checkingElement) },
+                {Granularity.Year, () => GranularityYear<T>(checkingElement) }
+            };
+            checkGranularity[granularity].Invoke();
+        }
+
+        private void GranularitySecond<T>(Datum<T> checkingElement)
+        {
+            if (checkingElement.Timestamp.Millisecond != 0)
+                throw new TimestampHaveWrongFormatException();
+        }
+
+        private void GranularityMinute<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityHour<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityDay<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityWeek<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.DayOfWeek != DayOfWeek.Monday))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityMonth<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.Day != 1))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+
+        private void GranularityYear<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.Day != 1) || (checkingElement.Timestamp.Month != 1))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
         }
     }
 }
