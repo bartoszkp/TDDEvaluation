@@ -2135,7 +2135,37 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(TimestampHaveWrongFormatException))]
+            public void GivenASignalAndDatum_WhenSettingDataQueriesWithIncorrectWithGranularitySeconds_CallException()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
 
+                GivenASignal(new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.String,
+                    Granularity = Granularity.Second
+                    
+                });
+
+                var existingDatum = new Datum<string>[]
+                {
+                    new Datum<string>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = null }
+                };
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<string>(It.IsAny<IEnumerable<Datum<string>>>()));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, existingDatum.ToDto<IEnumerable<Dto.Datum>>());
+                
+            }
 
             //Private methods
 
