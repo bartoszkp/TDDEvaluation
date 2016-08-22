@@ -822,6 +822,36 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2000, 1, 1), result.ElementAt(0).Timestamp);
             }
 
+            [TestMethod]
+            public void WhenGettingDataFromSignalWithNoDataAtAll_NoneQualityMissingValuePolicy_FillsMissingData()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.String,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var existingDatum = new Dto.Datum[]
+                {
+                };
+
+                SetupGettingData<string>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString(),
+                    new DateTime(2000, 1, 1), new DateTime(2000, 1, 10));
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 10));
+                var dateTime = new DateTime(2000, 1, 1);
+
+                foreach (var item in result)
+                {
+                    Assert.AreEqual(Dto.Quality.None, item.Quality);
+                    Assert.AreEqual(dateTime, item.Timestamp);
+                    Assert.AreEqual(null, item.Value);
+
+                    dateTime = dateTime.AddDays(1);
+                }
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
