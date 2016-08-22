@@ -111,7 +111,10 @@ namespace Domain.Services.Implementation
             var ListOfDatum = datum.ToList();
             foreach(var d in ListOfDatum)
             {
-                d.Signal = signal;
+                if (ValidateTimestamp(d.Timestamp, signal.Granularity))
+                    d.Signal = signal;
+                else 
+                    throw new InvalidTimestampException();
             }
 
             this.signalsDataRepository.SetData<T>(ListOfDatum);
@@ -501,7 +504,7 @@ namespace Domain.Services.Implementation
                     break;
 
                 case Granularity.Month:
-                    break;
+                    return timestamp.Day == 1 && timestamp.Hour == 0;
 
                 case Granularity.Year:
                     break;
