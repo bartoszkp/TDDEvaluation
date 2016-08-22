@@ -197,13 +197,26 @@ namespace Domain.Services.Implementation
             }
             if(missingValuePolicy is ZeroOrderMissingValuePolicy<T>)
             {
-                return new Datum<T>
+                if (lastDatum == null)
                 {
-                    Quality = lastDatum.Quality,
-                    Signal = signal,
-                    Timestamp = date,
-                    Value = lastDatum.Value
-                };
+                    return new Datum<T>
+                    {
+                        Quality = Quality.None,
+                        Signal = signal,
+                        Timestamp = date,
+                        Value = default(T)
+                    };
+                }
+                else
+                {
+                    return new Datum<T>
+                    {
+                        Quality = lastDatum.Quality,
+                        Signal = signal,
+                        Timestamp = date,
+                        Value = lastDatum.Value
+                    };
+                }
             }
             return new Datum<T>()
             {
