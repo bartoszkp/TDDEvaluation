@@ -99,14 +99,22 @@ namespace Domain.Services.Implementation
             var dataList = data.ToList();
 
             foreach (var d in dataList)
+            {
+                if (!VerifyTimestamp(d.Timestamp, signal.Granularity))
+                    throw new InvalidTimestampException();
                 d.Signal = signal;
+            }
 
             this.signalsDataRepository.SetData(dataList);
         }
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var signal = this.signalsRepository.Get(signalId);           
+            var signal = this.signalsRepository.Get(signalId);
+
+            if (!VerifyTimestamp(fromIncludedUtc, signal.Granularity))
+                throw new InvalidTimestampException();
+                      
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             var sortedList = result.OrderBy(x => x.Timestamp).ToList();
@@ -250,6 +258,29 @@ namespace Domain.Services.Implementation
                   .Select(p => p);
 
             return signalsPaths.ToList();
+        }
+
+        private bool VerifyTimestamp(DateTime timestamp, Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return timestamp.Millisecond == 0;
+                case Granularity.Minute:
+                    return timestamp.Second == 0 && timestamp.Millisecond == 0;
+                case Granularity.Hour:
+                    return timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
+                case Granularity.Day:
+                    return timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
+                case Granularity.Week:
+                    return timestamp.DayOfWeek == DayOfWeek.Monday && timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
+                case Granularity.Month:
+                    return timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
+                case Granularity.Year:
+                    return timestamp.Month == 1 && timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
+                default:
+                    return false;
+            }
         }
     } 
 }
