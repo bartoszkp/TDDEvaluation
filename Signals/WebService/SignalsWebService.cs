@@ -61,6 +61,8 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
+            checkDate(signal.Granularity, new Datum[] { new Datum() { Timestamp= fromIncludedUtc} , new Datum() { Timestamp = toExcludedUtc } });
+
             switch (signal.DataType)
             {
                 case Dto.DataType.Double:
