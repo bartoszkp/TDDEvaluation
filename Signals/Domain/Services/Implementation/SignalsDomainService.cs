@@ -62,6 +62,10 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
+            bool areDataTimestampsCorrect = CheckCorrectnessOfDataTimestamps(signal, data);
+
+            if (!areDataTimestampsCorrect) throw new ArgumentException();
+
             data = data.Select(d =>
             {
                 d.Signal = signal;
@@ -73,10 +77,151 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            var data =  this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            bool isFromIncludedUtcCorrect = CheckCorrectnessOfFromIncludedUtc(signal, fromIncludedUtc);
 
-            return CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
+            if (!isFromIncludedUtcCorrect) throw new ArgumentException();
+
+            var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+            var filledData = CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
+
+            return filledData;
         }
+
+        private bool CheckCorrectnessOfFromIncludedUtc(Signal signal, DateTime fromIncludedUtc)
+        {
+            switch (signal.Granularity)
+            {
+                case Granularity.Second:
+                    if (fromIncludedUtc.Millisecond != 0)
+                        return false;
+                    break;
+                case Granularity.Minute:
+                    if (fromIncludedUtc.Millisecond != 0 |
+                        fromIncludedUtc.Second != 0)
+                        return false;
+                    break;
+                case Granularity.Hour:
+                    if (fromIncludedUtc.Millisecond != 0 |
+                        fromIncludedUtc.Second != 0 |
+                        fromIncludedUtc.Minute != 0)
+                        return false;
+                    break;
+                case Granularity.Day:
+                    break;
+                case Granularity.Week:
+                    if (fromIncludedUtc.Millisecond != 0 |
+                        fromIncludedUtc.Second != 0 |
+                        fromIncludedUtc.Minute != 0 |
+                        fromIncludedUtc.Hour != 0 |
+                        fromIncludedUtc.DayOfWeek != DayOfWeek.Monday)
+                        return false;
+                    break;
+                case Granularity.Month:
+                    if (fromIncludedUtc.Millisecond != 0 |
+                        fromIncludedUtc.Second != 0 |
+                        fromIncludedUtc.Minute != 0 |
+                        fromIncludedUtc.Hour != 0 |
+                        fromIncludedUtc.Day != 1)
+                        return false;
+                    break;
+                case Granularity.Year:
+                    if (fromIncludedUtc.Millisecond != 0 |
+                        fromIncludedUtc.Second != 0 |
+                        fromIncludedUtc.Minute != 0 |
+                        fromIncludedUtc.Hour != 0 |
+                        fromIncludedUtc.Day != 1 |
+                        fromIncludedUtc.Month != 1)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
+        private bool CheckCorrectnessOfDataTimestamps<T>(Signal signal, IEnumerable<Datum<T>> data)
+        {
+            switch (signal.Granularity)
+            {
+                case Granularity.Second:
+                    foreach (var datum in data)
+                    {
+                        if (datum.Timestamp.Millisecond != 0)
+                            return false;
+                    }
+                    break;
+                case Granularity.Minute:
+                    foreach (var datum in data)
+                    {
+                        if (datum.Timestamp.Millisecond != 0 |
+                            datum.Timestamp.Second != 0)
+                            return false;
+                    }
+                    break;
+                case Granularity.Hour:
+                    foreach (var datum in data)
+                    {
+                        if (datum.Timestamp.Millisecond != 0 |
+                            datum.Timestamp.Second != 0 |
+                            datum.Timestamp.Minute != 0)
+                            return false;
+                    }
+                    break;
+                case Granularity.Day:
+                    foreach (var datum in data)
+                    {
+                        if (datum.Timestamp.Millisecond != 0 |
+                            datum.Timestamp.Second != 0 |
+                            datum.Timestamp.Minute != 0 |
+                            datum.Timestamp.Hour != 0)
+                            return false;
+                    }
+                    break;
+                case Granularity.Week:
+                    foreach (var datum in data)
+                    {
+                        if (datum.Timestamp.Millisecond != 0 |
+                            datum.Timestamp.Second != 0 |
+                            datum.Timestamp.Minute != 0 |
+                            datum.Timestamp.Hour != 0 |
+                            datum.Timestamp.DayOfWeek != DayOfWeek.Monday)
+                            return false;
+                    }
+                    break;
+                case Granularity.Month:
+                    foreach (var datum in data)
+                    {
+                        if (datum.Timestamp.Millisecond != 0 |
+                            datum.Timestamp.Second != 0 |
+                            datum.Timestamp.Minute != 0 |
+                            datum.Timestamp.Hour != 0 |
+                            datum.Timestamp.Day != 1)
+                            return false;
+                    }
+                    break;
+                case Granularity.Year:
+                    foreach (var datum in data)
+                    {
+                        if (datum.Timestamp.Millisecond != 0 |
+                            datum.Timestamp.Second != 0 |
+                            datum.Timestamp.Minute != 0 |
+                            datum.Timestamp.Hour != 0 |
+                            datum.Timestamp.Day != 1 |
+                            datum.Timestamp.Month != 1)
+                            return false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
+       
+
 
         private IEnumerable<Datum<T>> CheckMissingValues<T>(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
