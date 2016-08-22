@@ -21,7 +21,7 @@ namespace ExampleSignalClient
                 var signalId1 = client.Add(signal1).Id.Value;
             }
 
-            client.SetMissingValuePolicy(1, new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
+            client.SetMissingValuePolicy(1, new ZeroOrderMissingValuePolicy() { DataType = DataType.Double });
 
             client.SetData(1, new Datum[]
             {

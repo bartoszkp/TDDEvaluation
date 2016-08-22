@@ -121,8 +121,8 @@ namespace Domain.Services.Implementation
                         else
                             datum = new Datum<T>()
                             {
-                                Quality = gettingList.Last().Quality,
-                                Value = gettingList.Last().Value
+                                Quality = returnList.Last().Quality,
+                                Value = returnList.Last().Value
                             };
                     }
                     returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });

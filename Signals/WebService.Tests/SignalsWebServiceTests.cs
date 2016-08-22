@@ -387,7 +387,7 @@ namespace WebService.Tests
                     i++;
                 }
             }
-            
+
             [TestMethod]
             public void SettingEmptyDataShouldNotThrow()
             {
@@ -442,7 +442,7 @@ namespace WebService.Tests
 
                 signalsWebService.GetData(1, new DateTime(), new DateTime());
             }
-            
+
             [TestMethod]
             public void RepositoryWithSignalAndData_GetData_ReturnSortedCollection()
             {
@@ -489,7 +489,7 @@ namespace WebService.Tests
                     Assert.AreEqual(existingSortedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
                 }
             }
-            
+
             [TestMethod]
             public void RepositoryWithSignalAndData_WhenGet_DataIsFilled()
             {
@@ -507,11 +507,11 @@ namespace WebService.Tests
                 signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
                 signalDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())) ;
-               
+                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+
                 GivenASignal(existingSignal);
 
-                
+
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 missingValuePolicyRepositoryMock
                      .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
@@ -568,7 +568,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
                 Assert.IsNull(result);
             }
-            
+
             [TestMethod]
             public void GivenASignal_GetData_ReturnAllNoneQualityMissingValueElements()
             {
@@ -579,7 +579,7 @@ namespace WebService.Tests
                     Granularity = Granularity.Second,
                     Path = Domain.Path.FromString("signal")
                 };
-                
+
                 GivenASignal(existingSignal);
                 missingValuePolicyRepositoryMock
                     .Setup(sr => sr.Get(It.IsAny<Signal>()))
@@ -612,6 +612,61 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(21, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
                 Assert.AreEqual(new DateTime(2000, 1, 1), result.First().Timestamp);
+            }
+
+            [TestMethod]
+            public void ZeroOrderMissingValuePolicyCorrectlyFillDataWhenFirstDatumExist()
+            {
+                GiveNoSignalData();
+                int singalId = 143;
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(new Signal()
+                    {
+                        Id = singalId,
+                        DataType = DataType.Double,
+                        Granularity = Granularity.Month,
+                        Path = Path.FromString("sfda")
+                    });
+                missingValuePolicyRepositoryMock
+                    .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDecimal());
+                signalDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<double>(It.IsAny<Signal>(), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
+                    .Returns(new Datum<double>[]
+                        {
+                            new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                            new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                        });
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+            }
+
+            [TestMethod]
+            public void ZeroOrderMissingValuePolicyCorrectlyFillDataWhenFirstDatumNonExist()
+            {
+                GiveNoSignalData();
+                int singalId = 143;
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(new Signal()
+                    {
+                        Id = singalId,
+                        DataType = DataType.Double,
+                        Granularity = Granularity.Month,
+                        Path = Path.FromString("sfda")
+                    });
+                missingValuePolicyRepositoryMock
+                    .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDecimal());
+                signalDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<double>(It.IsAny<Signal>(), It.IsAny<System.DateTime>(), It.IsAny<System.DateTime>()))
+                    .Returns(new Datum<double>[]
+                        {
+                            new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                        });
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
             }
 
             #endregion
@@ -774,7 +829,7 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
                 List<Signal> listSignal = new List<Signal>();
-                listSignal.Add(new Signal() { Id = 1, DataType= DataType.Boolean,Granularity= Granularity.Minute,Path= Path.FromString("s0") });
+                listSignal.Add(new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Minute, Path = Path.FromString("s0") });
                 listSignal.Add(new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Minute, Path = Path.FromString("root/s1") });
                 listSignal.Add(new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Minute, Path = Path.FromString("root/podkatalog/s2") });
                 listSignal.Add(new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Minute, Path = Path.FromString("root / podkatalog / s3") });
@@ -887,4 +942,3 @@ namespace WebService.Tests
         }
     }
 }
- 
