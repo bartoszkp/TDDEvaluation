@@ -659,6 +659,23 @@ namespace WebService.Tests
                 Assert.AreEqual(result[2].Value, result[3].Value);
                 Assert.AreEqual(result[2].Quality, result[3].Quality);
             }
+            
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectTimestampException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestamps_IncorrectTimestampExceptionIsThrown()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Integer, Granularity.Month, Path.FromString("")));
+
+                var data = new Dto.Datum[] 
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 0, Timestamp = new DateTime(2000,1,4) },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 1, Timestamp = new DateTime(2000,2,7) },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 2, Timestamp = new DateTime(2000,3,14) }
+                };
+
+                signalsWebService.SetData(signalId, data);
+            }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
