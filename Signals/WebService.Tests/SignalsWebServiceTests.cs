@@ -866,9 +866,19 @@ namespace WebService.Tests
             {
                 var id = 1;
                 MakeMocks();
-                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Year, Domain.Path.FromString("a/b/c")));
 
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000,1, 1, 0, 0, 1) } });
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingMonthlyDataThatIsMidnightFirst_NoExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 3, 1) } });
             }
 
             #endregion
