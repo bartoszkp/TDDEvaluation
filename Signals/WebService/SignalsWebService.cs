@@ -93,17 +93,19 @@ namespace WebService
         {
             if (data == null || data.Count() == 0) return;
 
-            foreach (var d in data)
-            {
-                if (d.Timestamp != new DateTime(d.Timestamp.Year, 1, 1))
-                    throw new ArgumentException();
-            }
+
 
             if (signalsDomainService != null)
             {
                 var result = signalsDomainService.GetById(signalId);
 
                 if (result == null) throw new ArgumentException();
+
+                foreach (var d in data)
+                {
+                    if (result.Granularity == Domain.Granularity.Year && d.Timestamp != new DateTime(d.Timestamp.Year, 1, 1))
+                        throw new ArgumentException();
+                }
 
                 var type = DataTypeUtils.GetNativeType(result.DataType);
                 var firstValueType = data.ToList()[0].Value?.GetType();
