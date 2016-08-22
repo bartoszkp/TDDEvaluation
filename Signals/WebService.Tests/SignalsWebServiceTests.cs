@@ -549,6 +549,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
             public void GetData_PassInCorrectTimestampForMinute_ThrowException()
             {
                 int signalId = 1;
