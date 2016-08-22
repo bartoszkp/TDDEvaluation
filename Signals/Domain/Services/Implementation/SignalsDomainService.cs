@@ -151,7 +151,8 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
-                                        addingItem = returnList.ElementAt(i - 1);
+                                        var previousItem = returnList.ElementAt(i - 1);
+                                        addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                     }
 
                                     else
@@ -187,7 +188,8 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
-                                        addingItem = returnList.ElementAt(i - 1);
+                                        var previousItem = returnList.ElementAt(i - 1);
+                                        addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                     }
 
                                     else
@@ -223,7 +225,8 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
-                                        addingItem = returnList.ElementAt(i - 1);
+                                        var previousItem = returnList.ElementAt(i - 1);
+                                        addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                     }
 
                                     else
@@ -259,7 +262,8 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
-                                        addingItem = returnList.ElementAt(i - 1);
+                                        var previousItem = returnList.ElementAt(i - 1);
+                                        addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                     }
 
                                     else
@@ -297,7 +301,8 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
-                                        addingItem = returnList.ElementAt(i - 1);
+                                        var previousItem = returnList.ElementAt(i - 1);
+                                        addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                     }
 
                                     else
@@ -333,7 +338,8 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
-                                        addingItem = returnList.ElementAt(i - 1);
+                                        var previousItem = returnList.ElementAt(i - 1);
+                                        addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                     }
 
                                     else
@@ -369,7 +375,8 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
-                                        addingItem = returnList.ElementAt(i - 1);
+                                        var previousItem = returnList.ElementAt(i - 1);
+                                        addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                     }
 
                                     else
