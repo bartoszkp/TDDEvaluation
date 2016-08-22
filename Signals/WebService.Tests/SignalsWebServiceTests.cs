@@ -740,11 +740,11 @@ namespace WebService.Tests
 
                 GivenData(signalId, new[]
                {
-                    new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1,15,0,0), Value = 1.0},
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1,0,0,0), Value = 1.0},
                     new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2000,2,1,0,0,0), Value = 5.0}
                 });
 
-                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 15, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
             }
 
 

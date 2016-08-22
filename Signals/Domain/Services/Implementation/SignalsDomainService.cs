@@ -69,50 +69,84 @@ namespace Domain.Services.Implementation
         {
             if(domain_data != null)
             {
-                var signalGranlarity = domain_data.First().Signal.Granularity;
-                switch (signalGranlarity)
-                {
-                    case Granularity.Day:
-                        if (domain_data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, 0, 0, 0))) throw new DatumTimestampException();
-                        break;
-
-                    case Granularity.Hour:
-                        if (domain_data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, d.Timestamp.Hour, 0, 0))) throw new DatumTimestampException();
-                        break; ;
-
-                    case Granularity.Minute:
-                        if (domain_data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, d.Timestamp.Hour, d.Timestamp.Minute, 0))) throw new DatumTimestampException();
-                        break;
-
-                    case Granularity.Month:
-                        if (domain_data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, 1, 0, 0, 0))) throw new DatumTimestampException();
-                        break;
-
-                    case Granularity.Second:
-                        if (domain_data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, d.Timestamp.Hour, d.Timestamp.Minute, d.Timestamp.Second))) throw new DatumTimestampException();
-                        break;
-
-                    case Granularity.Week:
-                        if (domain_data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, 0, 0, 0) && d.Timestamp.DayOfWeek != DayOfWeek.Monday)) throw new DatumTimestampException();
-                        break;
-
-                    case Granularity.Year:
-                        if (domain_data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, 1, 1, 0, 0, 0))) throw new DatumTimestampException();
-                        break;
-                }
+                TimestampsCheck<T>(domain_data);
             }
-            
             this.signalsDataRepository.SetData(domain_data);
         }
 
-        private bool TimestampCheck(DateTime t1, DateTime t2)
+        private void TimestampsCheck<T>(IEnumerable<Datum<T>> data)
         {
-            if (t1 == t2) return true;
-            else return false;
+            var signalGranlarity = data.First().Signal.Granularity;
+
+            switch (signalGranlarity)
+            {
+                case Granularity.Day:
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, 0, 0, 0))) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Hour:
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, d.Timestamp.Hour, 0, 0))) throw new DatumTimestampException();
+                    break; ;
+
+                case Granularity.Minute:
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, d.Timestamp.Hour, d.Timestamp.Minute, 0))) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Month:
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, 1, 0, 0, 0))) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Second:
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, d.Timestamp.Hour, d.Timestamp.Minute, d.Timestamp.Second, 0))) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Week:
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, 0, 0, 0) && d.Timestamp.DayOfWeek != DayOfWeek.Monday)) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Year:
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, 1, 1, 0, 0, 0))) throw new DatumTimestampException();
+                    break;
+            }
+        }
+
+        private void SingleTimestampCheck(Signal signal,DateTime timestamp)
+        {
+            switch(signal.Granularity)
+            {
+                case Granularity.Day:
+                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, 0, 0, 0)) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Hour:
+                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, 0, 0)) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Minute:
+                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, 0)) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Month:
+                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, 1, 0, 0, 0)) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Second:
+                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, timestamp.Second, 0)) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Week:
+                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, 0, 0, 0) && timestamp.DayOfWeek == DayOfWeek.Monday) throw new DatumTimestampException();
+                    break;
+
+                case Granularity.Year:
+                    if (timestamp != new DateTime(timestamp.Year, 1, 1, 0, 0, 0)) throw new DatumTimestampException();
+                    break;
+            }
         }
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
+            SingleTimestampCheck(signal, fromIncluded);
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
             if (fromIncluded == toExcluded)
             {
