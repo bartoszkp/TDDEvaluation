@@ -677,6 +677,23 @@ namespace WebService.Tests
                 signalsWebService.SetData(signalId, data);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectTimestampException))]
+            public void GivenASignalWithData_WhenGettingDataWithIncorrectDates_IncorrectTimestampExceptionIsThrown()
+            {
+                int signalId = 1;
+                Func<int, DateTime> timeChange = (i) => new DateTime(2000, 1, 1).AddMonths(i);
+                var data = new Datum<double>[]
+                {
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = timeChange(0), Value = 3.0},
+                    new Datum<double> {Quality = Quality.Good, Timestamp = timeChange(1), Value = 5.0}
+                };
+
+                GivenASignalWithData(signalId, data);
+
+                signalsWebService.GetData(signalId, new DateTime(2000, 1, 11), new DateTime(2000, 10, 20));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
