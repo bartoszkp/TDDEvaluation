@@ -170,6 +170,28 @@ namespace Domain.Services.Implementation
             if (mvp is SpecificValueMissingValuePolicy<T>)
                 datumsList = AddSpecificQualityMissingValuePolicy(datumsList, time, fromIncludedUtc, toExcludedUtc, signal.Granularity, mvp);
 
+            if (mvp is ZeroOrderMissingValuePolicy<T>)
+                datumsList = AddZeroOrderMissingValuePolicy(datumsList, time, fromIncludedUtc, toExcludedUtc, signal.Granularity);
+
+            return datumsList;
+        }
+
+        private List<Datum<T>> AddZeroOrderMissingValuePolicy<T>
+             (List<Datum<T>> datumsList, DateTime time, DateTime fromIncludedUtc, DateTime toExcludedUtc, Granularity signalGranularity)
+        {
+            while (time < toExcludedUtc)
+            {
+                if (datumsList.FindIndex(x => x.Timestamp == time) < 0)
+                {
+                    var dataToAdd = datumsList.Find(d => d.Timestamp == ShiftTime(signalGranularity, time, -1));
+                    if (dataToAdd != null)
+                        datumsList.Add(new Datum<T>() { Quality = dataToAdd.Quality, Timestamp = time, Value = dataToAdd.Value });
+                    else
+                        datumsList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
+                }
+                time = ShiftTime(signalGranularity, time);
+            }
+
             return datumsList;
         }
 
@@ -180,7 +202,7 @@ namespace Domain.Services.Implementation
             {
                 if (datumsList.FindIndex(x => x.Timestamp == time) < 0)
                     datumsList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
-                time = AddTime(signalGranularity, time);
+                time = ShiftTime(signalGranularity, time);
             }
 
             return datumsList;
@@ -196,30 +218,30 @@ namespace Domain.Services.Implementation
                 {
                     datumsList.Add(new Datum<T>() { Quality = specifiedMvp.Quality, Timestamp = time, Value = specifiedMvp.Value });
                 }
-                time = AddTime(signalGranularity, time);
+                time = ShiftTime(signalGranularity, time);
             }
 
             return datumsList;
         }
 
-        private DateTime AddTime(Granularity granularity, DateTime time)
+        private DateTime ShiftTime(Granularity granularity, DateTime time, int shift = 1)
         {
             switch (granularity)
             {
                 case Granularity.Second:
-                    return time.AddSeconds(1);
+                    return time.AddSeconds(shift);
                 case Granularity.Minute:
-                    return time.AddMinutes(1);
+                    return time.AddMinutes(shift);
                 case Granularity.Hour:
-                    return time.AddHours(1);
+                    return time.AddHours(shift);
                 case Granularity.Day:
-                    return time.AddDays(1);
+                    return time.AddDays(shift);
                 case Granularity.Week:
-                    return time.AddDays(7);
+                    return time.AddDays(7 * shift);
                 case Granularity.Month:
-                    return time.AddMonths(1);
+                    return time.AddMonths(shift);
                 case Granularity.Year:
-                    return time.AddYears(1);
+                    return time.AddYears(shift);
                 default:
                     return new DateTime();
             }
