@@ -976,6 +976,16 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10, 3, 1, 4) } });
             }
 
+            [TestMethod]
+            public void GivenAMinutelySignal_WhenSettingDataThatIsFullMinute_NoExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Minute, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10, 3, 1, 0) } });
+            }
+
             #endregion
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
