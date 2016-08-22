@@ -17,8 +17,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -32,7 +32,7 @@ namespace Domain.Services.Implementation
             {
                 throw new IdNotNullException();
             }
-            
+
             var result = this.signalsRepository.Add(newSignal);
             var dataTypeSwitch = new Dictionary<DataType, Action>
             {
@@ -52,8 +52,8 @@ namespace Domain.Services.Implementation
         }
 
         public Signal Get(Path newPath)
-        { 
-            if(newPath.Components.Equals(""))
+        {
+            if (newPath.Components.Equals(""))
             {
                 throw new PathIsEmptyException();
             }
@@ -73,14 +73,14 @@ namespace Domain.Services.Implementation
                 return null;
             return TypeAdapter.Adapt(missingValuePolicy, missingValuePolicy.GetType(), missingValuePolicy.GetType().BaseType)
                     as MissingValuePolicy.MissingValuePolicyBase;
-            
+
         }
-        
+
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var returnList = new List<Datum<T>>();
             var mvp = GetMissingValuePolicy(signal);
-            if (mvp==null)
+            if (mvp == null)
             {
                 var gettingList = this.signalsDataRepository?.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
                 if (gettingList == null)
@@ -113,11 +113,19 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum)
         {
+            var datumWithSignal = new Datum<T>[datum.Count()];
+            int i = 0;
             foreach (var d in datum)
             {
-                d.Signal = signal;
+                datumWithSignal[i] = new Datum<T>()
+                {
+                    Quality = d.Quality,
+                    Timestamp = d.Timestamp,
+                    Value = d.Value,
+                    Signal = signal
+                };
             }
-            this.signalsDataRepository.SetData<T>(datum);
+            this.signalsDataRepository.SetData<T>(datumWithSignal);
         }
 
         public PathEntry GetPathEntry(Path pathDomain)
@@ -127,7 +135,7 @@ namespace Domain.Services.Implementation
             signalList.ForEach(p => { pathList.Add(p.Path); });
             return new PathEntry(signalList, pathList);
 
-          
+
         }
 
 
@@ -149,6 +157,6 @@ namespace Domain.Services.Implementation
             return date;
         }
 
-        
+
     }
 }
