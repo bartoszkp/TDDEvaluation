@@ -105,6 +105,9 @@ namespace WebService
                     || timestamp.Hour != 0))
                 return false;
 
+            if (signal.Granularity == Domain.Granularity.Day)
+                return false;
+
 
             return true;
         }
