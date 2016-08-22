@@ -142,6 +142,14 @@ namespace Domain.Services.Implementation
                             }
                             break;
                         }
+                    case Granularity.Year:
+                        {
+                            if ((item.Timestamp.Millisecond != 0) || (item.Timestamp.Second != 0) || (item.Timestamp.Minute != 0) || (item.Timestamp.Hour != 0) || (item.Timestamp.Day != 1)||(item.Timestamp.Month!=1))
+                            {
+                                throw new TimestampHaveWrongFormatException();
+                            }
+                            break;
+                        }
 
                 }
             }
