@@ -126,35 +126,37 @@ namespace WebService
                 switch (granularity)
                 {
                     case Granularity.Year:
-                        if (i.Timestamp.DayOfYear != 1 || i.Timestamp.Day != 1 || i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        checkSingularDate(i.Timestamp.Millisecond, i.Timestamp.Second, i.Timestamp.Minute, i.Timestamp.Hour, i.Timestamp.Day, i.Timestamp.DayOfYear);
                         break;
                     case Granularity.Month:
-                        if (i.Timestamp.Day != 1 || i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        checkSingularDate(i.Timestamp.Millisecond, i.Timestamp.Second, i.Timestamp.Minute, i.Timestamp.Hour, i.Timestamp.Day);
                         break;
                     case Granularity.Week:
-                        if (i.Timestamp.DayOfWeek != DayOfWeek.Monday || i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        if (i.Timestamp.DayOfWeek != DayOfWeek.Monday) throw new ArgumentException();
+                        checkSingularDate(i.Timestamp.Millisecond, i.Timestamp.Second, i.Timestamp.Minute, i.Timestamp.Hour);
                         break;
                     case Granularity.Day:
-                        if (i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        checkSingularDate(i.Timestamp.Millisecond, i.Timestamp.Second, i.Timestamp.Minute, i.Timestamp.Hour);
                         break;
                     case Granularity.Hour:
-                        if (i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        checkSingularDate(i.Timestamp.Millisecond, i.Timestamp.Second, i.Timestamp.Minute);
                         break;
                     case Granularity.Minute:
-                        if (i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        checkSingularDate(i.Timestamp.Millisecond, i.Timestamp.Second);
                         break;
                     case Granularity.Second:
-                        if (i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        checkSingularDate(i.Timestamp.Millisecond);
                         break;
                     default:
                         break;
                 }
 
             }
-
-           
         }
-
+        private void checkSingularDate(int millisecond, int second = 0, int minute = 0, int hour = 0, int day = 1, int dayOfYear = 1)
+        {
+            if (dayOfYear != 1 || day != 1 || hour != 0 || minute != 0 || second != 0 || millisecond != 0) throw new ArgumentException();
+        }
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
             Domain.Signal signal = this.signalsDomainService.GetById(signalId);
