@@ -639,6 +639,25 @@ namespace WebService.Tests
                 });
             }
 
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingDatumWithIncorrectDate_ThrowsArgumentException()
+            {
+                //arrange
+                int dummyId = 5;
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                GivenASignal(new Domain.Signal() { Id = dummyId, DataType = DataType.Boolean, Granularity = Granularity.Month });
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                //act
+
+                signalsWebService.SetData(dummyId,new Dto.Datum[] {new  Dto.Datum() { Timestamp = new DateTime(2015, 2, 5) } });
+
+                //assert
+            }
+
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
