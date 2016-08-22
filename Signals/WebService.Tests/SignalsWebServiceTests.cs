@@ -318,7 +318,7 @@ namespace WebService.Tests
                 Setup_CheckingDatumLists_Integer(addedCollection, domainSignal);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, 
-                    new DateTime(2005,1,1), new DateTime(2005,3,2)).ToList();
+                    new DateTime(2005,1,1), new DateTime(2005,4,1)).ToList();
 
                 List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)5},
@@ -357,7 +357,7 @@ namespace WebService.Tests
                 Setup_CheckingDatumLists_Integer(addedCollection, domainSignal);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId,
-                    new DateTime(2005, 1, 1), new DateTime(2005, 3, 2)).ToList();
+                    new DateTime(2005, 1, 1), new DateTime(2005, 4, 1)).ToList();
 
                 List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)11 },
@@ -385,7 +385,7 @@ namespace WebService.Tests
                 Setup_CheckingDatumLists_Integer(addedCollection, domainSignal);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId,
-                    new DateTime(2005, 1, 1), new DateTime(2005, 3, 2)).ToList();
+                    new DateTime(2005, 1, 1), new DateTime(2005, 4, 1)).ToList();
 
                 List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)11 },
@@ -447,7 +447,7 @@ namespace WebService.Tests
                 this.missingValuePolicyRepoMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(returnedMvp);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId,
-                    new DateTime(2005, 1, 1), new DateTime(2005, 5, 2)).ToList();
+                    new DateTime(2005, 1, 1), new DateTime(2005, 6, 1)).ToList();
 
                 List<Dto.Datum> expectedResult = new List<Dto.Datum>(new Dto.Datum[] {
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)11 },
