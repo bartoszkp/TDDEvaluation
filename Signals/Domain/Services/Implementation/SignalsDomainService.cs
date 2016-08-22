@@ -68,7 +68,7 @@ namespace Domain.Services.Implementation
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
-            var missingValuePolicy = this.missingValuePolicyRepository?.Get(signal);
+            var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
             if (missingValuePolicy == null)
                 return null;
             return TypeAdapter.Adapt(missingValuePolicy, missingValuePolicy.GetType(), missingValuePolicy.GetType().BaseType)
@@ -79,40 +79,53 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var returnList = new List<Datum<T>>();
+            var datum = new Datum<T>();
             var mvp = GetMissingValuePolicy(signal);
-            if (mvp == null)
+            if (mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
+                datum = new Datum<T>()
+                {
+                    Quality = Quality.None,
+                    Value = default(T)
+                };
+            if (mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
             {
-                var gettingList = this.signalsDataRepository?.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
-                if (fromIncludedUtc == toExcludedUtc)
+                var svmvp = mvp as SpecificValueMissingValuePolicy<T>;
+                datum = new Datum<T>()
                 {
-                    return gettingList;
-                }
-                if (gettingList == null)
-                {
-                    while (fromIncludedUtc < toExcludedUtc)
-                    {
-                        returnList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) });
-                        fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
-                    }
-                    return returnList;
-                }
-                else
-                {
-                    while (fromIncludedUtc < toExcludedUtc)
-                    {
-                        Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
-                        if (xx == null)
-                        {
-                            returnList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) });
-                        }
-                        else
-                            returnList.Add(xx);
-                        fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
-                    }
-                    return returnList;
-                }
+                    Quality = svmvp.Quality,
+                    Value = svmvp.Value
+                };
             }
-            return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+
+            var gettingList = this.signalsDataRepository?.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                return gettingList;
+            }
+            if (gettingList == null)
+            {
+                while (fromIncludedUtc < toExcludedUtc)
+                {
+                    returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
+                    fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
+                }
+                return returnList;
+            }
+            else
+            {
+                while (fromIncludedUtc < toExcludedUtc)
+                {
+                    Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
+                    if (xx == null)
+                    {
+                        returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
+                    }
+                    else
+                        returnList.Add(xx);
+                    fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
+                }
+                return returnList;
+            }
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum)
