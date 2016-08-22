@@ -714,6 +714,35 @@ namespace WebService.Tests
                     CollectionAssert.AreEqual(subpaths[i].Components.ToArray(),result[i].Components.ToArray());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(DatumTimestampException))]
+            public void GivenASignal_HavingInAproppriateDatumTimestamp_SetData_ThrowException()
+            {
+                int signalId = 1;
+
+                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
+                var someDatum = new Dto.Datum[] { new Dto.Datum { Quality = Dto.Quality.Fair, Value = 1.5, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) } };
+
+                GivenASignal(someSignal);
+
+                this.signalsWebService.SetData(signalId, someDatum);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
