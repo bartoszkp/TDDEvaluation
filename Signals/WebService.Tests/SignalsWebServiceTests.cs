@@ -729,6 +729,27 @@ namespace WebService.Tests
 
                 //assert
             }
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithZeroOrderMissingData_ReturnsNotNull()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
+                GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = "test1" } });
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1)).ToArray();
+
+                Assert.IsNotNull( result[0].Value);
+         
+           
+            }
+
+
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
