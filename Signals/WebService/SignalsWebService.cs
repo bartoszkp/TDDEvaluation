@@ -92,7 +92,7 @@ namespace WebService
             if(signal.Granularity==Granularity.Month)
                 foreach (var i in data)
                 {
-                    if (i.Timestamp.Day != 1)
+                    if (i.Timestamp.Day != 1||i.Timestamp.Hour!=0||i.Timestamp.Minute!=0||i.Timestamp.Millisecond!=0)
                         throw new ArgumentException();
                 }
             
