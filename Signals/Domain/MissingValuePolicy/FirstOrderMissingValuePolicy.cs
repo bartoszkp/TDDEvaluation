@@ -7,5 +7,9 @@ namespace Domain.MissingValuePolicy
 {
     public class FirstOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
+        public override Datum<T> GetMissingDatum(IEnumerable<Datum<T>> data, DateTime dt)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
