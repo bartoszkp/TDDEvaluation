@@ -326,19 +326,19 @@ namespace Domain.Services.Implementation
                     return true;
 
                 case Granularity.Day:
-                    if (timestamp.Ticks != 0) return false;
+                    if (timestamp.TimeOfDay.Ticks != 0) return false;
                     return true;
 
                 case Granularity.Week:
-                    if (timestamp.Ticks != 0 || timestamp.DayOfWeek == DayOfWeek.Monday) return false;
+                    if (timestamp.TimeOfDay.Ticks != 0 || timestamp.DayOfWeek == DayOfWeek.Monday) return false;
                     return true;
 
                 case Granularity.Month:
-                    if (timestamp.Day != 1 || timestamp.Ticks != 0) return false;
+                    if (timestamp.Day != 1 || timestamp.TimeOfDay.Ticks != 0) return false;
                     return true;
 
                 case Granularity.Year:
-                    if (timestamp.Month != 1 || timestamp.Ticks != 0) return false;
+                    if (timestamp.Month != 1 || timestamp.Day != 1 || timestamp.TimeOfDay.Ticks != 0) return false;
                     return true;
 
                 default:
