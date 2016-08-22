@@ -852,6 +852,48 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void WhenGettingData_FromSignal_WithSignalDatumInTheMiddleOfTheRange_CorrectlyFillsMissingData()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.String,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = "aasd", }
+                };
+
+                SetupGettingData<string>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString(),
+                    new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
+                var dateTime = new DateTime(2000, 1, 1);
+
+                int i = 0;
+                foreach (var item in result)
+                {
+                    if (i == 2)
+                    {
+                        Assert.AreEqual(Dto.Quality.Good, item.Quality);
+                        Assert.AreEqual(dateTime, item.Timestamp);
+                        Assert.AreEqual("aasd", item.Value);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(Dto.Quality.None, item.Quality);
+                        Assert.AreEqual(dateTime, item.Timestamp);
+                        Assert.AreEqual(null, item.Value);
+                    }
+
+                    dateTime = dateTime.AddDays(1);
+                    i++;
+                }
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
