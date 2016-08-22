@@ -90,6 +90,7 @@ namespace Domain.Services.Implementation
             var empty = array.Length < 1;
 
             DateTime tmp;
+            bool timestampsFollowingExistingDates = false;
             var dateModifier = DateModifier(signal.Granularity);
             var filledArray = new Datum<T>[NumberOfPeriods(fromIncludedUtc, toExcludedUtc, signal.Granularity)];
 
@@ -99,18 +100,20 @@ namespace Domain.Services.Implementation
             {
                 if (!empty && array[j].Timestamp == tmp)
                 {
+                    timestampsFollowingExistingDates = true;
                     filledArray[i] = array[j];
                     j = (j + 1) % array.Length;
                 }
                 else
-                    ValueFromMVP(i, ref filledArray, policy, signal, tmp);
+                    ValueFromMVP(i, ref filledArray, policy, signal, tmp, timestampsFollowingExistingDates);
                 tmp = dateModifier(tmp);
             }
 
             return filledArray;
         }
 
-        private void ValueFromMVP<T>(int current_index, ref Datum<T>[] filledArray, MissingValuePolicyBase policy, Signal signal, DateTime timestamp)
+        private void ValueFromMVP<T>(int current_index, ref Datum<T>[] filledArray, MissingValuePolicyBase policy, 
+            Signal signal, DateTime timestamp, bool timestampsFollowingExistingDates)
         {
             if (policy is SpecificValueMissingValuePolicy<T>)
             {
@@ -125,6 +128,12 @@ namespace Domain.Services.Implementation
             }
             else if(policy is ZeroOrderMissingValuePolicy<T>)
             {
+                if (!timestampsFollowingExistingDates)
+                {
+                    filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
+                    return;
+                }
+
                 var previousDatum = filledArray[current_index - 1];
                 filledArray[current_index] = new Datum<T>()
                 {
