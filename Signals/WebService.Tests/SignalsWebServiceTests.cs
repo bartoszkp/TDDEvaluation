@@ -1063,6 +1063,24 @@ namespace WebService.Tests
                 }));
             }
 
+            [TestMethod]
+            public void GivenASignalWithZeroOrderMvp_WhenGettingDataWithNoPreviousDatum_MissingDataHasDefaulValueAndNoneQuality()
+            {
+                var id = 1;
+                SetupGetDataDatum(id, new Datum[] { });
+                missingValuePolicyRepositoryMock
+                    .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new ZeroOrderMissingValuePolicyDouble());
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 5, 1), new DateTime(2000, 8, 1));
+
+                Assert.IsTrue(CompareDatumArrays(result, new Datum[] {
+                    new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = default(double)},
+                    new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 6, 1), Value = default(double)},
+                    new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 7, 1), Value = default(double)}
+                }));
+            }
+
             #endregion
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
