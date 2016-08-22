@@ -89,7 +89,7 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
-            
+            if(signal.Granularity==Granularity.Month)
                 foreach (var i in data)
                 {
                     if (i.Timestamp.Day != 1)
