@@ -456,6 +456,35 @@ namespace WebService.Tests
                 Assert.IsTrue(result.Count() == 0);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSetDataWithIncorrectTimestamp_ExpectedException()
+            {
+                int signalId = 5;
+                var signal = SignalWith(signalId, DataType.String, Granularity.Month, Path.FromString("x/y"));
+                var datum = new Dto.Datum[] {
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = "a" },
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 15), Value = "f" }};
+
+                GivenASignal(signal);
+
+                signalsWebService.SetData(signalId, datum);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGetDataWithIncorrectTimestamp_ExpectedException()
+            {
+                int signalId = 5;
+                var signal = SignalWith(signalId, DataType.String, Granularity.Day, Path.FromString("x/y"));
+
+                DateTime fromIncludedUtc = new DateTime(2000, 3 , 4, 0, 5, 0);
+
+                GivenASignal(signal);
+
+                signalsWebService.GetData(signalId, fromIncludedUtc, new DateTime(2005, 2, 1));
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
