@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -64,7 +65,7 @@ namespace WebService
             Domain.Signal domainSignal = GetById(signalId)?.ToDomain<Domain.Signal>();
 
             if (domainSignal == null)
-                throw new ArgumentException("A signal with the given Id does not exist");
+                throw new CouldntGetASignalException();
 
             switch (domainSignal.DataType)
             {
@@ -103,7 +104,7 @@ namespace WebService
             var signal = GetById(signalId);
 
             if (signal == null)
-                throw new ArgumentException("A signal with the given Id does not exist");
+                throw new CouldntGetASignalException();
 
             switch (signal.DataType)
             {
@@ -129,7 +130,7 @@ namespace WebService
         {
             Domain.Signal signal = GetById(signalId)?.ToDomain<Domain.Signal>();
             if (signal == null)
-                throw new ArgumentException("A signal with the given Id does not exist");
+                throw new CouldntGetASignalException();
 
             var result = signalsDomainService.GetMissingValuePolicy(signal);
 
@@ -146,7 +147,7 @@ namespace WebService
         {
             Domain.Signal signal = GetById(signalId)?.ToDomain<Domain.Signal>();
             if (signal == null)
-                throw new ArgumentException("A signal with the given Id does not exist");
+                throw new CouldntGetASignalException();
             var domainPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
             signalsDomainService.SetMissingValuePolicy(signal, domainPolicy);

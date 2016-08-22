@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\CouldntGetASignalException.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\IncorrectDatumTimestampException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />

@@ -135,8 +135,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignal_WhenSettingData_ThrowsArgumentException()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignal_WhenSettingData_ThrowsCouldntGetASignalException()
             {
                 GivenNoSignals();
 
@@ -170,8 +170,8 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignal_WhenGettingData_ThrowsArgumentException()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignal_WhenGettingData_ThrowsCouldntGetASignalException()
             {
                 GivenNoSignals();
                 GivenData(1, new Domain.Datum<double>[] {
@@ -210,8 +210,8 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignal_WhenGettingMissingValuePolicy_ArgumentExceptionIsThrown()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignal_WhenGettingMissingValuePolicy_CouldntGetASignalExceptionIsThrown()
             {
                 GivenNoSignals();
 
@@ -270,8 +270,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenNoSignal_WhenSettingMissingValuePolicy_ArgumentExceptionIsThrown()
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignal_WhenSettingMissingValuePolicy_CouldntGetASignalExceptionIsThrown()
             {
                 GivenNoSignals();
                 var missingValuePolicy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
@@ -316,7 +316,7 @@ namespace WebService.Tests
                 var signal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") };
 
                 GivenASignal(signal);
-                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(Enumerable.Empty<Datum<double>>);
+                GivenData(signalId, Enumerable.Empty<Datum<double>>());
 
                 GivenMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>()
                 {
@@ -330,7 +330,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GetData_ThreeMissingPoints_SpecificValueMissingValuePolicyShouldFillMissingData()
+            public void GetData_TwoMissingPoints_SpecificValueMissingValuePolicyShouldFillMissingData()
             {
                 int signalId = 1;
                 var signal = SignalWith(signalId, DataType.Integer, Granularity.Day, Path.FromString("x/y"));
@@ -342,7 +342,7 @@ namespace WebService.Tests
                 };
 
                 GivenASignal(signal);
-                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(data);
+                GivenData(signalId, data);
 
                 GivenMissingValuePolicy(new Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>()
                 {
@@ -364,11 +364,6 @@ namespace WebService.Tests
 
                 AssertDataDtoEquals(expectedResult, result);
             }
-
-
-
-
-
 
             [TestMethod]
             public void GetData_EqualTimestamps_ReturnSingleDatum()
@@ -440,7 +435,7 @@ namespace WebService.Tests
                 };
 
                 GivenASignal(signal);
-                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(data);
+                GivenData(signalId, data);
 
                 GivenMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>()
                 {
@@ -469,7 +464,7 @@ namespace WebService.Tests
                 var signal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") };
 
                 GivenASignal(signal);
-                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(Enumerable.Empty<Datum<double>>);
+                GivenData(signalId, Enumerable.Empty<Datum<double>>());
 
                 GivenMissingValuePolicy(new Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>()
                 {
@@ -585,8 +580,7 @@ namespace WebService.Tests
                     }
                 };
 
-                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(data);
+                GivenData(signal.Id.Value,data);
 
                 signalsWebService.GetData(signal.Id.Value, new DateTime(2001, 3, 1), new DateTime(2001,5,1));
             }
@@ -728,8 +722,6 @@ namespace WebService.Tests
                 signalsDataRepositoryMock
                     .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns<Domain.Signal, DateTime, DateTime>((s, from, to) => data.Where(d => d.Timestamp >= from && d.Timestamp < to));
-
-
             }
 
             private Domain.Signal SignalWith(

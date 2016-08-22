@@ -177,15 +177,9 @@ namespace Domain.Services.Implementation
         {
             if (missingValuePolicy is NoneQualityMissingValuePolicy<T>)
             {
-                return new Datum<T>
-                {
-                    Quality = Quality.None,
-                    Signal = signal,
-                    Timestamp = date,
-                    Value = default(T)
-                };
+                return Domain.Datum<T>.CreateNone(signal,date);
             }
-            if (missingValuePolicy is SpecificValueMissingValuePolicy<T>)
+            else if (missingValuePolicy is SpecificValueMissingValuePolicy<T>)
             {
                 return new Datum<T>
                 {
@@ -195,17 +189,11 @@ namespace Domain.Services.Implementation
                     Value = (missingValuePolicy as SpecificValueMissingValuePolicy<T>).Value
                 };
             }
-            if(missingValuePolicy is ZeroOrderMissingValuePolicy<T>)
+            else if(missingValuePolicy is ZeroOrderMissingValuePolicy<T>)
             {
                 if (lastDatum == null)
                 {
-                    return new Datum<T>
-                    {
-                        Quality = Quality.None,
-                        Signal = signal,
-                        Timestamp = date,
-                        Value = default(T)
-                    };
+                    return Domain.Datum<T>.CreateNone(signal, date);
                 }
                 else
                 {
@@ -238,19 +226,29 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
-            this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
+            missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
-        private DateTime AddTime(Granularity granuality, DateTime date)
+        private DateTime AddTime(Granularity granularity, DateTime date)
         {
-            if (granuality == Granularity.Second) return date.AddSeconds(1);
-            if (granuality == Granularity.Minute) return date.AddMinutes(1);
-            if (granuality == Granularity.Hour) return date.AddHours(1);
-            if (granuality == Granularity.Day) return date.AddDays(1);
-            if (granuality == Granularity.Week) return date.AddDays(7);
-            if (granuality == Granularity.Month) return date.AddMonths(1);
-            if (granuality == Granularity.Year) return date.AddYears(1);
-            return date;
+            switch (granularity) {
+                case Granularity.Second:
+                    return date.AddSeconds(1);
+                case Granularity.Minute:
+                    return date.AddMinutes(1);
+                case Granularity.Hour:
+                    return date.AddHours(1);
+                case Granularity.Day:
+                    return date.AddDays(1);
+                case Granularity.Week:
+                    return date.AddDays(7);
+                case Granularity.Month:
+                    return date.AddMonths(1);
+                case Granularity.Year:
+                    return date.AddYears(1);
+                default:
+                    return date;
+            }
         }
 
         public PathEntry GetPathEntry(Path domainPath)
