@@ -128,15 +128,18 @@ namespace Domain.Services.Implementation
             }
 
             if(mvp is ZeroOrderMissingValuePolicy<T>)
-            {             
-                if(lastDatum == null)
+            {
+                if (lastDatum == null)
                 {
                     result = new Datum<T>() { Quality = Quality.None, Timestamp = timestamp, Value = default(T) };
                 }
                 else
                 {
-                    result = lastDatum;
-                    result.Timestamp = timestamp;
+                    result = new Datum<T>() {
+                        Quality = lastDatum.Quality,
+                        Value = lastDatum.Value,
+                        Timestamp = timestamp
+                    };
                 }
             }
 
