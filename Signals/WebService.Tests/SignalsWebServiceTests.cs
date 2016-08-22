@@ -922,6 +922,18 @@ namespace WebService.Tests
 
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 1, 3) } });
             }
+
+            [ExpectedException(typeof(ArgumentException))]
+            [TestMethod]
+            public void GivenADailySignal_WhenSettingDataThatIsNotMidnight_ArgumentExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Day, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10, 0, 1, 0) } });
+            }
+
             #endregion
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
