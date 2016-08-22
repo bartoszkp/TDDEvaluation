@@ -572,40 +572,28 @@ namespace WebService.Tests
             [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidMilliseconds_ExpectedException()
             {
-                var id = PrepareYearSignal();
-
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddMilliseconds(1), Value = 0 }});
+                CheckSetDataTimestamps(_validTimestamp.AddMilliseconds(1));
             }
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidSeconds_ExpectedException()
             {
-                var id = PrepareYearSignal();
-
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddSeconds(1), Value = 0 }});
+                CheckSetDataTimestamps(_validTimestamp.AddSeconds(1));
             }
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidMinutes_ExpectedException()
             {
-                var id = PrepareYearSignal();
-
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddMinutes(1), Value = 0 }});
+                CheckSetDataTimestamps(_validTimestamp.AddMinutes(1));
             }
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidHours_ExpectedException()
             {
-                var id = PrepareYearSignal();
-
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddHours(1), Value = 0 }});
+                CheckSetDataTimestamps(_validTimestamp.AddHours(1));
             }
 
             [TestMethod]
@@ -623,20 +611,14 @@ namespace WebService.Tests
             [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidFirstDayOfMonth_ExpectedException()
             {
-                var id = PrepareYearSignal();
-
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddDays(1), Value = 0 }});
+                CheckSetDataTimestamps(_validTimestamp.AddDays(1));
             }
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidMonths_ExpectedException()
             {
-                var id = PrepareYearSignal();
-
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp.AddMonths(1), Value = 0 }});
+                CheckSetDataTimestamps(_validTimestamp.AddMonths(1));
             }
 
             [TestMethod]
@@ -670,8 +652,8 @@ namespace WebService.Tests
                 var dtCorrect = new DateTime(2016, 08, 22);
                 GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Week, Domain.Path.FromString("a/b")));
 
-                Assert.IsTrue(IsTimestampThrowingException(id, dtCorrect.AddDays(-1), dtCorrect));
-                Assert.IsTrue(IsTimestampThrowingException(id, dtCorrect, dtCorrect.AddDays(1)));
+                Assert.IsTrue(IsGetDataTimestampThrowingException(id, dtCorrect.AddDays(-1), dtCorrect));
+                Assert.IsTrue(IsGetDataTimestampThrowingException(id, dtCorrect, dtCorrect.AddDays(1)));
             }
 
             [TestMethod]
@@ -686,12 +668,20 @@ namespace WebService.Tests
                 Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddMonths(1)));
             }
 
+            private void CheckSetDataTimestamps(DateTime dt)
+            {
+                var id = PrepareYearSignal();
+
+                signalsWebService.SetData(id, new Dto.Datum[] {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = dt, Value = 0 }});
+            }
+
             private bool CheckGetDataTimestamps(DateTime dtCorrect, DateTime dtWrong)
             {
                 var id = PrepareYearSignal();
 
-                return IsTimestampThrowingException(id, dtWrong, dtCorrect.AddYears(1)) &&
-                       IsTimestampThrowingException(id, dtCorrect, dtWrong);
+                return IsGetDataTimestampThrowingException(id, dtWrong, dtCorrect.AddYears(1)) &&
+                       IsGetDataTimestampThrowingException(id, dtCorrect, dtWrong);
             }
 
             private int PrepareYearSignal()
@@ -702,7 +692,7 @@ namespace WebService.Tests
                 return id;
             }
 
-            private bool IsTimestampThrowingException(int id, DateTime dtStart, DateTime dtEnd)
+            private bool IsGetDataTimestampThrowingException(int id, DateTime dtStart, DateTime dtEnd)
             {
                 try
                 {

@@ -80,13 +80,12 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal foundSignal, IEnumerable<Datum<T>> data)
         {
-            foreach(Datum<T> d in data.ToList())
-                if (IsInvalid(d.Timestamp, foundSignal.Granularity))
-                    throw new DatetimeIsInvalidException(d.Timestamp, foundSignal.Granularity);
-
             List<Datum<T>> dataList = data.ToList();
             for (int i = 0; i < dataList.Count; ++i)
+            {
+                CheckTimestamp(dataList[i].Timestamp, foundSignal.Granularity);
                 dataList[i].Signal = foundSignal;
+            }
 
             this.signalsDataRepository.SetData(dataList);
         }
@@ -149,9 +148,8 @@ namespace Domain.Services.Implementation
         }
         public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            if (IsInvalid(fromIncludedUtc, foundSignal.Granularity) ||
-                IsInvalid(toExcludedUtc, foundSignal.Granularity))
-                throw new DatetimeIsInvalidException(fromIncludedUtc, foundSignal.Granularity);
+            CheckTimestamp(fromIncludedUtc, foundSignal.Granularity);
+            CheckTimestamp(toExcludedUtc, foundSignal.Granularity);
 
             IEnumerable<Datum<T>> returnedData =
                 this.signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
@@ -203,6 +201,12 @@ namespace Domain.Services.Implementation
         {
             return signalsRepository.GetAllWithPathPrefix(prefix);
 
+        }
+
+        private void CheckTimestamp(DateTime dt, Granularity granularity)
+        {
+            if(IsInvalid(dt, granularity))
+                throw new DatetimeIsInvalidException(dt, granularity);
         }
 
         private bool IsInvalid(DateTime dt, Granularity granularity)
