@@ -9,4 +9,13 @@ namespace Domain.Exceptions
         {
         }
     }
+
+    public class TimestampHaveWrongFormatException: Exception
+    {
+        public TimestampHaveWrongFormatException()
+            :base("Timestamp have wrong timestamp format")
+        {
+
+        }
+    }
 }
