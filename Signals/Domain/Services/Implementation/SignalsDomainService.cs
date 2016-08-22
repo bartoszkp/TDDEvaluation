@@ -478,5 +478,39 @@ namespace Domain.Services.Implementation
             }
 
         }
+
+
+        private bool ValidateTimestamp(DateTime timestamp,Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+
+                    break;
+
+                case Granularity.Minute:
+                    break;
+
+                case Granularity.Hour:
+                    break;
+
+                case Granularity.Day:
+                    break;
+
+                case Granularity.Week:
+                    break;
+
+                case Granularity.Month:
+                    break;
+
+                case Granularity.Year:
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+
     }
 }
