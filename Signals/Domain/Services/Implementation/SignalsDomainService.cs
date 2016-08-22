@@ -108,6 +108,11 @@ namespace Domain.Services.Implementation
                         return false;
                     break;
                 case Granularity.Day:
+                    if (fromIncludedUtc.Millisecond != 0 |
+                        fromIncludedUtc.Second != 0 |
+                        fromIncludedUtc.Minute != 0 |
+                        fromIncludedUtc.Hour != 0)
+                        return false;
                     break;
                 case Granularity.Week:
                     if (fromIncludedUtc.Millisecond != 0 |

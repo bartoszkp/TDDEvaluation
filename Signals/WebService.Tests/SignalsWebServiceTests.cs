@@ -413,6 +413,73 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataOfTheSignalByCorrectTimestamps_CalledIsSignalsDataRepositoryMockSetData()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal() { Id = 1, Granularity = Granularity.Minute, DataType = DataType.Decimal };
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
+
+                signalsWebService.SetData(1, new Dto.Datum[] { new Dto.Datum() { Timestamp = new DateTime(2016, 8, 22, 1, 1, 0) } });
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData(It.IsAny<IEnumerable<Datum<decimal>>>()));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingDataOfTheSignalByIncorrectTimestamps_ThrowedIsArgumentException()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal() { Id = 1, Granularity = Granularity.Minute, DataType = DataType.Decimal };
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
+
+                signalsWebService.SetData(1, new Dto.Datum[] { new Dto.Datum() { Timestamp = new DateTime(2016, 8, 22, 1, 1, 1) } });
+
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataOfTheSignalByCorrectTime_CalledIsSignalsDataRepositoryMockGetData()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal() { Id = 1, Granularity = Granularity.Week, DataType = DataType.Decimal };
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
+
+                signalsWebService.GetData(1, new DateTime(2016, 8, 22), new DateTime(2016, 8, 31));
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.GetData<decimal>(It.Is<Signal>(s =>
+                    s.Id == dummySignal.Id && s.Granularity == dummySignal.Granularity && s.DataType == dummySignal.DataType),
+                    new DateTime(2016, 8, 22), new DateTime(2016, 8, 31)));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGettingDataOfTheSignalByIncorrectTime_ThrowedIsArgumentException()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                var dummySignal = new Signal() { Id = 1, Granularity = Granularity.Week, DataType = DataType.Decimal };
+                signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(dummySignal);
+
+                signalsWebService.GetData(1, new DateTime(2016, 8, 23), new DateTime(2016, 8, 31));
+            }
+
+
+
             private void setupGetByPathEntry(IEnumerable<string> paths)
             {
                 paths = paths.ToList();
