@@ -549,6 +549,16 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GetData_PassInCorrectTimestampForMinute_ThrowException()
+            {
+                int signalId = 1;
+                SetupWebService();
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new Domain.Signal() { Id = signalId, Granularity = Granularity.Minute });
+
+                signalsWebService.GetData(1, new DateTime(2016, 8, 23, 1, 1,1), new DateTime(2016, 8, 25, 0, 0, 0));
+            }
+            [TestMethod]
             public void GivenSignalId_WhenGettingData_CallsGetByIdWithPassedId()
             {
                 SetupWebService();
