@@ -944,6 +944,18 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10) } });
             }
 
+            [ExpectedException(typeof(ArgumentException))]
+            [TestMethod]
+            public void GivenAHourlySignal_WhenSettingDataThatIsNotFullHourArgumentExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Hour, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10, 0, 1, 0) } });
+            }
+
+
             #endregion
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
