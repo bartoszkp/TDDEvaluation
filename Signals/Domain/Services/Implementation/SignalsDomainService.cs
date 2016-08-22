@@ -165,5 +165,25 @@ namespace Domain.Services.Implementation
 
                 return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
         }
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            var result = signalsRepository.GetAllWithPathPrefix(path);
+
+            List<Signal> signals = new List<Signal>();
+            List<Path> paths = new List<Path>();
+
+            foreach (var signal in result)
+            {
+                if(signal.Path.ToString().LastIndexOf('/') == path.ToString().Length)
+                    signals.Add(signal);
+
+                var pathToAdd = signal.Path.GetPrefix(path.Length + 1);
+                if (pathToAdd.ToString() != signal.Path.ToString() && !paths.Contains(pathToAdd))
+                    paths.Add(pathToAdd);
+            }
+
+            return new PathEntry(signals, paths);
+        }
     }
 }
