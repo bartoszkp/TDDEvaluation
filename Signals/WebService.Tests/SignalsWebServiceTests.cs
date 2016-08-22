@@ -523,6 +523,19 @@ namespace WebService.Tests
                 signalsWebService.SetData(signalId, data);
             }
 
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GetData_PassIncorrectTimestampForMonth_ThrowException()
+            {
+                int signalId = 1;
+                SetupWebService();
+
+                signalsRepositoryMock.Setup(x => x.Get(It.IsAny<int>())).Returns(new Domain.Signal() { Id = signalId, Granularity = Granularity.Month });
+
+                signalsWebService.GetData(1, new DateTime(2000, 2, 2, 0, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
+            }
+
             [TestMethod]
             public void GivenSignalId_WhenGettingData_CallsGetByIdWithPassedId()
             {
