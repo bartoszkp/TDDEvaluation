@@ -89,6 +89,14 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
+            
+                foreach (var i in data)
+                {
+                    if (i.Timestamp.Day != 1)
+                        throw new ArgumentException();
+                }
+            
+
             switch (signal.DataType)
             {
                 case Dto.DataType.Double:
