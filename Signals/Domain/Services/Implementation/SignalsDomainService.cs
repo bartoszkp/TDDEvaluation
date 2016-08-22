@@ -109,6 +109,11 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            if (!checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(signal.Granularity, fromIncludedUtc))
+            {
+                throw new ArgumentException("incorrect timestamp(s)");
+            }
+
             var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             MissingValuePolicyBase policy = GetMissingValuePolicy(signal.Id.Value);
