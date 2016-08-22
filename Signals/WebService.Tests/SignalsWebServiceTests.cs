@@ -129,66 +129,6 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
-            private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
-            {
-                return new Dto.Signal()
-                {
-                    DataType = dataType,
-                    Granularity = granularity,
-                    Path = path
-                };
-            }
-
-            private Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
-            {
-                return new Signal()
-                {
-                    Id = id,
-                    DataType = dataType,
-                    Granularity = granularity,
-                    Path = path
-                };
-            }
-
-            private void GivenNoSignals()
-            {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsRepositoryMock
-                    .Setup(sr => sr.Add(It.IsAny<Signal>()))
-                    .Returns<Signal>(s => s);
-
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalsMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-
-                var signalsDomainService = new SignalsDomainService(
-                    signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, signalsMissingValuePolicyRepositoryMock.Object);
-                signalsWebService = new SignalsWebService(signalsDomainService);
-            }
-
-            private void GivenASignal(Signal existingSignal)
-            {
-                GivenNoSignals();
-
-                signalsRepositoryMock
-                    .Setup(sr => sr.Get(existingSignal.Id.Value))
-                    .Returns(existingSignal);
-                signalsRepositoryMock
-                    .Setup(sr => sr.Get(existingSignal.Path))
-                    .Returns(existingSignal);
-            }
-
-            private void GivenRepositoryThatAssigns(int id)
-            {
-                signalsRepositoryMock
-                    .Setup(sr => sr.Add(It.IsAny<Signal>()))
-                    .Returns<Signal>(s =>
-                    {
-                        s.Id = id;
-                        return s;
-                    });
-            }
-
             // -------------------------------------------------------------------------------------------
             // 2nd Iteration:
             // -------------------------------------------------------------------------------------------
@@ -290,10 +230,6 @@ namespace WebService.Tests
 
                 Assert.IsNotNull(result);
             }
-
-            // -------------------------------------------------------------------------------------------
-
-
 
             // -------------------------------------------------------------------------------------------
             // 3rd Iteration:
@@ -656,18 +592,7 @@ namespace WebService.Tests
                 
                 Assert.AreEqual(1, result.Signals.Count());
                 Assert.AreEqual(1, result.SubPaths.Count());
-            }
-
-            private void GivenSomeSignals(Signal[] signals)
-            {
-                GivenNoSignals();
-
-                foreach (var signal in signals)
-                {
-                    signalsRepositoryMock.Setup(sr => sr.Get(signal.Id.Value)).Returns(signal);
-                    signalsRepositoryMock.Setup(sr => sr.Get(signal.Path)).Returns(signal);
-                }
-            }
+            }            
 
             [TestMethod]
             public void GivenASignal_WhenSettingDataOfStringThatIsNull_DoesNotThrow()
@@ -762,6 +687,78 @@ namespace WebService.Tests
                     Assert.AreEqual(Dto.Quality.Fair, datum.Quality);
                 }
             }
+
+            private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
+            {
+                return new Dto.Signal()
+                {
+                    DataType = dataType,
+                    Granularity = granularity,
+                    Path = path
+                };
+            }
+
+            private Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
+            {
+                return new Signal()
+                {
+                    Id = id,
+                    DataType = dataType,
+                    Granularity = granularity,
+                    Path = path
+                };
+            }
+
+            private void GivenNoSignals()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Signal>()))
+                    .Returns<Signal>(s => s);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsMissingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, signalsMissingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
+            private void GivenASignal(Signal existingSignal)
+            {
+                GivenNoSignals();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Path))
+                    .Returns(existingSignal);
+            }
+
+            private void GivenRepositoryThatAssigns(int id)
+            {
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Signal>()))
+                    .Returns<Signal>(s =>
+                    {
+                        s.Id = id;
+                        return s;
+                    });
+            }
+
+            private void GivenSomeSignals(Signal[] signals)
+            {
+                GivenNoSignals();
+
+                foreach (var signal in signals)
+                {
+                    signalsRepositoryMock.Setup(sr => sr.Get(signal.Id.Value)).Returns(signal);
+                    signalsRepositoryMock.Setup(sr => sr.Get(signal.Path)).Returns(signal);
+                }
+            }
+
         }
     }
 }

@@ -9,26 +9,28 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            client.Add(new Signal { Path = new Path { Components = new[] { "s0" } } });
-            client.Add(new Signal { Path = new Path { Components = new[] { "root", "s1" } } });
-            client.Add(new Signal { Path = new Path { Components = new[] { "root", "podkatalog", "s2" } } });
-            client.Add(new Signal { Path = new Path { Components = new[] { "root", "podkatalog", "s3" } } });
-            client.Add(new Signal { Path = new Path { Components = new[] { "root", "podkatalog2", "s4" } } });
-            
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
-
-            Console.WriteLine("Sygnały w 'root':");
-            foreach (var r in result.Signals)
+            client.Add(new Signal()
             {
-                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
-            }
-            Console.WriteLine("Ścieżki podrzędne w 'root':");
-            foreach (var s in result.SubPaths)
+                ExtensionData = null,
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "root", "s1" } }
+            });
+
+            client.SetMissingValuePolicy(1, new ZeroOrderMissingValuePolicy() { DataType = DataType.Double });
+
+            client.SetData(1, new Datum[]
             {
-                Console.WriteLine(string.Join("/", s.Components));
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+            });
+
+            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+            foreach (var d in result)
+            {
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
             }
-
-
 
             Console.ReadKey();
         }
