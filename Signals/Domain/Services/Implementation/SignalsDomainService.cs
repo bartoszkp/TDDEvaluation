@@ -157,11 +157,19 @@ namespace Domain.Services.Implementation
 
         public PathEntry GetPathEntry(Path pathDomain)
         {
-            List<Domain.Signal> signalList = signalsRepository.GetAllWithPathPrefix(pathDomain).ToList();
-            List<Domain.Path> pathList = new List<Path>();
+
+            int lengthEntryPath = pathDomain.Length + 1;
+            IEnumerable<Domain.Signal> signalsDomain = signalsRepository.GetAllWithPathPrefix(pathDomain).ToArray();
+
+            IEnumerable<Signal> signals = signalsDomain.Where<Signal>(s => s.Path.Components.Count() == lengthEntryPath).Select(signal => signal);
+            IEnumerable<Path> subPaths = signalsDomain
+                .Where<Signal>(s => s.Path.Components.Count() > lengthEntryPath)
+                .Select(signal => signal.Path.GetPrefix(lengthEntryPath))
+                .Distinct();
+            PathEntry pathEntry = new PathEntry(signals, subPaths);
+            return pathEntry;
+
             
-            signalList.ForEach(p => { pathList.Add(p.Path); });
-            return new PathEntry(signalList, pathList);
         }
     }
 }
