@@ -946,7 +946,7 @@ namespace WebService.Tests
 
             [ExpectedException(typeof(ArgumentException))]
             [TestMethod]
-            public void GivenAHourlySignal_WhenSettingDataThatIsNotFullHourArgumentExceptionIsThrown()
+            public void GivenAHourlySignal_WhenSettingDataThatIsNotFullHour_ArgumentExceptionIsThrown()
             {
                 var id = 1;
                 MakeMocks();
@@ -955,6 +955,15 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10, 0, 1, 0) } });
             }
 
+            [TestMethod]
+            public void GivenAHourlySignal_WhenSettingDataThatIsFullHour_NoExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Hour, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10, 5, 0, 0) } });
+            }
 
             #endregion
 
