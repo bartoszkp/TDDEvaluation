@@ -65,7 +65,7 @@ namespace Domain.Services.Implementation
 
                 if (datum == null)
                 {
-                    var tempDatum = (mvp as MissingValuePolicy<T>).GetDatum();
+                    var tempDatum = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc, res);
                     tempDatum.Signal = signal;
                     tempDatum.Timestamp = fromIncludedUtc;
 

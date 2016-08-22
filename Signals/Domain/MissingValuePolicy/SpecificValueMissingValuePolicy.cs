@@ -11,7 +11,7 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public override Datum<T> GetDatum()
+        public override Datum<T> GetDatum(DateTime timeStamp, IEnumerable<Datum<T>> otherData = null)
         {
             return new Datum<T>()
             {
