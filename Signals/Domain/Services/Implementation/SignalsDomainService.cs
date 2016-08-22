@@ -95,14 +95,19 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            
             var signal = GetById(signalId);
+            Datum<T> secondaryItem = new Datum<T>() { Signal = signal, Timestamp = fromIncludedUtc };
+            VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
 
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
             foreach (var item in data)
             {
                 VerifyTimeStamp<T>(signal.Granularity, item);
             }
+
             if (fromIncludedUtc==toExcludedUtc)
             {
                 List<Datum<T>> returnElement = new List<Datum<T>>();
