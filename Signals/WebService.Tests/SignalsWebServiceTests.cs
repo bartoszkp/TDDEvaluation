@@ -628,23 +628,23 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)1.5 },
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 3, 1),  Value = (double)2.5 }
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 0),  Value = (double)1.5 },
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 3, 0),  Value = (double)2.5 }
                 };
 
                 var filledDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)1.5 },
-                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 1, 2, 1),  Value = default(double)},
-                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 3, 1),  Value = (double)2.5 }
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 0),  Value = (double)1.5 },
+                    new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 1, 2, 0),  Value = default(double)},
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 3, 0),  Value = (double)2.5 }
                 };
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
                 GivenASignal(existingSignal);
 
-                var firstTimestamp = new DateTime(2000, 1, 1, 1, 1, 1);
-                var lastTimestamp = new DateTime(2000, 1, 1, 1, 4, 1);
+                var firstTimestamp = new DateTime(2000, 1, 1, 1, 1, 0);
+                var lastTimestamp = new DateTime(2000, 1, 1, 1, 4, 0);
 
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
@@ -1249,19 +1249,19 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)1.5 },
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 2, 1),  Value = (double)2.0 }
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 0,0),  Value = (double)1.5 },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 2, 0,0),  Value = (double)2.0 }
                 };
 
                 var filledDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1),  Value = (double)1.5 },
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 2, 1),  Value = (double)2.0},
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 3, 1),  Value = (double)42.42}
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 0,0),  Value = (double)1.5 },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 2, 0,0),  Value = (double)2.0},
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 3, 0,0),  Value = (double)42.42}
                 };
 
-                var firstTimestamp = new DateTime(2000, 1, 1, 1, 1, 1);
-                var lastTimestamp = new DateTime(2000, 1, 1, 1, 4, 1);
+                var firstTimestamp = new DateTime(2000, 1, 1, 1, 1,0);
+                var lastTimestamp = new DateTime(2000, 1, 1, 1, 4,0);
 
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
 
@@ -1845,13 +1845,15 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(TimestampHaveWrongFormatException))]
             public void GivenASignalAndDatum_WhenGettingDataQueriesWithIncorrectWithGranularityMinutes_CallException()
             {
                 var existingSignal = new Signal()
                 {
                     Id = 1,
                     DataType = DataType.Double,
-                    Granularity = Granularity.Second,
+                    Granularity = Granularity.Minute,
                     Path = Domain.Path.FromString("root/signal1")
                 };
 
@@ -1890,6 +1892,55 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(TimestampHaveWrongFormatException))]
+            public void GivenASignalAndDatum_WhenGettingDataQueriesWithIncorrectWithGranularityHours_CallException()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Hour,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1,12,0,0),  Value = default(double) },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1,13,13,0),  Value = (double)2.0},
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1,14,14,0,10),  Value = default(double)}
+                };
+
+                var firstTimestamp = new DateTime(2000, 1, 1);
+                var lastTimestamp = new DateTime(2000, 3, 1);
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(existingSignal, firstTimestamp, lastTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<double>>>);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+            }
+
             //Private methods
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)

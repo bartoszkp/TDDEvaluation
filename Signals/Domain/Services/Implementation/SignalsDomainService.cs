@@ -104,7 +104,7 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Minute:
                         {
-                            if((item.Timestamp.Millisecond!=0)&&(item.Timestamp.Second!=0))
+                            if((item.Timestamp.Millisecond!=0)||(item.Timestamp.Second!=0))
                             {
                                 throw new TimestampHaveWrongFormatException();
                             }
