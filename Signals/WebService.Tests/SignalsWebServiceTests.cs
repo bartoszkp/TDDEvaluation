@@ -767,7 +767,29 @@ namespace WebService.Tests
                 Assert.AreEqual("test1", result[1].Value);
 
             }
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithZeroOrderMissingData_ReturnsDatumWithGoodDate()
+            {
+                int signalId = 7;
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
+                GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } });
 
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray();
+
+                Assert.AreEqual("test1", result[0].Value);
+                Assert.AreEqual("test1", result[1].Value);
+                Assert.AreEqual(new DateTime(2000, 1, 1), result[0].Timestamp);
+                Assert.AreEqual(new DateTime(2000, 2, 1), result[1].Timestamp);
+                Assert.AreEqual(Domain.Quality.Good, result[0].Quality);
+                Assert.AreEqual(Domain.Quality.Good, result[1].Quality);
+
+            }
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
