@@ -120,7 +120,13 @@ namespace Domain.Services.Implementation
             MissingValuePolicy<T> missingValuePolicy;
 
             var data = this.signalsDataRepository
-                .GetData<T>(signal, fromIncludedUTC, toExcludedUTC);
+                .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToArray();
+
+            if (data == null)
+                return null;
+
+            if (fromIncludedUTC == toExcludedUTC)
+                return data;
 
             var timestampBegin = fromIncludedUTC;
             var timestampEnd = toExcludedUTC;
