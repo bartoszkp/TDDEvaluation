@@ -62,6 +62,10 @@ namespace WebService
                 var policy = GetMissingValuePolicy(signalId);
 
                 if (sig == null) throw new ArgumentException();
+
+                if (!VerifyTimeStamp(sig, fromIncludedUtc))
+                    throw new ArgumentException();
+
                 var k = sig.DataType;
                 switch (k)
                 {
