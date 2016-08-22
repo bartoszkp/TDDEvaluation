@@ -518,6 +518,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(dummySignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
 
                 Assert.AreEqual(5, result.Count()); //missing are filled
+                Assert.AreEqual(5, result.Select(d => d.Timestamp).Distinct().Count()); //timestamp is not copied
 
                 foreach (var value in result.Select(d => d.Value))
                     Assert.AreEqual(default(bool), value);

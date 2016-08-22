@@ -38,7 +38,21 @@ namespace Domain.MissingValuePolicy
         {
             Datum<T> newDatum = datums.FirstOrDefault(datum => datum.Timestamp == tmp);
 
-            filledList.Add(newDatum ?? filledList.LastOrDefault() ?? Datum<T>.CreateNone(signal, tmp));
+            if (newDatum == null)
+            {
+                var last = filledList.LastOrDefault();
+                if (last != null)
+                    newDatum = new Datum<T>
+                    {
+                        Quality = last.Quality,
+                        Signal = Signal,
+                        Timestamp = tmp,
+                        Value = last.Value
+                    };
+                else
+                    newDatum = Datum<T>.CreateNone(signal, tmp);
+            }
+            filledList.Add(newDatum);
         }
     }
 }
