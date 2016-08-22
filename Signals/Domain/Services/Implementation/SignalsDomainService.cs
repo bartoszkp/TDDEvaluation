@@ -151,7 +151,7 @@ namespace Domain.Services.Implementation
         {
             if (IsInvalid(fromIncludedUtc, foundSignal.Granularity) ||
                 IsInvalid(toExcludedUtc, foundSignal.Granularity))
-                throw new Exception();
+                throw new DatetimeIsInvalidException(fromIncludedUtc, foundSignal.Granularity);
 
             IEnumerable<Datum<T>> returnedData =
                 this.signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
@@ -211,7 +211,7 @@ namespace Domain.Services.Implementation
             if ((int)granularity >= 1 && dt.Second != 0) return true;
             if ((int)granularity >= 2 && dt.Minute != 0) return true;
             if ((int)granularity >= 3 && dt.Hour != 0) return true;
-            if ((int)granularity >= 4 && dt.DayOfWeek != DayOfWeek.Monday) return true;
+            if ((int)granularity == 4 && dt.DayOfWeek != DayOfWeek.Monday) return true;
             if ((int)granularity >= 5 && dt.Day != 1) return true;
             if ((int)granularity >= 6 && dt.Month != 1) return true;
 
