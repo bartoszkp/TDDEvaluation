@@ -655,7 +655,20 @@ namespace WebService.Tests
 
                 //assert
             }
+            [TestMethod]
+            public void GivenASignal_WhenSettingDatumWithCorrectHour_DoNotThrowsException()
+            {
+                //arrange
+                int dummyId = 5;
+                GivenASignal(SignalWith(dummyId, DataType.Boolean, Granularity.Day, Path.FromString("x/y")));
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                //act
 
+                signalsWebService.SetData(dummyId, new Dto.Datum[] { new Dto.Datum() { Timestamp = new DateTime(2015, 2, 5,0,0,0) } });
+
+                //assert
+            }
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
