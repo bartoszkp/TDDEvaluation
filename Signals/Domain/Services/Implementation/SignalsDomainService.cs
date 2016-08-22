@@ -85,6 +85,54 @@ namespace Domain.Services.Implementation
             return resultArray;
         }
 
+        public void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable)
+        {
+            var signal = GetById(signalId);
+
+            foreach(var datum in enumerable)
+            {
+                if (!IsTimestampRegular(signal.Granularity, datum.Timestamp))
+                    throw new IncorrectTimestampException();
+            }
+
+            enumerable = enumerable.Select(datum => { datum.Signal = signal; return datum; });
+
+            signalsDataRepository.SetData(enumerable.ToList());
+        }
+
+        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            var mvp = missingValuePolicyRepository.Get(signal);
+
+            if (mvp == null) return null;
+
+            else return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                as MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicyBase)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
+        }
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            var result = signalsRepository.GetAllWithPathPrefix(path);
+            var level = path.Length + 1;
+
+            var signals = result.Where(signal => signal.Path.Length == level);
+            var subpaths = result.Where(signal => signal.Path.Length > level)
+                .Select(signal => signal.Path)
+                .Select(p => Path.FromString(Path.JoinComponents(p.Components.Take(level))))
+                .Distinct();
+
+            return new PathEntry(signals.ToList(), subpaths.ToList());
+        }
+
         private Datum<T>[] FillArray<T>(Datum<T>[] array, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, MissingValuePolicyBase policy)
         {
             var empty = array.Length < 1;
@@ -201,46 +249,35 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void SetData<T>(int signalId, IEnumerable<Datum<T>> enumerable)
+        private bool IsTimestampRegular(Granularity granularity, DateTime timestamp)
         {
-            var signal = GetById(signalId);
+            bool seconds = timestamp.Millisecond == 0;
+            bool minutes = seconds && timestamp.Second == 0;
+            bool hours = minutes && timestamp.Minute == 0;
+            bool days = hours && timestamp.Hour == 0;
+            bool weeks = days && timestamp.Day % 7 == 1;
+            bool months = days && timestamp.Day == 1;
+            bool years = months && timestamp.Month == 1;
 
-            enumerable = enumerable.Select(datum => { datum.Signal = signal; return datum; });
-
-            signalsDataRepository.SetData(enumerable.ToList());
-        }
-
-        public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
-        {
-            var signal = signalsRepository.Get(signalId);
-
-            var mvp = missingValuePolicyRepository.Get(signal);
-
-            if (mvp == null) return null;
-
-            else return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy.MissingValuePolicyBase;
-        }
-
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicyBase)
-        {
-            var signal = signalsRepository.Get(signalId);
-
-            missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
-        }
-
-        public PathEntry GetPathEntry(Path path)
-        {
-            var result = signalsRepository.GetAllWithPathPrefix(path);
-            var level = path.Length + 1;
-
-            var signals = result.Where(signal => signal.Path.Length == level);
-            var subpaths = result.Where(signal => signal.Path.Length > level)
-                .Select(signal => signal.Path)
-                .Select(p => Path.FromString(Path.JoinComponents(p.Components.Take(level))))
-                .Distinct();
-
-            return new PathEntry(signals.ToList(), subpaths.ToList());
+            switch (granularity)
+            {
+                case Granularity.Second:                    
+                    return seconds;
+                case Granularity.Minute:
+                    return minutes;
+                case Granularity.Hour:
+                    return hours;
+                case Granularity.Day:
+                    return days;
+                case Granularity.Week:
+                    return weeks;
+                case Granularity.Month:
+                    return months;
+                case Granularity.Year:
+                    return years;
+                default:
+                    return false;
+            }
         }
     }
 }
