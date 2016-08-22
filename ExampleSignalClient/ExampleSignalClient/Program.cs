@@ -9,26 +9,15 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-         //   client.Add(new Signal() { Path = new Path() { Components = new[] { "s0" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "s1" } } });
-         //   client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "s1", "s2" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog", "s3" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog", "podpodkatalog", "s4" } } });
-            //client.Add(new Signal() { Path = new Path() { Components = new[] { "root", "podkatalog2", "s5" } } });
+            //client.Add(new Signal() { DataType = DataType.Integer, Granularity = Granularity.Month, Path = new Path() { Components = new[] { "a" } } });
 
-            var result = client.GetPathEntry(new Path() { Components = new[] { "root","s1" } });
+            var data = new Datum[]
+            {
+                new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) }
+            };
 
-            Console.WriteLine("Sygnały w 'root':");
-            foreach (var r in result.Signals)
-            {
-                Console.WriteLine(string.Join("/", r.Path.Components) + ", " + r.Id);
-            }
-            Console.WriteLine("Ścieżki podrzędne w 'root':");
-            foreach (var s in result.SubPaths)
-            {
-                Console.WriteLine(string.Join("/", s.Components));
-            }
-            
+            client.SetData(1, data);
+
             Console.ReadKey();
         }
     }

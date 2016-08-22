@@ -80,6 +80,10 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal foundSignal, IEnumerable<Datum<T>> data)
         {
+            foreach(Datum<T> d in data.ToList())
+                if (IsInvalid(d.Timestamp, foundSignal.Granularity))
+                    throw new DatetimeIsInvalidException(d.Timestamp, foundSignal.Granularity);
+
             List<Datum<T>> dataList = data.ToList();
             for (int i = 0; i < dataList.Count; ++i)
                 dataList[i].Signal = foundSignal;
@@ -145,6 +149,10 @@ namespace Domain.Services.Implementation
         }
         public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            if (IsInvalid(fromIncludedUtc, foundSignal.Granularity) ||
+                IsInvalid(toExcludedUtc, foundSignal.Granularity))
+                throw new Exception();
+
             IEnumerable<Datum<T>> returnedData =
                 this.signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc);
 
@@ -195,6 +203,19 @@ namespace Domain.Services.Implementation
         {
             return signalsRepository.GetAllWithPathPrefix(prefix);
 
+        }
+
+        private bool IsInvalid(DateTime dt, Granularity granularity)
+        {
+            if ((int)granularity >= 0 && dt.Millisecond != 0) return true;
+            if ((int)granularity >= 1 && dt.Second != 0) return true;
+            if ((int)granularity >= 2 && dt.Minute != 0) return true;
+            if ((int)granularity >= 3 && dt.Hour != 0) return true;
+            if ((int)granularity >= 4 && dt.DayOfWeek != DayOfWeek.Monday) return true;
+            if ((int)granularity >= 5 && dt.Day != 1) return true;
+            if ((int)granularity >= 6 && dt.Month != 1) return true;
+
+            return false;
         }
     }
 }
