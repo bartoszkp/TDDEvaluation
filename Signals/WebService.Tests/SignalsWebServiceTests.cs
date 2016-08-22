@@ -714,6 +714,21 @@ namespace WebService.Tests
 
                 //assert
             }
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignalWithMonthGranularity_WhenGettingDatumWithIncorrectDate_ThrowsArgumentException()
+            {
+                //arrange
+                int dummyId = 5;
+                GivenASignal(SignalWith(dummyId, DataType.Boolean, Granularity.Week, Path.FromString("x/y")));
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                //act
+
+                signalsWebService.GetData(dummyId, new DateTime(2015, 1, 23), new DateTime(2016, 2, 1));
+
+                //assert
+            }
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
