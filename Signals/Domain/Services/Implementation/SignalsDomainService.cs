@@ -84,7 +84,7 @@ namespace Domain.Services.Implementation
             return current;
         }
 
-        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp)
+        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp,Datum<T> before)
         {
             if (mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
             {
@@ -97,8 +97,8 @@ namespace Domain.Services.Implementation
             }
             else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
             {
-                var zeroMVP = mvp as MissingValuePolicy.ZeroOrderMissingValuePolicy<T>;
-                return Datum<T>.CreateSpecific(signal, timeStamp, Quality.None,default(T));
+               
+                return before;
             }
             return new Datum<T>();
         }
@@ -115,15 +115,22 @@ namespace Domain.Services.Implementation
             DateTime current = fromIncludedUtc;
 
             int i = 0;
+            Datum<T> before = new Datum<T>() {}; 
             while(current < toExcludedUtc)
             {
+
                 if (i >= data.Count || data[i].Timestamp != current)
                 {
-                    data.Add(GetMissingValue<T>(mvp, signal, current));
+                    before = GetMissingValue<T>(mvp, signal, current, before);
+                    data.Add(before);
+
                 }
                 else
+                {
+                    before = data[i];
                     i++;
-
+                }
+               
                 current = GetNextDateFromGranularity(current, signal.Granularity);
             }
 
