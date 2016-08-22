@@ -79,7 +79,7 @@ namespace WebService.Tests
 
             Assert.AreEqual(2, result.Count());
             Assert.AreEqual(Dto.Quality.None, filledDatum.Quality);
-            Assert.AreEqual(0, filledDatum.Value);
+            Assert.AreEqual((double)0, filledDatum.Value);
 
 
         }
