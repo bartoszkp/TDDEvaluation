@@ -862,7 +862,7 @@ namespace WebService.Tests
 
             [ExpectedException(typeof(ArgumentException))]
             [TestMethod]
-            public void GivenASignal_WhenSettingYearlyDataThatIsNotMidnightFirstJanuary_ArgumentExceptionIsThrown()
+            public void GivenAYearlySignal_WhenSettingDataThatIsNotMidnightFirstJanuary_ArgumentExceptionIsThrown()
             {
                 var id = 1;
                 MakeMocks();
@@ -872,7 +872,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenSettingYearlyDataThatIsMidnightFirstJanuary_NoExceptionIsThrown()
+            public void GivenAYearlySignal_WhenSettingDataThatIsMidnightFirstJanuary_NoExceptionIsThrown()
             {
                 var id = 1;
                 MakeMocks();
@@ -881,8 +881,19 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 1, 1) } });
             }
 
+            [ExpectedException(typeof(ArgumentException))]
             [TestMethod]
-            public void GivenASignal_WhenSettingMonthlyDataThatIsMidnightFirst_NoExceptionIsThrown()
+            public void GivenAMonthlySignal_WhenSettingDataThatIsNotMidnightFirst_ArgumentExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 1, 1, 0, 0, 1) } });
+            }
+
+            [TestMethod]
+            public void GivenAMonthlySignal_WhenSettingDataThatIsMidnightFirst_NoExceptionIsThrown()
             {
                 var id = 1;
                 MakeMocks();
@@ -891,16 +902,7 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 3, 1) } });
             }
 
-            [ExpectedException(typeof(ArgumentException))]
-            [TestMethod]
-            public void GivenASignal_WhenSettingMonthlyDataThatIsNotMidnightFirst_ArgumentExceptionIsThrown()
-            {
-                var id = 1;
-                MakeMocks();
-                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
 
-                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 1, 1, 0, 0, 1) } });
-            }
 
 
             #endregion
