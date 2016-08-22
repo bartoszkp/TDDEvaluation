@@ -52,7 +52,7 @@ namespace Domain.MissingValuePolicy
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Month:
-                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
+                    count = (toExcludedUtc.Month - fromIncludedUtc.Month) + 12 * (toExcludedUtc.Year - fromIncludedUtc.Year);
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
                 case Granularity.Year:
