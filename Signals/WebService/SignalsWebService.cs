@@ -89,20 +89,9 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
-           if(signal.Granularity==Granularity.Month)
-                foreach (var i in data)
-                {
-                    if (i.Timestamp.Day != 1||i.Timestamp.Hour!=0||i.Timestamp.Minute!=0||i.Timestamp.Millisecond!=0)
-                        throw new ArgumentException();
-                }
-            if (signal.Granularity == Granularity.Day)
-                foreach (var i in data)
-                {
-                    if ( i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Millisecond != 0)
-                        throw new ArgumentException();
-                }
+         
 
-
+            checkDate(signal.Granularity, data);
             switch (signal.DataType)
             {
                 case Dto.DataType.Double:
@@ -126,6 +115,41 @@ namespace WebService
                         data.ToDomain<IEnumerable<Domain.Datum<String>>>());
                     break;
             }
+        }
+
+        private void checkDate(Granularity granularity, IEnumerable<Datum> data)
+        {
+            foreach (var i in data)
+            {
+                switch (granularity)
+                {
+                    case Granularity.Year:
+                        if (i.Timestamp.DayOfYear != 1 || i.Timestamp.Day != 1 || i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        break;
+                    case Granularity.Month:
+                        if (i.Timestamp.Day != 1 || i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        break;
+                    case Granularity.Week:
+                        break;
+                    case Granularity.Day:
+                        if (i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        break;
+                    case Granularity.Hour:
+                        if (i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        break;
+                    case Granularity.Minute:
+                        if (i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        break;
+                    case Granularity.Second:
+                        if (i.Timestamp.Millisecond != 0) throw new ArgumentException();
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+
+           
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
