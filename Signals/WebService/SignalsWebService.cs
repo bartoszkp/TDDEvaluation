@@ -94,6 +94,10 @@ namespace WebService
             if (signal.Granularity == Domain.Granularity.Year && timestamp != new DateTime(timestamp.Year, 1, 1))
                 return false;
 
+            if (signal.Granularity == Domain.Granularity.Month && timestamp != new DateTime(timestamp.Year, timestamp.Month, 1))
+                return false;
+
+
             return true;
         }
 
