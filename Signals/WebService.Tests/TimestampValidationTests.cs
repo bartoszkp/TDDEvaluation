@@ -39,6 +39,16 @@ namespace WebService.Tests
 
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(InvalidTimestampException))]
+        public void GetData_DayGranularity_InvalidTimestamp_ExceptionThrown()
+        {
+            SetupWebService();
+
+            signalsWebService.GetData(1, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 3, 1, 0, 0, 0));
+
+        }
+
 
         private void SetupWebService()
         {

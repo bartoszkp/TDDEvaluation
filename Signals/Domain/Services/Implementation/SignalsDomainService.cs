@@ -488,26 +488,25 @@ namespace Domain.Services.Implementation
             switch (granularity)
             {
                 case Granularity.Second:
-
-                    break;
-
+                    return timestamp.Millisecond == 0;
+                    
                 case Granularity.Minute:
-                    break;
+                    return timestamp.Second == 0;
 
                 case Granularity.Hour:
-                    break;
+                    return timestamp.Minute == 0;
 
                 case Granularity.Day:
-                    break;
+                    return timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0;
 
                 case Granularity.Week:
-                    break;
+                    return timestamp.DayOfWeek == DayOfWeek.Monday && timestamp.Hour == 0 && timestamp.Minute == 0;
 
                 case Granularity.Month:
-                    return timestamp.Day == 1 && timestamp.Hour == 0;
+                    return timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0;
 
                 case Granularity.Year:
-                    break;
+                    return timestamp.Month == 1 &&  timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0;
 
                 default:
                     break;
