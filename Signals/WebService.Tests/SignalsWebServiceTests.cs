@@ -612,16 +612,15 @@ namespace WebService.Tests
                     new Datum<double> {Quality = Quality.Good, Timestamp = timeChange(2), Value = 3.0},
                     new Datum<double> {Quality = Quality.Good, Timestamp = timeChange(4), Value = 5.0}
                 };
-
-                GivenASignalWithData(signalId, data);
-
                 var policy = new ZeroOrderMissingValuePolicyDouble();
+
+                GivenASignalWithData(signalId, data);                
                 GivenMissingValuePolicy(signalId, policy);
 
                 const int expectedResultNumber = 5;
                 var result = signalsWebService.GetData(signalId, timeChange(0), timeChange(expectedResultNumber)).ToArray();
 
-                Assert.AreEqual(expectedResultNumber, result.Length);                
+                Assert.AreEqual(expectedResultNumber, result.Length);
                 Assert.IsFalse(result.Any(d => d.Quality == Dto.Quality.None));
                 Assert.AreEqual(result[0].Value, result[1].Value);
                 Assert.AreEqual(result[2].Value, result[3].Value);
@@ -634,6 +633,31 @@ namespace WebService.Tests
                     timeChange(4)
                 },
                 result.Select(datum => datum.Timestamp).ToArray());
+            }
+
+            [TestMethod]
+            public void GivenASignalAndDataWithZOrderMVP_WhenGettingDataWithDatesEarlierThanTheFirstAvailable_ReturnsEarlierDatesAccordingToNoneQualityMVPAndTheRestAccordingToZeroOrderMVP()
+            {
+                int signalId = 1;
+                Func<int, DateTime> timeChange = (i) => new DateTime(2000, 1, 1).AddMonths(i);
+                var data = new Datum<double>[]
+                {
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = timeChange(2), Value = 3.0},
+                    new Datum<double> {Quality = Quality.Good, Timestamp = timeChange(4), Value = 5.0}
+                };
+                var policy = new ZeroOrderMissingValuePolicyDouble();
+
+                GivenASignalWithData(signalId, data);                
+                GivenMissingValuePolicy(signalId, policy);
+
+                const int expectedResultNumber = 5;
+                var result = signalsWebService.GetData(signalId, timeChange(0), timeChange(expectedResultNumber)).ToArray();
+                
+                Assert.AreEqual(default(double), result[0].Value);
+                Assert.AreEqual(default(double), result[1].Value);
+                Assert.IsTrue(Dto.Quality.None == result[0].Quality && Dto.Quality.None == result[1].Quality);
+                Assert.AreEqual(result[2].Value, result[3].Value);
+                Assert.AreEqual(result[2].Quality, result[3].Quality);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
