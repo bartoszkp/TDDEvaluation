@@ -94,10 +94,11 @@ namespace Domain.Services.Implementation
             if (getMissingValuePolicy == null)
                 return getData;
             
+     
             var result = new List<Datum<T>>();
             var dt = fromIncludedUtc;
 
-            while(dt < toExcludedUtc || dt == fromIncludedUtc)
+            while(dt < toExcludedUtc )
             {
                 var next = SignalUtils.GetNextDate(dt, signal.Granularity);
 
