@@ -81,6 +81,7 @@ namespace Domain.Services.Implementation
             CheckTimestamp(fromIncludedUtc, signal.Granularity);
 
             bool skipFirst = false;
+            Datum<T> lastDatum = null;
             List<Datum<T>> result;
             result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp).ToList();
             if (result.Count == 0)
@@ -99,10 +100,10 @@ namespace Domain.Services.Implementation
                              select x).FirstOrDefault();
                 if (datum == null)
                 {
-                    Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy);
+                    Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy,lastDatum);
                     result.Add(tempDatum);
                 }
-
+                lastDatum = datum;
                 date = AddTime(signal.Granularity, date);
             }
 
@@ -172,7 +173,7 @@ namespace Domain.Services.Implementation
             }
         }
 
-        private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy)
+        private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy,Datum<T> lastDatum)
         {
             if (missingValuePolicy is NoneQualityMissingValuePolicy<T>)
             {
@@ -192,6 +193,16 @@ namespace Domain.Services.Implementation
                     Signal = signal,
                     Timestamp = date,
                     Value = (missingValuePolicy as SpecificValueMissingValuePolicy<T>).Value
+                };
+            }
+            if(missingValuePolicy is ZeroOrderMissingValuePolicy<T>)
+            {
+                return new Datum<T>
+                {
+                    Quality = lastDatum.Quality,
+                    Signal = signal,
+                    Timestamp = date,
+                    Value = lastDatum.Value
                 };
             }
             return new Datum<T>()
