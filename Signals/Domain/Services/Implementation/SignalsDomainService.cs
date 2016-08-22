@@ -102,30 +102,36 @@ namespace Domain.Services.Implementation
             {
                 return gettingList;
             }
-            if (gettingList == null)
+            
+            Datum<T> xx = null;
+            while (fromIncludedUtc < toExcludedUtc)
             {
-                while (fromIncludedUtc < toExcludedUtc)
+                if (gettingList != null)
+                    xx = gettingList.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
+                if (xx == null)
                 {
-                    returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
-                    fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
-                }
-                return returnList;
-            }
-            else
-            {
-                while (fromIncludedUtc < toExcludedUtc)
-                {
-                    Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
-                    if (xx == null)
+                    if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                     {
-                        returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
+                        if (returnList.Count == 0)
+                            datum = new Datum<T>()
+                            {
+                                Quality = Quality.None,
+                                Value = default(T)
+                            };
+                        else
+                            datum = new Datum<T>()
+                            {
+                                Quality = gettingList.Last().Quality,
+                                Value = gettingList.Last().Value
+                            };
                     }
-                    else
-                        returnList.Add(xx);
-                    fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
+                    returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
                 }
-                return returnList;
+                else
+                    returnList.Add(xx);
+                fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
             }
+            return returnList;
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum)
