@@ -457,6 +457,31 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalWithZeroOrderValueMissingValuePolicy_WhenGettingData_MissingValuesHaveSpecificValue()
+            {
+                var signal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x/y"));
+                GivenASignal(signal);
+
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble() { });
+
+                var datum = new Datum<double>[] {
+                   new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
+                   new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 } };
+
+                var expectedDatum = new Dto.Datum[] {
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = 1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 4, 1), Value = 2.5 } };
+
+                SetupGetData(datum);
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                Assert.IsTrue(CompareDatum(expectedDatum, result));
+            }
+
+            [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GivenASignal_WhenSetDataWithIncorrectTimestamp_ExpectedException()
             {
