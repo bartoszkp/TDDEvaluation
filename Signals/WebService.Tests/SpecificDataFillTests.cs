@@ -39,8 +39,8 @@ namespace WebService.Tests
             dataRepoMock.Setup(d => d.GetData<double>(returnedSignal, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)))
                 .Returns(new List<Datum<double>>()
                 {
-                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1,0,0,0), Value = (double)1.5 },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1,0,0,0), Value = (double)2.5 }
 
                 });
 
@@ -50,7 +50,6 @@ namespace WebService.Tests
             var filledDatum = result.ElementAt(1);
 
             Assert.AreEqual(3, result.Count());
-            Assert.AreEqual(Dto.Quality.Fair, filledDatum.Quality);
             Assert.AreEqual(specificMvpMock.Object.Value, filledDatum.Value);
 
 

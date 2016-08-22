@@ -10,6 +10,7 @@ using System;
 using DataAccess;
 using DataAccess.GenericInstantiations;
 using Dto;
+using Domain.MissingValuePolicy;
 
 namespace WebService.Tests
 {
@@ -762,7 +763,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetData(1, new List<Datum>()
                 {
-                    new Datum() { Quality = Dto.Quality.Good, Timestamp = DateTime.Now, Value = null }
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000,1,1,2,0,0), Value = null }
                 });
 
                 signalsDataRepositoryMock.Verify(x => x.SetData<string>(
@@ -778,7 +779,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetData(1, new List<Datum>()
                 {
-                    new Datum() { Quality = Dto.Quality.Good, Timestamp = DateTime.Now, Value = null }
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000,1,1,1,1,0), Value = null }
                 });
 
                 signalsDataRepositoryMock.Verify(x => x.SetData<string>(
@@ -930,8 +931,11 @@ namespace WebService.Tests
 
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
 
+                Mock<SpecificValueMissingValuePolicy<double>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<double>>();
+                specificMvpMock.Object.Value = 42.52;
+
                 missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
-                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble() { Value = (double)42.52 });
+                    .Returns(specificMvpMock.Object);
 
                 signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(new Datum<double>[]
@@ -943,7 +947,7 @@ namespace WebService.Tests
                 var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 
                 Assert.AreEqual(items.Count(), 3);
-                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, (double)42.52);
+                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, specificMvpMock.Object.Value);
 
             }
 
