@@ -2151,7 +2151,7 @@ namespace WebService.Tests
 
                 var existingDatum = new Datum<string>[]
                 {
-                    new Datum<string>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = null }
+                    new Datum<string>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1,1,1,1,1), Value = null }
                 };
 
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();

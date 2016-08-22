@@ -79,8 +79,15 @@ namespace Domain.Services.Implementation
             foreach(var item in data)
             {
                 item.Signal = signal;
+                
             }
-
+            if ((data != null) && (signal !=null))
+            {
+                foreach(var item in data)
+                {
+                    VerifyTimeStamp<T>(signal.Granularity, item);
+                }
+            }
             signalsDataRepository.SetData(data);
         }
         
