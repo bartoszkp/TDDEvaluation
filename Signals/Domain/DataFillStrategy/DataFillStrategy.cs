@@ -18,6 +18,7 @@ namespace Domain.DataFillStrategy
 
         public void FillMissingData<T>(List<Domain.Datum<T>> datums, DateTime after, DateTime before)
         {
+            var dict = new Dictionary<DateTime, Datum<T>>();
             var datum = new Datum<T>();
             if (this.missingValuePolicy is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
                 datum = new Datum<T>()
@@ -25,7 +26,6 @@ namespace Domain.DataFillStrategy
                     Quality = Quality.None,
                     Value = default(T),
                 };
-
             else if (this.missingValuePolicy is MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
             {
                 var mvp = missingValuePolicy as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
@@ -34,13 +34,34 @@ namespace Domain.DataFillStrategy
                     Quality = mvp.Quality,
                     Value = mvp.Value,
                 };
+
+            }
+            else if(this.missingValuePolicy is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
+            {
+                if(datums.Find(d => d.Timestamp == after) == null)
+                    dict.Add(after, new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                foreach (var item in datums)
+                {
+                    dict.Add(item.Timestamp, item);
+                }
             }
 
             DateTime currentDate = new DateTime(after.Ticks);
-
+            DateTime lastDate = currentDate;
             while (currentDate < before)
-            {
-                if (datums.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+            {   
+                if(datums.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null && this.missingValuePolicy is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
+                {
+                    if (dict.ContainsKey(lastDate))
+                        datum = dict[lastDate];
+                    datums.Add(new Datum<T>()
+                    {
+                        Quality = datum.Quality,
+                        Value = datum.Value,
+                        Timestamp = currentDate
+                    });
+                }
+                else if (datums.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                     datums.Add(new Datum<T>()
                     {
                         Quality = datum.Quality,
@@ -48,6 +69,7 @@ namespace Domain.DataFillStrategy
                         Timestamp = currentDate
                     });
 
+                lastDate = currentDate;
                 incrementData(ref currentDate);
             }
         }
