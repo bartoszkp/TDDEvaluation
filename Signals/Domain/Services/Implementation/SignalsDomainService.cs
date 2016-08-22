@@ -89,7 +89,7 @@ namespace Domain.Services.Implementation
         {
             foreach (var datum in dataDomain)
             {
-                if(!checkIfTimestampIsGoodBasedOnGranualityOfSignal(signal.Granularity,datum.Timestamp))
+                if(!checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(signal.Granularity,datum.Timestamp))
                 {
                     throw new ArgumentException("incorrect timestamp(s)");
                 }
@@ -309,7 +309,7 @@ namespace Domain.Services.Implementation
             return true;
         }
 
-        private bool checkIfTimestampIsGoodBasedOnGranualityOfSignal(Granularity granularity, DateTime timestamp)
+        private bool checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(Granularity granularity, DateTime timestamp)
         {
             switch (granularity)
             {
