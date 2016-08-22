@@ -63,6 +63,7 @@
     <Compile Include="SignalsWebServiceTests.cs" />
     <Compile Include="SpecificDataFillTests.cs" />
     <Compile Include="VerifyOrAssertTestResults.cs" />
+    <Compile Include="ZeroOrderDataFillTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">
