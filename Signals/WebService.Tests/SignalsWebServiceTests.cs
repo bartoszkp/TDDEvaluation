@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using DataAccess;
 using Domain.Exceptions;
+using DataAccess.GenericInstantiations;
 
 namespace WebService.Tests
 {
@@ -686,6 +687,51 @@ namespace WebService.Tests
                     Assert.AreEqual(5.0, datum.Value);
                     Assert.AreEqual(Dto.Quality.Fair, datum.Quality);
                 }
+            }
+
+            [TestMethod]
+            public void GivenASignalAndDataWithZeroOrderMVP_WhenGettingData_ReturnsDataAccordingToZeroOrderMVP()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    signalId,
+                    DataType.Double,
+                    Granularity.Month,
+                    Path.FromString("")));
+
+                Func<int, DateTime> timeChange = (i) => new DateTime(2000, 1, 1).AddMonths(i);
+
+                var data = new Datum<double>[]
+                {
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = timeChange(0), Value = 1.0},
+                    new Datum<double> {Quality = Quality.Good, Timestamp = timeChange(2), Value = 3.0},
+                    new Datum<double> {Quality = Quality.Good, Timestamp = timeChange(4), Value = 5.0}
+                };
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
+
+                var policy = new ZeroOrderMissingValuePolicyDouble();
+                signalsMissingValuePolicyRepositoryMock
+                   .Setup(mvp => mvp.Get(It.Is<Signal>(s => s.Id == signalId)))
+                   .Returns(policy);
+
+                const int expectedResultNumber = 5;
+                var result = signalsWebService.GetData(signalId, timeChange(0), timeChange(expectedResultNumber)).ToArray();
+
+                Assert.AreEqual(expectedResultNumber, result.Length);                
+                Assert.IsFalse(result.Any(d => d.Quality == Dto.Quality.None));
+                Assert.AreEqual(result[0].Value, result[1].Value);
+                Assert.AreEqual(result[2].Value, result[3].Value);
+                CollectionAssert.AreEqual(new[]
+                {
+                    timeChange(0),
+                    timeChange(1),
+                    timeChange(2),
+                    timeChange(3),
+                    timeChange(4)
+                },
+                result.Select(datum => datum.Timestamp).ToArray());
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
