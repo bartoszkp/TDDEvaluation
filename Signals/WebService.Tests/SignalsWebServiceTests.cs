@@ -742,9 +742,9 @@ namespace WebService.Tests
                 GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
                 GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = "test1" } });
 
-                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1)).ToArray();
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray();
 
-                Assert.IsNotNull( result[0].Value);
+                Assert.IsNotNull( result[0]);
          
            
             }

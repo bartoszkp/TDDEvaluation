@@ -86,7 +86,7 @@ namespace Domain.Services.Implementation
 
         private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp)
         {
-            if(mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
+            if (mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
             {
                 return Datum<T>.CreateNone(signal, timeStamp);
             }
@@ -94,6 +94,11 @@ namespace Domain.Services.Implementation
             {
                 var specificMVP = mvp as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
                 return Datum<T>.CreateSpecific(signal, timeStamp, specificMVP.Quality, specificMVP.Value);
+            }
+            else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
+            {
+                var zeroMVP = mvp as MissingValuePolicy.ZeroOrderMissingValuePolicy<T>;
+                return Datum<T>.CreateSpecific(signal, timeStamp, Quality.None,default(T));
             }
             return new Datum<T>();
         }
