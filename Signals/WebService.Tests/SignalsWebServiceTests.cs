@@ -858,7 +858,21 @@ namespace WebService.Tests
             }
 
             #endregion
-            
+            #region Issue #18 (Incorrect timestamps)
+
+            [ExpectedException(typeof(ArgumentException))]
+            [TestMethod]
+            public void GivenASignal_WhenSettingYearlyDataThatIsNotMidnightFirstJanuary_ArgumentExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
+
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000,1, 1, 0, 0, 1) } });
+            }
+
+            #endregion
+
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
             {
                 GivenNoSignals();
