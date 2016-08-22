@@ -914,7 +914,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenAWeeklySignal_WhenSettingDataThatIsMidnightMonday_ArgumentExceptionIsThrown()
+            public void GivenAWeeklySignal_WhenSettingDataThatIsMidnightMonday_NoExceptionIsThrown()
             {
                 var id = 1;
                 MakeMocks();
