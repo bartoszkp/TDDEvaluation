@@ -557,6 +557,17 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(IncorrectDatumTimestampException))]
+            public void GivenNoData_WhenGettingData_ThrowsIncorrectDatumTimestampException()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                signalsWebService.GetData(signal.Id.Value, new DateTime(2001, 3, 2), new DateTime(2001, 5, 4));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectDatumTimestampException))]
             public void GivenASignal_WhenGettingData_ThrowsIncorrectDatumTimestampException()
             {
                 var signal = GetDefaultSignal_IntegerMonth();
@@ -576,7 +587,7 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(data);
 
-                signalsWebService.GetData(signal.Id.Value, new DateTime(2001, 3, 2), new DateTime(2001,5,4));
+                signalsWebService.GetData(signal.Id.Value, new DateTime(2001, 3, 1), new DateTime(2001,5,1));
             }
 
             private Signal GetDefaultSignal_IntegerMonth()
