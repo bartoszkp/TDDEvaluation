@@ -45,6 +45,9 @@ namespace WebService.Tests
         {
             SetupWebService();
 
+            var returnedSignal = new Domain.Signal() { Id = 1, Granularity = Domain.Granularity.Month, DataType = Domain.DataType.Double };
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+
             signalsWebService.GetData(1, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 3, 1, 0, 0, 0));
 
         }

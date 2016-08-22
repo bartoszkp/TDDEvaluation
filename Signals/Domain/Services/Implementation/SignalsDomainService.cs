@@ -124,6 +124,9 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            if (!ValidateTimestamp(fromIncludedUtc, signal.Granularity) || !ValidateTimestamp(toExcludedUtc, signal.Granularity))
+                throw new InvalidTimestampException();
+
             var policy = GetMissingValuePolicy(signal);
             if(policy != null)
             {
