@@ -105,8 +105,8 @@ namespace WebService
                 switch (typeName)
                 {
                     case "Int32":
-                        GenericSetDataCall<int>(signal, data);
-                        break;
+                    GenericSetDataCall<int>(signal, data);
+                    break;
                     case "Double":
                         GenericSetDataCall<double>(signal, data);
                         break;
@@ -124,7 +124,7 @@ namespace WebService
         
 
         private void GenericSetDataCall<T>(Domain.Signal signal, Datum[] data)
-        { 
+        {
             this.signalsDomainService?.SetData(signal, data?.ToDomain<IEnumerable<Domain.Datum<T>>>().ToArray());
         }
 
