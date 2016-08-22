@@ -1017,6 +1017,14 @@ namespace WebService.Tests
                 signalsWebService.GetData(id, new DateTime(2000, 1, 2), new DateTime(2000, 2, 1));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataFromCorrectTimeStamp_NoExceptionIsThrown()
+            {
+                var id = 1;
+                SetupGetDataDatum(id);
+
+                signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
+            }
             #endregion
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
