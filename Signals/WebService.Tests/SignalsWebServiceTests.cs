@@ -959,8 +959,11 @@ namespace WebService.Tests
 
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
 
+                Mock<SpecificValueMissingValuePolicy<int>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<int>>();
+                specificMvpMock.Object.Value = value;
+
                 missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
-                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger() { Value = value });
+                    .Returns(specificMvpMock.Object);
 
                 signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(DetDefaultDatumCollection<int>(new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)));
@@ -968,7 +971,7 @@ namespace WebService.Tests
                 var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 
                 Assert.AreEqual(items.Count(), 3);
-                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, value);
+                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, specificMvpMock.Object.Value);
             }
 
 
