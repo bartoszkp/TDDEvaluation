@@ -130,6 +130,7 @@ namespace WebService
                         if (i.Timestamp.Day != 1 || i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
                         break;
                     case Granularity.Week:
+                        if (i.Timestamp.DayOfWeek != DayOfWeek.Monday || i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
                         break;
                     case Granularity.Day:
                         if (i.Timestamp.Hour != 0 || i.Timestamp.Minute != 0 || i.Timestamp.Second != 0 || i.Timestamp.Millisecond != 0) throw new ArgumentException();
