@@ -148,6 +148,12 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
+
+                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        addingItem = returnList.ElementAt(i - 1);
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
@@ -178,6 +184,12 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
+
+                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        addingItem = returnList.ElementAt(i - 1);
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
@@ -208,6 +220,12 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
+
+                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        addingItem = returnList.ElementAt(i - 1);
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
@@ -238,6 +256,12 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
+
+                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        addingItem = returnList.ElementAt(i - 1);
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
@@ -270,6 +294,12 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
+
+                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        addingItem = returnList.ElementAt(i - 1);
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
@@ -300,6 +330,12 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
+
+                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        addingItem = returnList.ElementAt(i - 1);
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
@@ -330,6 +366,12 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
+
+                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        addingItem = returnList.ElementAt(i - 1);
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
