@@ -87,8 +87,16 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> dataDomain)
         {
-            Datum<T>[] dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToArray();          
+            foreach (var datum in dataDomain)
+            {
+                if(datum.Timestamp.TimeOfDay.Ticks != 0 || datum.Timestamp.Day != 1)
+                {
+                    throw new ArgumentException("incorrect timestamp(s)");
+                }
+            }
 
+            Datum<T>[] dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToArray();    
+            
             for(int i = 0; i < dataDomain.Count(); ++i)
             {
                 dataDomainOrderedList.ElementAt(i).Signal = signal;

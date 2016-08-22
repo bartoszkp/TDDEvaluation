@@ -479,7 +479,7 @@ namespace WebService.Tests
                 int signalId = 1;
                 var data = new Dto.Datum[]
                 {
-                   new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) }
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 2, 0, 0, 0,0) }
                 };
                 SetupWebService();
 
