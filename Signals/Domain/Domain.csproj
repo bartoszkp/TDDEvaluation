@@ -66,6 +66,7 @@
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />
     <Compile Include="Infrastructure\UnityRegisterAttribute.cs" />
+    <Compile Include="MissingValuePolicy\DateHelper.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\FirstOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\ZeroOrderMissingValuePolicy.cs" />

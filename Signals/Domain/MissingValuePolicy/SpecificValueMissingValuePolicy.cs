@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Infrastructure;
 
 namespace Domain.MissingValuePolicy
 {
@@ -11,7 +10,7 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public virtual IEnumerable<Domain.Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public override IEnumerable<Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum<T>>();
@@ -32,7 +31,7 @@ namespace Domain.MissingValuePolicy
                 {
                     AddToTheListSuitableDatum(filledList, tmp, datums, signal);
 
-                    tmp = NextDate(tmp, granularity);
+                    tmp = DateHelper.NextDate(tmp, granularity);
                 }
 
                 return filledList;
@@ -55,28 +54,6 @@ namespace Domain.MissingValuePolicy
                 Value = Value,
                 Signal = signal
             };
-        }
-
-        private DateTime NextDate(DateTime date, Granularity granularity)
-        {
-            switch (granularity)
-            {
-                case Granularity.Second:
-                    return date.AddSeconds(1);
-                case Granularity.Minute:
-                    return date.AddMinutes(1);
-                case Granularity.Hour:
-                    return date.AddHours(1);
-                case Granularity.Day:
-                    return date.AddDays(1);
-                case Granularity.Week:
-                    return date.AddDays(7);
-                case Granularity.Month:
-                    return date.AddMonths(1);
-                case Granularity.Year:
-                    return date.AddYears(1);
-                default: return date;
-            }
         }
     }
 }

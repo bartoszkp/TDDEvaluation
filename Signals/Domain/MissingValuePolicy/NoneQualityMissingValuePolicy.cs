@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Domain.Infrastructure;
 using System;
 
 namespace Domain.MissingValuePolicy
 {
     public class NoneQualityMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public virtual IEnumerable<Domain.Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public override IEnumerable<Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum<T>>();
@@ -28,7 +27,7 @@ namespace Domain.MissingValuePolicy
                 {
                     AddToTheListSuitableDatum(filledList, tmp, datums, signal);
 
-                    tmp = NextDate(tmp, granularity);
+                    tmp = DateHelper.NextDate(tmp, granularity);
                 }
 
                 return filledList;
@@ -40,28 +39,6 @@ namespace Domain.MissingValuePolicy
             Datum<T> newDatum = datums.FirstOrDefault(datum => datum.Timestamp == tmp);
 
             filledList.Add(newDatum ?? Datum<T>.CreateNone(signal, tmp));
-        }
-
-        private DateTime NextDate(DateTime date, Granularity granularity)
-        {
-            switch (granularity)
-            {
-                case Granularity.Second:
-                    return date.AddSeconds(1);
-                case Granularity.Minute:
-                    return date.AddMinutes(1);
-                case Granularity.Hour:
-                    return date.AddHours(1);
-                case Granularity.Day:
-                    return date.AddDays(1);
-                case Granularity.Week:
-                    return date.AddDays(7);
-                case Granularity.Month:
-                    return date.AddMonths(1);
-                case Granularity.Year:
-                    return date.AddYears(1);
-                default: return date;
-            }
         }
     }
 }
