@@ -733,14 +733,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingDataWithZeroOrderMissingData_ReturnsNotNull()
             {
                 int signalId = 7;
-                var signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.String,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
-                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
-                GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = "test1" } });
+                MakeASignalWebServiceForZeroOrderMissingValuePolicy(signalId);
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray();
 
@@ -752,14 +745,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingDataWithZeroOrderMissingData_ReturnsValueFromEarlierDatum()
             {
                 int signalId = 7;
-                var signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.String,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
-                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
-                GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } });
+                MakeASignalWebServiceForZeroOrderMissingValuePolicy(signalId);
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray();
 
@@ -771,15 +757,7 @@ namespace WebService.Tests
             public void GivenASignal_WhenGettingDataWithZeroOrderMissingData_ReturnsDatumWithGoodDate()
             {
                 int signalId = 7;
-                var signal = SignalWith(
-                    id: signalId,
-                    dataType: Domain.DataType.String,
-                    granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
-                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
-                GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } });
-
+                MakeASignalWebServiceForZeroOrderMissingValuePolicy(signalId);
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1)).ToArray();
 
                 Assert.AreEqual("test1", result[0].Value);
@@ -790,6 +768,20 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.Good, result[1].Quality);
 
             }
+
+            private void MakeASignalWebServiceForZeroOrderMissingValuePolicy(int signalId)
+            {
+                
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
+                GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } });
+            }
+
             private void GivenSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();

@@ -97,8 +97,6 @@ namespace Domain.Services.Implementation
             }
             else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
             {
-               
-                var zeroMVP = mvp as MissingValuePolicy.ZeroOrderMissingValuePolicy<T>;
                 return Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
             }
             return new Datum<T>();
@@ -123,18 +121,12 @@ namespace Domain.Services.Implementation
                 if (i >= data.Count || data[i].Timestamp != current)
                 {
                     
-                    before = GetMissingValue<T>(mvp, signal, current, before);
-               
+                    before = GetMissingValue<T>(mvp, signal, current, before);             
                     data.Add(before);
-
-                   
-
-
                 }
                 else
                 {
-                    before = data[i];
-                   
+                    before = data[i];   
                     i++;
                 }
                
