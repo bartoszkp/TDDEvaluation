@@ -29,7 +29,7 @@ namespace WebService.Tests
             var returnedSignal = new Signal() { Id = id, Granularity = Granularity.Month, DataType = DataType.Double };
 
             Mock<SpecificValueMissingValuePolicy<double>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<double>>();
-            specificMvpMock.Object.Value = (double)42.42;
+            specificMvpMock.Object.Value = 42.42;
             specificMvpMock.Object.Quality = Quality.Fair;
 
             signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
@@ -50,8 +50,8 @@ namespace WebService.Tests
             var filledDatum = result.ElementAt(1);
 
             Assert.AreEqual(3, result.Count());
-            Assert.AreEqual(Quality.Fair, filledDatum.Quality);
-            Assert.AreEqual(42.42, filledDatum.Value);
+            Assert.AreEqual(Dto.Quality.Fair, filledDatum.Quality);
+            Assert.AreEqual(specificMvpMock.Object.Value, filledDatum.Value);
 
 
         }

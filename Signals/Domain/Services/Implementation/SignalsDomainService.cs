@@ -146,7 +146,7 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                                     {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
                                     else
                                     {
@@ -176,7 +176,7 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                                     {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
                                     else
                                     {
@@ -206,7 +206,7 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                                     {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
                                     else
                                     {
@@ -236,7 +236,7 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                                     {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
                                     else
                                     {
@@ -268,7 +268,7 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                                     {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
                                     else
                                     {
@@ -298,7 +298,7 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                                     {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
                                     else
                                     {
@@ -323,12 +323,22 @@ namespace Domain.Services.Implementation
                                 Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
                                 if (xx == null)
                                 {
-                                    var addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
                                     returnList.Add(addingItem);
                                 }
                                 else
                                     returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddYears(1);
+                                checkedDateTime = checkedDateTime.AddYears(7);
                             }
                             break;
                         }
