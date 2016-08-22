@@ -796,6 +796,32 @@ namespace WebService.Tests
                 AssertGettingGenericData(filledDatum, result);
             }
 
+            [TestMethod]
+            public void WhenSettingNullValueForStringSignal_GetDataDoesntThrowAnException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.String,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var existingDatum = new Dto.Datum[] 
+                {
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = null, }
+                };
+
+                SetupSettingData<string>(existingSignal, existingDatum);
+                SetupGettingData<string>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString(),
+                    new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(null, result.ElementAt(0).Value);
+                Assert.AreEqual(Dto.Quality.Good, result.ElementAt(0).Quality);
+                Assert.AreEqual(new DateTime(2000, 1, 1), result.ElementAt(0).Timestamp);
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
