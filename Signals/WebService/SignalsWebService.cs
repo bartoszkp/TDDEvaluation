@@ -91,8 +91,14 @@ namespace WebService
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
-            if (data == null || data.Count() == 0) return; 
-           
+            if (data == null || data.Count() == 0) return;
+
+            foreach (var d in data)
+            {
+                if (d.Timestamp != new DateTime(d.Timestamp.Year, 1, 1))
+                    throw new ArgumentException();
+            }
+
             if (signalsDomainService != null)
             {
                 var result = signalsDomainService.GetById(signalId);

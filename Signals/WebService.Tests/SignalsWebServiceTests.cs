@@ -819,7 +819,7 @@ namespace WebService.Tests
                 MakeMocks();
                 GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b/c")));
 
-                signalsWebService.SetData(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = DateTime.Now, Value = null } });
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = null } });
             }
 
             #endregion
