@@ -78,6 +78,8 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            CheckTimestamp(fromIncludedUtc, signal.Granularity);
+
             bool skipFirst = false;
             List<Datum<T>> result;
             result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp).ToList();
@@ -114,6 +116,50 @@ namespace Domain.Services.Implementation
             return result.OrderBy(x => x.Timestamp);
         }
 
+        private void CheckTimestamp(DateTime date, Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Year:
+                    if (date.Month != 1)
+                    {
+                        throw new IncorrectDatumTimestampException();
+                    }
+                    goto case Granularity.Month;
+                case Granularity.Month:
+                case Granularity.Week:
+                    if (date.Day != 1)
+                    {
+                        throw new IncorrectDatumTimestampException();
+                    }
+                    goto case Granularity.Day;
+                case Granularity.Day:
+                    if (date.Hour != 0)
+                    {
+                        throw new IncorrectDatumTimestampException();
+                    }
+                    goto case Granularity.Hour;
+                case Granularity.Hour:
+                    if (date.Minute != 0)
+                    {
+                        throw new IncorrectDatumTimestampException();
+                    }
+                    goto case Granularity.Minute;
+                case Granularity.Minute:
+                    if (date.Second != 0)
+                    {
+                        throw new IncorrectDatumTimestampException();
+                    }
+                    goto case Granularity.Second;
+                case Granularity.Second:
+                    if (date.Millisecond != 0)
+                    {
+                        throw new IncorrectDatumTimestampException();
+                    }
+                    break;
+            }
+        }
+
         private void CheckTimestampCorrectness<T>(IEnumerable<Datum<T>> data)
         {
             foreach(var match in data)
@@ -122,47 +168,7 @@ namespace Domain.Services.Implementation
                 {
                     continue;
                 }
-
-                switch (match.Signal.Granularity)
-                {
-                    case Granularity.Year:
-                        if (match.Timestamp.Month != 1)
-                        {
-                            throw new IncorrectDatumTimestampException();
-                        }
-                        goto case Granularity.Month;
-                    case Granularity.Month:
-                    case Granularity.Week:
-                        if (match.Timestamp.Day != 1)
-                        {
-                            throw new IncorrectDatumTimestampException();
-                        }
-                        goto case Granularity.Day;
-                    case Granularity.Day:
-                        if (match.Timestamp.Hour != 0)
-                        {
-                            throw new IncorrectDatumTimestampException();
-                        }
-                        goto case Granularity.Hour;
-                    case Granularity.Hour:
-                        if (match.Timestamp.Minute != 0)
-                        {
-                            throw new IncorrectDatumTimestampException();
-                        }
-                        goto case Granularity.Minute;
-                    case Granularity.Minute:
-                        if (match.Timestamp.Second != 0)
-                        {
-                            throw new IncorrectDatumTimestampException();
-                        }
-                        goto case Granularity.Second;
-                    case Granularity.Second:
-                        if (match.Timestamp.Millisecond != 0)
-                        {
-                            throw new IncorrectDatumTimestampException();
-                        }
-                        break;
-                }
+                CheckTimestamp(match.Timestamp,match.Signal.Granularity);
             }
         }
 
