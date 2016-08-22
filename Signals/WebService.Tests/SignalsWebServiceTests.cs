@@ -1811,9 +1811,9 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1,12,45,0),  Value = default(double) },
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1,13,13,13),  Value = (double)2.0},
-                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1,14,14,14),  Value = default(double)}
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1,12,45,0,1),  Value = default(double) },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1,13,13,13,1),  Value = (double)2.0},
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1,14,14,14,0),  Value = default(double)}
                 };
 
                 var firstTimestamp = new DateTime(2000, 1, 1);

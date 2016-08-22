@@ -90,16 +90,30 @@ namespace Domain.Services.Implementation
 
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-            if(fromIncludedUtc==toExcludedUtc)
+            foreach (var item in data)
             {
-                List<Datum<T>> aa = new List<Datum<T>>();
+                switch (signal.Granularity)
+                {
+                    case Granularity.Second:
+                        {
+                            if(item.Timestamp.Millisecond != 0)
+                            {
+                                throw new TimestampHaveWrongFormatException();
+                            }
+                            break;
+                        }
+                }
+            }
+            if (fromIncludedUtc==toExcludedUtc)
+            {
+                List<Datum<T>> returnElement = new List<Datum<T>>();
                 int indeks = 0;
                 foreach(var x in data)
                 {
                     if (fromIncludedUtc == x.Timestamp)
                     {
-                        aa.Add(x);
-                        return aa;
+                        returnElement.Add(x);
+                        return returnElement;
                     }
                     indeks++;    
                 }
