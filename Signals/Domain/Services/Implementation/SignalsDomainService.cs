@@ -117,7 +117,7 @@ namespace Domain.Services.Implementation
             int i = 0;
             foreach (var d in datum)
             {
-                datumWithSignal[i] = new Datum<T>()
+                datumWithSignal[i++] = new Datum<T>()
                 {
                     Quality = d.Quality,
                     Timestamp = d.Timestamp,

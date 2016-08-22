@@ -387,15 +387,14 @@ namespace WebService.Tests
                     i++;
                 }
             }
-
-
+            
             [TestMethod]
             public void SettingEmptyDataShouldNotThrow()
             {
                 GiveNoSignalData();
                 var newSignal = new Domain.Signal()
                 {
-                    Id = 21243,
+                    Id = 25253,
                     DataType = Domain.DataType.Integer,
                     Granularity = Domain.Granularity.Month,
                     Path = Domain.Path.FromString("root/signal1")
@@ -403,7 +402,32 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(It.IsAny<int>()))
                     .Returns(newSignal);
-                signalsWebService.SetData(newSignal.Id.Value, new Dto.Datum[0]);
+            }
+
+            [TestMethod]
+            public void SetDataAddindSignalsToDatum()
+            {
+                GiveNoSignalData();
+                var newSignal = new Domain.Signal()
+                {
+                    Id = 7878,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("signal1")
+                };
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(newSignal);
+                signalDataRepositoryMock
+                    .Setup(sdr => sdr.SetData(It.IsAny<IEnumerable<Datum<bool>>>()));
+
+                signalsWebService.SetData(
+                newSignal.Id.Value,
+                 new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = false } });
+
+                signalDataRepositoryMock.Verify(sdr => sdr.SetData<Boolean>(It.Is<IEnumerable<Datum<bool>>>
+                    (d => d.First().Signal == newSignal)));
             }
 
             #endregion
