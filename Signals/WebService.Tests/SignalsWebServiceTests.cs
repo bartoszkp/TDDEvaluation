@@ -721,7 +721,7 @@ namespace WebService.Tests
                 int signalId = 1;
 
                 var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
-                var someDatum = new Dto.Datum[] { new Dto.Datum { Quality = Dto.Quality.Fair, Value = 1.5, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) } };
+                var someDatum = new Dto.Datum[] { new Dto.Datum { Quality = Dto.Quality.Fair, Value = 1.5, Timestamp = new DateTime(2000, 1, 1, 12, 0, 0) } };
 
                 GivenASignal(someSignal);
 
