@@ -83,6 +83,10 @@ namespace Domain.Services.Implementation
             if (mvp == null)
             {
                 var gettingList = this.signalsDataRepository?.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+                if (fromIncludedUtc == toExcludedUtc)
+                {
+                    return gettingList;
+                }
                 if (gettingList == null)
                 {
                     while (fromIncludedUtc < toExcludedUtc)

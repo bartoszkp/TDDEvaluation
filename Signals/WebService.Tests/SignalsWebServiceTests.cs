@@ -501,8 +501,7 @@ namespace WebService.Tests
                     Assert.AreEqual(existingSortedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
                 }
             }
-
-
+            
             [TestMethod]
             public void RepositoryWithSignalAndData_WhenGet_DataIsFilled()
             {
@@ -579,9 +578,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
                 Assert.IsNull(result);
             }
-
-
-
+            
             [TestMethod]
             public void GivenASignal_GetData_ReturnAllNoneQualityMissingValueElements()
             {
@@ -607,6 +604,29 @@ namespace WebService.Tests
                 GivenASignal(existingSignal);
                 var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
                 Assert.AreEqual(60, result.Count());
+            }
+
+            [TestMethod]
+            public void GetDataReturnsOneDatumWhenTimestampsAreEqual()
+            {
+                GiveNoSignalData();
+                var newSignal = new Domain.Signal()
+                {
+                    Id = 355,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("signal1")
+                };
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(newSignal);
+                signalDataRepositoryMock
+                    .Setup(sr => sr.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new Datum<double>[] {
+                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } });
+
+                var result = signalsWebService.GetData(21, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+                Assert.AreEqual(new DateTime(2000, 1, 1), result.First().Timestamp);
             }
 
             #endregion
