@@ -9,7 +9,7 @@ namespace Domain.MissingValuePolicy
     {
         public override Datum<T> GetDatum()
         {
-            throw new NotImplementedException();
+            return new Datum<T>();
         }
     }
 }
