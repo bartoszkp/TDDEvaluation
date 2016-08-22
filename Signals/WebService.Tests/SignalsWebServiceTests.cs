@@ -1049,7 +1049,7 @@ namespace WebService.Tests
             public void GivenASignalWithZeroOrderMvp_WhenGettingData_MissingDataIsPreviousValue()
             {
                 var id = 1;
-                SetupGetDataDatum(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = 3} });
+                SetupGetDataDatum(id, new Datum[] { new Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = 3.0} });
                 missingValuePolicyRepositoryMock
                     .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
                     .Returns(new ZeroOrderMissingValuePolicyDouble());
