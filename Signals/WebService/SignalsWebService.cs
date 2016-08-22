@@ -112,6 +112,9 @@ namespace WebService
                 && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, 0, 0))
                 return false;
 
+            if (signal.Granularity == Domain.Granularity.Minute)
+                return false;
+
             return true;
         }
 
