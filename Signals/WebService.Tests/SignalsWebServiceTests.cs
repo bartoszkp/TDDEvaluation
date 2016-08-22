@@ -499,6 +499,34 @@ namespace WebService.Tests
                 CollectionAssert.AreEqual(new Path[] { }, result.SubPaths.ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataAndZeroOrderMVP_WhenGettingData_PolicyIsAppliedCorrectly()
+            {
+                var dummySignal = new Signal
+                {
+                    Granularity = Granularity.Month,
+                    DataType = DataType.Boolean,
+                    Id = 1
+                };
+                GivenASignal(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyBoolean());
+
+                SetupDataRepository<bool>();
+
+                var result = signalsWebService.GetData(dummySignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+
+                Assert.AreEqual(5, result.Count()); //missing are filled
+
+                foreach (var value in result.Select(d => d.Value))
+                    Assert.AreEqual(default(bool), value);
+
+                Assert.AreEqual(3, result.Where(d => d.Quality == Dto.Quality.Fair).Count()); //Fair is replicated
+
+                Assert.AreEqual(Dto.Quality.None, result.First().Quality); //When no previous value, default is applied
+            }
+
             private void SetupDataRepository<T>()
             {
                 signalsDataRepositoryMock
