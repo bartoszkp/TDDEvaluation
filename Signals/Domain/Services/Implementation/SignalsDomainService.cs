@@ -95,15 +95,14 @@ namespace Domain.Services.Implementation
                 var datum = (from x in result
                              where x.Timestamp == date
                              select x).FirstOrDefault();
-
                 if (datum == null)
                 {
                     Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy);
                     result.Add(tempDatum);
                 }
+
                 date = AddTime(signal.Granularity, date);
             }
-
 
             if (skipFirst == true)
             {
@@ -119,6 +118,11 @@ namespace Domain.Services.Implementation
         {
             foreach(var match in data)
             {
+                if(match.Signal == null)
+                {
+                    continue;
+                }
+
                 switch (match.Signal.Granularity)
                 {
                     case Granularity.Year:
@@ -128,11 +132,6 @@ namespace Domain.Services.Implementation
                         }
                         goto case Granularity.Month;
                     case Granularity.Month:
-                        if (match.Timestamp.Day != 1)
-                        {
-                            throw new IncorrectDatumTimestampException();
-                        }
-                        goto case Granularity.Week;
                     case Granularity.Week:
                         if (match.Timestamp.Day != 1)
                         {
@@ -163,7 +162,6 @@ namespace Domain.Services.Implementation
                             throw new IncorrectDatumTimestampException();
                         }
                         break;
-                    
                 }
             }
         }
@@ -190,10 +188,12 @@ namespace Domain.Services.Implementation
                     Value = (missingValuePolicy as SpecificValueMissingValuePolicy<T>).Value
                 };
             }
-            return new Datum<T>();
+            return new Datum<T>()
+            {
+                Signal = signal,
+                Timestamp = date
+            };
         }
-
-
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
@@ -204,7 +204,6 @@ namespace Domain.Services.Implementation
 
             return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType)
                 as MissingValuePolicy.MissingValuePolicyBase;
-
         }
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase missingValuePolicy)

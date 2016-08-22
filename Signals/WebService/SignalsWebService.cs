@@ -32,7 +32,6 @@ namespace WebService
             var result = signalsDomainService.Get(path);
 
             return result?.ToDto<Dto.Signal>();
-
         }
 
         public Signal GetById(int signalId)
@@ -63,7 +62,6 @@ namespace WebService
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Domain.Signal domainSignal = GetById(signalId)?.ToDomain<Domain.Signal>();
-
 
             if (domainSignal == null)
                 throw new ArgumentException("A signal with the given Id does not exist");

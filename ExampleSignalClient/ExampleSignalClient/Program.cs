@@ -11,7 +11,7 @@ namespace ExampleSignalClient
 
             var data = new Datum[]
             {
-                new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0) }
+                new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) }
             };
 
             client.SetData(1, data);

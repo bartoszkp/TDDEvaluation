@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -372,8 +373,12 @@ namespace WebService.Tests
             public void GetData_EqualTimestamps_ReturnSingleDatum()
             {
                 int signalId = 1;
-                GivenASignal(SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y")));
-                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), new DateTime(2000, 2, 1), new DateTime(2000, 2, 1))).Returns(Enumerable.Repeat(new Domain.Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }, 1));
+                var signal = SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x/y"));
+                GivenASignal(signal);
+                signalsDataRepositoryMock
+                    .Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), new DateTime(2000, 2, 1), new DateTime(2000, 2, 1)))
+                    .Returns(Enumerable.Repeat(new Domain.Datum<double>() { Signal = signal, Quality = Domain.Quality.Good,
+                        Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }, 1));
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1));
 
@@ -532,6 +537,56 @@ namespace WebService.Tests
                 var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new[] { "root/s1" } });
 
                 Assert.AreEqual(string.Join("/", result.Signals.ToList()[0].Path.Components), "root/s1/s2");
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectDatumTimestampException))]
+            public void GivenASignal_WhenSettingData_ThrowsIncorrectDatumTimestampException()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Dto.Datum[] data = new Dto.Datum[]
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2001,4,3), Value = default(int) }
+                };
+
+                signalsWebService.SetData(signal.Id.Value,data);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectDatumTimestampException))]
+            public void GivenASignal_WhenGettingData_ThrowsIncorrectDatumTimestampException()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.Datum<int>[] data = new Domain.Datum<int>[]
+                {
+                    new Domain.Datum<int>() {
+                        Quality = Domain.Quality.Bad,
+                        Timestamp = new DateTime(2001,4,3),
+                        Value = default(int),
+                        Signal = signal
+                    }
+                };
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
+
+                signalsWebService.GetData(signal.Id.Value, new DateTime(2001, 3, 2), new DateTime(2001,5,4));
+            }
+
+            private Signal GetDefaultSignal_IntegerMonth()
+            {
+                return new Signal()
+                {
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("x/y")
+                };
             }
 
             private void VerifySetDataCallToFillSingleMissingData<T>(int signalId, DateTime timeStamp, Quality quality = Quality.None, T value = default(T))
