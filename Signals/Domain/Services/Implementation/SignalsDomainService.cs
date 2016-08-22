@@ -125,6 +125,21 @@ namespace Domain.Services.Implementation
             if (data == null)
                 return null;
 
+            if (data.Count() == 0)
+            {
+                List<Datum<T>> dataToFill = data.ToList();
+                dataToFill.Add(new Datum<T>()
+                {
+                    Id = 0,
+                    Quality = Quality.None,
+                    Signal = signal,
+                    Timestamp = fromIncludedUTC,
+                    Value = default(T),
+                });
+
+                data = dataToFill.ToArray();
+            }
+
             if (fromIncludedUTC == toExcludedUTC)
                 return data;
 
