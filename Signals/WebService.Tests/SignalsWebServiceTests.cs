@@ -2560,7 +2560,7 @@ namespace WebService.Tests
 
                 missingValuePolicyRepositoryMock
                     .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
-                    .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyBoolean());
+                    .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble());
 
 
                 var signalsDomainService = new SignalsDomainService(

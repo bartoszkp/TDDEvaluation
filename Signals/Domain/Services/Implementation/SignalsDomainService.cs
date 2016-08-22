@@ -225,6 +225,8 @@ namespace Domain.Services.Implementation
         }
         private void GranularityWeek<T>(Datum<T> checkingElement)
         {
+            DateTime dd = new DateTime(2000, 1, 1, 0, 0, 0);
+            if(dd.DayOfWeek == DayOfWeek.Monday);
             if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.DayOfWeek != DayOfWeek.Monday))
             {
                 throw new TimestampHaveWrongFormatException();
