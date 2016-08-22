@@ -40,8 +40,6 @@ namespace Domain.MissingValuePolicy
 
             dictionary = Dictionary();
 
-            DateTime firstTimestamp = data.First().Timestamp;
-
             datetimeList = new List<DateTime>();
 
             int count = 0;
@@ -52,31 +50,31 @@ namespace Domain.MissingValuePolicy
             {
                 case Granularity.Second:
                     count = (int)timeSpan.TotalSeconds;
-                    CreateDateTimeList(data, firstTimestamp, key, count);
+                    CreateDateTimeList(data, fromIncludedUtc, key, count);
                     break;
                 case Granularity.Minute:
                     count = (int)timeSpan.TotalMinutes;
-                    CreateDateTimeList(data, firstTimestamp, key, count);
+                    CreateDateTimeList(data, fromIncludedUtc, key, count);
                     break;
                 case Granularity.Hour:
                     count = (int)timeSpan.TotalHours;
-                    CreateDateTimeList(data, firstTimestamp, key, count);
+                    CreateDateTimeList(data, fromIncludedUtc, key, count);
                     break;
                 case Granularity.Day:
                     count = (int)timeSpan.TotalDays;
-                    CreateDateTimeList(data, firstTimestamp, key, count);
+                    CreateDateTimeList(data, fromIncludedUtc, key, count);
                     break;
                 case Granularity.Week:
                     count = (int)timeSpan.TotalDays / 7;
-                    CreateDateTimeList(data, firstTimestamp, key, count);
+                    CreateDateTimeList(data, fromIncludedUtc, key, count);
                     break;
                 case Granularity.Month:
                     count = (int)timeSpan.TotalDays / 30;
-                    CreateDateTimeList(data, firstTimestamp, key, count);
+                    CreateDateTimeList(data, fromIncludedUtc, key, count);
                     break;
                 case Granularity.Year:
                     count = (int)timeSpan.TotalDays / 365;
-                    CreateDateTimeList(data, firstTimestamp, key, count);
+                    CreateDateTimeList(data, fromIncludedUtc, key, count);
                     break;
             }
             
