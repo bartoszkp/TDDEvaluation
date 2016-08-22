@@ -646,9 +646,7 @@ namespace WebService.Tests
             {
                 //arrange
                 int dummyId = 5;
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                GivenASignal(new Domain.Signal() { Id = dummyId, DataType = DataType.Boolean, Granularity = Granularity.Month });
+                GivenASignal( SignalWith( dummyId,  DataType.Boolean,   Granularity.Month,Path.FromString("x/y") ));
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
                 signalsWebService = new SignalsWebService(signalsDomainService);
                 //act
