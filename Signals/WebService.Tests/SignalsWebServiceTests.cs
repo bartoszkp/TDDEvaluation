@@ -902,7 +902,16 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 3, 1) } });
             }
 
+            [ExpectedException(typeof(ArgumentException))]
+            [TestMethod]
+            public void GivenAWeeklySignal_WhenSettingDataThatIsNotMidnightMonday_ArgumentExceptionIsThrown()
+            {
+                var id = 1;
+                MakeMocks();
+                GivenASignal(SignalWith(id, Domain.DataType.Double, Domain.Granularity.Week, Domain.Path.FromString("a/b/c")));
 
+                signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 1, 4) } });
+            }
 
 
             #endregion
