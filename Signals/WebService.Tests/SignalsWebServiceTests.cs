@@ -894,6 +894,98 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void WhenGettingByPathPrefix_CorrectlyReturnsSubPaths()
+            {
+                var signalsToReturn = new Domain.Signal[]
+                {
+                    new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1") },
+                    new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1/s11") },
+                    new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1/s12/s121") },
+                    new Signal() { Id = 4, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1/s13/s131/s1311") },
+                };
+                SetupMocksGetPath(signalsToReturn);
+
+                var pathDto = new Dto.Path() { Components = new[] { "r", "s1" } };
+                var result = signalsWebService.GetPathEntry(pathDto);
+
+                var expectedSubPaths = new Dto.Path[]
+                {
+                    new Dto.Path() {Components = new[] {"r", "s1", "s12" } },
+                    new Dto.Path() {Components = new[] {"r", "s1", "s13" } },
+                };
+
+                var actualResultA = result.SubPaths.ToArray();
+
+                int i = 0;
+                foreach (var actualItem in actualResultA)
+                {
+                    CollectionAssert.AreEqual(expectedSubPaths[i].Components.ToArray(), actualItem.Components.ToArray());
+
+                    i++;
+                }
+            }
+
+            [TestMethod]
+            public void WhenGettingWithGivenPathPrefix_ReturnsSignals_ContainedInSpecifiedPath()
+            {
+                var signalsToReturn = new Domain.Signal[]
+                {
+                    new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1") },
+                    new Signal() { Id = 2, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1/s11") },
+                    new Signal() { Id = 3, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1/s12") },
+                    new Signal() { Id = 4, DataType = DataType.Boolean, Granularity = Granularity.Day, Path = Domain.Path.FromString("r/s1/s13/s131") },
+                };
+                SetupMocksGetPath(signalsToReturn);
+
+                var pathDto = new Dto.Path() { Components = new[] { "r", "s1" } };
+                var result = signalsWebService.GetPathEntry(pathDto);
+
+                var dtoSignals = new Dto.Signal[]
+                {
+                    new Dto.Signal() { Id = 1, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Day, Path = new Dto.Path() { Components = new[] { "r", "s1" } } },
+                    new Dto.Signal() { Id = 2, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Day, Path = new Dto.Path() { Components = new[] { "r", "s1", "s11" } } },
+                    new Dto.Signal() { Id = 3, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Day, Path = new Dto.Path() { Components = new[] { "r", "s1", "s12" } } },
+                    new Dto.Signal() { Id = 4, DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Day, Path = new Dto.Path() { Components = new[] { "r", "s1", "s13", "s131" } } },
+                };
+                var actualResultA = result.Signals.ToArray();
+                Assert.AreEqual(2, actualResultA.Count());
+
+                int id = 1;
+                foreach (var signal in actualResultA)
+                {
+                    Assert.AreEqual(dtoSignals[id].DataType, signal.DataType);
+                    Assert.AreEqual(dtoSignals[id].Granularity, signal.Granularity);
+                    Assert.AreEqual(dtoSignals[id].Id, signal.Id);
+                    CollectionAssert.AreEqual(dtoSignals[id].Path.Components.ToArray(), signal.Path.Components.ToArray());
+
+                    id++;
+                }
+            }
+
+            private void SetupMocksGetPath(IEnumerable<Signal> domainSignalsToReturn)
+            {
+                SetupWebService();
+                signalsRepositoryMock
+                    .Setup(sdrm => sdrm.GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
+                    .Returns(domainSignalsToReturn);
+            }
+
+            private void SetupWebService(Signal signal = null)
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                SignalsDomainService domainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(domainService);
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(signal);
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
