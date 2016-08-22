@@ -1007,6 +1007,16 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, new Datum[] { new Datum() { Timestamp = new DateTime(2000, 5, 10, 3, 1, 4) } });
             }
 
+            [ExpectedException(typeof(ArgumentException))]
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataFromIncorrectTimeStamp_ArgumentExceptionIsThrown()
+            {
+                var id = 1;
+                SetupGetDataDatum(id);
+
+                signalsWebService.GetData(id, new DateTime(2000, 1, 2), new DateTime(2000, 2, 1));
+            }
+
             #endregion
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
