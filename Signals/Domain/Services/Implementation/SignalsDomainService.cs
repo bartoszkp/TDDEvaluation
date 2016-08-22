@@ -335,7 +335,7 @@ namespace Domain.Services.Implementation
                     return true;
 
                 case Granularity.Week:
-                    if (timestamp.TimeOfDay.Ticks != 0 || timestamp.DayOfWeek == DayOfWeek.Monday) return false;
+                    if (timestamp.TimeOfDay.Ticks != 0 || timestamp.DayOfWeek != DayOfWeek.Monday) return false;
                     return true;
 
                 case Granularity.Month:
