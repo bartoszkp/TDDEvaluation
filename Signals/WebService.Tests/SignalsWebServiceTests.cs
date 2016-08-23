@@ -723,10 +723,10 @@ namespace WebService.Tests
                     .Returns(new ZeroOrderMissingValuePolicyDouble());
 
                 GivenAColletionOfDatums(new[] {
-                        new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 1, 1), Value = 1.1 },
-                        new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 3, 1), Value = 3.3 },
-                        new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 5, 1), Value = 5.5 }
-                    }, signal);
+                    new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 1, 1), Value = 1.1 },
+                    new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 3, 1), Value = 3.3 },
+                    new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 5, 1), Value = 5.5 }
+                }, signal);
                 
                 var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
 
@@ -735,7 +735,34 @@ namespace WebService.Tests
                     new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 1.1 },
                     new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 3.3 },
                     new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 3.3 },
-                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 5.5 },
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 5.5 }
+                }, result.ToArray()));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithZeroOrderMissingValuePolicy_ReturnsDefault()
+            {
+                int id = 1;
+                var signal = SignalWith(id, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("a/b"));
+                GivenASignal(signal);
+                Setup_AllRepos(signal);
+
+                missingValuePolicyRepoMock
+                    .Setup(mvp => mvp.Get(It.Is<Domain.Signal>(sig => sig.Id == id)))
+                    .Returns(new ZeroOrderMissingValuePolicyDouble());
+
+                GivenAColletionOfDatums(new[] {
+                    new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 2, 1), Value = 2.0 },
+                    new Datum<double> { Quality = Domain.Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 4, 1), Value = 4.0 }
+                }, signal);
+
+                var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                Assert.IsTrue(CompareDatum(new Datum[] {
+                    new Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(double) },
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 2.0 },
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2.0 },
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 4.0 }
                 }, result.ToArray()));
             }
 
