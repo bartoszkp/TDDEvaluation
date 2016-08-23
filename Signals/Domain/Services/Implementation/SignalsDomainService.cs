@@ -26,45 +26,14 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
-        private MissingValuePolicyBase ReturnMissingValuePolicy(Signal signal)
-        {
-            MissingValuePolicyBase policy;
-
-            switch (signal.DataType)
-            {
-                case Domain.DataType.Boolean:
-                        policy = new NoneQualityMissingValuePolicy<Boolean>();
-                    break;
-                case Domain.DataType.Decimal:
-                        policy = new NoneQualityMissingValuePolicy<Decimal>();
-                    break;
-                case Domain.DataType.Double:
-                         policy = new NoneQualityMissingValuePolicy<Double>();
-                    break;
-                case Domain.DataType.Integer:
-                        policy = new NoneQualityMissingValuePolicy<Int32>();
-                    break;
-                case Domain.DataType.String:
-                        policy = new NoneQualityMissingValuePolicy<String>();
-                    break;
-                default: return null;
-            }
-
-            return policy;
-        }
-
         public Signal Add(Signal newSignal)
         {
             if (newSignal.Id.HasValue)
-            {
                 throw new IdNotNullException();
-            }
 
-            var signal = this.signalsRepository.Add(newSignal);
-
-            var policy = ReturnMissingValuePolicy(signal);
-            this.missingValuePolicyRepository.Set(signal, policy);
-
+            var signal = signalsRepository.Add(newSignal);
+            SetDefaultMissingValuePolicy(signal);
+            
             return signal;
         }
 
@@ -186,6 +155,15 @@ namespace Domain.Services.Implementation
             return new PathEntry(signalList, subPathList.Distinct()); 
         }
 
+        public Type GetSignalType(int signalId)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            if (signal == null) throw new SignalNotExistException();
+
+            return DataTypeUtils.GetNativeType(signal.DataType);
+        }
+
         private Path CreatePath(IEnumerable<string> components)
         {
             return Path.FromString(Path.JoinComponents(components));
@@ -210,13 +188,12 @@ namespace Domain.Services.Implementation
             return false;
         }
 
-        public Type GetSignalType(int signalId)
+        private void SetDefaultMissingValuePolicy(Signal signal)
         {
-            var signal = signalsRepository.Get(signalId);
+            var policy = typeof(NoneQualityMissingValuePolicy<>)
+                .MakeGenericType(new Type[] { DataTypeUtils.GetNativeType(signal.DataType) });
 
-            if (signal == null) throw new SignalNotExistException();
-
-            return DataTypeUtils.GetNativeType(signal.DataType);
+            missingValuePolicyRepository.Set(signal, (MissingValuePolicyBase)Activator.CreateInstance(policy));
         }
     }
 }
