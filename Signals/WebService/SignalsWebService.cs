@@ -70,6 +70,8 @@ namespace WebService
             if (signal == null)
                 throw new NoSuchSignalException();
 
+            CheckTimestamps(signal.Granularity, fromIncludedUtc);
+
             switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
@@ -116,6 +118,10 @@ namespace WebService
             if (signal == null)
                 throw new NoSuchSignalException();
 
+            foreach(var datum in data)
+            {
+                CheckTimestamps(signal.Granularity, datum.Timestamp);
+            }
 
             switch (signal.DataType)
             {
@@ -184,6 +190,49 @@ namespace WebService
             foreach (var item in data)
             {
                 item.Signal = signal;
+            }
+        }
+
+        private void CheckTimestamps(Domain.Granularity granularity, DateTime timestamp)
+        {
+            switch (granularity)
+            {
+                case Domain.Granularity.Second:
+                    if (timestamp.Millisecond != 0)
+                        throw new ArgumentException();
+                    break;
+                case Domain.Granularity.Minute:
+                    if (timestamp.Second != 0 || timestamp.Millisecond != 0)
+                        throw new ArgumentException();
+                    break;
+                case Domain.Granularity.Hour:
+                    if (timestamp.Minute != 0 || timestamp.Second != 0 
+                        || timestamp.Millisecond != 0)
+                        throw new ArgumentException();
+                    break;
+                case Domain.Granularity.Day:
+                    if (timestamp.Hour != 0 || timestamp.Minute != 0 
+                        || timestamp.Second != 0 || timestamp.Millisecond != 0)
+                        throw new ArgumentException();
+                    break;
+                case Domain.Granularity.Week: 
+                    if (timestamp.DayOfWeek != DayOfWeek.Monday || timestamp.Hour != 0 
+                        || timestamp.Minute != 0 || timestamp.Second != 0 
+                        || timestamp.Millisecond != 0)
+                        throw new ArgumentException();
+                    break;
+                case Domain.Granularity.Month:
+                    if (timestamp.Day != 1 || timestamp.Hour != 0 
+                        || timestamp.Minute != 0 || timestamp.Second != 0 
+                        || timestamp.Millisecond != 0)
+                        throw new ArgumentException();
+                    break;
+                case Domain.Granularity.Year:
+                    if (timestamp.Month != 1 || timestamp.Day != 1 
+                        || timestamp.Hour != 0 || timestamp.Minute != 0 
+                        || timestamp.Second != 0 || timestamp.Millisecond != 0)
+                        throw new ArgumentException();
+                    break;
             }
         }
 
