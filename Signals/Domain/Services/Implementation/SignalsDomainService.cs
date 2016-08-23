@@ -78,6 +78,9 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            if (!dateIsValid(signal.Granularity, fromIncludedUtc))
+                throw new ArgumentException("Date: "+fromIncludedUtc.ToString()+ "is invalid");
+
             var returnList = new List<Datum<T>>();
             var datum = new Datum<T>();
             var mvp = GetMissingValuePolicy(signal);
@@ -160,10 +163,7 @@ namespace Domain.Services.Implementation
 
 
         }
-
-
-
-
+        
         public DateTime AddToDateTime(DateTime date, Signal signal)
         {
             var addTimeSpan = new Dictionary<Granularity, Action>
@@ -180,6 +180,46 @@ namespace Domain.Services.Implementation
             return date;
         }
 
+        private bool dateIsValid (Granularity granularity, DateTime date)
+        {
+            DateTime correctDate = new DateTime();
+            switch (granularity)
+            {
+                case (Granularity.Year):
+                    correctDate = new DateTime(date.Year, 1, 1);
+                    break;
+
+                case (Granularity.Month):
+                    correctDate = new DateTime(date.Year, date.Month, 1);
+                    break;
+
+                case (Granularity.Week):
+                    if (date.DayOfWeek != DayOfWeek.Monday)
+                        return false;
+                    correctDate = new DateTime(date.Year, date.Month, date.Day);
+                    break;
+
+                case (Granularity.Day):
+                    correctDate = new DateTime(date.Year, date.Month, date.Day);
+                    break;
+
+                case (Granularity.Hour):
+                    correctDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, 0, 0);
+                    break;
+
+                case (Granularity.Minute):
+                    correctDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0);
+                    break;
+
+                case (Granularity.Second):
+                    correctDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
+                    break;
+
+                default:
+                    throw new NotSupportedException("Granularity: " + granularity.ToString() + " is not supported");
+            }
+            return date.Ticks == correctDate.Ticks;
+        }
 
     }
 }
