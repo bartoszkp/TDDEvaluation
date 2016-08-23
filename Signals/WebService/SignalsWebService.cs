@@ -123,19 +123,12 @@ namespace WebService
         private void SetDataWithType<T>(Domain.Signal signal, IEnumerable<Datum> dataDto)
         {
             IEnumerable<Domain.Datum<T>> dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<T>>>();
-            dataDomain = FillDatum<T>(signal, dataDomain);
+            dataDomain = SetSignalToData<T>(signal, dataDomain);
             this.signalsDomainService.SetData<T>(dataDomain);
         }
-        private IEnumerable<Domain.Datum<T>> FillDatum<T>(Domain.Signal signal, IEnumerable<Domain.Datum<T>> dataDomain)
+        private IEnumerable<Domain.Datum<T>> SetSignalToData<T>(Domain.Signal signal, IEnumerable<Domain.Datum<T>> dataDomain)
         {
-            List<Domain.Datum<T>> result = new List<Domain.Datum<T>>();
-            foreach (var d in dataDomain)
-            {
-                var temp = d;
-                temp.Signal = signal;
-                result.Add(temp);
-            }
-            return result;
+            return dataDomain.Select(d => { d.Signal = signal; return d; }).ToList();
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
