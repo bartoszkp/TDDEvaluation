@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Domain.Exceptions;
 using Domain.MissingValuePolicy;
+using System.Collections.Generic;
 
 namespace WebService.Tests
 {
@@ -198,8 +199,6 @@ namespace WebService.Tests
                 var result = signalsWebService.GetMissingValuePolicy(1);
                 Assert.IsNotNull(result);
                 Assert.IsInstanceOfType(result, typeof(Dto.MissingValuePolicy.SpecificValueMissingValuePolicy));
-
-
             }
 
 
@@ -314,6 +313,49 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
+            public void WhenSettingDatumWithNotExistingData_ThenThrowingBadDateFormatForSignalException()
+            {
+                int result;
+
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1, 12, 45, 0), Value = (int)1 },
+                };
+
+                var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
+                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                if (existingSignal.Granularity == Granularity.Month && TimestampDay == 1 && TimestampHour == 12
+                    && TimestampMinute == 00 && TimestampSecond == 00)
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
+
+            }
+
             private void SetupWebServiceForMvpOperations()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
@@ -388,6 +430,7 @@ namespace WebService.Tests
 
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<IMissingValuePolicyRepository> missingValueRepoMock;
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
         }
     }
 }
