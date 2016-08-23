@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -93,6 +94,8 @@ namespace WebService
         }
         private IEnumerable<Dto.Datum> GetDataWithType<T>(Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            CheckTimestamp(fromIncludedUtc, signal.Granularity);
+
             IEnumerable<Domain.Datum<T>> result = signalsDomainService.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
 
             var policy = this.signalsDomainService.GetMissingValuePolicy(signal.Id.Value) as Domain.MissingValuePolicy.MissingValuePolicy<T>;
@@ -123,9 +126,17 @@ namespace WebService
         private void SetDataWithType<T>(Domain.Signal signal, IEnumerable<Datum> dataDto)
         {
             IEnumerable<Domain.Datum<T>> dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<T>>>();
+            CheckDataTimestamps(dataDomain, signal.Granularity);
             dataDomain = SetSignalToData<T>(signal, dataDomain);
             this.signalsDomainService.SetData<T>(dataDomain);
         }
+
+        private void CheckDataTimestamps<T>(IEnumerable<Domain.Datum<T>> dataDomain, Domain.Granularity granularity)
+        {
+            foreach (var datum in dataDomain)
+                CheckTimestamp(datum.Timestamp, granularity);
+        }
+
         private IEnumerable<Domain.Datum<T>> SetSignalToData<T>(Domain.Signal signal, IEnumerable<Domain.Datum<T>> dataDomain)
         {
             return dataDomain.Select(d => { d.Signal = signal; return d; }).ToList();
@@ -145,6 +156,30 @@ namespace WebService
         public void SetMissingValuePolicy(MissingValuePolicy policy)
         {
             this.signalsDomainService.SetMissingValuePolicy(policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+        }
+
+        private void CheckTimestamp(DateTime timestamp, Domain.Granularity granularity)
+        {
+            if (timestamp.Millisecond != 0)
+                throw new TimestampIncorrectException(timestamp, granularity);
+
+            if (granularity > Domain.Granularity.Second && timestamp.Second != 0)
+                throw new TimestampIncorrectException(timestamp, granularity);
+
+            if (granularity > Domain.Granularity.Minute && timestamp.Minute != 0)
+                throw new TimestampIncorrectException(timestamp, granularity);
+
+            if (granularity > Domain.Granularity.Hour && timestamp.Hour != 0)
+                throw new TimestampIncorrectException(timestamp, granularity);
+
+            if (granularity == Domain.Granularity.Week && timestamp.DayOfWeek != DayOfWeek.Monday)
+                throw new TimestampIncorrectException(timestamp, granularity);
+
+            if (granularity > Domain.Granularity.Week && timestamp.Day != 1)
+                throw new TimestampIncorrectException(timestamp, granularity);
+
+            if (granularity > Domain.Granularity.Month && timestamp.Month != 1)
+                throw new TimestampIncorrectException(timestamp, granularity);
         }
     }
 }
