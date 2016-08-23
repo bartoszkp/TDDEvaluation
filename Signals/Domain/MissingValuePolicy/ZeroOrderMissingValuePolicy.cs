@@ -29,7 +29,7 @@ namespace Domain.MissingValuePolicy
             return returnListDatum;
         }
 
-        public DateTime AddToDateTime(DateTime date, Signal signal)
+        public static DateTime AddToDateTime(DateTime date, Signal signal)
         {
             var addTimeSpan = new Dictionary<Granularity, Action>
                 {
