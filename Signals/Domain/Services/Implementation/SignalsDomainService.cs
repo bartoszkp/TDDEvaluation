@@ -55,7 +55,7 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal getSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var MVP = GetMVP(getSignal);
-
+            
             List<Datum<T>> datumList = new List<Datum<T>>();
 
             if (fromIncludedUtc > toExcludedUtc) return datumList;
@@ -169,7 +169,25 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal setDataSignal, IEnumerable<Datum<T>> datum)
         {
+            Granularity granularity = setDataSignal.Granularity;
+
+            ChekCorrectTimeStamp<T>(granularity, datum);
+
             this.signalsDataRepository.SetData(datum.Select(d => { d.Signal = setDataSignal; return d; }).ToList());
+        }
+        private bool ChekCorrectTimeStamp<T>(Granularity granularity, IEnumerable<Datum<T>> datum)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second: { if (datum.Any(s => s.Timestamp.Millisecond != 0))                                                                 { throw new InvalidCastException(); } break; }
+                case Granularity.Minute: { if (datum.Any(s => s.Timestamp.Second!= 0                    || ChekCorrectTimeStamp<T>(granularity - 1, datum))) { throw new InvalidCastException(); } break; }
+                case Granularity.Hour:   { if (datum.Any(s => s.Timestamp.Minute != 0                   || ChekCorrectTimeStamp<T>(granularity - 1, datum))) { throw new InvalidCastException(); } break; }
+                case Granularity.Day:    { if (datum.Any(s => s.Timestamp.Hour != 0                     || ChekCorrectTimeStamp<T>(granularity - 1, datum))) { throw new InvalidCastException(); } break; }
+                case Granularity.Week:   { if (datum.Any(s => s.Timestamp.DayOfWeek != DayOfWeek.Monday || ChekCorrectTimeStamp<T>(granularity - 1, datum))) { throw new InvalidCastException(); } break; }
+                case Granularity.Month:  { if (datum.Any(s => s.Timestamp.Day != 1                      || ChekCorrectTimeStamp<T>(granularity - 2, datum))) { throw new InvalidCastException(); } break; }
+                case Granularity.Year:   { if (datum.Any(s => s.Timestamp.Month != 1                    || ChekCorrectTimeStamp<T>(granularity - 1, datum))) { throw new InvalidCastException(); } break; }
+            }
+            return false;
         }
 
         public PathEntry GetPathEntry(Path pathDomain)
