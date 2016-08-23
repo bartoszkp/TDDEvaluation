@@ -669,6 +669,25 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GetDataWithIncorrectTimestampsShouldThrowsException()
+            {
+                GiveNoSignalData();
+                int signalId = 243;
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(new Signal()
+                    {
+                        Id = signalId,
+                        DataType = DataType.String,
+                        Granularity = Granularity.Week,
+                        Path = Path.FromString("sfdsfd/sfdad")
+                    });
+
+                signalsWebService.GetData(signalId, new DateTime(2016, 08, 23), DateTime.MaxValue);
+            }
+
             #endregion
 
 
