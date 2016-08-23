@@ -101,6 +101,11 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
+            if (!isTimeStampValid(signal, data))
+            {
+                throw new Domain.Exceptions.InvalidTimeStampException();
+            }
+
             if(data == null)
             {
                 this.signalsDataRepository.SetData<T>(data);
@@ -117,6 +122,15 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUTC, DateTime toExcludedUTC)
         {
+            List<Datum<T>> dataToCheck = new List<Datum<T>>();
+            dataToCheck.Add(new Datum<T>() { Timestamp = fromIncludedUTC });
+            dataToCheck.Add(new Datum<T>() { Timestamp = toExcludedUTC });
+
+            if (!isTimeStampValid(signal, dataToCheck))
+            {
+                throw new Domain.Exceptions.InvalidTimeStampException();
+            }
+
             MissingValuePolicy<T> missingValuePolicy;
 
             var data = this.signalsDataRepository
@@ -184,6 +198,62 @@ namespace Domain.Services.Implementation
             }
 
             return new PathEntry(signals, paths);
+        }
+
+        private bool isTimeStampValid<T>(Signal signal, IEnumerable<Datum<T>> data)
+        {
+            foreach (var datum in data)
+            {
+                switch (signal.Granularity)
+                {
+                    case Granularity.Second:
+                        if (!IsZero(datum.Timestamp.Millisecond))
+                            return false;
+                        break;
+
+                    case Granularity.Minute:
+                        if (!IsZero(datum.Timestamp.Millisecond, datum.Timestamp.Second))
+                            return false;
+                        break;
+
+                    case Granularity.Hour:
+                        if (!IsZero(datum.Timestamp.Millisecond, datum.Timestamp.Second, datum.Timestamp.Minute))
+                            return false;
+                        break;
+
+                    case Granularity.Day:
+                        if (!IsZero(datum.Timestamp.Millisecond, datum.Timestamp.Second, datum.Timestamp.Minute, datum.Timestamp.Hour))
+                            return false;
+                        break;
+
+                    case Granularity.Week:
+                        if (!IsZero(datum.Timestamp.Millisecond, datum.Timestamp.Second, datum.Timestamp.Minute, datum.Timestamp.Hour, datum.Timestamp.DayOfWeek))
+                            return false;
+                        break;
+
+                    case Granularity.Month:
+                        if (!IsZero(datum.Timestamp.Millisecond, datum.Timestamp.Second, datum.Timestamp.Minute, datum.Timestamp.Hour, DayOfWeek.Monday, datum.Timestamp.Day))
+                            return false;
+                        break;
+
+                    case Granularity.Year:
+                        if (!IsZero(datum.Timestamp.Millisecond, datum.Timestamp.Second, datum.Timestamp.Minute, datum.Timestamp.Hour, DayOfWeek.Monday, datum.Timestamp.Day, datum.Timestamp.Month))
+                            return false;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            return true;
+        }
+
+        private bool IsZero(int millisecond, int second = 0, int minute = 0, int hour = 0, DayOfWeek dayOfWeek = DayOfWeek.Monday, int day = 1, int month = 1)
+        {
+            if (millisecond == 0 && second == 0 && minute == 0 && hour == 0 && dayOfWeek == DayOfWeek.Monday && day == 1 && month == 1)
+                return true;
+            return false;
         }
     }
 }
