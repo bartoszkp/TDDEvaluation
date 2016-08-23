@@ -191,6 +191,10 @@ namespace Domain.Services.Implementation
             {
                 throw new Domain.Exceptions.BadDateFormatForSignalException();
             }
+            else if (signal.Granularity == Granularity.Hour && TimestampSecond == 0)
+            {
+                throw new Domain.Exceptions.BadDateFormatForSignalException();
+            }
             else signalsDataRepository.SetData(data);
         }
 
