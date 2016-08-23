@@ -569,56 +569,60 @@ namespace WebService.Tests
             #region IsInvalid (Issue #12)
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidMilliseconds_ExpectedException()
             {
-                CheckSetDataTimestamps(_validTimestamp.AddMilliseconds(1));
+                Assert.IsTrue(CheckSetDataTimestamps(_validTimestamp.AddMilliseconds(1)));
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidSeconds_ExpectedException()
             {
-                CheckSetDataTimestamps(_validTimestamp.AddSeconds(1));
+                Assert.IsTrue(CheckSetDataTimestamps(_validTimestamp.AddSeconds(1)));
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidMinutes_ExpectedException()
             {
-                CheckSetDataTimestamps(_validTimestamp.AddMinutes(1));
+                Assert.IsTrue(CheckSetDataTimestamps(_validTimestamp.AddMinutes(1)));
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidHours_ExpectedException()
             {
-                CheckSetDataTimestamps(_validTimestamp.AddHours(1));
+                Assert.IsTrue(CheckSetDataTimestamps(_validTimestamp.AddHours(1)));
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidWeekDay_ExpectedException()
             {
                 var id = 1;
                 GivenASignal(SignalWith(id, Domain.DataType.Integer, Domain.Granularity.Week, Domain.Path.FromString("a/b")));
 
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp, Value = 0 }});
+                try
+                {
+                    signalsWebService.SetData(id, new Dto.Datum[] {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = _validTimestamp, Value = 0 }});
+
+                    Assert.Fail();
+                }
+                catch(System.Reflection.TargetInvocationException ex)
+                {
+                    if (ex.InnerException.GetType() != typeof(Domain.Exceptions.DatetimeIsInvalidException))
+                        Assert.Fail();
+                }
+
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidFirstDayOfMonth_ExpectedException()
             {
-                CheckSetDataTimestamps(_validTimestamp.AddDays(1));
+                Assert.IsTrue(CheckSetDataTimestamps(_validTimestamp.AddDays(1)));
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.DatetimeIsInvalidException))]
             public void GivenASignal_WhenSettingSignalDataWithInvalidMonths_ExpectedException()
             {
-                CheckSetDataTimestamps(_validTimestamp.AddMonths(1));
+                Assert.IsTrue(CheckSetDataTimestamps(_validTimestamp.AddMonths(1)));
             }
 
             [TestMethod]
@@ -668,12 +672,21 @@ namespace WebService.Tests
                 Assert.IsTrue(CheckGetDataTimestamps(_validTimestamp, _validTimestamp.AddMonths(1)));
             }
 
-            private void CheckSetDataTimestamps(DateTime dt)
+            private bool CheckSetDataTimestamps(DateTime dt)
             {
                 var id = PrepareYearSignal();
 
-                signalsWebService.SetData(id, new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = dt, Value = 0 }});
+                try
+                { 
+                    signalsWebService.SetData(id, new Dto.Datum[] {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = dt, Value = 0 }});
+
+                    return false;
+                }
+                catch (System.Reflection.TargetInvocationException ex)
+                {
+                    return (ex.InnerException.GetType() == typeof(Domain.Exceptions.DatetimeIsInvalidException));
+                }
             }
 
             private bool CheckGetDataTimestamps(DateTime dtCorrect, DateTime dtWrong)
@@ -699,9 +712,9 @@ namespace WebService.Tests
                     signalsWebService.GetData(id, dtStart, dtEnd);
                     return false;
                 }
-                catch (Domain.Exceptions.DatetimeIsInvalidException)
+                catch (System.Reflection.TargetInvocationException ex)
                 {
-                    return true;
+                    return (ex.InnerException.GetType() == typeof(Domain.Exceptions.DatetimeIsInvalidException));
                 }
             }
 

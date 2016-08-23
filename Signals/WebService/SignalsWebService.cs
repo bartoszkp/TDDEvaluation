@@ -11,7 +11,6 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
-using Domain.Exceptions;
 
 namespace WebService
 {
@@ -64,60 +63,13 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            Signal foundSignal = GetById(signalId);
-            if (foundSignal == null)
-                throw new SignalNotExistException();
-
-            Domain.Signal signal = foundSignal.ToDomain<Domain.Signal>();
-
-            switch (foundSignal.DataType)
-            {
-                case Dto.DataType.Double:
-                    return signalsDomainService.GetData<Double>(signal, fromIncludedUtc, toExcludedUtc)
-                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
-                case Dto.DataType.Integer:
-                    return signalsDomainService.GetData<Int32>(signal, fromIncludedUtc, toExcludedUtc)
-                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
-                case Dto.DataType.Boolean:
-                    return signalsDomainService.GetData<Boolean>(signal, fromIncludedUtc, toExcludedUtc)
-                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
-                case Dto.DataType.Decimal:
-                    return signalsDomainService.GetData<Decimal>(signal, fromIncludedUtc, toExcludedUtc)
-                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
-                case Dto.DataType.String:
-                    return signalsDomainService.GetData<String>(signal, fromIncludedUtc, toExcludedUtc)
-                             .ToArray().ToDto<IEnumerable<Dto.Datum>>();
-            }
-            return null;
+            return (IEnumerable<Datum>)RunGenericMethod(GetSignalType(signalId), 
+                "GetDataGeneric", signalId, fromIncludedUtc, toExcludedUtc);
         }
 
         public void SetData(int signalId, IEnumerable<Dto.Datum> data)
         {
-            Signal foundSignal = GetById(signalId);
-            if (foundSignal == null)
-                throw new SignalNotExistException();
-
-            Domain.Signal domainSignal = foundSignal.ToDomain<Domain.Signal>();
-
-            switch (foundSignal.DataType)
-            {
-                case Dto.DataType.Double:
-                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Double>>>());
-                    break;
-                case Dto.DataType.Boolean:
-                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Boolean>>>());
-                    break;
-                case Dto.DataType.Decimal:
-                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Decimal>>>());
-                    break;
-                case Dto.DataType.Integer:
-                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<Int32>>>());
-                    break;
-                case Dto.DataType.String:
-                    signalsDomainService.SetData(domainSignal, data.ToDomain<IEnumerable<Domain.Datum<String>>>());
-                    break;
-            }
-
+            RunGenericMethod(GetSignalType(signalId), "SetDataGeneric", signalId, data);
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
@@ -132,6 +84,33 @@ namespace WebService
             var domainMvp = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
             signalsDomainService.SetMissingValuePolicy(signalId, domainMvp);
+        }
+
+        public IEnumerable<Datum> GetDataGeneric<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            return signalsDomainService
+                .GetData<T>(signalId, fromIncludedUtc, toExcludedUtc)
+                .ToDto<IEnumerable<Datum>>();
+        }
+
+        public void SetDataGeneric<T>(int signalId, IEnumerable<Datum> data)
+        {
+            signalsDomainService
+                .SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<T>>>());
+        }
+
+        private object RunGenericMethod(Type type, string methodName, params object[] param)
+        {
+            MethodInfo method = GetType()
+                .GetMethod(methodName)
+                .MakeGenericMethod(new Type[] { type });
+
+            return method.Invoke(this, param.ToArray());
+        }
+
+        private Type GetSignalType(int signalId)
+        {
+            return signalsDomainService.GetSignalType(signalId);
         }
     }
 }

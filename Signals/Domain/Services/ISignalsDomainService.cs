@@ -10,9 +10,9 @@ namespace Domain.Services
 
         Signal GetById(int signalId);
 
-        void SetData<T>(Signal foundSignal, IEnumerable<Datum<T>> data);
+        void SetData<T>(int signalId, IEnumerable<Datum<T>> data);
 
-        IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+        IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
         void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp);
 
@@ -21,5 +21,7 @@ namespace Domain.Services
         Signal GetByPath(Path domainPath);
 
         PathEntry GetAllWithPathPrefix(Path prefix);
+
+        Type GetSignalType(int signalId);
     }
 }

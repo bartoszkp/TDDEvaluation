@@ -78,18 +78,6 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(signalId);
         }
 
-        public void SetData<T>(Signal foundSignal, IEnumerable<Datum<T>> data)
-        {
-            List<Datum<T>> dataList = data.ToList();
-            for (int i = 0; i < dataList.Count; ++i)
-            {
-                CheckTimestamp(dataList[i].Timestamp, foundSignal.Granularity);
-                dataList[i].Signal = foundSignal;
-            }
-
-            this.signalsDataRepository.SetData(dataList);
-        }
-
         private void AddToDateTime(ref DateTime dateTime, Granularity granularity)
         {
             switch (granularity)
@@ -117,22 +105,37 @@ namespace Domain.Services.Implementation
                     break;
             }
         }
-        
-        public IEnumerable<Datum<T>> GetData<T>(Signal foundSignal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+
+        public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
         {
-            CheckTimestamp(fromIncludedUtc, foundSignal.Granularity);
-            CheckTimestamp(toExcludedUtc, foundSignal.Granularity);
+            var signal = signalsRepository.Get(signalId);
+
+            foreach (var d in data)
+            {
+                CheckTimestamp(d.Timestamp, signal.Granularity);
+                d.Signal = signal;
+            }
+
+            signalsDataRepository.SetData(data);
+        }
+
+        public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            CheckTimestamp(fromIncludedUtc, signal.Granularity);
+            CheckTimestamp(toExcludedUtc, signal.Granularity);
             
-            var sortedData = signalsDataRepository.GetData<T>(foundSignal, fromIncludedUtc, toExcludedUtc)
+            var sortedData = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)
                 .OrderBy(d => d.Timestamp)
                 .ToList();
 
-            var policy = GetMissingValuePolicy(foundSignal.Id.Value) as MissingValuePolicy<T>;
+            var policy = GetMissingValuePolicy(signal.Id.Value) as MissingValuePolicy<T>;
             var index = 0;
 
             if (fromIncludedUtc == toExcludedUtc) toExcludedUtc = toExcludedUtc.AddTicks(1);
 
-            for (DateTime dt = fromIncludedUtc; dt < toExcludedUtc; AddToDateTime(ref dt, foundSignal.Granularity), index++)
+            for (DateTime dt = fromIncludedUtc; dt < toExcludedUtc; AddToDateTime(ref dt, signal.Granularity), index++)
                 if (sortedData.FirstOrDefault(d => d.Timestamp == dt) == null)
                     sortedData.Insert(index, policy.GetMissingDatum(sortedData, dt));
             
@@ -205,6 +208,15 @@ namespace Domain.Services.Implementation
             if ((int)granularity >= 6 && dt.Month != 1) return true;
 
             return false;
+        }
+
+        public Type GetSignalType(int signalId)
+        {
+            var signal = signalsRepository.Get(signalId);
+
+            if (signal == null) throw new SignalNotExistException();
+
+            return DataTypeUtils.GetNativeType(signal.DataType);
         }
     }
 }
