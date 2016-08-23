@@ -154,44 +154,22 @@ namespace Domain.Services.Implementation
                     }
                     else
                     {
-                        if (!(policy is ZeroOrderMissingValuePolicy<T>))
-                        {
-                            filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
-                        }
 
-                        filledList.Add(new Datum<T>()
-                        {
-                            Quality = filledList.Last().Quality,
-                            Signal = filledList.Last().Signal,
-                            Value = filledList.Last().Value,
-                            Timestamp = lastIterativeTime
-                        });
+                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(filledList,policy, signal, lastIterativeTime));
                     }
                 }
                 else
                 {
                     lastIterativeTime = iterativeTime;
                     AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime);
-                    
-                    if(!(policy is ZeroOrderMissingValuePolicy<T>))
-                    {
-                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
-                    }
 
-                    filledList.Add(new Datum<T>()
-                    {
-                        Quality = filledList.Last().Quality,
-                        Signal = filledList.Last().Signal,
-                        Value = filledList.Last().Value,
-                        Timestamp = lastIterativeTime
-                    });
-                   
+                    filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(filledList, policy, signal, lastIterativeTime));
                 }
             }
             return filledList;
         }
 
-        private Domain.Datum<T> GetDatumFilledWithMissingValuePolicy<T>(MissingValuePolicyBase policy,Signal signal, 
+        private Domain.Datum<T> GetDatumFilledWithMissingValuePolicy<T>(List<Domain.Datum<T>> filledList,MissingValuePolicyBase policy,Signal signal, 
             DateTime timestamp)
         {
             if(policy is NoneQualityMissingValuePolicy<T>)
@@ -206,6 +184,16 @@ namespace Domain.Services.Implementation
                     Quality = specificPolicy.Quality,
                     Timestamp = timestamp,
                     Value = specificPolicy.Value
+                };
+            }
+            else if (policy is ZeroOrderMissingValuePolicy<T>)
+            {
+                return new Datum<T>()
+                {
+                    Quality = filledList.Last().Quality,
+                    Signal = filledList.Last().Signal,
+                    Value = filledList.Last().Value,
+                    Timestamp = timestamp
                 };
             }
             else
