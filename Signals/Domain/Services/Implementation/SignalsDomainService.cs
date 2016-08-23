@@ -166,7 +166,8 @@ namespace Domain.Services.Implementation
 
             SetSignalForDatumCollection(data, signal);
 
-            if (signal.Granularity == Granularity.Month && TimestampDay != 1)
+            if (signal.Granularity == Granularity.Month && (TimestampDay > 1 || TimestampHour > 0
+                    || TimestampMinute > 0 || TimestampSecond > 0))
             {
                 throw new Domain.Exceptions.BadDateFormatForSignalException();
             }
