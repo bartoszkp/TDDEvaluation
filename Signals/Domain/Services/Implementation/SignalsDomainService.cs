@@ -166,12 +166,11 @@ namespace Domain.Services.Implementation
 
             SetSignalForDatumCollection(data, signal);
 
-            if (signal.Granularity == Granularity.Month && TimestampDay == 1 && TimestampHour == 12
-                    && TimestampMinute == 0 && TimestampSecond == 0)
+            if (signal.Granularity == Granularity.Month && TimestampDay != 1)
             {
-                signalsDataRepository.SetData(data);
+                throw new Domain.Exceptions.BadDateFormatForSignalException();
             }
-            else throw new Domain.Exceptions.BadDateFormatForSignalException();
+            else signalsDataRepository.SetData(data);
         }
 
         private void SetSignalForDatumCollection<T>(IEnumerable<Domain.Datum<T>> data, Signal signal)

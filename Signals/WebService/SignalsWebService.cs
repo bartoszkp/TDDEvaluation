@@ -112,7 +112,7 @@ namespace WebService
                     break;
 
                 case DataType.Integer:
-                    var domainIntData = data?.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray(); 
+                    var domainIntData = data?.ToDomain<IEnumerable<Domain.Datum<int>>>().ToArray();
                     signalsDomainService.SetData(domainIntData, signal.ToDomain<Domain.Signal>());
                     break;
 

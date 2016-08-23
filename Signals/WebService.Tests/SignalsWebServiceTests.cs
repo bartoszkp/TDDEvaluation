@@ -318,8 +318,6 @@ namespace WebService.Tests
             [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
             public void WhenSettingDatumWithNotExistingData_ForMonthSignal_ThenThrowingBadDateFormatForSignalException()
             {
-                int result;
-
                 var existingSignal = new Domain.Signal()
                 {
                     Id = 1,
@@ -330,7 +328,7 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1, 12, 45, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 4, 12, 45, 0), Value = (int)1 },
                 };
 
                 var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
@@ -348,13 +346,14 @@ namespace WebService.Tests
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                if (existingSignal.Granularity == Granularity.Month && TimestampDay == 1 && TimestampHour == 12
-                    && TimestampMinute == 00 && TimestampSecond == 00)
+                if (existingSignal.Granularity == Granularity.Month && TimestampDay != 1)
                 {
-                    signalsWebService.SetData(1, existingDatum);
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
+                else signalsWebService.SetData(1, existingDatum);
 
-                
+
+
             }
 
             private void SetupWebServiceForMvpOperations()
