@@ -999,6 +999,42 @@ namespace WebService.Tests
                 DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
             }
 
+            [TestMethod]
+            public void GetData_FirstElementOfDataDoesntExist_ZeroOrderMissingValuePolicyShouldCorrectlyFillMissingData()
+            {
+                SetupWebService();
+
+                var signal = GetDefaultSignal_IntegerMonth();
+
+                Dto.Datum[] datumArray = new Dto.Datum[]{
+                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (int) 5},
+                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int) 2} };
+
+                var policy = new ZeroOrderMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Integer
+                };
+
+                int signalId = 1;
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datumArray);
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(policy.ToDomain<ZeroOrderMissingValuePolicyInteger>());
+
+                IEnumerable<Dto.Datum> returnedData = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                int expectedArrayLength = 4;
+                Assert.AreEqual(expectedArrayLength, returnedData.ToArray().Length);
+
+                Dto.Datum[] expectedResult = new Dto.Datum[]{
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = 0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad,  Timestamp = new DateTime(2000, 4, 1), Value = (int)5 } };
+
+                DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
+            }
+
 
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
             {
