@@ -1045,6 +1045,94 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 3));
             }
 
+            [TestMethod]
+            public void WhenZeroOrderPolicyIsSet_ItFillsMissingData()
+            {
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 2, 1), Value = 30 },
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 35 },
+                    new Dto.Datum { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = 40, }
+                };
+
+                SetupGettingDataForZeroOrderPolicy<int>(existingDatum, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+                var dateTime = new DateTime(2000, 1, 1);
+
+                int index = 0;
+                foreach (var item in result)
+                {
+                    if (dateTime.Month == 1)
+                    {
+                        Assert.AreEqual(Dto.Quality.None, item.Quality);
+                        Assert.AreEqual(new DateTime(2000, 1, 1), item.Timestamp);
+                        Assert.AreEqual(default(int), item.Value);
+                    }
+                    else if (dateTime.Month == 4)
+                    {
+                        Assert.AreEqual(existingDatum[1].Quality, item.Quality);
+                        Assert.AreEqual(existingDatum[1].Timestamp.AddMonths(1), item.Timestamp);
+                        Assert.AreEqual(existingDatum[1].Value, item.Value);
+                    }
+                    else if(dateTime.Month == 6)
+                    {
+                        Assert.AreEqual(existingDatum[2].Quality, item.Quality);
+                        Assert.AreEqual(existingDatum[2].Timestamp, item.Timestamp);
+                        Assert.AreEqual(existingDatum[2].Value, item.Value);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(existingDatum[index].Quality, item.Quality);
+                        Assert.AreEqual(existingDatum[index].Timestamp, item.Timestamp);
+                        Assert.AreEqual(existingDatum[index].Value, item.Value);
+
+                        index++;
+                    }
+
+                    dateTime = dateTime.AddMonths(1);
+                }
+            }
+
+            private void SetupGettingDataForZeroOrderPolicy<T>(
+                Dto.Datum[] existingDatum,
+                DateTime firstTimestamp,
+                DateTime lastTimestamp)
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var genericInstance = new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyInteger();
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<T>(
+                        existingSignal,
+                        firstTimestamp,
+                        lastTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<T>>>());
+
+                GivenASignal(existingSignal);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(genericInstance);
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
             private void SetupGettingDataForSpecificPolicy<T>(
                 Dto.Datum[] existingDatum,
                 DateTime firstTimestamp,

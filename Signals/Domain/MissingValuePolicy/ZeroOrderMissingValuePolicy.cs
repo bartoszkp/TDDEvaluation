@@ -37,7 +37,7 @@ namespace Domain.MissingValuePolicy
             int j = 0;
             foreach (var item in resultList)
             {
-                if (item.GetType() == typeof(Domain.Datum<T>) && j != 0)
+                if (item.Quality == Quality.None && item.Value.Equals(default(T)) && j != 0)
                 {
                     resultList.ElementAt(j).Quality = resultList.ElementAt(j - 1).Quality;
                     resultList.ElementAt(j).Value = resultList.ElementAt(j - 1).Value;
