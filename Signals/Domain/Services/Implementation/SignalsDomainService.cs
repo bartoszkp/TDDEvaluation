@@ -89,15 +89,15 @@ namespace Domain.Services.Implementation
         {
             foreach (var datum in dataDomain)
             {
-                if(!checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(signal.Granularity,datum.Timestamp))
+                if (!checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(signal.Granularity, datum.Timestamp))
                 {
                     throw new ArgumentException("incorrect timestamp(s)");
                 }
             }
 
-            Datum<T>[] dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToArray();    
-            
-            for(int i = 0; i < dataDomain.Count(); ++i)
+            Datum<T>[] dataDomainOrderedList = dataDomain.OrderBy(d => d.Timestamp).ToArray();
+
+            for (int i = 0; i < dataDomain.Count(); ++i)
             {
                 dataDomainOrderedList.ElementAt(i).Signal = signal;
             }
@@ -105,7 +105,7 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData<T>(dataDomainOrderedList);
         }
 
-      
+
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
@@ -118,10 +118,10 @@ namespace Domain.Services.Implementation
 
             MissingValuePolicyBase policy = GetMissingValuePolicy(signal.Id.Value);
 
-            return DataFilledWithMissingValues<T>(data, signal, policy ,fromIncludedUtc,toExcludedUtc);
+            return DataFilledWithMissingValues<T>(data, signal, policy, fromIncludedUtc, toExcludedUtc);
         }
 
-        private IEnumerable<Domain.Datum<T>> DataFilledWithMissingValues<T>(IEnumerable<Domain.Datum<T>> data, 
+        private IEnumerable<Domain.Datum<T>> DataFilledWithMissingValues<T>(IEnumerable<Domain.Datum<T>> data,
             Signal signal, MissingValuePolicyBase policy, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             List<Domain.Datum<T>> filledList = new List<Datum<T>>();
@@ -140,7 +140,7 @@ namespace Domain.Services.Implementation
                     }
                 }
             }
-            for (DateTime iterativeTime = fromIncludedUtc; iterativeTime<toExcludedUtc;)
+            for (DateTime iterativeTime = fromIncludedUtc; iterativeTime < toExcludedUtc;)
             {
                 if (indexOfArray < array.Length && array[indexOfArray].Timestamp >= iterativeTime)
                 {
@@ -155,7 +155,7 @@ namespace Domain.Services.Implementation
                     else
                     {
 
-                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(filledList,policy, signal, lastIterativeTime));
+                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(filledList, policy, signal, lastIterativeTime));
                     }
                 }
                 else
@@ -169,10 +169,10 @@ namespace Domain.Services.Implementation
             return filledList;
         }
 
-        private Domain.Datum<T> GetDatumFilledWithMissingValuePolicy<T>(List<Domain.Datum<T>> filledList,MissingValuePolicyBase policy,Signal signal, 
+        private Domain.Datum<T> GetDatumFilledWithMissingValuePolicy<T>(List<Domain.Datum<T>> filledList, MissingValuePolicyBase policy, Signal signal,
             DateTime timestamp)
         {
-            if(policy is NoneQualityMissingValuePolicy<T>)
+            if (policy is NoneQualityMissingValuePolicy<T>)
             {
                 return Domain.Datum<T>.CreateNone(signal, timestamp);
             }
@@ -188,6 +188,8 @@ namespace Domain.Services.Implementation
             }
             else if (policy is ZeroOrderMissingValuePolicy<T>)
             {
+                if (filledList.Count() == 0) return Domain.Datum<T>.CreateNone(signal, timestamp);
+
                 return new Datum<T>()
                 {
                     Quality = filledList.Last().Quality,
@@ -202,7 +204,7 @@ namespace Domain.Services.Implementation
             }
         }
 
-        private void AddTimeBasedOnGranulatity(Granularity granularity,ref DateTime dateTime)
+        private void AddTimeBasedOnGranulatity(Granularity granularity, ref DateTime dateTime)
         {
             switch (granularity)
             {
@@ -288,7 +290,7 @@ namespace Domain.Services.Implementation
 
             var array = signals.ToArray();
 
-            foreach(var signal in array)
+            foreach (var signal in array)
             {
                 if (signal.Path.Components.Count() - 1 == prefixCount)
                 {
@@ -301,7 +303,7 @@ namespace Domain.Services.Implementation
                 {
                     Path path = signal.Path;
                     List<string> components = new List<string>();
-                    for(int i = 0; i < prefixCount + 1; ++i)
+                    for (int i = 0; i < prefixCount + 1; ++i)
                     {
                         components.Add(path.Components.ElementAt(i));
                     }
