@@ -34,7 +34,7 @@ namespace Domain.MissingValuePolicy
             var datum = DateTimeList(data, signal, fromIncludedUtc, toExcludedUtc);
 
             return datum
-                .Select(d => dataDictionary.ContainsKey(d) ? dataDictionary[d] : Datum<T>.CreateSpecific(Signal, d, Quality, Value));
+                .Select(d => dataDictionary.ContainsKey(d) ? dataDictionary[d] : Datum<T>.CreateSpecific<T>(Signal, d, Quality, Value));
         }
 
         private List<DateTime> DateTimeList(IEnumerable<Datum<T>> data, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)

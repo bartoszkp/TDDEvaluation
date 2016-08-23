@@ -15,9 +15,9 @@ namespace Domain
                 Quality = Quality.None
             };
         }
-        public static Datum<Y> CreateSpecific<Y>(Signal signal, DateTime timestamp, Quality quality, Y Value)
+        public static Datum<T> CreateSpecific<U>(Signal signal, DateTime timestamp, Quality quality, T Value)
         {
-            return new Datum<Y>()
+            return new Datum<T>()
             {
                 Id = 0,
                 Signal = signal,
