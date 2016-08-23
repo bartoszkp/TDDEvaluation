@@ -161,6 +161,7 @@ namespace Domain.Services.Implementation
             if (policy != null)
             {
                 var timeNextMethod = GetTimeNextMethod(signal.Granularity);
+                var timePreviousMethod = GetTimePreviousMethod(signal.Granularity);
                 var date = fromIncluded;
                 var newData = new List<Datum<T>>();
 
@@ -181,6 +182,36 @@ namespace Domain.Services.Implementation
                         date = timeNextMethod(date);
                     }                    
                 }
+                else if (policy is ZeroOrderMissingValuePolicy<T>)
+                {
+                    while (date < toExcluded)
+                    {
+                        Datum<T> datum;
+                        Datum<T> previousDatum;
+
+                        if(date == fromIncluded)
+                        {
+                            datum = result.FirstOrDefault(d => d.Timestamp == date);
+                            if (datum == null) throw new ZeroOrderMVPException();
+                            newData.Add(datum);
+                        }
+
+                        else
+                        {
+                            datum = result.FirstOrDefault(d => d.Timestamp == date);
+                            previousDatum = result.FirstOrDefault(d => d.Timestamp == timePreviousMethod(date));
+                            if (datum != null) newData.Add(datum);
+
+                            else
+                            {
+                                if(previousDatum != null) newData.Add(Datum<T>.CreateSpecific(policy.Signal, date, previousDatum.Quality, previousDatum.Value));
+                                else throw new ZeroOrderMVPException();
+                            }
+                        }
+                        date = timeNextMethod(date);
+                    }
+                }
+
                 else
                     throw new NotImplementedException();
 
@@ -240,6 +271,28 @@ namespace Domain.Services.Implementation
                     throw new NotImplementedException();
             }
         }
-        
+
+        private Func<DateTime, DateTime> GetTimePreviousMethod(Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return (date) => date.AddSeconds(-1);
+                case Granularity.Minute:
+                    return (date) => date.AddMinutes(-1);
+                case Granularity.Hour:
+                    return (date) => date.AddHours(-1);
+                case Granularity.Day:
+                    return (date) => date.AddDays(-1);
+                case Granularity.Week:
+                    return (date) => date.AddDays(-7);
+                case Granularity.Month:
+                    return (date) => date.AddMonths(-1);
+                case Granularity.Year:
+                    return (date) => date.AddYears(-1);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }

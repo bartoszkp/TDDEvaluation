@@ -772,8 +772,8 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
 
-                Assert.AreEqual(3, result.Count());
-                Assert.AreEqual(result.ElementAt(1).Quality, Quality.Fair);
+                Assert.AreEqual(4, result.Count());
+                Assert.AreEqual(result.ElementAt(1).Quality, Dto.Quality.Fair);
                 Assert.AreEqual(result.ElementAt(3).Value, 5.0);
             }
 

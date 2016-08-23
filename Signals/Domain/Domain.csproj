@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\DatumTimestampException.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
+    <Compile Include="Exceptions\ZeroOrderMVPException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />
