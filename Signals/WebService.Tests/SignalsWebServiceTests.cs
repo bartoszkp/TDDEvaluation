@@ -259,7 +259,7 @@ namespace WebService.Tests
                 {
                     Id = 567,
                     DataType = DataType.Integer,
-                    Granularity = Granularity.Week,
+                    Granularity = Granularity.Day,
                     Path = Path.FromString("sfda/xvbc/jhkl")
                 };
                 prepareDataRepository(signal.Id.Value, signal);
@@ -322,9 +322,6 @@ namespace WebService.Tests
 
                 missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
             }
-
-            
-            
 
             private void SetupGetRepositories(DateTime fromIncluded, DateTime toExcluded, List<Dto.Datum> expectedResult)
             {

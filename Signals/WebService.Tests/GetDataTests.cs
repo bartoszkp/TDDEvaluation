@@ -66,6 +66,271 @@ namespace WebService.Tests
         }
 
 
+        #region TimeStampVerifyTests
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Second_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Second
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 1, 1, 11, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Minute_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Minute
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 1, 0, 1, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Hour_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Hour
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 0, 0, 1, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Day_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Day
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0, 1, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Month_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Month
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Week_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Week
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Year_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Year
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Second()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Second
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Minute()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Minute
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 1, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Hour()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Hour
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Day()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Day
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Month()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Month
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Week()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Week
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+
+        [TestMethod]
+        public void WhenGetData_VerifyTimeStamp_Year()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Year
+            };
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            var data = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2000, 1, 2));
+        }
+
+        #endregion
+
         private void SetupWebService()
         {
             var signalsDomainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, mvpRepoMock.Object);
