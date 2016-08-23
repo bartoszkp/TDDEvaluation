@@ -971,7 +971,7 @@ namespace WebService.Tests
                 var signal = GetDefaultSignal_IntegerMonth();
 
                 Dto.Datum[] datumArray = new Dto.Datum[]{
-                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (int) 5},
+                     new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 5, 1), Value = (int) 5},
                      new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int) 2} };
 
                 var policy = new ZeroOrderMissingValuePolicy()
@@ -993,8 +993,8 @@ namespace WebService.Tests
                 Dto.Datum[] expectedResult = new Dto.Datum[]{
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (int)2 },
                     new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (int)2 },
-                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = 0 },
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = (int)42 } };
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (int)2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad,  Timestamp = new DateTime(2000, 5, 1), Value = (int)5 } };
 
                 DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
             }

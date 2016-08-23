@@ -154,14 +154,38 @@ namespace Domain.Services.Implementation
                     }
                     else
                     {
-                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
+                        if (!(policy is ZeroOrderMissingValuePolicy<T>))
+                        {
+                            filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
+                        }
+
+                        filledList.Add(new Datum<T>()
+                        {
+                            Quality = filledList.Last().Quality,
+                            Signal = filledList.Last().Signal,
+                            Value = filledList.Last().Value,
+                            Timestamp = lastIterativeTime
+                        });
                     }
                 }
                 else
                 {
                     lastIterativeTime = iterativeTime;
                     AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime);
-                    filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
+                    
+                    if(!(policy is ZeroOrderMissingValuePolicy<T>))
+                    {
+                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(policy, signal, lastIterativeTime));
+                    }
+
+                    filledList.Add(new Datum<T>()
+                    {
+                        Quality = filledList.Last().Quality,
+                        Signal = filledList.Last().Signal,
+                        Value = filledList.Last().Value,
+                        Timestamp = lastIterativeTime
+                    });
+                   
                 }
             }
             return filledList;
