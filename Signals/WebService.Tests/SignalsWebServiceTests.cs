@@ -336,15 +336,7 @@ namespace WebService.Tests
                 var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
                 var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupSettingData<int>(existingSignal, existingDatum);
 
                 if (existingSignal.Granularity == Granularity.Month && (TimestampDay > 1 || TimestampHour > 0
                     || TimestampMinute > 0 || TimestampSecond > 0))
@@ -377,15 +369,7 @@ namespace WebService.Tests
                 var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
                 var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
 
-                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
-                signalsDataRepositoryMock
-                    .Setup(sdrm => sdrm.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
+                SetupSettingData<int>(existingSignal, existingDatum);
 
                 if (existingSignal.Granularity == Granularity.Year && (TimestampMonth == 1 && TimestampDay == 1 && TimestampHour == 0
                     && TimestampMinute == 0 && TimestampSecond == 0))
@@ -393,6 +377,21 @@ namespace WebService.Tests
                     throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
                 else signalsWebService.SetData(1, existingDatum);
+            }
+
+            private void SetupSettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<T>(It.IsAny<IEnumerable<Datum<T>>>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.SetData(1, existingDatum);
             }
 
             private void SetupWebServiceForMvpOperations()
