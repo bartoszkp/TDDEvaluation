@@ -1021,6 +1021,30 @@ namespace WebService.Tests
                 SetupSettingData<int>(existingSignal, existingDatum);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.InvalidTimeStampException))]
+            public void WhenGettingDataWithInvalidTimestamp_ThrowsInvalidTimestampException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 30 },
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 2), Value = 35 },
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 3), Value = 40, }
+                };
+
+                SetupGettingData<int>(existingSignal, existingDatum, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger(),
+                    new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 3));
+            }
+
             private void SetupGettingDataForSpecificPolicy<T>(
                 Dto.Datum[] existingDatum,
                 DateTime firstTimestamp,
