@@ -316,7 +316,7 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
-            public void WhenSettingDatumWithNotExistingData_ThenThrowingBadDateFormatForSignalException()
+            public void WhenSettingDatumWithNotExistingData_ForMonthSignal_ThenThrowingBadDateFormatForSignalException()
             {
                 int result;
 
