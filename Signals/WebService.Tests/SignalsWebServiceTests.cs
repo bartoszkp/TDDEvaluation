@@ -443,6 +443,35 @@ namespace WebService.Tests
                 else signalsWebService.SetData(1, existingDatum);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
+            public void WhenSettingDatumWithNotExistingData_ForHourSignal_ThenThrowingBadDateFormatForSignalException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Hour,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 6, 0, 0), Value = (int)1 },
+                };
+
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                SetupSettingData<int>(existingSignal, existingDatum);
+
+                if (existingSignal.Granularity == Granularity.Day && TimestampMinute == 0 && TimestampSecond == 0)
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else signalsWebService.SetData(1, existingDatum);
+            }
+
             private void SetupSettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
