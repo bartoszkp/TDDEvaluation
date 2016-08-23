@@ -963,6 +963,87 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            public void SpecificValuePolicyIsSet_WhenGettingData_CorrectlyFillsMissingData()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 30 },
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 35 },
+                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 40, }
+                };
+
+                var specificPolicy = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger();
+                specificPolicy.Quality = Quality.Fair;
+                specificPolicy.Value = 50;
+
+                SetupGettingDataForSpecificPolicy<int>(existingSignal, existingDatum, specificPolicy,
+                    new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
+                var dateTime = new DateTime(2000, 1, 1);
+
+                int index = 0;
+                foreach (var item in result)
+                {
+                    if (dateTime.Month == 1 || dateTime.Month == 3 || dateTime.Month == 5)
+                    {
+                        Assert.AreEqual(existingDatum[index].Quality, item.Quality);
+                        Assert.AreEqual(existingDatum[index].Timestamp, item.Timestamp);
+                        Assert.AreEqual(existingDatum[index].Value, item.Value);
+
+                        index++;
+                    }
+                    else
+                    {
+                        Assert.AreEqual(Dto.Quality.Fair, item.Quality);
+                        Assert.AreEqual(50, item.Value);
+                        Assert.AreEqual(dateTime, item.Timestamp);
+                    }
+
+                    dateTime = dateTime.AddMonths(1);
+                }
+            }
+
+            private void SetupGettingDataForSpecificPolicy<T>(
+                Signal existingSignal,
+                Dto.Datum[] existingDatum,
+                Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T> genericInstance,
+                DateTime firstTimestamp,
+                DateTime lastTimestamp)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<T>(
+                        existingSignal,
+                        firstTimestamp,
+                        lastTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<T>>>());
+
+                GivenASignal(existingSignal);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(genericInstance);
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+            }
+
             private void SetupMocksGetPath(IEnumerable<Signal> domainSignalsToReturn)
             {
                 SetupWebService();
