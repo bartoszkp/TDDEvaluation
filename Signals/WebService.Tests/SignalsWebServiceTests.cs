@@ -430,6 +430,28 @@ namespace WebService.Tests
                     (d => d.First().Signal == newSignal)));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void SetDataWithIncorrectTimestampsShouldThrowsException()
+            {
+                GiveNoSignalData();
+                int signalId = 465;
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(new Signal()
+                    {
+                        Id = signalId,
+                        DataType = DataType.Boolean,
+                        Granularity = Granularity.Minute,
+                        Path = Path.FromString("sfdsfd/sfdad")
+                    });
+
+                signalsWebService.SetData(signalId, new Dto.Datum[]
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2132, 8, 21, 14, 58, 45), Value= false }
+                });
+            }
+
             #endregion
 
 
