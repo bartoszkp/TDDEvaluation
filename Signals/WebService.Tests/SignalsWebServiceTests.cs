@@ -966,13 +966,6 @@ namespace WebService.Tests
             [TestMethod]
             public void SpecificValuePolicyIsSet_WhenGettingData_CorrectlyFillsMissingData()
             {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1,
-                    DataType = DataType.Integer,
-                    Granularity = Granularity.Month,
-                    Path = Domain.Path.FromString("example/path"),
-                };
                 var existingDatum = new Dto.Datum[]
                 {
                     new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 30 },
@@ -980,12 +973,7 @@ namespace WebService.Tests
                     new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 40, }
                 };
 
-                var specificPolicy = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger();
-                specificPolicy.Quality = Quality.Fair;
-                specificPolicy.Value = 50;
-
-                SetupGettingDataForSpecificPolicy<int>(existingSignal, existingDatum, specificPolicy,
-                    new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
+                SetupGettingDataForSpecificPolicy<int>(existingDatum, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
 
                 var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
                 var dateTime = new DateTime(2000, 1, 1);
@@ -1013,12 +1001,21 @@ namespace WebService.Tests
             }
 
             private void SetupGettingDataForSpecificPolicy<T>(
-                Signal existingSignal,
                 Dto.Datum[] existingDatum,
-                Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T> genericInstance,
                 DateTime firstTimestamp,
                 DateTime lastTimestamp)
             {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var genericInstance = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger();
+                genericInstance.Quality = Quality.Fair;
+                genericInstance.Value = 50;
+
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
                 signalsDataRepositoryMock

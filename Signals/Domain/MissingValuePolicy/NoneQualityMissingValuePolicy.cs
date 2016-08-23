@@ -9,7 +9,6 @@ namespace Domain.MissingValuePolicy
     {
         public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-
             var timestampBegin = fromIncludedUtc;
             var timestampEnd = toExcludedUtc;
             var dateTimeComaparator = DateTime.Compare(timestampBegin, timestampEnd);
