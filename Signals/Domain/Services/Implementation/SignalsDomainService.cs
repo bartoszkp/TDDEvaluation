@@ -93,6 +93,11 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new NoSuchSignalException();
 
+            if (!VeryfiTimeStamp(signal.Granularity, fromIncludedUtc))
+                throw new InvalidOperationException("Timestamp error :" + fromIncludedUtc + " dosen't match for " + signal.Granularity);
+
+
+
             var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
             var sortedDatums = data?.OrderBy(datum => datum.Timestamp).ToList();
 
@@ -117,6 +122,13 @@ namespace Domain.Services.Implementation
             Signal signal = GetById(signalId);
             if (signal == null)
                 throw new NoSuchSignalException();
+
+            foreach(var item in dataDomain)
+            {
+                if (!VeryfiTimeStamp(signal.Granularity, item.Timestamp))
+                    throw new InvalidOperationException("Timestamp error :" + item.Timestamp + " dosen't match for " + signal.Granularity);
+            }
+
 
             var datums = new Datum<T>[dataDomain.Count()];
             int i = 0;
@@ -175,6 +187,65 @@ namespace Domain.Services.Implementation
             return subPaths;
         }
 
+        private bool VeryfiTimeStamp(Granularity granularity, DateTime timeStamp)
+        {
+            switch(granularity)
+            {
+                case Granularity.Day:
+                    {
+                        if (timeStamp.Hour == 0 && timeStamp.Minute == 0
+                            && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Hour:
+                    {
+                        if (timeStamp.Minute == 0 && timeStamp.Second == 0 
+                            && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Minute:
+                    {
+                        if (timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Month:
+                    {
+                        if (timeStamp.Day == 1 && timeStamp.Hour == 0 && timeStamp.Minute == 0
+                            && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Second:
+                    {
+                        if (timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Week:
+                    {
+                        if (timeStamp.DayOfWeek == DayOfWeek.Monday && timeStamp.Hour == 0 && timeStamp.Minute == 0
+                             && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                            break;
+                    }
+                case Granularity.Year:
+                    {
+                        if(timeStamp.DayOfYear == 1 && timeStamp.Hour == 0 && timeStamp.Minute == 0
+                             && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
+            }
+
+            return false;
+        }
 
 
     }
