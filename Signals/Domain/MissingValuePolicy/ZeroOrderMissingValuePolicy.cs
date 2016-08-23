@@ -10,18 +10,20 @@ namespace Domain.MissingValuePolicy
         public override Datum<T> GetMissingDatum(IEnumerable<Datum<T>> data, DateTime dt)
         {
             var datum = data.Where(d => d.Timestamp < dt).LastOrDefault();
+            var quality = Quality.None;
+            var value = default(T);
 
             if (datum != null)
             {
-                datum.Timestamp = dt;
-                return datum;
+                quality = datum.Quality;
+                value = datum.Value;
             }
 
             return new Datum<T>()
             {
-                Quality = Quality.None,
+                Quality = quality,
                 Timestamp = dt,
-                Value = default(T)
+                Value = value
             };
         }
     }
