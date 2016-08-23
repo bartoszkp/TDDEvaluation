@@ -528,6 +528,126 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.None, result.First().Quality); //When no previous value, default is applied
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestampSeconds_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Second,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(1, new[] { new Dto.Datum { Timestamp = new DateTime(2000, 1, 1, 0, 0, 0, 1) } });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestampMinutes_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Minute,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(1, new[] { new Dto.Datum { Timestamp = new DateTime(2000, 1, 1, 0, 0, 1, 0) } });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestampHours_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Hour,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(1, new[] { new Dto.Datum { Timestamp = new DateTime(2000, 1, 1, 0, 1, 0, 0) } });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestampDays_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Day,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(1, new[] { new Dto.Datum { Timestamp = new DateTime(2000, 1, 1, 1, 0, 0, 0) } });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestampWeeks_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Week,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(1, new[] { new Dto.Datum { Timestamp = new DateTime(2016, 8, 23) } });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestampMonths_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Month,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(1, new[] { new Dto.Datum { Timestamp = new DateTime(2000, 1, 2) } });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenSettingDataWithIncorrectTimestampYears_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Year,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.SetData(1, new[] { new Dto.Datum { Timestamp = new DateTime(2000, 2, 1) } });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.TimestampIncorrectException))]
+            public void GivenASignal_WhenGettingDataWithIncorrectFromIncluded_ThrowsException()
+            {
+                var dummySignal = new Signal
+                {
+                    Id = 1,
+                    Granularity = Granularity.Month,
+                    DataType = DataType.Boolean
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 1, 0), new DateTime(2000, 2, 1));
+            }
+
             private void SetupDataRepository<T>()
             {
                 signalsDataRepositoryMock
