@@ -20,6 +20,6 @@ namespace Domain.Services
 
         Signal GetByPath(Path domainPath);
 
-        IEnumerable<Signal> GetAllWithPathPrefix(Path prefix);
+        PathEntry GetAllWithPathPrefix(Path prefix);
     }
 }

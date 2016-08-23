@@ -163,10 +163,29 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicyBase;
         }
 
-        public IEnumerable<Signal> GetAllWithPathPrefix(Path prefix)
+        public PathEntry GetAllWithPathPrefix(Path prefix)
         {
-            return signalsRepository.GetAllWithPathPrefix(prefix);
+            var signals = signalsRepository.GetAllWithPathPrefix(prefix);
+            var signalList = new List<Signal>();
+            var subPathList = new List<Path>();
+            var prefixCnt = prefix.Components.Count();
 
+            foreach(var signal in signals)
+            {
+                var signalCnt = signal.Path.Components.Count();
+
+                if (signalCnt == prefixCnt + 1)
+                    signalList.Add(signal);
+                else if (signalCnt > prefixCnt)
+                    subPathList.Add(CreatePath(signal.Path.Components.Take(prefixCnt + 1)));
+            }
+
+            return new PathEntry(signalList, subPathList.Distinct()); 
+        }
+
+        private Path CreatePath(IEnumerable<string> components)
+        {
+            return Path.FromString(Path.JoinComponents(components));
         }
 
         private void CheckTimestamp(DateTime dt, Granularity granularity)
