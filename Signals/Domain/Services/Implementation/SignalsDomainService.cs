@@ -161,6 +161,7 @@ namespace Domain.Services.Implementation
             var TimestampHour = data.ToList().ElementAt(0).Timestamp.Hour;
             var TimestampMinute = data.ToList().ElementAt(0).Timestamp.Minute;
             var TimestampSecond = data.ToList().ElementAt(0).Timestamp.Second;
+            var TimestampMilisecond = data.ToList().ElementAt(0).Timestamp.Millisecond;
 
             if (data == null)
                 throw new ArgumentNullException("Attempted to set null data for a signal");
@@ -191,7 +192,11 @@ namespace Domain.Services.Implementation
             {
                 throw new Domain.Exceptions.BadDateFormatForSignalException();
             }
-            else if (signal.Granularity == Granularity.Hour && TimestampSecond == 0)
+            else if (signal.Granularity == Granularity.Minute && TimestampSecond == 0)
+            {
+                throw new Domain.Exceptions.BadDateFormatForSignalException();
+            }
+            else if (signal.Granularity == Granularity.Second && TimestampSecond == 0)
             {
                 throw new Domain.Exceptions.BadDateFormatForSignalException();
             }
