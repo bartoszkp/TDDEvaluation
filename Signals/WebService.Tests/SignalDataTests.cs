@@ -101,6 +101,7 @@ namespace WebService.Tests
 
 
         [TestMethod]
+        [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
         public void SignalExists_SetSignalData_WithNonNullData()
         {
             var returnedSignal = new Signal() { Id = 1, DataType = DataType.Integer };
@@ -120,8 +121,6 @@ namespace WebService.Tests
 
             signalsWebService.SetData(1, dtoSignalData);
             signalsDataRepoMock.Verify(sr => sr.SetData(It.IsAny<IEnumerable<Datum<int>>>()), Times.Once);
-
-
         }
 
 

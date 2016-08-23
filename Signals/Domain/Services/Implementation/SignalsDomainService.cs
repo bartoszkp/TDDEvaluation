@@ -156,12 +156,22 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> data, Signal signal)
         {
+            var TimestampDay = data.ToList().ElementAt(0).Timestamp.Day;
+            var TimestampHour = data.ToList().ElementAt(0).Timestamp.Hour;
+            var TimestampMinute = data.ToList().ElementAt(0).Timestamp.Minute;
+            var TimestampSecond = data.ToList().ElementAt(0).Timestamp.Second;
+
             if (data == null)
                 throw new ArgumentNullException("Attempted to set null data for a signal");
 
             SetSignalForDatumCollection(data, signal);
 
-            signalsDataRepository.SetData(data);
+            if (signal.Granularity == Granularity.Month && TimestampDay == 1 && TimestampHour == 12
+                    && TimestampMinute == 0 && TimestampSecond == 0)
+            {
+                signalsDataRepository.SetData(data);
+            }
+            else throw new Domain.Exceptions.BadDateFormatForSignalException();
         }
 
         private void SetSignalForDatumCollection<T>(IEnumerable<Domain.Datum<T>> data, Signal signal)
