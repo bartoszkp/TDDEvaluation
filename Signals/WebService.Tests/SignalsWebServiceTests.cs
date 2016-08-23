@@ -316,38 +316,6 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
-            public void WhenSettingDatumWithNotExistingData_ForMonthSignal_ThenThrowingBadDateFormatForSignalException()
-            {
-                var existingSignal = new Domain.Signal()
-                {
-                    Id = 1,
-                    DataType = Domain.DataType.Integer,
-                    Granularity = Domain.Granularity.Month,
-                    Path = Domain.Path.FromString("root/signal1")
-                };
-
-                var existingDatum = new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1, 12, 45, 0), Value = (int)1 },
-                };
-
-                var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
-                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
-                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
-                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
-
-                SetupSettingData<int>(existingSignal, existingDatum);
-
-                if (existingSignal.Granularity == Granularity.Month && (TimestampDay > 1 || TimestampHour > 0
-                    || TimestampMinute > 0 || TimestampSecond > 0))
-                {
-                    throw new Domain.Exceptions.BadDateFormatForSignalException();
-                }
-                else signalsWebService.SetData(1, existingDatum);
-            }
-
-            [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
             public void WhenSettingDatumWithNotExistingData_ForYearSignal_ThenThrowingBadDateFormatForSignalException()
             {
                 var existingSignal = new Domain.Signal()
@@ -360,23 +328,54 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 3, 1, 12, 34, 31), Value = (int)1 },
                 };
-
-                var TimestampMonth = existingDatum.ToList().ElementAt(0).Timestamp.Month;
-                var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
-                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
-                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
-                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
 
                 SetupSettingData<int>(existingSignal, existingDatum);
 
-                if (existingSignal.Granularity == Granularity.Year && (TimestampMonth == 1 && TimestampDay == 1 && TimestampHour == 0
-                    && TimestampMinute == 0 && TimestampSecond == 0))
+                var compareResult = TimestampCorrectCheckerForYear(existingDatum, existingSignal);
+
+                if (compareResult == "Year signal with bad month" || compareResult == "Year signal with bad day" || compareResult == "Year signal with bad hour" 
+                    || compareResult == "Year signal with bad minute" || compareResult == "Year signal with bad second")
                 {
                     throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
-                else signalsWebService.SetData(1, existingDatum);
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
+            public void WhenSettingDatumWithNotExistingData_ForMonthSignal_ThenThrowingBadDateFormatForSignalException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1, 0, 0, 13), Value = (int)1 },
+                };
+
+                SetupSettingData<int>(existingSignal, existingDatum);
+
+                var compareResult = TimestampCorrectCheckerForMonth(existingDatum, existingSignal);
+
+                if (compareResult == "Month signal with bad day" || compareResult == "Month signal with bad hour"
+                    || compareResult == "Month signal with bad minute" || compareResult == "Month signal with bad second")
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
             }
 
             [TestMethod]
@@ -393,23 +392,23 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 1, 0, 0, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000,4,(int)System.DayOfWeek.Thursday, 12, 34, 12), Value = (int)1 },
                 };
-
-
-                var TimestampDayOfWeek = existingDatum.ToList().ElementAt(0).Timestamp.Day;
-                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
-                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
-                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
 
                 SetupSettingData<int>(existingSignal, existingDatum);
 
-                if (existingSignal.Granularity == Granularity.Week && (TimestampDayOfWeek == 1 && TimestampHour == 0
-                    && TimestampMinute == 0 && TimestampSecond == 0))
+                var compareResult = TimestampCorrectCheckerForWeek(existingDatum, existingSignal);
+
+                if (compareResult == "Week signal with bad day" || compareResult == "Week signal with bad hour"
+                    || compareResult == "Week signal with bad minute" || compareResult == "Week signal with bad second")
                 {
                     throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
-                else signalsWebService.SetData(1, existingDatum);
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
+                
             }
 
             [TestMethod]
@@ -426,21 +425,23 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 0, 0, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 3, 23, 0, 23, 12), Value = (int)1 },
                 };
-
-                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
-                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
-                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
 
                 SetupSettingData<int>(existingSignal, existingDatum);
 
-                if (existingSignal.Granularity == Granularity.Day && (TimestampHour == 0
-                    && TimestampMinute == 0 && TimestampSecond == 0))
+
+                var compareResult = TimestampCorrectCheckerForDay(existingDatum, existingSignal);
+
+                if (compareResult == "Day signal with bad hour" || compareResult == "Day signal with bad minute" 
+                    || compareResult == "Day signal with bad second")
                 {
                     throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
-                else signalsWebService.SetData(1, existingDatum);
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
             }
 
             [TestMethod]
@@ -457,19 +458,23 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 6, 0, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 11, 24, 7, 0, 14), Value = (int)1 },
                 };
-
-                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
-                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
 
                 SetupSettingData<int>(existingSignal, existingDatum);
 
-                if (existingSignal.Granularity == Granularity.Day && TimestampMinute == 0 && TimestampSecond == 0)
+
+                var compareResult = TimestampCorrectCheckerForHour(existingDatum, existingSignal);
+
+                if (compareResult == "Hour signal with bad minute" || compareResult == "Hour signal with bad second")
                 {
                     throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
-                else signalsWebService.SetData(1, existingDatum);
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
+
             }
 
             [TestMethod]
@@ -489,15 +494,18 @@ namespace WebService.Tests
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 6, 25, 0), Value = (int)1 },
                 };
 
-                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
-
                 SetupSettingData<int>(existingSignal, existingDatum);
 
-                if (existingSignal.Granularity == Granularity.Day && TimestampSecond == 0)
+                var compareResult = TimestampCorrectCheckerForMinute(existingDatum, existingSignal);
+
+                if (compareResult == "Minute signal with bad second" || compareResult == "Minute signal with bad milisecond")
                 {
                     throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
-                else signalsWebService.SetData(1, existingDatum);
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
             }
 
             [TestMethod]
@@ -514,18 +522,22 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 6, 25, 56, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 6, 25, 56, 13), Value = (int)1 },
                 };
-
-                var TimestampMilisecond = existingDatum.ToList().ElementAt(0).Timestamp.Millisecond;
 
                 SetupSettingData<int>(existingSignal, existingDatum);
 
-                if (existingSignal.Granularity == Granularity.Day && TimestampMilisecond == 0)
+                var compareResult = TimestampCorrectCheckerForSecond(existingDatum, existingSignal);
+
+                if (compareResult == "Second signal with bad milisecond")
                 {
                     throw new Domain.Exceptions.BadDateFormatForSignalException();
                 }
-                else signalsWebService.SetData(1, existingDatum);
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.SetData(1, existingDatum);
+                }
+
             }
 
             private void SetupSettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
@@ -613,6 +625,168 @@ namespace WebService.Tests
                     .Setup(sr => sr.Get(It.IsAny<int>()))
                     .Returns(signal);
                 return signal;
+            }
+
+            private string TimestampCorrectCheckerForMonth(Dto.Datum[] existingDatum, Domain.Signal existingSignal)
+            {
+                var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
+                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                if (existingSignal.Granularity == Granularity.Month && TimestampDay != 1 && TimestampHour >= 0
+                    && TimestampMinute >= 0 && TimestampSecond >= 0)
+                {
+                    return "Month signal with bad day";
+                }
+                else if (existingSignal.Granularity == Granularity.Month && TimestampDay == 1 && TimestampHour != 0
+                    && TimestampMinute >= 0 && TimestampSecond >= 0)
+                {
+                    return "Month signal with bad hour";
+                }
+                else if (existingSignal.Granularity == Granularity.Month && TimestampDay == 1 && TimestampHour == 0
+                    && TimestampMinute != 0 && TimestampSecond >= 0)
+                {
+                    return "Month signal with bad minute";
+                }
+                else if (existingSignal.Granularity == Granularity.Month && TimestampDay == 1 && TimestampHour == 0
+                    && TimestampMinute == 0 && TimestampSecond != 0)
+                {
+                    return "Month signal with bad second";
+                }
+                else return "Correct data";
+            }
+
+            private string TimestampCorrectCheckerForYear(Dto.Datum[] existingDatum, Domain.Signal existingSignal)
+            {
+                var TimestampMonth = existingDatum.ToList().ElementAt(0).Timestamp.Month;
+                var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
+                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                if (existingSignal.Granularity == Granularity.Year && TimestampMonth != 1 && TimestampDay >= 1 && TimestampHour >= 0
+                    && TimestampMinute >= 0 && TimestampSecond >= 0)
+                {
+                    return "Year signal with bad month";
+                }
+                else if (existingSignal.Granularity == Granularity.Year && TimestampMonth == 1 && TimestampDay != 1 && TimestampHour >= 0
+                    && TimestampMinute >= 0 && TimestampSecond >= 0)
+                {
+                    return "Year signal with bad day";
+                }
+                else if (existingSignal.Granularity == Granularity.Year && TimestampMonth == 1 && TimestampDay == 1 && TimestampHour != 0
+                    && TimestampMinute != 0 && TimestampSecond >= 0)
+                {
+                    return "Year signal with bad hour";
+                }
+                else if (existingSignal.Granularity == Granularity.Year && TimestampMonth != 1 && TimestampDay == 1 && TimestampHour == 0
+                    && TimestampMinute != 0 && TimestampSecond >= 0)
+                {
+                    return "Year signal with bad minute";
+                }
+                else if (existingSignal.Granularity == Granularity.Year && TimestampMonth != 1 && TimestampDay == 1 && TimestampHour == 0
+                    && TimestampMinute == 0 && TimestampSecond != 0)
+                {
+                    return "Year signal with bad second";
+                }
+                else return "Correct data";
+            }
+
+            private string TimestampCorrectCheckerForWeek(Dto.Datum[] existingDatum, Domain.Signal existingSignal)
+            {
+                var TimestampDayOfTheWeek = existingDatum.ToList().ElementAt(0).Timestamp.DayOfWeek;
+                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                if (existingSignal.Granularity == Granularity.Week && TimestampDayOfTheWeek != System.DayOfWeek.Monday && TimestampHour >= 0
+                    && TimestampMinute >= 0 && TimestampSecond >= 0)
+                {
+                    return "Week signal with bad day";
+                }
+                else if (existingSignal.Granularity == Granularity.Week && TimestampDayOfTheWeek == System.DayOfWeek.Monday && TimestampHour != 0
+                    && TimestampMinute >= 0 && TimestampSecond >= 0)
+                {
+                    return "Week signal with bad hour";
+                }
+                else if (existingSignal.Granularity == Granularity.Week && TimestampDayOfTheWeek != System.DayOfWeek.Monday && TimestampHour == 0
+                    && TimestampMinute != 0 && TimestampSecond >= 0)
+                {
+                    return "Week signal with bad minute";
+                }
+                else if (existingSignal.Granularity == Granularity.Week && TimestampDayOfTheWeek != System.DayOfWeek.Monday && TimestampHour == 0
+                    && TimestampMinute == 0 && TimestampSecond != 0)
+                {
+                    return "Week signal with bad second";
+                }
+                else return "Correct data";
+            }
+
+            private string TimestampCorrectCheckerForDay(Dto.Datum[] existingDatum, Domain.Signal existingSignal)
+            {
+                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                if (existingSignal.Granularity == Granularity.Day && TimestampHour != 0 && TimestampMinute >= 0 && TimestampSecond >= 0)
+                {
+                    return "Day signal with bad hour";
+                }
+                else if (existingSignal.Granularity == Granularity.Day && TimestampHour == 0
+                    && TimestampMinute != 0 && TimestampSecond >= 0)
+                {
+                    return "Day signal with bad minute";
+                }
+                else if (existingSignal.Granularity == Granularity.Day && TimestampHour == 0
+                    && TimestampMinute == 0 && TimestampSecond != 0)
+                {
+                    return "Day signal with bad second";
+                }
+                else return "Correct data";
+            }
+
+            private string TimestampCorrectCheckerForHour(Dto.Datum[] existingDatum, Domain.Signal existingSignal)
+            {
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                if (existingSignal.Granularity == Granularity.Hour && TimestampMinute != 0 && TimestampSecond >= 0)
+                {
+                    return "Hour signal with bad minute";
+                }
+                else if (existingSignal.Granularity == Granularity.Hour && TimestampMinute == 0 && TimestampSecond != 0)
+                {
+                    return "Hour signal with bad second";
+                }
+                else return "Correct data";
+            }
+
+            private string TimestampCorrectCheckerForMinute(Dto.Datum[] existingDatum, Domain.Signal existingSignal)
+            {
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+                var TimestampMilisecond = existingDatum.ToList().ElementAt(0).Timestamp.Millisecond;
+
+                if (existingSignal.Granularity == Granularity.Minute && TimestampSecond != 0)
+                {
+                    return "Minute signal with bad second";
+                }
+                else if (existingSignal.Granularity == Granularity.Minute && TimestampSecond == 0 && TimestampMilisecond != 0)
+                {
+                    return "Minute signal with bad milisecond";
+                }
+                else return "Correct data";
+            }
+
+            private string TimestampCorrectCheckerForSecond(Dto.Datum[] existingDatum, Domain.Signal existingSignal)
+            {
+                var TimestampMilisecond = existingDatum.ToList().ElementAt(0).Timestamp.Millisecond;
+
+                if (existingSignal.Granularity == Granularity.Second && TimestampMilisecond != 0)
+                {
+                    return "Second signal with bad milisecond";
+                }
+                else return "Correct data";
             }
 
             private Mock<ISignalsRepository> signalsRepositoryMock;

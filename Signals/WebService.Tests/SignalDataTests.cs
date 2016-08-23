@@ -99,30 +99,6 @@ namespace WebService.Tests
             signalsWebService.SetData(1, null);
         }
 
-
-        [TestMethod]
-        public void SignalExists_SetSignalData_WithNonNullData()
-        {
-            var returnedSignal = new Signal() { Id = 1, DataType = DataType.Integer };
-            SetupWebService(returnedSignal);
-
-            IEnumerable<Dto.Datum> dtoSignalData = new[] { new Dto.Datum() { Quality = Dto.Quality.Fair,
-                                                                 Timestamp = new DateTime(2000, 1, 1),
-                                                                 Value = 1 },
-
-                                                           new Dto.Datum() { Quality = Dto.Quality.Good,
-                                                                 Timestamp = new DateTime(2000, 2, 1),
-                                                                 Value = 1 },
-
-                                                           new Dto.Datum() { Quality = Dto.Quality.Poor,
-                                                                 Timestamp = new DateTime(2000, 3, 1),
-                                                                 Value = 2 } };
-
-            signalsWebService.SetData(1, dtoSignalData);
-            signalsDataRepoMock.Verify(sr => sr.SetData(It.IsAny<IEnumerable<Datum<int>>>()), Times.Once);
-        }
-
-
         [TestMethod]
         public void WhenGettingSignalData_ReturnsItSortedByDate()
         {
