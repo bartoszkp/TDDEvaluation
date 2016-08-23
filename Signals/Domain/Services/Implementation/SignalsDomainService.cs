@@ -156,6 +156,7 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> data, Signal signal)
         {
+            var TimestampMonth = data.ToList().ElementAt(0).Timestamp.Month;
             var TimestampDay = data.ToList().ElementAt(0).Timestamp.Day;
             var TimestampHour = data.ToList().ElementAt(0).Timestamp.Hour;
             var TimestampMinute = data.ToList().ElementAt(0).Timestamp.Minute;
@@ -168,6 +169,11 @@ namespace Domain.Services.Implementation
 
             if (signal.Granularity == Granularity.Month && (TimestampDay > 1 || TimestampHour > 0
                     || TimestampMinute > 0 || TimestampSecond > 0))
+            {
+                throw new Domain.Exceptions.BadDateFormatForSignalException();
+            }
+            else if (signal.Granularity == Granularity.Year && (TimestampMonth == 1 && TimestampDay == 1
+                && TimestampHour == 0 && TimestampMinute == 0 && TimestampSecond == 0))
             {
                 throw new Domain.Exceptions.BadDateFormatForSignalException();
             }
