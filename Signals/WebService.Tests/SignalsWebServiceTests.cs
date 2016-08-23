@@ -354,6 +354,47 @@ namespace WebService.Tests
                 else signalsWebService.SetData(1, existingDatum);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
+            public void WhenSettingDatumWithNotExistingData_ForYearSignal_ThenThrowingBadDateFormatForSignalException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Year,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
+                };
+
+                var TimestampMonth = existingDatum.ToList().ElementAt(0).Timestamp.Month;
+                var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
+                var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+                var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+                var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
+
+                GivenASignal(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                if (existingSignal.Granularity == Granularity.Year && (TimestampMonth == 1 && TimestampDay == 1 && TimestampHour == 0
+                    && TimestampMinute == 0 && TimestampSecond == 0))
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else signalsWebService.SetData(1, existingDatum);
+            }
+
             private void SetupWebServiceForMvpOperations()
             {
                 missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
