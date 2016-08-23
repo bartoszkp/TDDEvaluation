@@ -143,6 +143,9 @@ namespace Domain.Services.Implementation
             int i = 0;
             foreach (var d in datum)
             {
+                if (!dateIsValid(signal.Granularity, d.Timestamp))
+                    throw new ArgumentException("Date: " + d.Timestamp.ToString() + "is invalid");
+
                 datumWithSignal[i++] = new Datum<T>()
                 {
                     Quality = d.Quality,
