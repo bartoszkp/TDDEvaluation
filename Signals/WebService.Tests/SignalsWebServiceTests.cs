@@ -548,6 +548,7 @@ namespace WebService.Tests
                 signalsWebService.GetData(1, new DateTime(2016, 8, 23, 0, 0, 0,0), new DateTime(2016, 8, 22, 0, 0, 0));
             }
 
+
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GetData_PassInCorrectTimestampForMinute_ThrowException()

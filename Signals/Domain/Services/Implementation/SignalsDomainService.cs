@@ -337,11 +337,11 @@ namespace Domain.Services.Implementation
                     return true;
 
                 case Granularity.Minute:
-                    if (timestamp.Second != 0) return false;
+                    if (timestamp.Second != 0 || timestamp.Millisecond !=0) return false;
                     return true;
 
                 case Granularity.Hour:
-                    if (timestamp.Minute != 0) return false;
+                    if (timestamp.Minute != 0 || timestamp.Second !=0 || timestamp.Millisecond != 0) return false;
                     return true;
 
                 case Granularity.Day:
