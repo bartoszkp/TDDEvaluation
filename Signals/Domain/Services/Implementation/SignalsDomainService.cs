@@ -139,7 +139,7 @@ namespace Domain.Services.Implementation
             if (data == null)
                 return null;
 
-            if (data.Count() == 0)
+            if (data.Count() == 0 || data.First().Timestamp != fromIncludedUTC)
             {
                 List<Datum<T>> dataToFill = data.ToList();
                 dataToFill.Add(new Datum<T>()
@@ -151,7 +151,7 @@ namespace Domain.Services.Implementation
                     Value = default(T),
                 });
 
-                data = dataToFill.ToArray();
+                data = dataToFill.OrderBy(s => s.Timestamp).ToArray();
             }
 
             if (fromIncludedUTC == toExcludedUTC)
