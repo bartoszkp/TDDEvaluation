@@ -747,7 +747,35 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 15, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
             }
 
+            [TestMethod]
+            public void GivenASignal_HavingZeroOrderMVPAdded_GetData_ReturnsProperData()
+            {
+                int signalId = 1;
 
+                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
+
+                GivenASignal(someSignal);
+
+                GivenData(signalId, new[]
+               {
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1,0,0,0), Value = 1.0},
+                    new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2000,3,1,0,0,0), Value = 5.0}
+                });
+
+                mvpRepositoryMock
+                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(new ZeroOrderMissingValuePolicyDouble());
+
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
+
+                Assert.AreEqual(3, result.Count());
+                Assert.AreEqual(result.ElementAt(1).Quality, Quality.Fair);
+                Assert.AreEqual(result.ElementAt(3).Value, 5.0);
+            }
 
 
 
