@@ -622,7 +622,7 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException))]
-            public void WhenGettingDatumWithIncorrectData_ForMonthSignal_ThenThrowingQuerryAboutDateWithIncorrectFormatException()
+            public void WhenGettingDatumWithIncorrectData_ForWeekSignal_ThenThrowingQuerryAboutDateWithIncorrectFormatException()
             {
                 var existingSignal = new Domain.Signal()
                 {
@@ -633,9 +633,9 @@ namespace WebService.Tests
                 };
 
                 var existingDatum = new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 2, 3, 14, 25, 56, 0), Value = (int)1 },
-                };
+                 {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000,4,(int)System.DayOfWeek.Thursday, 12, 34, 12), Value = (int)1 },
+                 };
 
                 var firstTimestamp = existingDatum.ElementAt(0).Timestamp;
 
@@ -645,9 +645,10 @@ namespace WebService.Tests
                     new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger(),
                     firstTimestamp);
 
-                var compareResult = TimestampCorrectCheckerForMonth(existingDatum, existingSignal);
+                var compareResult = TimestampCorrectCheckerForWeek(existingDatum, existingSignal);
 
-                if (compareResult == "Year signal with bad month")
+                if (compareResult == "Week signal with bad day" || compareResult == "Week signal with bad hour"
+                     || compareResult == "Week signal with bad minute" || compareResult == "Week signal with bad second")
                 {
                     throw new Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException();
                 }
