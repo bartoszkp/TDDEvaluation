@@ -568,7 +568,10 @@ namespace WebService.Tests
 
                 var compareResult = TimestampCorrectCheckerForYear(existingDatum, existingSignal);
 
-                if (compareResult == "Year signal with bad month")
+                if (compareResult == "Year signal with bad month" || compareResult == "Year signal with bad day" 
+                    || compareResult == "Year signal with bad hour"
+                    || compareResult == "Year signal with bad minute" 
+                    || compareResult == "Year signal with bad second")
                 {
                     throw new Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException();
                 }
@@ -592,7 +595,7 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 2, 3, 14, 25, 56, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 11, 1, 13, 25, 56), Value = (int)1 },
                 };
 
                 var firstTimestamp = existingDatum.ElementAt(0).Timestamp;
@@ -605,7 +608,9 @@ namespace WebService.Tests
 
                 var compareResult = TimestampCorrectCheckerForMonth(existingDatum, existingSignal);
 
-                if (compareResult == "Year signal with bad month")
+                if (compareResult == "Month signal with bad day" || compareResult == "Month signal with bad hour"
+                    || compareResult == "Month signal with bad minute" 
+                    || compareResult == "Month signal with bad second")
                 {
                     throw new Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException();
                 }
