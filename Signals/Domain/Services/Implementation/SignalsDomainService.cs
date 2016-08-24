@@ -133,7 +133,11 @@ namespace Domain.Services.Implementation
             {
                 throw new QuerryAboutDateWithIncorrectFormatException();
             }
-
+            else if (signal.Granularity == Granularity.Minute && fromIncludedUtc.Second != 0 && fromIncludedUtc.Millisecond >= 0
+                || fromIncludedUtc.Second == 0 && fromIncludedUtc.Millisecond !=0)
+            {
+                throw new QuerryAboutDateWithIncorrectFormatException();
+            }
 
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
 
