@@ -72,6 +72,7 @@
     <Compile Include="SignalsWebServiceTests\SetDataTests.cs" />
     <Compile Include="SignalsWebServiceTestsOld.cs" />
     <Compile Include="SignalsWebServiceTests\Infrastructure\Utils.cs" />
+    <Compile Include="SignalsWebServiceTests\SetMissingValuePolicyTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">
