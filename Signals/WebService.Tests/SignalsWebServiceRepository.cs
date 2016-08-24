@@ -7,7 +7,7 @@ using Domain.Repositories;
 using Domain.Services.Implementation;
 using Moq;
 
-namespace WebService.Tests.SignalsWebServiceTests
+namespace WebService.Tests
 {
     public abstract class SignalsWebServiceRepository
     {
@@ -27,7 +27,7 @@ namespace WebService.Tests.SignalsWebServiceTests
             signalsWebService = new SignalsWebService(signalsDomainService);
         }
 
-        protected abstract void Setup();
+        protected abstract void Setup(params object[] param);
 
         protected Mock<ISignalsRepository> signalsRepositoryMock;
         protected Mock<ISignalsDataRepository> signalsDataRepositoryMock;

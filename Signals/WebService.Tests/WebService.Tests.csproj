@@ -62,10 +62,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SignalsWebServiceTests\SignalsWebServiceRepository.cs" />
-    <Compile Include="SignalsWebServiceTests\SignalsWebServiceAddTests.cs" />
-    <Compile Include="SignalsWebServiceTests\SignalsWebServiceTestsOld.cs" />
-    <Compile Include="SignalsWebServiceTests\Utils.cs" />
+    <Compile Include="SignalsWebServiceGetByIdTests.cs" />
+    <Compile Include="SignalsWebServiceRepository.cs" />
+    <Compile Include="SignalsWebServiceAddTests.cs" />
+    <Compile Include="SignalsWebServiceTestsOld.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">

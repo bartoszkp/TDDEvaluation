@@ -12,7 +12,7 @@ using Dto.MissingValuePolicy;
 using Domain.MissingValuePolicy;
 using DataAccess.GenericInstantiations;
 
-namespace WebService.Tests.SignalsWebServiceTests
+namespace WebService.Tests
 {
     [TestClass]
     public class SignalsWebServiceTestsOld

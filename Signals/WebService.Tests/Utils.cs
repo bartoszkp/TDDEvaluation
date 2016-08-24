@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Moq;
 
-namespace WebService.Tests.SignalsWebServiceTests
+namespace WebService.Tests
 {
     public static class Utils
     {
@@ -16,6 +16,21 @@ namespace WebService.Tests.SignalsWebServiceTests
             Dto.Path path = null)
         {
             return new Dto.Signal()
+            {
+                Id = id,
+                DataType = dataType,
+                Granularity = granularity,
+                Path = path
+            };
+        }
+
+        public static Domain.Signal SignalWith(
+            int? id = null,
+            Domain.DataType dataType = Domain.DataType.Double,
+            Domain.Granularity granularity = Domain.Granularity.Month,
+            Domain.Path path = null)
+        {
+            return new Domain.Signal()
             {
                 Id = id,
                 DataType = dataType,

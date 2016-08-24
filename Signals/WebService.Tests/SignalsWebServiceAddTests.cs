@@ -3,7 +3,7 @@ using System.Linq;
 using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace WebService.Tests.SignalsWebServiceTests
+namespace WebService.Tests
 {
     [TestClass]
     public class SignalsWebServiceAddTests : SignalsWebServiceRepository
@@ -14,7 +14,7 @@ namespace WebService.Tests.SignalsWebServiceTests
         {
             Setup();
 
-            signalsWebService.Add(Utils.SignalWith(id: 1));
+            signalsWebService.Add(Utils.SignalWith(id: 1, dataType: Dto.DataType.Boolean));
         }
         
         [TestMethod]
@@ -47,8 +47,8 @@ namespace WebService.Tests.SignalsWebServiceTests
                     && passedSignal.Granularity == Domain.Granularity.Day
                     && passedSignal.Path.ToString() == "a")));
         }
-
-        protected override void Setup()
+        
+        protected override void Setup(params object[] param)
         {
             signalsRepositoryMock
                 .Setup(f => f.Add(It.IsAny<Domain.Signal>()))
