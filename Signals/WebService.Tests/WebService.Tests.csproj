@@ -68,6 +68,7 @@
     <Compile Include="SignalsWebServiceGetTests.cs" />
     <Compile Include="SignalsWebServiceRepository.cs" />
     <Compile Include="SignalsWebServiceAddTests.cs" />
+    <Compile Include="SignalsWebServiceSetDataTests.cs" />
     <Compile Include="SignalsWebServiceTestsOld.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
