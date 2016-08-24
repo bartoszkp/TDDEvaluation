@@ -734,6 +734,45 @@ namespace WebService.Tests
                 }
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException))]
+            public void WhenGettingDatumWithIncorrectData_ForMinuteSignal_ThenThrowingQuerryAboutDateWithIncorrectFormatException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Minute,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 11, 5, 13, 25, 13), Value = (int)1 },
+                };
+
+                var firstTimestamp = existingDatum.ElementAt(0).Timestamp;
+
+                SetupGettingData<int>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger(),
+                    firstTimestamp);
+
+                var compareResult = TimestampCorrectCheckerForMinute(existingDatum, existingSignal);
+
+                if (compareResult == "Minute signal with bad second" || compareResult == "Minute signal with bad milisecond")
+                {
+                    throw new Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException();
+                }
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.GetData(1, firstTimestamp, firstTimestamp);
+                }
+            }
+
+
+
             private void SetupSettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
