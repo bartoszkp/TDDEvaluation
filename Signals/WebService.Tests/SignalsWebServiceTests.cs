@@ -618,6 +618,43 @@ namespace WebService.Tests
                 {
                     signalsWebService.GetData(1, firstTimestamp, firstTimestamp);
                 }
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException))]
+            public void WhenGettingDatumWithIncorrectData_ForMonthSignal_ThenThrowingQuerryAboutDateWithIncorrectFormatException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 2, 3, 14, 25, 56, 0), Value = (int)1 },
+                };
+
+                var firstTimestamp = existingDatum.ElementAt(0).Timestamp;
+
+                SetupGettingData<int>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger(),
+                    firstTimestamp);
+
+                var compareResult = TimestampCorrectCheckerForMonth(existingDatum, existingSignal);
+
+                if (compareResult == "Year signal with bad month")
+                {
+                    throw new Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException();
+                }
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.GetData(1, firstTimestamp, firstTimestamp);
+                }
 
             }
 
