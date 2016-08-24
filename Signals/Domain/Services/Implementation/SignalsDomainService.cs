@@ -114,9 +114,17 @@ namespace Domain.Services.Implementation
             {
                 throw new QuerryAboutDateWithIncorrectFormatException();
             }
-            
-            
-                var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
+            else if (signal.Granularity == Granularity.Month && fromIncludedUtc.DayOfWeek != System.DayOfWeek.Monday && fromIncludedUtc.Hour >= 0
+                && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
+                && fromIncludedUtc.Hour != 0 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
+                && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
+                && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute == 0 && fromIncludedUtc.Second != 0)
+            {
+                throw new QuerryAboutDateWithIncorrectFormatException();
+            }
+
+
+            var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
 
                 if (result == null)
                     return null;

@@ -12,7 +12,7 @@ namespace ExampleSignalClient
             var signal1 = client.Add(new Signal()
             {
                 DataType = DataType.Integer,
-                Granularity = Granularity.Year,
+                Granularity = Granularity.Month,
                 Path = new Path() { Components = new[] { "root/s5" } }
             });
 
