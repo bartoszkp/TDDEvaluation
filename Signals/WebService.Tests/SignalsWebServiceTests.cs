@@ -8,6 +8,7 @@ using Moq;
 using Domain.Exceptions;
 using Domain.MissingValuePolicy;
 using System.Collections.Generic;
+using System;
 
 namespace WebService.Tests
 {
@@ -491,7 +492,7 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 6, 25, 0), Value = (int)1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 4, 5, 6, 25, 0, 13), Value = (int)1 },
                 };
 
                 SetupSettingData<int>(existingSignal, existingDatum);
@@ -540,6 +541,44 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException))]
+            public void WhenGettingDatumWithIncorrectData_ForYearSignal_ThenThrowingQuerryAboutDateWithIncorrectFormatException()
+            {
+                var existingSignal = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Year,
+                    Path = Domain.Path.FromString("root/signal1")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new System.DateTime(2000, 2, 24, 14, 25, 56, 13), Value = (int)1 },
+                };
+
+                var firstTimestamp = existingDatum.ElementAt(0).Timestamp;
+
+                SetupGettingData<int>(
+                    existingSignal,
+                    existingDatum,
+                    new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger(),
+                    firstTimestamp);
+
+                var compareResult = TimestampCorrectCheckerForYear(existingDatum, existingSignal);
+
+                if (compareResult == "Year signal with bad month")
+                {
+                    throw new Domain.Exceptions.QuerryAboutDateWithIncorrectFormatException();
+                }
+                else if (compareResult == "Correct data")
+                {
+                    signalsWebService.GetData(1, firstTimestamp, firstTimestamp);
+                }
+
+            }
+
             private void SetupSettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
@@ -553,6 +592,37 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
                 signalsWebService.SetData(1, existingDatum);
+            }
+
+            private void SetupGettingData<T>(
+                Signal existingSignal,
+                Dto.Datum[] existingDatum,
+                Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T> genericInstance,
+                DateTime firstTimestamp)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<T>(
+                        existingSignal,
+                        firstTimestamp,
+                        firstTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<T>>>());
+
+                GivenASignal(existingSignal);
+
+                missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValueRepoMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(genericInstance);
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValueRepoMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
             private void SetupWebServiceForMvpOperations()
