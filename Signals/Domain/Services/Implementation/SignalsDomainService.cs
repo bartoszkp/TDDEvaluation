@@ -83,9 +83,21 @@ namespace Domain.Services.Implementation
 
             var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            var filledData = CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
+            var mvp = missingValuePolicyRepository.Get(signal);
+
+            IEnumerable<Datum<T>> filledData = null;
+
+            if (mvp is NoneQualityMissingValuePolicy<T> | mvp is SpecificValueMissingValuePolicy<T> )
+                filledData = CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
+
+            if (mvp is ZeroOrderMissingValuePolicy<T>) filledData = (mvp as ZeroOrderMissingValuePolicy<T>).SetMissingValue(signal, data, fromIncludedUtc, toExcludedUtc);
 
             return filledData;
+        }
+
+        private IEnumerable<Datum<object>> FillDataWhenGivenIsZeroOrderMvp()
+        {
+            throw new NotImplementedException();
         }
 
         private bool CheckCorrectnessOfFromIncludedUtc(Signal signal, DateTime fromIncludedUtc)
