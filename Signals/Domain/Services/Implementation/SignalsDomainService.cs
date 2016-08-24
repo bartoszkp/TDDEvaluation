@@ -124,7 +124,7 @@ namespace Domain.Services.Implementation
             }
             else if (signal.Granularity == Granularity.Day && fromIncludedUtc.Hour != 0 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0
                 || fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0 ||  fromIncludedUtc.Hour == 0 
-                && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second != 0 ||)
+                && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second != 0)
             {
                 throw new QuerryAboutDateWithIncorrectFormatException();
             }
