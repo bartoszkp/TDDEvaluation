@@ -13,15 +13,17 @@ namespace WebService.Tests.SignalsWebServiceTests
         [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
         public void GivenNoSignals_WhenAddingASignalWithId_ThrowIdNotNullException()
         {
-            SetupAdd();
+            var signalId = 1;
+            SetupAdd(signalId);
 
-            signalsWebService.Add(Utils.SignalWith(id: 1, dataType: Dto.DataType.Boolean));
+            signalsWebService.Add(Utils.SignalWith(id: signalId, dataType: Dto.DataType.Boolean));
         }
         
         [TestMethod]
         public void GivenNoSignals_WhenAddingASignal_ReturnsIt()
         {
-            SetupAdd();
+            var signalId = 1;
+            SetupAdd(signalId);
 
             var signal = Utils.SignalWith(path: new Dto.Path() { Components = new[] { "a" } });
             var result = signalsWebService.Add(signal);
@@ -34,7 +36,8 @@ namespace WebService.Tests.SignalsWebServiceTests
         [TestMethod]
         public void GivenNoSignals_WhenAddingASignal_CallsRepositoryAdd()
         {
-            SetupAdd();
+            var signalId = 1;
+            SetupAdd(signalId);
 
             signalsWebService.Add(Utils.SignalWith(
                 null, 
@@ -47,6 +50,18 @@ namespace WebService.Tests.SignalsWebServiceTests
                 => passedSignal.DataType == Domain.DataType.Double
                     && passedSignal.Granularity == Domain.Granularity.Day
                     && passedSignal.Path.ToString() == "a")));
+        }
+
+        [TestMethod]
+        public void GivenNoSignals_WhenAddingASignal_DefaultMissingPolicyIsSet()
+        {
+            SetupAdd(1);
+
+            var result = signalsWebService.Add(Utils.SignalWith(null, Dto.DataType.Double));
+
+            missingValuePolicyRepoMock
+                .Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(),
+                    It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
         }
     }
 }

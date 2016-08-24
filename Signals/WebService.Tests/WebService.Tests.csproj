@@ -64,6 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalsWebServiceTests\GetByIdTests.cs" />
     <Compile Include="SignalsWebServiceTests\GetDataTests.cs" />
+    <Compile Include="SignalsWebServiceTests\GetMissingValuePolicyTests.cs" />
     <Compile Include="SignalsWebServiceTests\GetPathEntryTests.cs" />
     <Compile Include="SignalsWebServiceTests\GetTests.cs" />
     <Compile Include="SignalsWebServiceTests\Infrastructure\Repository.cs" />

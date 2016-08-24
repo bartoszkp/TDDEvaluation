@@ -27,11 +27,11 @@ namespace WebService.Tests.SignalsWebServiceTests.Infrastructure
             signalsWebService = new SignalsWebService(signalsDomainService);
         }
 
-        protected void SetupAdd()
+        protected void SetupAdd(int signalId)
         {
             signalsRepositoryMock
                 .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
-                .Returns<Domain.Signal>(signal => signal);
+                .Returns<Domain.Signal>(signal => { signal.Id = signalId;  return signal; });
         }
 
         protected void SetupGet()
@@ -64,6 +64,13 @@ namespace WebService.Tests.SignalsWebServiceTests.Infrastructure
             missingValuePolicyRepoMock
                 .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
                 .Returns(missingValuePolicy);
+        }
+
+        protected void SetupMVPSet()
+        {
+            missingValuePolicyRepoMock
+                .Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), 
+                    It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
         }
 
         protected Mock<ISignalsRepository> signalsRepositoryMock;
