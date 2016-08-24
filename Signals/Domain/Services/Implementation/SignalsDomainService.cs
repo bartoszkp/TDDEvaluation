@@ -138,6 +138,10 @@ namespace Domain.Services.Implementation
             {
                 throw new QuerryAboutDateWithIncorrectFormatException();
             }
+            else if (signal.Granularity == Granularity.Second && fromIncludedUtc.Millisecond != 0)
+            {
+                throw new QuerryAboutDateWithIncorrectFormatException();
+            }
 
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
 
