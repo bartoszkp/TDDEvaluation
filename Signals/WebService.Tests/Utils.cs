@@ -47,6 +47,23 @@ namespace WebService.Tests
                 PathToString(a.Path) == PathToString(b.Path); 
         }
 
+        public static bool CompareDatum(Dto.Datum[] a, Dto.Datum[] b)
+        {
+            if(a.Length != b.Length) return false;
+
+            for (int i = 0; i < a.Length; i++)
+                if (CompareDatum(a[i], b[i]) == false) return false;
+
+            return true;
+        }
+
+        public static bool CompareDatum(Dto.Datum a, Dto.Datum b)
+        {
+            return a.Quality == b.Quality &&
+                a.Timestamp == b.Timestamp &&
+                a.Value.ToString() == b.Value.ToString();
+        }
+
         private static string PathToString(Dto.Path path)
         {
             return string.Join("/", path.Components.ToArray());
