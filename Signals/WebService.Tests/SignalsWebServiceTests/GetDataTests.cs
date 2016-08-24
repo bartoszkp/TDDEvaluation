@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System.Linq;
 using DataAccess.GenericInstantiations;
 using System.Collections.Generic;
+using WebService.Tests.SignalsWebServiceTests.Infrastructure;
 
-namespace WebService.Tests
+namespace WebService.Tests.SignalsWebServiceTests
 {
     [TestClass]
     public class SignalsWebServiceGetDataTests : SignalsWebServiceRepository
@@ -14,19 +14,17 @@ namespace WebService.Tests
         [ExpectedException(typeof(Domain.Exceptions.SignalNotExistException))]
         public void GivenNoSignals_GetDataByIdAndTime_ExpectedException()
         {
-            var signalId = 1;
-            Domain.Signal signal = null;
-            Setup(signalId, signal);
+            SetupGet();
 
-            signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+            signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
         }
         
         [TestMethod]
         public void GivenASignalWithNoDataSource_WhenGettingData_ChecksLengthOfArray()
         {
             var signalId = 1;
-            Setup(signalId, Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day));
-            SetupMVP(new NoneQualityMissingValuePolicyDouble());
+            SetupGet(Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Day));
+            SetupMVPGet(new NoneQualityMissingValuePolicyDouble());
 
             var result = signalsWebService.GetData(signalId, new DateTime(2005, 1, 1), new DateTime(2005, 1, 21));
             
@@ -38,9 +36,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new NoneQualityMissingValuePolicyInteger());
-            SetupData(new[]
+            SetupGet(signal);
+            SetupMVPGet(new NoneQualityMissingValuePolicyInteger());
+            SetupGetData(new[]
             {
                 new Domain.Datum<Int32>() { Signal = signal, Quality = Domain.Quality.Fair,
                     Timestamp = new DateTime(2005, 1, 1), Value = 5 },
@@ -62,9 +60,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new NoneQualityMissingValuePolicyInteger());
-            SetupData(new[]
+            SetupGet(signal);
+            SetupMVPGet(new NoneQualityMissingValuePolicyInteger());
+            SetupGetData(new[]
             {
                 new Domain.Datum<Int32>() { Signal = signal, Quality = Domain.Quality.Good,
                     Timestamp = new DateTime(2005, 3, 1), Value = 7, },
@@ -88,9 +86,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new NoneQualityMissingValuePolicyInteger());
-            SetupData(new[]
+            SetupGet(signal);
+            SetupMVPGet(new NoneQualityMissingValuePolicyInteger());
+            SetupGetData(new[]
             {
                 new Domain.Datum<Int32>() { Signal = signal, Quality = Domain.Quality.Good,
                     Timestamp = new DateTime(2005, 3, 1), Value = 7, },
@@ -112,9 +110,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new NoneQualityMissingValuePolicyInteger());
-            SetupData(new[]
+            SetupGet(signal);
+            SetupMVPGet(new NoneQualityMissingValuePolicyInteger());
+            SetupGetData(new[]
             {
                 new Domain.Datum<Int32>() { Signal = signal, Quality = Domain.Quality.Fair,
                     Timestamp = new DateTime(2005, 1, 1), Value = (int)11 }
@@ -132,9 +130,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new SpecificValueMissingValuePolicyInteger() { Quality = Domain.Quality.Poor, Value = 16 });
-            SetupData(new[]
+            SetupGet(signal);
+            SetupMVPGet(new SpecificValueMissingValuePolicyInteger() { Quality = Domain.Quality.Poor, Value = 16 });
+            SetupGetData(new[]
             {
                 new Domain.Datum<Int32>() { Signal = signal, Quality = Domain.Quality.Good,
                     Timestamp = new DateTime(2005, 3, 1), Value = 7, },
@@ -159,9 +157,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new SpecificValueMissingValuePolicyInteger() { Quality = Domain.Quality.Poor, Value = 16 });
-            SetupData(new List<Domain.Datum<Int32>>());
+            SetupGet(signal);
+            SetupMVPGet(new SpecificValueMissingValuePolicyInteger() { Quality = Domain.Quality.Poor, Value = 16 });
+            SetupGetData(new List<Domain.Datum<Int32>>());
 
             var result = signalsWebService.GetData(signalId, new DateTime(2005, 1, 1), new DateTime(2005, 1, 1)).ToArray();
             var expected = new[] {
@@ -176,9 +174,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new ZeroOrderMissingValuePolicyDouble());
-            SetupData(new[] {
+            SetupGet(signal);
+            SetupMVPGet(new ZeroOrderMissingValuePolicyDouble());
+            SetupGetData(new[] {
                 new Domain.Datum<double> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.1 },
                 new Domain.Datum<double> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 3.3 },
                 new Domain.Datum<double> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 5.5 }
@@ -201,9 +199,9 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month);
-            Setup(signalId, signal);
-            SetupMVP(new ZeroOrderMissingValuePolicyDouble());
-            SetupData(new[] {
+            SetupGet(signal);
+            SetupMVPGet(new ZeroOrderMissingValuePolicyDouble());
+            SetupGetData(new[] {
                 new Domain.Datum<double> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 2.0 },
                 new Domain.Datum<double> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 4.0 }
             });
@@ -218,26 +216,76 @@ namespace WebService.Tests
 
             Assert.IsTrue(Utils.CompareDatum(expected, result));
         }
-
-        protected override void Setup(params object[] param)
+        
+        // ~        ~~~~~~~~~~~~~~~~~~         ~
+        
+        [TestMethod]
+        public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
         {
-            signalsRepositoryMock
-                .Setup(sr => sr.Get(It.Is<int>(id => id == (int)param[0])))
-                .Returns(param[1] as Domain.Signal);
+            Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMilliseconds(1)));
         }
 
-        private void SetupData<T>(IEnumerable<Domain.Datum<T>> data)
+        [TestMethod]
+        public void GivenASignal_WhenGettingSignalDataWithInvalidSeconds_ExpectHandledExceptions()
         {
-            signalsDataRepositoryMock
-                .Setup(sdr => sdr.GetData<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .Returns(data);
+            Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddSeconds(1)));
         }
 
-        private void SetupMVP(Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
+        [TestMethod]
+        public void GivenASignal_WhenGettingSignalDataWithInvalidMinutes_ExpectHandledExceptions()
         {
-            missingValuePolicyRepoMock
-                .Setup(mvp => mvp.Get(It.IsAny<Domain.Signal>()))
-                .Returns(missingValuePolicy);
+            Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMinutes(1)));
         }
+
+        [TestMethod]
+        public void GivenASignal_WhenGettingSignalDataWithInvalidHours_ExpectHandledExceptions()
+        {
+            Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddHours(1)));
+        }
+
+        [TestMethod]
+        public void GivenASignal_WhenGettingSignalDataWithInvalidWeekDay_ExpectHandledExceptions()
+        {
+            var signalId = 1;
+            var dtCorrect = new DateTime(2016, 08, 22);
+            SetupGet(Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Week, Domain.Path.FromString("a/b")));
+
+            Assert.IsTrue(IsGetDataTimestampThrowingException(signalId, dtCorrect.AddDays(-1), dtCorrect));
+            Assert.IsTrue(IsGetDataTimestampThrowingException(signalId, dtCorrect, dtCorrect.AddDays(1)));
+        }
+
+        [TestMethod]
+        public void GivenASignal_WhenGettingSignalDataWithInvalidFirstDayOfMonth_ExpectHandledExceptions()
+        {
+            Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddDays(1)));
+        }
+
+        [TestMethod]
+        public void GivenASignal_WhenGettingSignalDataWithInvalidMonths_ExpectHandledExceptions()
+        {
+            Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMonths(1)));
+        }
+
+        private bool IsGetDataTimestampValid(DateTime dtCorrect, DateTime dtWrong)
+        {
+            var signalId = 1;
+            SetupGet(Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Year));
+
+            return IsGetDataTimestampThrowingException(signalId, dtWrong, dtCorrect.AddYears(1)) &&
+                    IsGetDataTimestampThrowingException(signalId, dtCorrect, dtWrong);
+        }
+
+        private bool IsGetDataTimestampThrowingException(int id, DateTime dtStart, DateTime dtEnd)
+        {
+            try
+            {
+                signalsWebService.GetData(id, dtStart, dtEnd);
+                return false;
+            }
+            catch (System.Reflection.TargetInvocationException ex)
+            {
+                return (ex.InnerException.GetType() == typeof(Domain.Exceptions.DatetimeIsInvalidException));
+            }
+        } 
     }
 }

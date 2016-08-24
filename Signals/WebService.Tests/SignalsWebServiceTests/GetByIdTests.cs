@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using WebService.Tests.SignalsWebServiceTests.Infrastructure;
 
-namespace WebService.Tests
+namespace WebService.Tests.SignalsWebServiceTests
 {
     [TestClass]
     public class SignalsWebServiceGetByIdTests : SignalsWebServiceRepository
@@ -11,8 +11,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenNoSignals_WhenGettingById_ReturnsNull()
         {
-            Domain.Signal sig = null;
-            Setup(sig);
+            SetupGet();
 
             var result = signalsWebService.GetById(0);
 
@@ -24,7 +23,7 @@ namespace WebService.Tests
         {
             var signalId = 1;
             var signal = Utils.SignalWith(signalId, Domain.DataType.Boolean, Domain.Granularity.Hour, Domain.Path.FromString("a/b"));
-            Setup(signal);
+            SetupGet(signal);
 
             var result = signalsWebService.GetById(signalId);
 
@@ -32,13 +31,6 @@ namespace WebService.Tests
             Assert.AreEqual(Dto.DataType.Boolean, result.DataType);
             Assert.AreEqual(Dto.Granularity.Hour, result.Granularity);
             CollectionAssert.AreEqual(new[] { "a", "b" }, result.Path.Components.ToArray());
-        }
-
-        protected override void Setup(params object[] param)
-        {
-            signalsRepositoryMock
-                .Setup(sr => sr.Get(It.IsAny<int>()))
-                .Returns(param[0] as Domain.Signal);
         }
     }
 }

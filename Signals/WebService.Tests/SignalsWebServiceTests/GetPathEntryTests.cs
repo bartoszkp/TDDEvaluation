@@ -3,8 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using Moq;
 using System.Linq;
+using WebService.Tests.SignalsWebServiceTests.Infrastructure;
 
-namespace WebService.Tests
+namespace WebService.Tests.SignalsWebServiceTests
 {
     [TestClass]
     public class SignalsWebServiceGetPathEntryTests : SignalsWebServiceRepository
@@ -55,11 +56,11 @@ namespace WebService.Tests
             CollectionAssert.AreEquivalent(new[] { "root", "s5", "s4" }, result.Signals.First().Path.Components.ToArray());
         }
 
-        protected override void Setup(params object[] param)
+        private void Setup(IEnumerable<Domain.Signal> signals)
         {
             signalsRepositoryMock.Setup(sr => sr
                 .GetAllWithPathPrefix(It.IsAny<Domain.Path>()))
-                .Returns(param[0] as List<Domain.Signal>);
+                .Returns(signals);
         }
 
         private List<Domain.Signal> _premade5 = new List<Domain.Signal>() {

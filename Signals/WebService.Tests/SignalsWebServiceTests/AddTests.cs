@@ -2,8 +2,9 @@
 using System.Linq;
 using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using WebService.Tests.SignalsWebServiceTests.Infrastructure;
 
-namespace WebService.Tests
+namespace WebService.Tests.SignalsWebServiceTests
 {
     [TestClass]
     public class SignalsWebServiceAddTests : SignalsWebServiceRepository
@@ -12,7 +13,7 @@ namespace WebService.Tests
         [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
         public void GivenNoSignals_WhenAddingASignalWithId_ThrowIdNotNullException()
         {
-            Setup();
+            SetupAdd();
 
             signalsWebService.Add(Utils.SignalWith(id: 1, dataType: Dto.DataType.Boolean));
         }
@@ -20,7 +21,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenNoSignals_WhenAddingASignal_ReturnsIt()
         {
-            Setup();
+            SetupAdd();
 
             var signal = Utils.SignalWith(path: new Dto.Path() { Components = new[] { "a" } });
             var result = signalsWebService.Add(signal);
@@ -33,7 +34,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenNoSignals_WhenAddingASignal_CallsRepositoryAdd()
         {
-            Setup();
+            SetupAdd();
 
             signalsWebService.Add(Utils.SignalWith(
                 null, 
@@ -46,13 +47,6 @@ namespace WebService.Tests
                 => passedSignal.DataType == Domain.DataType.Double
                     && passedSignal.Granularity == Domain.Granularity.Day
                     && passedSignal.Path.ToString() == "a")));
-        }
-        
-        protected override void Setup(params object[] param)
-        {
-            signalsRepositoryMock
-                .Setup(f => f.Add(It.IsAny<Domain.Signal>()))
-                .Returns<Domain.Signal>(signal => signal);
         }
     }
 }

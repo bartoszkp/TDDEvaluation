@@ -62,15 +62,15 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SignalsWebServiceGetByIdTests.cs" />
-    <Compile Include="SignalsWebServiceGetDataTests.cs" />
-    <Compile Include="SignalsWebServiceGetPathEntryTests.cs" />
-    <Compile Include="SignalsWebServiceGetTests.cs" />
-    <Compile Include="SignalsWebServiceRepository.cs" />
-    <Compile Include="SignalsWebServiceAddTests.cs" />
-    <Compile Include="SignalsWebServiceSetDataTests.cs" />
+    <Compile Include="SignalsWebServiceTests\GetByIdTests.cs" />
+    <Compile Include="SignalsWebServiceTests\GetDataTests.cs" />
+    <Compile Include="SignalsWebServiceTests\GetPathEntryTests.cs" />
+    <Compile Include="SignalsWebServiceTests\GetTests.cs" />
+    <Compile Include="SignalsWebServiceTests\Infrastructure\Repository.cs" />
+    <Compile Include="SignalsWebServiceTests\AddTests.cs" />
+    <Compile Include="SignalsWebServiceTests\SetDataTests.cs" />
     <Compile Include="SignalsWebServiceTestsOld.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="SignalsWebServiceTests\Infrastructure\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">

@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Moq;
 
-namespace WebService.Tests
+namespace WebService.Tests.SignalsWebServiceTests.Infrastructure
 {
     public static class Utils
     {
+        public static readonly DateTime validTimestamp = new DateTime(2000, 1, 1, 0, 0, 0);
+
         public static Dto.Signal SignalWith(
             int? id = null,
             Dto.DataType dataType = Dto.DataType.Double,
@@ -64,7 +66,17 @@ namespace WebService.Tests
                 a.Value.ToString() == b.Value.ToString();
         }
 
+        public static bool ComparePath(Domain.Path a, Domain.Path b)
+        {
+            return PathToString(a) == PathToString(b);
+        }
+
         private static string PathToString(Dto.Path path)
+        {
+            return string.Join("/", path.Components.ToArray());
+        }
+
+        private static string PathToString(Domain.Path path)
         {
             return string.Join("/", path.Components.ToArray());
         }
