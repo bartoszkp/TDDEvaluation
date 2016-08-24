@@ -156,49 +156,74 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> data, Signal signal)
         {
-            var TimestampMonth = data.ToList().ElementAt(0).Timestamp.Month;
-            var TimestampDay = data.ToList().ElementAt(0).Timestamp.Day;
-            var TimestampHour = data.ToList().ElementAt(0).Timestamp.Hour;
-            var TimestampMinute = data.ToList().ElementAt(0).Timestamp.Minute;
-            var TimestampSecond = data.ToList().ElementAt(0).Timestamp.Second;
-            var TimestampMilisecond = data.ToList().ElementAt(0).Timestamp.Millisecond;
+            bool comparationResult;
 
             if (data == null)
                 throw new ArgumentNullException("Attempted to set null data for a signal");
 
+
+
             SetSignalForDatumCollection(data, signal);
 
-            if (signal.Granularity == Granularity.Month && (TimestampDay > 1 || TimestampHour > 0
-                    || TimestampMinute > 0 || TimestampSecond > 0))
+            if (signal.Granularity == Granularity.Year)
             {
-                throw new Domain.Exceptions.BadDateFormatForSignalException();
+                comparationResult = TimestampCorrectCheckerForYear<T>(data, signal);
+
+                if (comparationResult == true)
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else return;
             }
-            else if (signal.Granularity == Granularity.Year && (TimestampMonth == 1 && TimestampDay == 1
-                && TimestampHour == 0 && TimestampMinute == 0 && TimestampSecond == 0))
+            else if (signal.Granularity == Granularity.Month)
             {
-                throw new Domain.Exceptions.BadDateFormatForSignalException();
+                comparationResult = TimestampCorrectCheckerForMonth<T>(data, signal);
+
+                if (comparationResult == true)
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else return;
             }
-            else if (signal.Granularity == Granularity.Week && (TimestampDay == 1 && TimestampHour == 0
-                && TimestampMinute == 0 && TimestampSecond == 0))
+            else if (signal.Granularity == Granularity.Day)
             {
-                throw new Domain.Exceptions.BadDateFormatForSignalException();
+                comparationResult = TimestampCorrectCheckerForDay<T>(data, signal);
+
+                if (comparationResult == true)
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else return;
             }
-            else if (signal.Granularity == Granularity.Day && (TimestampHour == 0 && TimestampMinute == 0
-                && TimestampSecond == 0))
+            else if (signal.Granularity == Granularity.Hour)
             {
-                throw new Domain.Exceptions.BadDateFormatForSignalException();
+                comparationResult = TimestampCorrectCheckerForHour<T>(data, signal);
+
+                if (comparationResult == true)
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else return;
             }
-            else if (signal.Granularity == Granularity.Hour && TimestampMinute == 0 && TimestampSecond == 0)
+            else if (signal.Granularity == Granularity.Minute)
             {
-                throw new Domain.Exceptions.BadDateFormatForSignalException();
+                comparationResult = TimestampCorrectCheckerForMinute<T>(data, signal);
+
+                if (comparationResult == true)
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else return;
             }
-            else if (signal.Granularity == Granularity.Minute && TimestampSecond == 0)
+            else if (signal.Granularity == Granularity.Second)
             {
-                throw new Domain.Exceptions.BadDateFormatForSignalException();
-            }
-            else if (signal.Granularity == Granularity.Second && TimestampSecond == 0)
-            {
-                throw new Domain.Exceptions.BadDateFormatForSignalException();
+                comparationResult = TimestampCorrectCheckerForSecond<T>(data, signal);
+
+                if (comparationResult == true)
+                {
+                    throw new Domain.Exceptions.BadDateFormatForSignalException();
+                }
+                else return;
             }
             else signalsDataRepository.SetData(data);
         }
@@ -212,6 +237,115 @@ namespace Domain.Services.Implementation
             {
                 datum.Signal = signal;
             }
+        }
+
+        private bool TimestampCorrectCheckerForYear<T>(IEnumerable<Datum<T>> existingDatum, Domain.Signal existingSignal)
+        {
+            var TimestampMonth = existingDatum.ToList().ElementAt(0).Timestamp.Month;
+            var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
+            var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+            var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+            var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+            if (existingSignal.Granularity == Granularity.Year && TimestampMonth != 1 && TimestampDay >= 1 && TimestampHour >= 0
+                && TimestampMinute >= 0 && TimestampSecond >= 0 || TimestampMonth == 1 && TimestampDay != 1 && TimestampHour >= 0
+                && TimestampMinute >= 0 && TimestampSecond >= 0 || TimestampMonth == 1 && TimestampDay == 1 && TimestampHour != 0
+                && TimestampMinute >= 0 && TimestampSecond >= 0 || TimestampMonth == 1 && TimestampDay == 1 && TimestampHour == 0
+                && TimestampMinute != 0 && TimestampSecond >= 0 || TimestampMonth == 1 && TimestampDay == 1 && TimestampHour == 0
+                && TimestampMinute == 0 && TimestampSecond != 0)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private bool TimestampCorrectCheckerForMonth<T>(IEnumerable<Datum<T>> existingDatum, Domain.Signal existingSignal)
+        {
+            var TimestampDay = existingDatum.ToList().ElementAt(0).Timestamp.Day;
+            var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+            var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+            var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+            if (existingSignal.Granularity == Granularity.Month &&  TimestampDay != 1 && TimestampHour >= 0
+                && TimestampMinute >= 0 && TimestampSecond >= 0 || TimestampDay == 1 && TimestampHour != 0
+                && TimestampMinute >= 0 && TimestampSecond >= 0 || TimestampDay == 1 && TimestampHour == 0
+                && TimestampMinute != 0 && TimestampSecond >= 0 || TimestampDay == 1 && TimestampHour == 0
+                && TimestampMinute == 0 && TimestampSecond != 0)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private bool TimestampCorrectCheckerForWeek<T>(IEnumerable<Datum<T>> existingDatum, Domain.Signal existingSignal)
+        {
+            var TimestampDayOfTheWeek = existingDatum.ToList().ElementAt(0).Timestamp.DayOfWeek;
+            var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+            var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+            var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+            if (existingSignal.Granularity == Granularity.Week && TimestampDayOfTheWeek != System.DayOfWeek.Monday && TimestampHour >= 0
+                && TimestampMinute >= 0 && TimestampSecond >= 0 || TimestampDayOfTheWeek == System.DayOfWeek.Monday && TimestampHour != 0
+                && TimestampMinute >= 0 && TimestampSecond >= 0 || TimestampDayOfTheWeek != System.DayOfWeek.Monday && TimestampHour == 0
+                && TimestampMinute != 0 && TimestampSecond >= 0 || TimestampDayOfTheWeek != System.DayOfWeek.Monday && TimestampHour == 0
+                && TimestampMinute == 0 && TimestampSecond != 0)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private bool TimestampCorrectCheckerForDay<T>(IEnumerable<Datum<T>> existingDatum, Domain.Signal existingSignal)
+        {
+            var TimestampHour = existingDatum.ToList().ElementAt(0).Timestamp.Hour;
+            var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+            var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+            if (existingSignal.Granularity == Granularity.Day &&  TimestampHour != 0 
+                && TimestampMinute >= 0 && TimestampSecond >= 0 ||  TimestampHour == 0
+                && TimestampMinute != 0 && TimestampSecond >= 0 ||  TimestampHour == 0
+                && TimestampMinute == 0 && TimestampSecond != 0)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private bool TimestampCorrectCheckerForHour<T>(IEnumerable<Datum<T>> existingDatum, Domain.Signal existingSignal)
+        {
+            var TimestampMinute = existingDatum.ToList().ElementAt(0).Timestamp.Minute;
+            var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+
+            if (existingSignal.Granularity == Granularity.Hour && TimestampMinute != 0 && TimestampSecond >= 0 
+                || TimestampMinute == 0 && TimestampSecond != 0)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private bool TimestampCorrectCheckerForMinute<T>(IEnumerable<Datum<T>> existingDatum, Domain.Signal existingSignal)
+        {
+            var TimestampSecond = existingDatum.ToList().ElementAt(0).Timestamp.Second;
+            var TimestampMilisecond = existingDatum.ToList().ElementAt(0).Timestamp.Millisecond;
+
+            if (existingSignal.Granularity == Granularity.Minute && TimestampSecond != 0 && TimestampMilisecond >= 0
+                || TimestampSecond == 0 && TimestampMilisecond != 0)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private bool TimestampCorrectCheckerForSecond<T>(IEnumerable<Datum<T>> existingDatum, Domain.Signal existingSignal)
+        {
+            var TimestampMilisecond = existingDatum.ToList().ElementAt(0).Timestamp.Millisecond;
+
+            if (existingSignal.Granularity == Granularity.Second && TimestampMilisecond != 0)
+            {
+                return true;
+            }
+            else return false;
         }
 
         private void increaseDate(ref DateTime date, Granularity granularity)

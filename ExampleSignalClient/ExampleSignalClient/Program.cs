@@ -12,14 +12,14 @@ namespace ExampleSignalClient
             var signal1 = client.Add(new Signal()
             {
                 DataType = DataType.Integer,
-                Granularity = Granularity.Month,
+                Granularity = Granularity.Minute,
                 Path = new Path() { Components = new[] { "root/s1" } }
             });
 
 
             var data = new Datum[]
             {
-                 new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) }
+                 new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12) }
             };
 
             client.SetData(1, data);
