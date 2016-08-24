@@ -114,7 +114,7 @@ namespace Domain.Services.Implementation
             {
                 throw new QuerryAboutDateWithIncorrectFormatException();
             }
-            else if (signal.Granularity == Granularity.Month && fromIncludedUtc.DayOfWeek != System.DayOfWeek.Monday && fromIncludedUtc.Hour >= 0
+            else if (signal.Granularity == Granularity.Week && fromIncludedUtc.DayOfWeek != System.DayOfWeek.Monday && fromIncludedUtc.Hour >= 0
                 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
                 && fromIncludedUtc.Hour != 0 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
                 && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
