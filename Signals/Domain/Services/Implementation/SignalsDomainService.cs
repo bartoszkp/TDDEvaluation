@@ -85,7 +85,7 @@ namespace Domain.Services.Implementation
 
             var mvp = missingValuePolicyRepository.Get(signal);
 
-            IEnumerable<Datum<T>> filledData = null;
+            IEnumerable<Datum<T>> filledData = data;
 
             if (mvp is NoneQualityMissingValuePolicy<T> | mvp is SpecificValueMissingValuePolicy<T> )
                 filledData = CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);

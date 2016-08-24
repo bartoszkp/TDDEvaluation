@@ -16,7 +16,7 @@ namespace ExampleSignalClient
                 new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
             });
 
-            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+            var result = client.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 
             foreach (var d in result)
             {
