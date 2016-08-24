@@ -70,7 +70,6 @@
     <Compile Include="SignalsWebServiceTests\Infrastructure\Repository.cs" />
     <Compile Include="SignalsWebServiceTests\AddTests.cs" />
     <Compile Include="SignalsWebServiceTests\SetDataTests.cs" />
-    <Compile Include="SignalsWebServiceTestsOld.cs" />
     <Compile Include="SignalsWebServiceTests\Infrastructure\Utils.cs" />
     <Compile Include="SignalsWebServiceTests\SetMissingValuePolicyTests.cs" />
   </ItemGroup>
