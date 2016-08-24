@@ -154,22 +154,8 @@ namespace WebService.Tests
             Assert.Fail();
         }
 
-        [TestMethod]
-        public void WhenFromIncludedUtcIsNotFirstDayOfYear_GetDataReturnedTrueData()
-        {
-            var signal = new Signal()
-            {
-                Id = 1,
-                DataType = DataType.Integer,
-                Granularity = Granularity.Year
-            };
-            var datums = new Datum<bool>[]{};
-            SetupMocks(datums, signal);
-
-            var result = signalsWebService.GetData(signal.Id.Value, new DateTime(1999, 5, 1), new DateTime(2000, 4, 1));
-            foreach (var d in result)
-                Assert.AreEqual(d.Timestamp, new DateTime(2000, 1, 1));
-        }
+     
+       
 
         [TestMethod]
         public void WhenGettingDataForFromUtcSameAsToUtc_ReturnsSingleDatum()
