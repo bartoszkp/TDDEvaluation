@@ -88,6 +88,7 @@
     <Compile Include="Repositories\ISignalsRepository.cs" />
     <Compile Include="Services\DataFillHelpers\NoneQualityDataFillHelper.cs" />
     <Compile Include="Services\DataFillHelpers\SpecificDataFillHelper.cs" />
+    <Compile Include="Services\DataFillHelpers\ZeroOrderFillHelper.cs" />
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />
     <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />

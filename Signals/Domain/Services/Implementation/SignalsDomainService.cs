@@ -108,7 +108,10 @@ namespace Domain.Services.Implementation
                 var specificMvp = mvp as SpecificValueMissingValuePolicy<T>;
                 SpecificDataFillHelper.FillMissingData(signal.Granularity, sortedDatums, specificMvp.Value, fromIncludedUtc, toExcludedUtc);
             }
-
+            else if(mvp is ZeroOrderMissingValuePolicy<T>)
+            {
+                ZeroOrderFillHelper.FillMissingData<T>(signal.Granularity, sortedDatums, fromIncludedUtc, toExcludedUtc);
+            }
             else if (mvp is NoneQualityMissingValuePolicy<T>)
             {
                 NoneQualityDataFillHelper.FillMissingData(signal.Granularity, sortedDatums, fromIncludedUtc, toExcludedUtc);
