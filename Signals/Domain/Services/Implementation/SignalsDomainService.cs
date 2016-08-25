@@ -153,8 +153,6 @@ namespace Domain.Services.Implementation
                     return result;
                 }
 
-
-
                 for (int j = result.Length - 1; j > 0; --j)
                     for (int i = 0; i < j; ++i)
                         if (result[i].Timestamp > result[i + 1].Timestamp)

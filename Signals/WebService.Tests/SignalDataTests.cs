@@ -154,8 +154,48 @@ namespace WebService.Tests
             Assert.Fail();
         }
 
+        [TestMethod]
+        public void ZeroOrderValueMissingValuePolicy_ShouldFillMissingData()
+        { 
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Double,
+                Granularity = Granularity.Month
+            };
 
+            var datums = new Datum<double>[]
+            {
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 }
+            };
 
+            SetupWebService(signal);
+            missingValueRepoMock
+                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble());
+            signalsDataRepoMock
+                .Setup(dr => dr.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(datums);
+
+            var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+            for (int i = 0; i <= result.Count() - 1; i++)
+            {
+                if(result.ToArray().ElementAt(i+1).Timestamp == null && result.Count() > 1)
+                {
+                    result.ElementAt(i + 1).Timestamp = result.ElementAt(i).Timestamp; 
+                }
+            }
+
+            for (int j = 0; j < result.Count() - 1; j++)
+            {
+                if (result.ElementAt(j+1).Timestamp == null)
+                {
+                    Assert.AreEqual(result.ElementAt(j+1), result.ElementAt(j));
+                }
+            }
+        } 
 
         [TestMethod]
         public void WhenGettingDataForFromUtcSameAsToUtc_ReturnsSingleDatum()
