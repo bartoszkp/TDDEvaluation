@@ -217,8 +217,6 @@ namespace WebService.Tests.SignalsWebServiceTests
             Assert.IsTrue(Utils.CompareDatum(expected, result));
         }
         
-        // ~        ~~~~~~~~~~~~~~~~~~         ~
-        
         [TestMethod]
         public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
         {
@@ -287,5 +285,7 @@ namespace WebService.Tests.SignalsWebServiceTests
                 return (ex.InnerException.GetType() == typeof(Domain.Exceptions.DatetimeIsInvalidException));
             }
         } 
+
+        private void 
     }
 }
