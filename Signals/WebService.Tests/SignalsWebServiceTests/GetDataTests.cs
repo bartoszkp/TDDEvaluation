@@ -285,7 +285,5 @@ namespace WebService.Tests.SignalsWebServiceTests
                 return (ex.InnerException.GetType() == typeof(Domain.Exceptions.DatetimeIsInvalidException));
             }
         } 
-
-        private void 
     }
 }
