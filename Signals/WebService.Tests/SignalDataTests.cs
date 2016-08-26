@@ -289,16 +289,28 @@ namespace WebService.Tests
                     new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 }
             };
 
+            var expectedDatums = new Datum<double>[]
+            {
+                   new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
+                   new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
+                   new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 }
+            };
+
             SetupWebService(signal);
-            missingValueRepoMock
-                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
-                .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble());
-            signalsDataRepoMock
-                .Setup(dr => dr.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .Returns(datums);
+            SetupMocksForZero<double>(datums, signal);
 
             var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
             Assert.AreEqual(datums.Count(), result.Count());
+
+            int i = 0;
+            foreach (var datum in result)
+            {
+                Assert.AreEqual(expectedDatums[i].Quality, datum.Quality);
+                Assert.AreEqual(expectedDatums[i].Timestamp, datum.Timestamp);
+                Assert.AreEqual(expectedDatums[i].Value, datum.Value);
+
+                i++;
+            }
         }
 
         private void SetupWebService(Signal signal=null)
@@ -325,6 +337,18 @@ namespace WebService.Tests
                 .Setup(dr => dr.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .Returns(datums);
         }
+
+        private void SetupMocksForZero<T>(Datum<T>[] datums, Signal signal)
+        {
+            SetupWebService(signal);
+            missingValueRepoMock
+                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble());
+            signalsDataRepoMock
+                .Setup(dr => dr.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(datums);
+        }
+
 
         private void SetupMocksGetPath(IEnumerable<Signal> domainSignalsToReturn)
         {
