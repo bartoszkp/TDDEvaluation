@@ -12,7 +12,7 @@ namespace Domain.Services.DataFillHelpers
             DateTime fromIncluded, DateTime toExcluded)
         {
             T actuallValue = default(T);
-            var time = fromIncluded - toExcluded;
+            var time = toExcluded - fromIncluded;
             var quality = Domain.Quality.None;
             
             switch(granularity)
@@ -89,7 +89,7 @@ namespace Domain.Services.DataFillHelpers
                     }
                 case Granularity.Month:
                     {
-                        int months = toExcluded.Month - fromIncluded.Month + (12 * (toExcluded.Year - fromIncluded.Year)) - 1;
+                        int months = toExcluded.Month - fromIncluded.Month + (12 * (toExcluded.Year - fromIncluded.Year));
                         for (int i = 0; i < months ; i++)
                         {
                             if (data[i].Timestamp != fromIncluded.AddMonths(i))
