@@ -79,6 +79,16 @@ namespace WebService.Tests
                 Id = 1,
                 Path = Domain.Path.FromString("x/y")
             });
+
+            var items = signalsWebService.GetData(1, collection.First().Timestamp, collection.Last().Timestamp);
+
+            var returnCollection = items.ToList();
+
+            Assert.AreEqual(returnCollection.First().Value, startvalue);
+            Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
+            Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
+            Assert.AreEqual(returnCollection.Last().Value, endvalue);
+
         }
 
         [TestMethod]
@@ -143,6 +153,15 @@ namespace WebService.Tests
                 Id = 1,
                 Path = Domain.Path.FromString("x/y")
             });
+
+            var items = signalsWebService.GetData(1, collection.First().Timestamp, collection.Last().Timestamp);
+
+            var returnCollection = items.ToList();
+
+            Assert.AreEqual(returnCollection.First().Value, startvalue);
+            Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
+            Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
+            Assert.AreEqual(returnCollection.Last().Value, endvalue);
         }
 
         [TestMethod]
