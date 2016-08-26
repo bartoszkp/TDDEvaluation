@@ -111,6 +111,26 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
+        [TestCategory("issue17")]
+        public void GivenASignalWithNoData_WhenGettingDataUsingSingleTimestamp_ReturnsDefaultData()
+        {
+            ForAllGranularitiesAndQualities((granularity, quality)
+            =>
+            {
+                WhenReadingData(UniversalBeginTimestamp, UniversalBeginTimestamp);
+
+                var expected = new Datum<T>
+                {
+                    Quality = Quality.None,
+                    Timestamp = UniversalBeginTimestamp,
+                    Value = default(T)
+                };
+
+                Assertions.AreEqual(expected, whenReadingDataResult.SingleOrDefault());
+            });
+        }
+
+        [TestMethod]
         [TestCategory("issue2")]
         [TestCategory("issue14")]
         public void GivenASignalWithUnorderedData_WhenGettingData_ReturnsDataSorted()
