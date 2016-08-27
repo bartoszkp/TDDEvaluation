@@ -357,7 +357,7 @@ namespace SignalsIntegrationTests
         {
             GivenASignalWith(Granularity.Year);
 
-            WhenGettigData(FromTimestamp.AddMonths(1), ToTimestamp);
+            WhenGettigData(FromTimestamp.AddMonths(1), ToTimestamp.AddYears(1));
 
             ThenRequestThrows();
         }
