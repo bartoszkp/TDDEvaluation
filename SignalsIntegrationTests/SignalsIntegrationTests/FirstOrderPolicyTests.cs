@@ -205,6 +205,30 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
+        public void GivenTwoDatumsBeforeBeginingAndOneAfterEnd_InterpolatesForTheWholeRange()
+        {
+            ForAllGranularities((granularity)
+                =>
+            {
+                GivenData(
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, -1) },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(20), Timestamp = UniversalBeginTimestamp.AddSteps(granularity, -2) },
+                    new Datum<T>() { Quality = Quality.Good, Value = Value(80), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, 1) });
+
+                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+                ThenResultEquals(DatumArray<T>
+                    .ForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                    .WithGoodQualityValueAt(Value(20), UniversalBeginTimestamp.AddSteps(granularity, 0))
+                    .WithGoodQualityValueAt(Value(30), UniversalBeginTimestamp.AddSteps(granularity, 1))
+                    .WithGoodQualityValueAt(Value(40), UniversalBeginTimestamp.AddSteps(granularity, 2))
+                    .WithGoodQualityValueAt(Value(50), UniversalBeginTimestamp.AddSteps(granularity, 3))
+                    .WithGoodQualityValueAt(Value(60), UniversalBeginTimestamp.AddSteps(granularity, 4)));
+            });
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
         public void GivenThreeDatums_ProperlyChangesInterpolation()
         {
             ForAllGranularities((granularity)
