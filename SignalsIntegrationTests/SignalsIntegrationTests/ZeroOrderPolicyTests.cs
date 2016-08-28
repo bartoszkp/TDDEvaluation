@@ -48,7 +48,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue10")]
-        public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithThatValue()
+        public void GivenSingleDatumAtBeginning_FillsRemainingRangeWithThatValue()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = BeginTimestamp });
 
@@ -60,7 +60,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue10")]
-        public void GivenSingleDatumAfterTheBeginning_FillsRemainingRangeWithThatValue()
+        public void GivenSingleDatumAfterBeginning_FillsRemainingRangeWithThatValue()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = BeginTimestamp.AddDays(1) });
 
@@ -112,7 +112,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue10")]
-        public void GivenDatumAtTheBeginningAndInTheMiddle_ReturnsFirstValueBeforeMiddleAndSecondValueAfter()
+        public void GivenDatumAtBeginningAndInTheMiddle_ReturnsFirstValueBeforeMiddleAndSecondValueAfter()
         {
             GivenData(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
                       new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = MiddleTimestamp });
@@ -127,7 +127,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue10")]
-        public void GivenDatumAtTheBeginningAndNoneTheMiddle_ReturnsFirstValueBeforeMiddleAndNoneForRestOfRange()
+        public void GivenDatumAtBeginningAndNoneTheMiddle_ReturnsFirstValueBeforeMiddleAndNoneForRestOfRange()
         {
             GivenData(new Datum<int>() { Quality = Quality.Poor, Value = 753, Timestamp = BeginTimestamp },
                       new Datum<int>() { Quality = Quality.None, Timestamp = MiddleTimestamp });
@@ -142,7 +142,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue10")]
-        public void GivenSingleDatumBeforeTheBeginning_ReturnsItValueForTheWholeRange()
+        public void GivenSingleDatumBeforeBeginning_ReturnsItValueForTheWholeRange()
         {
             GivenSingleDatum(new Datum<int>() { Quality = Quality.Fair, Value = 1410, Timestamp = BeginTimestamp.AddDays(-10) });
 

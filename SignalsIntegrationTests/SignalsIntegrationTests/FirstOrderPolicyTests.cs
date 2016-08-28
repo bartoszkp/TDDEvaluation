@@ -40,7 +40,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenSingleDatumAtBeginning_FillsRestOfRangeWithNone()
+        public void GivenSingleDatumAtBegining_FillsRestOfRangeWithNone()
         {
             ForAllGranularities((granularity)
                 =>
@@ -57,7 +57,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenSingleDatumAfterBeginning_FillsRestOfRangeWithNone()
+        public void GivenSingleDatumAfterBegining_FillsRestOfRangeWithNone()
         {
             ForAllGranularities((granularity)
                =>
@@ -74,7 +74,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsAtBeginningAndBeforeEnd_InterpolatesValueForTheWholeRange()
+        public void GivenDatumsAtBeginingAndBeforeEnd_InterpolatesValueForTheWholeRange()
         {
             ForAllGranularities((granularity)
               =>
@@ -96,7 +96,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsAfterBeginningAndBeforeEnd_InterpolatesValueForGivenRangeAndInsertsNoneOutsideIt()
+        public void GivenDatumsAfterBeginingAndBeforeEnd_InterpolatesValueForGivenRangeAndInsertsNoneOutsideIt()
         {
             ForAllGranularities((granularity)
               =>
@@ -117,7 +117,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsBeforeAndAfterBeginning_InterpolatesValueForRangeBetweenBeginAndGivenDatumAndInsertsNoneAfterIt()
+        public void GivenDatumsBeforeAndAfterBegining_InterpolatesValueForRangeBetweenBeginAndGivenDatumAndInsertsNoneAfterIt()
         {
             ForAllGranularities((granularity)
               =>
@@ -137,7 +137,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsAtBeginningAndAtEnd_InterpolatesForTheWholeRange()
+        public void GivenDatumsAtBeginingAndAtEnd_InterpolatesForTheWholeRange()
         {
             ForAllGranularities((granularity)
                =>
@@ -160,7 +160,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsAfterBeginningAndAfterEnd_InterpolatesForRangeBetweenGivenDatumAndEnd()
+        public void GivenDatumsAfterBeginingAndAfterEnd_InterpolatesForRangeBetweenGivenDatumAndEnd()
         {
             ForAllGranularities((granularity)
                =>
@@ -182,7 +182,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsBeforeBeginningAndAfterEnd_InterpolatesForTheWholeRange()
+        public void GivenDatumsBeforeBeginingAndAfterEnd_InterpolatesForTheWholeRange()
         {
             ForAllGranularities((granularity)
                 =>

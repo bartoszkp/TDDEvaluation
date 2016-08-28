@@ -44,7 +44,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue8")]
-        public void GivenSingleDatumAtTheBeginning_FillsRemainingRangeWithSpecificValue()
+        public void GivenSingleDatumAtBeginning_FillsRemainingRangeWithSpecificValue()
         {
             ForAllGranularitiesAndQualities((granularity, quality)
                =>
@@ -66,7 +66,7 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue8")]
-        public void GivenSingleDatumBeforeTheBeginning_ReturnsSpecificValueForTheWholeRange()
+        public void GivenSingleDatumBeforeBeginning_ReturnsSpecificValueForTheWholeRange()
         {
             ForAllGranularitiesAndQualities((granularity, quality)
              =>
