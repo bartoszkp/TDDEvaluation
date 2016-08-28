@@ -137,6 +137,7 @@ namespace DataAccess.Repositories
                 .CreateCriteria(concreteDatumType)
                 .Add(Restrictions.Eq(signalPropertyName, signal))
                 .Add(Restrictions.Ge(timestampPropertyName, includedUtc))
+                .AddOrder(Order.Asc(timestampPropertyName))
                 .SetMaxResults(maxSampleCount)
                 .List()
                 .Cast<Datum<T>>();
