@@ -694,7 +694,19 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                signalsWebService.Delete(99);                
+                signalsWebService.Delete(99);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingSignal_SignalsRepositoryDeleteIsCalled()
+            {
+                int signalId = 1;
+                var signal = SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal"));
+                GivenASignal(signal);
+                
+                signalsWebService.Delete(signalId);
+
+                signalsRepositoryMock.Verify(s => s.Delete(signal));
             }
 
             private void SetupDataRepository<T>()
