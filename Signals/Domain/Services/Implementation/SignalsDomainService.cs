@@ -315,5 +315,22 @@ namespace Domain.Services.Implementation
             else
                 return null;
         }
+
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
+            
+            SetMissingValuePolicy(signal, null);
+            DeleteData(signal);
+
+            signalsRepository.Delete(signal);
+        }
+
+        private void DeleteData(Signal signal)
+        {
+            var type = signal.DataType.GetNativeType();
+            var methodInfo = typeof(ISignalsDataRepository).GetMethod("DeleteData").MakeGenericMethod(type);
+            methodInfo.Invoke(signalsDataRepository, new[] { signal });
+        }
     }
 }
