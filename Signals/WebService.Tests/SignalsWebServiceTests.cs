@@ -796,6 +796,44 @@ namespace WebService.Tests
 
                 AssertDataDtoEquals(expectedData, result.ToArray());
             }
+
+            [TestMethod]
+            public void GivenAData_WhenGettingData_ReturnsDataWithZeroOrderMissingValuePolicyFromOlderDatum()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                   
+                };
+
+                GivenData(signal.Id.Value, data);
+
+                signalsDataRepositoryMock
+                  .Setup(sdr => sdr.GetDataOlderThan<Double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                 .Returns<Domain.Signal,DateTime,int>((s, from, to) => data);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 5, 1), new DateTime(2000, 6, 1));
+                int expectedCount = 1;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                 
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = (double)1.5 },
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
