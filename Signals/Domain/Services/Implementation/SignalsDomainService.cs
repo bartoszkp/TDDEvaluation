@@ -165,51 +165,51 @@ namespace Domain.Services.Implementation
             var time = fromIncludedUtc;
 
             if (mvp is NoneQualityMissingValuePolicy<T>)
-                datumsList = AddNoneQualityMissingValuePolicy(datumsList, time, toExcludedUtc, signal.Granularity);
+                datumsList = AddNoneQualityMissingValuePolicy(datumsList, time, toExcludedUtc, signal);
 
             if (mvp is SpecificValueMissingValuePolicy<T>)
-                datumsList = AddSpecificQualityMissingValuePolicy(datumsList, time, toExcludedUtc, signal.Granularity, mvp);
+                datumsList = AddSpecificQualityMissingValuePolicy(datumsList, time, toExcludedUtc, signal, mvp);
 
             if (mvp is ZeroOrderMissingValuePolicy<T>)
-                datumsList = AddZeroOrderMissingValuePolicy(datumsList, time, toExcludedUtc, signal.Granularity);
+                datumsList = AddZeroOrderMissingValuePolicy(datumsList, time, toExcludedUtc, signal);
 
             return datumsList;
         }
 
         private List<Datum<T>> AddZeroOrderMissingValuePolicy<T>
-             (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Granularity signalGranularity)
+             (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Signal signal)
         {
             while (time < toExcludedUtc)
             {
                 if (datumsList.FindIndex(x => x.Timestamp == time) < 0)
                 {
-                    var dataToAdd = datumsList.Find(d => d.Timestamp == ShiftTime(signalGranularity, time, -1));
+                    var dataToAdd = signalsDataRepository.GetDataOlderThan<T>(signal, time, 1).SingleOrDefault();
                     if (dataToAdd != null)
                         datumsList.Add(new Datum<T>() { Quality = dataToAdd.Quality, Timestamp = time, Value = dataToAdd.Value });
                     else
                         datumsList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
                 }
-                time = ShiftTime(signalGranularity, time);
+                time = ShiftTime(signal.Granularity, time);
             }
 
             return datumsList;
         }
 
         private List<Datum<T>> AddNoneQualityMissingValuePolicy<T>
-             (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Granularity signalGranularity)
+             (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Signal signal)
         {
             while (time < toExcludedUtc)
             {
                 if (datumsList.FindIndex(x => x.Timestamp == time) < 0)
                     datumsList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
-                time = ShiftTime(signalGranularity, time);
+                time = ShiftTime(signal.Granularity, time);
             }
 
             return datumsList;
         }
 
         private List<Datum<T>> AddSpecificQualityMissingValuePolicy<T>
-            (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Granularity signalGranularity, MissingValuePolicyBase mvp)
+            (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Signal signal, MissingValuePolicyBase mvp)
         {
             var specifiedMvp = mvp as SpecificValueMissingValuePolicy<T>;
             while (time < toExcludedUtc)
@@ -218,7 +218,7 @@ namespace Domain.Services.Implementation
                 {
                     datumsList.Add(new Datum<T>() { Quality = specifiedMvp.Quality, Timestamp = time, Value = specifiedMvp.Value });
                 }
-                time = ShiftTime(signalGranularity, time);
+                time = ShiftTime(signal.Granularity, time);
             }
 
             return datumsList;
