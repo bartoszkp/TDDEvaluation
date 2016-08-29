@@ -619,6 +619,28 @@ namespace WebService.Tests
 
                 AssertDataDtoEquals(expectedData,result.ToArray());
             }
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectDatumTimestampException))]
+            public void GivenASignal_WhenGettingDataWithWeekTimestamp_ThrowsIncorrectDatumTimestampException()
+            {
+                var signal = new Signal() {DataType=DataType.Integer,Granularity=Granularity.Week,Path=Path.FromString("x/y") };
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.Datum<int>[] data = new Domain.Datum<int>[]
+                {
+                    new Domain.Datum<int>() {
+                        Quality = Domain.Quality.Bad,
+                        Timestamp = new DateTime(2016,8,29),
+                        Value = default(int),
+                        Signal = signal
+                    }
+                };
+
+                GivenData(signal.Id.Value, data);
+
+                signalsWebService.GetData(signal.Id.Value, new DateTime(2016, 8, 28), new DateTime(2016, 9, 4));
+            }
 
             [TestMethod]
             public void GivenAData_WhenGettingDataWithNoFirstDatum_ReturnsDataWithFilledZeroOrderMissingValuePolicy()
@@ -651,6 +673,35 @@ namespace WebService.Tests
                 };
 
                 AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
+
+            [TestMethod]
+            public void GivenAData_WhenGettingADataWithWeekTimeStamp_ReturnsData()
+            {
+                //arrange
+                var dummyId = 1;
+                Domain.Signal signal = new Signal() { DataType = DataType.Double, Granularity = Granularity.Week ,Id=dummyId,Path=Path.FromString("x/y")};
+
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 8, 22), Value = (double)2.5 },
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2016, 8, 29), Value = (double)5.4 }
+                };
+                GivenASignal(signal);
+                GivenData(dummyId, data);
+
+                //act
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2016,8,22), new DateTime(2016, 9, 5)).ToArray();
+
+                //assert
+                Assert.AreEqual(data.Length, result.Count());
+                Assert.AreEqual(Dto.Quality.Good, result[0].Quality);
+                Assert.AreEqual(new DateTime(2016, 8, 22), result[0].Timestamp);
+                Assert.AreEqual(2.5, result[0].Value);
+                Assert.AreEqual(Dto.Quality.Bad, result[1].Quality);
+                Assert.AreEqual(new DateTime(2016, 8, 29), result[1].Timestamp);
+                Assert.AreEqual(5.4, result[1].Value);
             }
 
             private Signal GetDefaultSignal_IntegerMonth()
