@@ -963,42 +963,7 @@ namespace WebService.Tests
                 }
             }
 
-            [TestMethod]
-            public void SpecificValuePolicyIsSet_WhenGettingData_CorrectlyFillsMissingData()
-            {
-                var existingDatum = new Dto.Datum[]
-                {
-                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 30 },
-                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 35 },
-                    new Dto.Datum { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 40, }
-                };
-
-                SetupGettingDataForSpecificPolicy<int>(existingDatum, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
-
-                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 7, 1));
-                var dateTime = new DateTime(2000, 1, 1);
-
-                int index = 0;
-                foreach (var item in result)
-                {
-                    if (dateTime.Month == 1 || dateTime.Month == 3 || dateTime.Month == 5)
-                    {
-                        Assert.AreEqual(existingDatum[index].Quality, item.Quality);
-                        Assert.AreEqual(existingDatum[index].Timestamp, item.Timestamp);
-                        Assert.AreEqual(existingDatum[index].Value, item.Value);
-
-                        index++;
-                    }
-                    else
-                    {
-                        Assert.AreEqual(Dto.Quality.Fair, item.Quality);
-                        Assert.AreEqual(50, item.Value);
-                        Assert.AreEqual(dateTime, item.Timestamp);
-                    }
-
-                    dateTime = dateTime.AddMonths(1);
-                }
-            }
+            
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.InvalidTimeStampException))]
