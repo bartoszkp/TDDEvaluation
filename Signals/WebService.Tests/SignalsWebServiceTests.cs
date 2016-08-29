@@ -122,7 +122,8 @@ namespace WebService.Tests
                 int signalId = 46486;
                 var signal = new Domain.Signal
                 {
-                    Id = signalId
+                    Id = signalId,
+                    DataType = DataType.String
                 };
                 SetupDelete(signal);
 
