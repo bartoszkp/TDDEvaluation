@@ -54,7 +54,6 @@ namespace Domain.Services.Implementation
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
             var dataOutOfDateRange = signalsDataRepository.GetDataOlderThan<T>(signal,toExcludedUtc,1).ToList();
-            dataOutOfDateRange.AddRange(signalsDataRepository.GetDataNewerThan<T>(signal,fromIncludedUtc,1));
             var mvp = Get(signal);
 
             if (mvp == null) mvp = new NoneQualityMissingValuePolicy<T>();

@@ -1069,27 +1069,8 @@ namespace WebService.Tests
                 };
 
                 SignalsRepositoryMock_SetupGet(signal.ToDomain<Domain.Signal>());
-
-                dataRepositoryMock
-                    .Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns<Domain.Signal,DateTime,DateTime>((sig,from,to) => 
-                        data.ToDomain<IEnumerable<Domain.Datum<int>>>().Where(x => (x.Timestamp >= from && x.Timestamp < to))?.ToArray());
-
-                dataRepositoryMock
-                    .Setup(x => x.GetDataOlderThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
-                    .Returns<Domain.Signal,DateTime,int>((sig,dt,i) => {
-                        var domainData = data.ToDomain<IEnumerable<Datum<int>>>();
-                        var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp < next.Timestamp ? cur : next);
-                        return Enumerable.Repeat(singleResult,1);
-                    });
-
-                dataRepositoryMock
-                    .Setup(x => x.GetDataNewerThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
-                    .Returns<Domain.Signal, DateTime, int>((sig, dt, i) => {
-                        var domainData = data.ToDomain<IEnumerable<Datum<int>>>();
-                        var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp > next.Timestamp ? cur : next);
-                        return Enumerable.Repeat(singleResult, 1);
-                    });
+                DataRepositoryMock_SetupGetData<int>(data);
+                DataRepositoryMock_SetupGetDataOlderThan<int>(data);
 
                 missingValuePolicyRepositoryMock
                     .Setup(x => x.Get(It.Is<Domain.Signal>(s => s.DataType == Domain.DataType.Integer)))
@@ -1116,6 +1097,25 @@ namespace WebService.Tests
                     Path = new Dto.Path() { Components = new[] { "x", "y" } },
                     DataType = Dto.DataType.Integer
                 };
+            }
+
+            private void DataRepositoryMock_SetupGetData<T>(IEnumerable<Dto.Datum> data)
+            {
+                dataRepositoryMock
+                    .Setup(x => x.GetData<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns<Domain.Signal, DateTime, DateTime>((sig, from, to) =>
+                          data.ToDomain<IEnumerable<Domain.Datum<T>>>().Where(x => (x.Timestamp >= from && x.Timestamp < to))?.ToArray());
+            }
+
+            private void DataRepositoryMock_SetupGetDataOlderThan<T>(IEnumerable<Dto.Datum> data)
+            {
+                dataRepositoryMock
+                    .Setup(x => x.GetDataOlderThan<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
+                    .Returns<Domain.Signal, DateTime, int>((sig, dt, i) => {
+                        var domainData = data.ToDomain<IEnumerable<Datum<T>>>().Where(x => x.Timestamp < dt);
+                        var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp > next.Timestamp ? cur : next);
+                        return Enumerable.Repeat(singleResult, 1);
+                    });
             }
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)

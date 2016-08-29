@@ -15,7 +15,7 @@ namespace Domain.MissingValuePolicy
             if (dataOutOfRange != null && dataOutOfRange.Count() > 0)
             {
                 date = dataOutOfRange.ToList();
-                date.InsertRange(dataOutOfRange.Count() / 2, previousData.ToList());
+                date.InsertRange(date.Count(), previousData);
             }
             else
                 date = otherData.ToList(); 
