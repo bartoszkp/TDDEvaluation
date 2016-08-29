@@ -1199,55 +1199,54 @@ namespace WebService.Tests
             [TestMethod]
             public void Delete_WithExistingSignal_ExpectedRepositoryDeleteCall()
             {
-                SetupWebService();
-                var signal = GetDefaultSignal_IntegerMonth();
-                signalsRepositoryMock
-                    .Setup(f => f.Get(It.IsAny<int>()))
-                    .Returns(signal);
-                
+                var signal = PrepareDefaultSignalToGet();
+
                 signalsWebService.Delete(1);
 
                 signalsRepositoryMock
-                    .Verify(f => f.Delete(It.Is<Domain.Signal>(sig
-                        => sig.DataType == signal.DataType &&
-                        sig.Path.ToString() == signal.Path.ToString() &&
-                        sig.Granularity == signal.Granularity)), Times.Once);
+                    .Verify(f => f.Delete(It.Is<Domain.Signal>(sig => CompareSignal(sig, signal))), Times.Once);
             }
 
             [TestMethod]
             public void Delete_WithExistingSignalAndData_ExpectedDataRepositoryDeleteDataCall()
             {
-                SetupWebService();
-                var signal = GetDefaultSignal_IntegerMonth();
-                signalsRepositoryMock
-                    .Setup(f => f.Get(It.IsAny<int>()))
-                    .Returns(signal);
+                var signal = PrepareDefaultSignalToGet();
 
                 signalsWebService.Delete(1);
 
                 signalsDataRepositoryMock
-                    .Verify(f => f.DeleteData<Int32>(It.Is<Signal>(sig
-                        => sig.DataType == signal.DataType &&
-                        sig.Path.ToString() == signal.Path.ToString() &&
-                        sig.Granularity == signal.Granularity)), Times.Once);
+                    .Verify(f => f.DeleteData<Int32>(It.Is<Signal>(sig => CompareSignal(sig, signal))), Times.Once);
             }
 
             [TestMethod]
             public void Delete_WithExistingSignalAndMVP_ExpectedMVPRepositorySetCallWithNull()
             {
+                var signal = PrepareDefaultSignalToGet();
+
+                signalsWebService.Delete(1);
+
+                missingValuePolicyRepositoryMock
+                    .Verify(f => f.Set(It.Is<Signal>(sig => CompareSignal(sig, signal)), null), Times.Once);
+            }
+
+            private Signal PrepareDefaultSignalToGet()
+            {
                 SetupWebService();
+
                 var signal = GetDefaultSignal_IntegerMonth();
                 signalsRepositoryMock
                     .Setup(f => f.Get(It.IsAny<int>()))
                     .Returns(signal);
 
-                signalsWebService.Delete(1);
+                return signal;
+            }
 
-                missingValuePolicyRepositoryMock
-                    .Verify(f => f.Set(It.Is<Signal>(sig => 
-                        sig.DataType == signal.DataType &&
-                        sig.Path.ToString() == signal.Path.ToString() &&
-                        sig.Granularity == signal.Granularity), null), Times.Once);
+            private bool CompareSignal(Signal a, Signal b)
+            {
+                return a.DataType == b.DataType &&
+                    a.Granularity == b.Granularity &&
+                    a.Path.ToString() == b.Path.ToString() &&
+                    a.Id == b.Id;
             }
 
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
