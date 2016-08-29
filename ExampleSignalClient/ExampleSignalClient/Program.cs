@@ -12,16 +12,16 @@ namespace ExampleSignalClient
             var id = client.Add(new Signal()
             {
                 DataType = DataType.Integer,
-                Granularity = Granularity.Year,
-                Path = new Path() { Components = new[] { "Year" } }
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "signal1" } }
             }).Id.Value;
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2002, 1, 1));
-
-            foreach (var d in result)
+            var data = new Datum[]
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
-            }
+                new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1, 0) }
+            };
+
+            client.SetData(id, data);
 
             Console.ReadKey();
         }
