@@ -269,7 +269,7 @@ namespace Domain.Services.Implementation
 
                 return new Datum<T>
                 {
-                    Quality = next.Quality > previous.Quality ? previous.Quality : next.Quality,
+                    Quality = previous.Quality.IsLowerQualityThan(next.Quality) ? previous.Quality : next.Quality,
                     Value = value,
                     Signal = signal,
                     Timestamp = dateTime
