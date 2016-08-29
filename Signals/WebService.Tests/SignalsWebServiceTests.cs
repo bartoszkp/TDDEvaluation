@@ -787,7 +787,7 @@ namespace WebService.Tests
                 var signal = new Signal() { DataType = DataType.String, Granularity = Granularity.Day, Path = Path.FromString("somePath"), Id = dummyId };
 
                 GivenASignal(signal);
-                signalsWebService.Delete(1);
+                signalsWebService.Delete(dummyId);
                 signalsRepositoryMock.Verify(d => d.Delete(It.IsAny<Domain.Signal>()));
             }
 

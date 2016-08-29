@@ -295,5 +295,10 @@ namespace Domain.Services.Implementation
                     return false;
             }
         }
+
+        public void Delete(Signal signalDomain)
+        {
+            this.signalsRepository.Delete(signalDomain);
+        }
     }
 }

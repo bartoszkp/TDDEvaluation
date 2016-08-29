@@ -52,7 +52,10 @@ namespace WebService
 
         public void Delete(int signalId)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+            var signalDomain = signal.ToDomain<Domain.Signal>();
+
+            this.signalsDomainService.Delete(signalDomain);
         }
 
         public PathEntry GetPathEntry(Path pathDto)
