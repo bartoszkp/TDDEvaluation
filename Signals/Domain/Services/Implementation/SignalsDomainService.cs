@@ -160,11 +160,18 @@ namespace Domain.Services.Implementation
         public PathEntry GetPathEntry(Path pathDomain)
         {
             List<Domain.Signal> signalList = signalsRepository.GetAllWithPathPrefix(pathDomain).ToList();
-            List<Domain.Path> pathList = new List<Path>();
-            signalList.ForEach(p => { pathList.Add(p.Path); });
-            return new PathEntry(signalList, pathList);
 
+            var directPathSignals = signalList
+                .Where(s => s.Path.Length == pathDomain.Length + 1)
+                .ToArray();
 
+            var subPaths = signalList
+                .Where(s => s.Path.Length > pathDomain.Length + 1)
+                .Select(s => s.Path.GetPrefix(pathDomain.Length + 1))
+                .Distinct()
+                .ToArray();
+
+            return new PathEntry(directPathSignals, subPaths);
         }
         
         public DateTime AddToDateTime(DateTime date, Signal signal)
