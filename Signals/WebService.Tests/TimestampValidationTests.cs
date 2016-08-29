@@ -41,6 +41,23 @@ namespace WebService.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
+        public void WhenSettigDataForMonthlySignal_WithInvalidDataTimestamp_InvalidTimestampExceptionIsThrown()
+        {
+            SetupWebService();
+            var returnedSignal = new Domain.Signal() { Id = 1, Granularity = Domain.Granularity.Month, DataType = Domain.DataType.Integer };
+
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+
+            List<Dto.Datum> data = new List<Dto.Datum>()
+            {
+                new Dto.Datum() {Quality = Dto.Quality.Bad,Timestamp = new DateTime(2000, 1, 1, 0, 0, 1, 0),Value = 0  }
+            };
+
+            signalsWebService.SetData(1, data);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidTimestampException))]
         public void GetData_DayGranularity_InvalidTimestamp_ExceptionThrown()
         {
             SetupWebService();
