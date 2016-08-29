@@ -43,7 +43,9 @@ namespace Domain.Services.Implementation
 
         public void Delete(int signalId)
         {
-            signalsRepository.Get(signalId);
+            var signal = signalsRepository.Get(signalId);
+
+            signalsRepository.Delete(signal);
         }
 
         public Signal GetById(int signalId)
