@@ -535,11 +535,6 @@ namespace WebService.Tests
                     new Domain.Datum<int>() {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 2), Value = 4 }
                 });
 
-                var givenData = new Dto.Datum[]
-                {
-                    new Dto.Datum() {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
-                    new Dto.Datum() {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 2), Value = 4 }
-                };
                 var expectedData = new Dto.Datum[]
                 {
                     new Dto.Datum() {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 10), Value = 4 },

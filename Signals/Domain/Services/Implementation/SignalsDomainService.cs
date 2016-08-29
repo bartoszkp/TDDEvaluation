@@ -109,7 +109,7 @@ namespace Domain.Services.Implementation
 
                 var datum = getData.FirstOrDefault(d => dt <= d.Timestamp && next > d.Timestamp);
                 if (datum == null)
-                    datum = GenerateDatumFromPolicy(getMissingValuePolicy as MissingValuePolicy<T>, signal, dt, result.LastOrDefault());
+                    datum = GenerateDatumFromPolicy(getMissingValuePolicy as MissingValuePolicy<T>, signal, dt);
                 result.Add(datum);
 
                 dt = next;
@@ -117,7 +117,7 @@ namespace Domain.Services.Implementation
             return result;
         }
 
-        private Datum<T> GenerateDatumFromPolicy<T>(MissingValuePolicy<T> mvp, Signal signal, DateTime timestamp, Datum<T> lastDatum)
+        private Datum<T> GenerateDatumFromPolicy<T>(MissingValuePolicy<T> mvp, Signal signal, DateTime timestamp)
         {
             Datum<T> result = null;
 
