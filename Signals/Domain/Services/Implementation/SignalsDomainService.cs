@@ -494,7 +494,7 @@ namespace Domain.Services.Implementation
                     return timestamp.Millisecond == 0;
                     
                 case Granularity.Minute:
-                    return timestamp.Second == 0;
+                    return timestamp.Second == 0 && timestamp.Millisecond == 0;
 
                 case Granularity.Hour:
                     return timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
