@@ -648,6 +648,46 @@ namespace WebService.Tests
                 signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 1, 0), new DateTime(2000, 2, 1));
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataWithZOMVP_WhenGettingDataUsingDatesAfterTheDatumsLastTimestamp_ReturnsDatumsAccordingToZOMVP()
+            {
+                int signalId = 1;
+                var signal = SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                var addedDate = new DateTime(2000, 1, 1);
+                var data = new Datum<double>[]
+                {
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = addedDate, Value = 1.0}
+                };
+
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(d => d == addedDate), It.Is<DateTime>(d => d == addedDate)))
+                    .Returns(data);
+
+                var policy = new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(policy);
+
+                var fromDate = new DateTime(2000, 1, 3);
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetDataOlderThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(d => d == fromDate), 1))
+                    .Returns(data);
+
+                var result = signalsWebService.GetData(signalId, fromDate, fromDate.AddDays(2)).ToArray();
+
+                const int expectedNumberOfResults = 2;
+                Assert.AreEqual(expectedNumberOfResults, result.Length);
+                Assert.AreEqual(new DateTime(2000, 1, 3), result[0].Timestamp);
+                Assert.AreEqual(new DateTime(2000, 1, 4), result[1].Timestamp);
+                for(int i = 0; i < expectedNumberOfResults; ++i)
+                {
+                    Assert.AreEqual(data[0].Value, result[i].Value);
+                    Assert.AreEqual(data[0].Quality.ToDto<Dto.Quality>(), result[i].Quality);
+                }                
+            }
+
             private void SetupDataRepository<T>()
             {
                 signalsDataRepositoryMock
