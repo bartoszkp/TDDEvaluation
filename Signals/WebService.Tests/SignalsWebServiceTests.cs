@@ -1141,6 +1141,42 @@ namespace WebService.Tests
                 signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
             }
 
+            [TestMethod]
+            public void GetData_FirstOrderMVPWithOutBoundValues_ExpectedEmptyDatums()
+            {
+                SetupWebService();
+
+                var signal = new Signal()
+                {
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("a")
+                };
+                var signalId = 1;
+
+                var datum = new List<Dto.Datum>
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 3 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 5), Value = 5 }
+                };
+
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datum.ToArray());
+
+                missingValuePolicyRepositoryMock
+                   .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                   .Returns(new FirstOrderMissingValuePolicyInteger());
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 8));
+
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = 0 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 2), Value = 0 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 4), Value = 4 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 6), Value = 0 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 7), Value = 0 });
+
+                DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
+            }
+
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
             {
                 signalsRepositoryMock
