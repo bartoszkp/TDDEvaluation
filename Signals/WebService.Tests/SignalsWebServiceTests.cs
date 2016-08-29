@@ -551,6 +551,32 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareDatum(result, expectedData));
             }
 
+            [TestMethod]
+            public void GivenASignalWithZeroOrderValueMissingValuePolicyAndNoOlderData_WhenGettingData_DataIsFilledWithDefaultValues()
+            {
+                var signal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x/y"));
+                GivenASignal(signal);
+
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble() { });
+                SetupGetData<double>(new Domain.Datum<double>[] { });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<double>(It.IsAny<Signal>(), new DateTime(2000, 10, 1), 1)).Returns(new Domain.Datum<double>[]
+                {
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<double>(It.IsAny<Signal>(), new DateTime(2000, 11, 1), 1)).Returns(new Domain.Datum<double>[]
+                {
+                });
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 10, 1), Value = default(double) },
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 11, 1), Value = default(double) }
+                };
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 10, 1), new DateTime(2000, 12, 1));
+
+                Assert.IsTrue(CompareDatum(result, expectedData));
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
