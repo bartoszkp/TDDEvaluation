@@ -53,7 +53,7 @@ namespace WebService.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
-        public void WhenSettigDataForYearlySignal_WithInvalidMiliSecondTimestamp_InvalidTimestampExceptionIsThrown()
+        public void WhenSettigDataForYearlySignal_WithInvalidMilliSecondTimestamp_InvalidTimestampExceptionIsThrown()
         {
             SetupSignalWithSpecificGranularity(Domain.Granularity.Year);
 
@@ -77,7 +77,7 @@ namespace WebService.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
-        public void WhenSettigDataForMonthlySignal_WithInvalidMiliSecondTimestamp_InvalidTimestampExceptionIsThrown()
+        public void WhenSettigDataForMonthlySignal_WithInvalidMilliSecondTimestamp_InvalidTimestampExceptionIsThrown()
         {
             SetupSignalWithSpecificGranularity(Domain.Granularity.Month);
 
