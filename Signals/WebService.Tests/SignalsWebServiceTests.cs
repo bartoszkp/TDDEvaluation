@@ -1101,6 +1101,25 @@ namespace WebService.Tests
                 DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(TypeUnsupportedException))]
+            public void GetData_FirstOrderMVPWithInvalidDataType_ExpectedException()
+            {
+                SetupWebService();
+                var signal = new Signal()
+                {
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Hour,
+                    Path = Path.FromString("a")
+                };
+                var signalId = 1;
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, new Dto.Datum[] { });
+                missingValuePolicyRepositoryMock
+                  .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                  .Returns(new FirstOrderMissingValuePolicyBoolean());
+
+                signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
+            }
 
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
             {
