@@ -506,7 +506,7 @@ namespace Domain.Services.Implementation
                     return timestamp.DayOfWeek == DayOfWeek.Monday && timestamp.Hour == 0 && timestamp.Minute == 0;
 
                 case Granularity.Month:
-                    return timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0;
+                    return timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
 
                 case Granularity.Year:
                     return timestamp.Month == 1 &&  timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0;
