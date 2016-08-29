@@ -20,5 +20,6 @@ namespace Domain.Services
         MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal);
 
         PathEntry GetPathEntry(Path pathDomain);
+        void Delete(int signalId);
     }
 }

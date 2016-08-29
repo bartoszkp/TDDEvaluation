@@ -101,10 +101,14 @@ namespace WebService.Tests
 
             #region Delete
             [TestMethod]
-            public void GivenNoSignal_WhenDeletingSignal_RepositoryDeleteIsCalledWithGivenId()
+            public void GivenASignal_WhenDeletingSignal_RepositoryDeleteIsCalledWithGivenId()
             {
-                GivenNoSignals();
                 int signalId = 1;
+                var signal = new Domain.Signal
+                {
+                    Id = signalId
+                };
+                GivenASignal(signal);
                 signalsRepositoryMock
                     .Setup(sr => sr.Delete(It.IsAny<Signal>()));
 

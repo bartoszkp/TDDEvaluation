@@ -91,8 +91,6 @@ namespace Domain.Services.Implementation
             signalsDataRepository.SetData(data);
         }
         
-        
-
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             
@@ -175,11 +173,10 @@ namespace Domain.Services.Implementation
             return new PathEntry(directPathSignals, subPaths.AsEnumerable<Path>().ToArray());
         }
 
-
-
-
-
-
+        public void Delete(int signalId)
+        {
+            signalsRepository.Delete(GetById(signalId));
+        }
 
 
         public void VerifyTimeStamp<T>(Granularity granularity, Datum<T> checkingElement)
@@ -247,5 +244,7 @@ namespace Domain.Services.Implementation
                 throw new TimestampHaveWrongFormatException();
             }
         }
+
+
     }
 }
