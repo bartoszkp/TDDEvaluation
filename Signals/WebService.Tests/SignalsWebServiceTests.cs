@@ -560,37 +560,7 @@ namespace WebService.Tests
                     Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, result.ElementAt(i).Timestamp);
                 }
             }
-
-            [TestMethod]
-            public void GivenASignalAndDatum_WhenGetDataWithArgmunetsLessThanFrom_ReturnEmptyResult()
-            {
-                var existingSignal = new Signal()
-                {
-                    Id = 1111,
-                    DataType = Domain.DataType.Double,
-                    Granularity = Granularity.Month,
-                    Path = Domain.Path.FromString("signal")
-                };
-                var existingDatum = new Dto.Datum[]
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1)},
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1)},
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1)}
-                };
-                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-                signalDataRepositoryMock
-                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
-
-                GivenASignal(existingSignal);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
-                Assert.IsNull(result);
-            }
-
+            
             [TestMethod]
             public void GivenASignal_GetData_ReturnAllNoneQualityMissingValueElements()
             {
@@ -930,6 +900,38 @@ namespace WebService.Tests
                 Assert.AreEqual(2, result.SubPaths.Count());
                 CollectionAssert.AreEqual(new[] { "root", "sub" }, result.SubPaths.First().Components.ToArray());
                 CollectionAssert.AreEqual(new[] { "root", "subsub" }, result.SubPaths.Last().Components.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenASignalAndData_WhenGettingDataFromEmptyRange_ReturnsEmptyResult()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month
+                });
+                
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+                
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 3 , 1), new DateTime(2000,1,1));
+
+                Assert.AreEqual(0, result.Count());
             }
 
             private Dto.Signal SignalWith(
