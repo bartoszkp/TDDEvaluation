@@ -103,6 +103,14 @@ namespace Domain.Services.Implementation
             var result = new List<Datum<T>>();
             var dt = fromIncludedUtc;
 
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                var datum = getData.FirstOrDefault(d => dt <= d.Timestamp);
+                if (datum == null)
+                    datum = GenerateDatumFromPolicy(getMissingValuePolicy as MissingValuePolicy<T>, signal, dt);
+                result.Add(datum);
+            }
+
             while(dt < toExcludedUtc )
             {
                 var next = SignalUtils.GetNextDate(dt, signal.Granularity);
