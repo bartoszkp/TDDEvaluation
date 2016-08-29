@@ -113,7 +113,16 @@ namespace Domain.Services.Implementation
                     xx = gettingList.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
                 if (xx == null)
                 {
-                    if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                    if(signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1) != null && mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                    {
+                        var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
+                        datum = new Datum<T>()
+                        {
+                            Quality = olderDatum.First().Quality,
+                            Value = olderDatum.First().Value
+                        };
+                    }
+                    else if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                     {
                         if (returnList.Count == 0)
                             datum = new Datum<T>()
