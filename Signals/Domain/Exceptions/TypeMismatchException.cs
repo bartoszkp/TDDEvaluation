@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    class TypeMismatchException : Exception
+    public class TypeMismatchException : Exception
     {
         public TypeMismatchException()
             : base("The types must be equal")

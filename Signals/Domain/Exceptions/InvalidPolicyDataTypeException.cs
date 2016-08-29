@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    class InvalidPolicyDataTypeException : Exception
+    public class InvalidPolicyDataTypeException : Exception
     {
         public InvalidPolicyDataTypeException(Type type)
             : base($"`{type}` is not a valid data type for current MissingValuePolicy.")
