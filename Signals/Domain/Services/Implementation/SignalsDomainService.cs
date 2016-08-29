@@ -102,10 +102,12 @@ namespace Domain.Services.Implementation
                 var datum = (from x in result
                              where x.Timestamp == date
                              select x).FirstOrDefault();
+                
                 if (datum == null)
                 {
                     Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy,lastDatum);
                     result.Add(tempDatum);
+                    datum = tempDatum;
                 }
                 lastDatum = datum;
                 date = AddTime(signal.Granularity, date);
