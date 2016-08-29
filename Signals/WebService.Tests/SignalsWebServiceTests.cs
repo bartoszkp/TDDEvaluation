@@ -1296,6 +1296,26 @@ namespace WebService.Tests
                 AssertDatum(result, filledDatum);
             }
 
+            [TestMethod]
+            public void GivenASignalAndDatumWithZeroOrderMVP_WhenGettingData_MVPCorrectlyPropagateSamplesMoreThanOneStepOld()
+            {
+                var existingSignal = SignalWith(1, DataType.String, Granularity.Day, Domain.Path.FromString("root/signal1"));
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = "first" },
+                };
+                var filledDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 10),  Value = "first"},
+                };
+                var fromIncludedUtc = new DateTime(2000, 1, 10);
+                var toExcludedUtc = new DateTime(2000, 1, 11);
+                
+                SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, fromIncludedUtc, toExcludedUtc, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
+                var result = signalsWebService.GetData(existingSignal.Id.Value, fromIncludedUtc, toExcludedUtc);
+                AssertDatum(result, filledDatum);
+            }
+
             #endregion
 
             #region PathEntry
