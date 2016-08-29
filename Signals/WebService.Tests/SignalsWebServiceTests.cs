@@ -703,6 +703,31 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2016, 8, 29), result[1].Timestamp);
                 Assert.AreEqual(5.4, result[1].Value);
             }
+            [TestMethod]
+            public void GivenNoData_WhenGettingDataWithFromIncludedUtcEqualsToExcluededUtc_ReturnsDataWithFilledZeroOrderMissingValuePolicy()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+                int expectedCount = 1;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(double)},
+                
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
 
             private Signal GetDefaultSignal_IntegerMonth()
             {

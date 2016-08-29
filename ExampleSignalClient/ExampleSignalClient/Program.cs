@@ -13,8 +13,9 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Decimal,
                 Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "second35" } }
+                Path = new Path() { Components = new[] { "second315778" } }
             }).Id.Value;
+            client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy());
 
             var ts = new DateTime(2000, 1, 1, 1, 1, 1);
             var result = client.GetData(id, ts, ts);
