@@ -769,9 +769,39 @@ namespace WebService.Tests
 
             }
 
-            private void MakeASignalWebServiceForZeroOrderMissingValuePolicy(int signalId)
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithZeroOrderMissingValuePolicy_CheckIfReturnsTheOldestData()
             {
-                
+                int signalId = 5;
+                Domain.Datum<string> givenDatum = new Domain.Datum<string>()
+                { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "first" };
+
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
+                GivenData(signalId, new Domain.Datum<string>[] { givenDatum });
+                SetupSignalsRepoGetDataOlderThan_ReturnsDatum(new Domain.Datum<string>[] { givenDatum }, signalId);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11)).ToArray();
+
+                Assert.AreEqual("first", result[0].Value);
+                Assert.AreEqual(Dto.Quality.Good, result[0].Quality);
+                Assert.AreEqual(new DateTime(2000, 1, 10), result[0].Timestamp);
+            }
+
+            private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatum, int signalId)
+            {
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetDataOlderThan<string>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns(givenDatum);
+            }
+
+            private void MakeASignalWebServiceForZeroOrderMissingValuePolicy(int signalId)
+            {       
                 var signal = SignalWith(
                     id: signalId,
                     dataType: Domain.DataType.String,
