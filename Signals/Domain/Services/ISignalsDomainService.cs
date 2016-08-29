@@ -21,6 +21,8 @@ namespace Domain.Services
 
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
+        IEnumerable<Datum<T>> GetDataOlderThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount);
+
         PathEntry GetPathEntry(Path path);
     }
 }

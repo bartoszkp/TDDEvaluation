@@ -97,11 +97,12 @@ namespace WebService
             CheckTimestamp(fromIncludedUtc, signal.Granularity);
 
             IEnumerable<Domain.Datum<T>> result = signalsDomainService.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+            var earlierDatum = signalsDomainService.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).FirstOrDefault();
 
             var policy = this.signalsDomainService.GetMissingValuePolicy(signal.Id.Value) as Domain.MissingValuePolicy.MissingValuePolicy<T>;
 
             if(policy != null)
-                result = policy.SetMissingValue(signal, result, fromIncludedUtc, toExcludedUtc);
+                result = policy.SetMissingValue(signal, result, fromIncludedUtc, toExcludedUtc, earlierDatum);
 
             result = result.OrderBy(dat => dat.Timestamp).ToArray();
 

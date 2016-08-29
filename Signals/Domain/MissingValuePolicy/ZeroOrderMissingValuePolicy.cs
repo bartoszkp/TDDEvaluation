@@ -6,7 +6,7 @@ namespace Domain.MissingValuePolicy
 {
     public class ZeroOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override IEnumerable<Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public override IEnumerable<Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> earlierDatum = null)
         {
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum<T>>();
@@ -25,7 +25,7 @@ namespace Domain.MissingValuePolicy
 
                 while (tmp < toExcludedUtc)
                 {
-                    AddToTheListSuitableDatum(filledList, tmp, datums, signal);
+                    AddToTheListSuitableDatum(filledList, tmp, signal, datums, earlierDatum);
 
                     tmp = DateHelper.NextDate(tmp, granularity);
                 }
@@ -34,7 +34,7 @@ namespace Domain.MissingValuePolicy
             }
         }
 
-        private void AddToTheListSuitableDatum(List<Datum<T>> filledList, DateTime tmp, IEnumerable<Domain.Datum<T>> datums, Signal signal)
+        private void AddToTheListSuitableDatum(List<Datum<T>> filledList, DateTime tmp, Signal signal, IEnumerable<Domain.Datum<T>> datums, Datum<T> earlierDatum)
         {
             Datum<T> newDatum = datums.FirstOrDefault(datum => datum.Timestamp == tmp);
 
@@ -50,7 +50,21 @@ namespace Domain.MissingValuePolicy
                         Value = last.Value
                     };
                 else
-                    newDatum = Datum<T>.CreateNone(signal, tmp);
+                {
+                    if(earlierDatum == null)
+                        newDatum = Datum<T>.CreateNone(signal, tmp);
+                    else
+                    {
+                        newDatum = new Datum<T>
+                        {
+                            Quality = earlierDatum.Quality,
+                            Signal = Signal,
+                            Timestamp = tmp,
+                            Value = earlierDatum.Value
+                        };
+                    }
+                }
+                    
             }
             filledList.Add(newDatum);
         }

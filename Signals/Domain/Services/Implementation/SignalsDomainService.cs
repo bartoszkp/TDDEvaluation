@@ -116,5 +116,10 @@ namespace Domain.Services.Implementation
 
             return new PathEntry(signals, subPaths);
         }
+
+        public IEnumerable<Datum<T>> GetDataOlderThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount)
+        {
+            return signalsDataRepository.GetDataOlderThan<T>(signal, excludedUtc, maxSampleCount);
+        }
     }
 }
