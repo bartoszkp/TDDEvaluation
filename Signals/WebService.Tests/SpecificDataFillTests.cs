@@ -56,7 +56,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GivenASignal_WhenGettingData_SpecificGoodQualityPolicy_CorrectlyFillsMissingSecondData()
+        public void GivenASecondSignal_WhenGettingData_SpecificGoodQualityPolicy_CorrectlyFillsMissingData()
         {
             SetupSpecificPolicy(Granularity.Second, Domain.Quality.Fair, 
                 new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5), new List<Datum<double>>()
@@ -80,7 +80,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GivenASignal_WhenGettingData_SpecificFairQualityPolicy_CorrectlyFillsMissingSecondData()
+        public void GivenASecondSignal_WhenGettingData_SpecificFairQualityPolicy_CorrectlyFillsMissingData()
         {
             SetupSpecificPolicy(Granularity.Second, Domain.Quality.Fair,
                 new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5), new List<Datum<double>>()
@@ -104,7 +104,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GivenASignal_WhenGettingData_SpecificGoodQualityPolicy_CorrectlyFillsMissingMinuteData()
+        public void GivenAMinuteSignal_WhenGettingData_SpecificGoodQualityPolicy_CorrectlyFillsMissingData()
         {
             SetupSpecificPolicy(Granularity.Minute, Domain.Quality.Good, 
                 new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 5, 0), new List<Datum<double>>()
