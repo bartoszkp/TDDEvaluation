@@ -65,13 +65,10 @@ namespace WebService.Tests
 
             var returnedSignal = new Signal() { Id = id, Granularity = Granularity.Second, DataType = DataType.Double };
 
-            Mock<SpecificValueMissingValuePolicy<double>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<double>>();
-            specificMvpMock.Object.Value = 42.42;
-            specificMvpMock.Object.Quality = Quality.Good;
-
             signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
             mvpRepoMock.Setup(m => m.Get(returnedSignal))
-                .Returns(specificMvpMock.Object);
+                .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
+                { Id = 1, Quality = Quality.Good, Value = 42.42, Signal = returnedSignal, });
 
             dataRepoMock.Setup(d => d.GetData<double>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5)))
                 .Returns(new List<Datum<double>>()
