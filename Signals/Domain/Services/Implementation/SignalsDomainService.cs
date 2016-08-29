@@ -105,10 +105,19 @@ namespace Domain.Services.Implementation
 
             if (fromIncludedUtc == toExcludedUtc) toExcludedUtc = toExcludedUtc.AddTicks(1);
 
+            var dataOlderThanRequest = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();
+
             for (DateTime dt = fromIncludedUtc; dt < toExcludedUtc; AddToDateTime(ref dt, signal.Granularity), index++)
-                if (sortedData.FirstOrDefault(d => d.Timestamp == dt) == null)
-                    sortedData.Insert(index, policy.GetMissingDatum(sortedData, dt));
-            
+                if (sortedData.FirstOrDefault(d => d.Timestamp == dt) == null) {
+                    if (dataOlderThanRequest == null) {
+                        sortedData.Insert(index, policy.GetMissingDatum(sortedData, dt));
+                    } else {
+                        dataOlderThanRequest.Timestamp = dt;
+                        sortedData.Insert(index, dataOlderThanRequest);
+                        dataOlderThanRequest = null;
+                    }
+                }
+                    
             return sortedData;
         }
 

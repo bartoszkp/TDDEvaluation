@@ -9,39 +9,26 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var signal1 = new Signal()
+            var id = client.Add(new Signal()
             {
-                DataType = DataType.Boolean,
+                DataType = DataType.String,
                 Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "signal1" } }
-            };
-            var signal2 = new Signal()
+                Path = new Path() { Components = new[] { "day" } }
+            }).Id.Value;
+
+            client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.String });
+            client.SetData(id, new Datum[]
             {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "signal2 " } }
-            };
+    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = "first", Quality = Quality.Good },
+    new Datum() { Timestamp = new DateTime(2000, 1, 2), Value = "second", Quality = Quality.Fair },
+     new Datum() { Timestamp = new DateTime(2000, 1, 3), Value = "third", Quality = Quality.Poor },
+            });
 
-            var signalId1 = client.Add(signal1).Id.Value;
-            var signalId2 = client.Add(signal2).Id.Value;
+            var result = client.GetData(id, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
 
-            client.SetData(
-                signalId1,
-                 new Datum[] { new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = false } });
-            client.SetData(
-                signalId2,
-                new Datum[] { new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = true } });
-
-            var data1 = client.GetData(signalId1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
-            var data2 = client.GetData(signalId2, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
-
-            foreach (var d in data1)
+            foreach (var d in result)
             {
-                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
-            }
-            foreach (var d in data2)
-            {
-                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
             }
 
             Console.ReadKey();
