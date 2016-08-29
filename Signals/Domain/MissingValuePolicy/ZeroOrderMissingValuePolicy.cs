@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Infrastructure;
+using Domain.Services.Implementation;
 
 namespace Domain.MissingValuePolicy
 {
@@ -33,6 +34,7 @@ namespace Domain.MissingValuePolicy
                 .Select(d => dataDictionary.ContainsKey(d) ? dataDictionary[d] : Datum<T>.CreateNone(Signal, d));
 
             var resultList = resultEnumerable.ToList();
+            
 
             int j = 0;
             foreach (var item in resultList)

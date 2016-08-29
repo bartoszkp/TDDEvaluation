@@ -134,11 +134,24 @@ namespace Domain.Services.Implementation
 
             MissingValuePolicy<T> missingValuePolicy;
 
+            var mvp = GetMissingValuePolicy(signal);
+
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToArray();
 
+            var dataList = this.signalsDataRepository
+                .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
+
             if (data == null)
                 return null;
+
+            if (mvp is ZeroOrderMissingValuePolicy<T>)
+            {
+                ZeroOrderDataFillHelper.FillMissingData(this, signal,dataList, fromIncludedUTC, toExcludedUTC);
+                return dataList;
+            }
+
+
 
             if (data.Count() == 0 || data.First().Timestamp != fromIncludedUTC)
             {
@@ -201,6 +214,12 @@ namespace Domain.Services.Implementation
             return new PathEntry(signals, paths);
         }
 
+        public IEnumerable<Datum<T>> GetDataOlderThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount)
+        {
+            return this.signalsDataRepository.GetDataOlderThan<T>(signal, excludedUtc, maxSampleCount);
+        }
+
+
         private bool isTimeStampValid<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
             foreach (var datum in data)
@@ -249,6 +268,7 @@ namespace Domain.Services.Implementation
 
             return true;
         }
+
 
         private bool IsZero(int millisecond, int second = 0, int minute = 0, int hour = 0, DayOfWeek dayOfWeek = DayOfWeek.Monday, int day = 1, int month = 1)
         {
