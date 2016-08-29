@@ -16,28 +16,7 @@ namespace WebService.Tests
     [TestClass]
     public class TimestampValidationTests
     {
-
         private SignalsWebService signalsWebService;
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidTimestampException))]
-        public void SetData_InvalidMonthGranularityTimestamp_ExceptionThrown()
-        {
-            SetupWebService();
-            var returnedSignal = new Domain.Signal() { Id = 1, Granularity = Domain.Granularity.Month, DataType = Domain.DataType.Double };
-
-
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
-
-            List<Dto.Datum> data = new List<Dto.Datum>()
-                {
-                    new Dto.Datum() {Quality = Dto.Quality.Good,Timestamp = new DateTime(2000, 1, 1, 2, 45, 0),Value = (double)1.5  }
-                };
-
-            signalsWebService.SetData(1, data);
-
-
-        }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
