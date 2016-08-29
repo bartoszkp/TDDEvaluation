@@ -70,8 +70,7 @@ namespace WebService
 
             if (signal == null)
                 throw new IdNotNullException();
-            if (fromIncludedUtc > toExcludedUtc)
-                return null;
+            
             switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
