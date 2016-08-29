@@ -1097,8 +1097,13 @@ namespace WebService.Tests
 
                 var returnedData = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
 
-                Assert.AreEqual(data.Count(),returnedData.Count());
-                Assert_Datums(data,returnedData.ToArray());
+                Dto.Datum[] expectedData = new Datum[] 
+                {
+                    new Datum() { Timestamp = new DateTime(2000, 1, 10), Value = 1, Quality = Dto.Quality.Good }
+                };
+
+                Assert.AreEqual(expectedData.Count(),returnedData.Count());
+                Assert_Datums(expectedData,returnedData.ToArray());
             }
 
             #endregion
