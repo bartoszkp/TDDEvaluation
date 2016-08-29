@@ -60,6 +60,9 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            if (fromIncludedUtc > toExcludedUtc)
+                return new List<Datum>();
+
             var signal = this.signalsDomainService?.GetById(signalId);
             if (signal == null)
             {

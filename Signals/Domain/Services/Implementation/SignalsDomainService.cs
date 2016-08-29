@@ -122,8 +122,6 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUTC, DateTime toExcludedUTC)
         {
-            if (fromIncludedUTC > toExcludedUTC)
-                return new List<Datum<T>>();
 
             List<Datum<T>> dataToCheck = new List<Datum<T>>();
             dataToCheck.Add(new Datum<T>() { Timestamp = fromIncludedUTC });
