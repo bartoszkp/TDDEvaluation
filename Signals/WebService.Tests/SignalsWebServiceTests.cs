@@ -98,7 +98,23 @@ namespace WebService.Tests
             }
 
             #endregion
-        
+
+            #region Delete
+            [TestMethod]
+            public void GivenNoSignal_WhenDeletingSignal_RepositoryDeleteIsCalledWithGivenId()
+            {
+                GivenNoSignals();
+                int signalId = 1;
+                signalsRepositoryMock
+                    .Setup(sr => sr.Delete(It.IsAny<Signal>()));
+
+                signalsWebService.Delete(signalId);
+
+                signalsRepositoryMock
+                    .Verify(sr => sr.Delete(It.Is<Signal>((s => s.Id == signalId))));
+            }
+            #endregion
+
             #region GetById
 
             [TestMethod]
