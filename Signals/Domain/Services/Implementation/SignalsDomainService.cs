@@ -173,6 +173,9 @@ namespace Domain.Services.Implementation
             if (mvp is ZeroOrderMissingValuePolicy<T>)
                 datumsList = AddZeroOrderMissingValuePolicy(datumsList, time, toExcludedUtc, signal);
 
+            if (mvp is FirstOrderMissingValuePolicy<T>)
+                datumsList = AddFirstOrderMissingValuePolicy(datumsList, time, toExcludedUtc, signal);
+
             return datumsList;
         }
 
@@ -188,6 +191,63 @@ namespace Domain.Services.Implementation
                         datumsList.Add(new Datum<T>() { Quality = dataToAdd.Quality, Timestamp = time, Value = dataToAdd.Value });
                     else
                         datumsList.Add(new Datum<T>() { Quality = Quality.None, Timestamp = time, Value = default(T) });
+                }
+                time = ShiftTime(signal.Granularity, time);
+            }
+
+            return datumsList;
+        }
+
+        private Quality GetWorseQuality(Quality a, Quality b)
+        {
+            var qualityOrder = new Quality[] { Quality.None, Quality.Bad, Quality.Poor, Quality.Fair, Quality.Good };
+
+            int aIndex = Array.FindIndex(qualityOrder, q => q == a);
+            int bIndex = Array.FindIndex(qualityOrder, q => q == b);
+
+            return aIndex < bIndex ? a : b;
+        }
+
+        private T CalculateInterpolatedValue<T>(Datum<T> olderData, Datum<T> newerData, DateTime time, Signal signal)
+        {
+            int currentTimeDiff = GetNumberOfTimeStepsBetween(signal.Granularity, olderData.Timestamp, time);
+            long wholeTimeDiff = GetNumberOfTimeStepsBetween(signal.Granularity, olderData.Timestamp, newerData.Timestamp);
+
+            T addedValue = ((dynamic)newerData.Value - (dynamic)olderData.Value) * currentTimeDiff / wholeTimeDiff;
+            return (dynamic)olderData.Value + addedValue;
+                
+        }
+
+        private List<Datum<T>> AddFirstOrderMissingValuePolicy<T>
+     (List<Datum<T>> datumsList, DateTime time, DateTime toExcludedUtc, Signal signal)
+        {
+            if (typeof(T) == typeof(string))
+                throw new NotSupportedException("FirstOrderMissingValuePolicy does not support string data.");
+
+            while (time < toExcludedUtc)
+            {
+                if (datumsList.FindIndex(x => x.Timestamp == time) < 0)
+                {
+
+                    var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, time, 1).SingleOrDefault();
+                    var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, time, 1).SingleOrDefault();
+
+                    if(olderData == null || newerData == null)
+                        datumsList.Add(new Datum<T>()
+                        {
+                            Quality = Quality.None,
+                            Timestamp = time,
+                            Value = default(T),
+                            Signal = signal
+                        });
+                    else
+                        datumsList.Add(new Datum<T>()
+                        {
+                            Quality = GetWorseQuality(olderData.Quality, newerData.Quality),
+                            Timestamp = time,
+                            Value =  CalculateInterpolatedValue(olderData, newerData, time, signal),
+                            Signal = signal
+                        });
                 }
                 time = ShiftTime(signal.Granularity, time);
             }
@@ -244,6 +304,29 @@ namespace Domain.Services.Implementation
                     return time.AddYears(shift);
                 default:
                     return new DateTime();
+            }
+        }
+
+        private int GetNumberOfTimeStepsBetween(Granularity granularity, DateTime olderTime, DateTime newerTime)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return (int)(newerTime - olderTime).TotalSeconds;
+                case Granularity.Minute:
+                    return (int)(newerTime - olderTime).TotalMinutes;
+                case Granularity.Hour:
+                    return (int)(newerTime - olderTime).TotalHours;
+                case Granularity.Day:
+                    return (int)(newerTime - olderTime).TotalDays;
+                case Granularity.Week:
+                    return (int)(newerTime - olderTime).TotalDays / 7;
+                case Granularity.Month:
+                    return (newerTime.Year - olderTime.Year) * 12 + (newerTime.Month - olderTime.Month);
+                case Granularity.Year:
+                    return (int)(newerTime.Year - olderTime.Year);
+                default:
+                    return 0;
             }
         }
 
