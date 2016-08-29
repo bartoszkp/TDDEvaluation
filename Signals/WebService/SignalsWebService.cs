@@ -84,10 +84,7 @@ namespace WebService
                         .Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
                 default:
                     throw new KeyNotFoundException();
-            }
-                    
-
-            
+            }   
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

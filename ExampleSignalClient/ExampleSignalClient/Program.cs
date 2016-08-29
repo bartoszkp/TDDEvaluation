@@ -13,15 +13,28 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Integer,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "signal1" } }
+                Path = new Path() { Components = new[] { "Month1" } }
             }).Id.Value;
 
-            var data = new Datum[]
+            client.SetData(id, new[]
             {
-                new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1, 0) }
-            };
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 14 },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 28 }
+            });
 
-            client.SetData(id, data);
+            client.SetMissingValuePolicy(id, new SpecificValueMissingValuePolicy()
+            {
+                DataType = DataType.Integer,
+                Quality = Quality.Fair,
+                Value = -1
+            });
+
+            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+            foreach (var d in result)
+            {
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+            }
 
             Console.ReadKey();
         }
