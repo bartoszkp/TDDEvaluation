@@ -687,6 +687,15 @@ namespace WebService.Tests
                     Assert.AreEqual(data[0].Quality.ToDto<Dto.Quality>(), result[i].Quality);
                 }                
             }
+            
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalNotFoundException))]
+            public void GivenNoSignals_WhenDeletingSignal_SignalNotFoundExceptionIsThrown()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Delete(99);                
+            }
 
             private void SetupDataRepository<T>()
             {
