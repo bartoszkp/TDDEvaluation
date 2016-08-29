@@ -124,47 +124,17 @@ namespace Domain.Services.Implementation
         private IEnumerable<Domain.Datum<T>> DataFilledWithMissingValues<T>(IEnumerable<Domain.Datum<T>> data,
             Signal signal, MissingValuePolicyBase policy, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            List<Domain.Datum<T>> filledList = new List<Datum<T>>();
-            var array = data.OrderBy(x => x.Timestamp).ToArray();
-            int indexOfArray = 0;
-            DateTime lastIterativeTime;
+            var filledList = data.OrderBy(x => x.Timestamp).ToList();
+            int index = 0;
 
             if (fromIncludedUtc == toExcludedUtc)
+                return filledList;
+
+            for (DateTime iterativeTime = fromIncludedUtc; iterativeTime < toExcludedUtc; index++, AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime))
             {
-                for (; indexOfArray < array.Length; ++indexOfArray)
-                {
-                    if (array[indexOfArray].Timestamp == fromIncludedUtc)
-                    {
-                        filledList.Add(array[indexOfArray]);
-                        return filledList;
-                    }
-                }
-            }
-            for (DateTime iterativeTime = fromIncludedUtc; iterativeTime < toExcludedUtc;)
-            {
-                if (indexOfArray < array.Length && array[indexOfArray].Timestamp >= iterativeTime)
-                {
-                    lastIterativeTime = iterativeTime;
-                    AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime);
+                if (filledList.Find(d => d.Timestamp == iterativeTime) != null) continue;
 
-                    if (array[indexOfArray].Timestamp < iterativeTime)
-                    {
-                        filledList.Add(array.ElementAt(indexOfArray));
-                        ++indexOfArray;
-                    }
-                    else
-                    {
-
-                        filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(filledList, policy, signal, lastIterativeTime));
-                    }
-                }
-                else
-                {
-                    lastIterativeTime = iterativeTime;
-                    AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime);
-
-                    filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(filledList, policy, signal, lastIterativeTime));
-                }
+                filledList.Insert(index, GetDatumFilledWithMissingValuePolicy<T>(filledList, policy, signal, iterativeTime));
             }
             return filledList;
         }
@@ -188,7 +158,7 @@ namespace Domain.Services.Implementation
             }
             else if (policy is ZeroOrderMissingValuePolicy<T>)
             {
-                var result = filledList.LastOrDefault();
+                var result = filledList.Where(d => d.Timestamp < timestamp).LastOrDefault();
 
                 if (result == null)
                     result = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).LastOrDefault();
@@ -204,12 +174,67 @@ namespace Domain.Services.Implementation
                     Timestamp = timestamp
                 };
             }
+            else if (policy is FirstOrderMissingValuePolicy<T>)
+            {
+                var left = filledList.Where(d => d.Timestamp <= timestamp).LastOrDefault();
+                var right = filledList.Where(d => d.Timestamp > timestamp).FirstOrDefault();
+
+                if (left == null)
+                {
+                    left = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).LastOrDefault();
+
+                    if (left == null)
+                        left = Datum<T>.CreateNone(signal, timestamp);
+                }
+                if (right == null)
+                {
+                    right = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1).FirstOrDefault();
+                    
+                    if (right == null)
+                        right = Datum<T>.CreateNone(signal, timestamp);
+                }
+
+                var value = GenerateLinearInterpolationValue(left, right, timestamp, signal.Granularity);
+                var quality = GenerateLinearInterpolationQuality(left.Quality, right.Quality);
+
+                return new Datum<T>()
+                {
+                    Quality = quality,
+                    Signal = signal,
+                    Value = value,
+                    Timestamp = timestamp
+                };
+            }
             else
             {
                 throw new NotImplementedException();
             }
         }
 
+        private T GenerateLinearInterpolationValue<T>(Datum<T> left, Datum<T> right, DateTime timestamp, Granularity granularity)
+        {
+            var numMissingValues = 0;
+            var numMissedValue = 0;
+
+            for (DateTime dt = left.Timestamp; dt < right.Timestamp; numMissingValues++, AddTimeBasedOnGranulatity(granularity, ref dt))
+                if (dt == timestamp) numMissedValue = numMissingValues;
+
+            dynamic leftValue = left.Value, 
+                    rightValue = right.Value;
+
+            var increaseValue = (rightValue - leftValue) / numMissingValues;
+
+            return leftValue + (increaseValue * numMissedValue);
+        }
+
+        private Quality GenerateLinearInterpolationQuality(Quality left, Quality right)
+        {
+            if (left == Quality.None || right == Quality.None)
+                return Quality.None;
+
+            return ((int)left > (int)right) ? left : right;
+        }
+        
         private void AddTimeBasedOnGranulatity(Granularity granularity, ref DateTime dateTime)
         {
             switch (granularity)
