@@ -78,14 +78,15 @@ namespace Domain.Services.Implementation
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
         {
             var signal = signalsRepository.Get(signalId);
+            var dataDomain = data.ToArray();
 
-            foreach (var d in data)
+            for (int i = 0; i < dataDomain.Count(); i++)
             {
-                CheckTimestamp(d.Timestamp, signal.Granularity);
-                d.Signal = signal;
+                CheckTimestamp(dataDomain[i].Timestamp, signal.Granularity);
+                dataDomain.ElementAt(i).Signal = signal;
             }
 
-            signalsDataRepository.SetData(data);
+            signalsDataRepository.SetData(dataDomain);
         }
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)

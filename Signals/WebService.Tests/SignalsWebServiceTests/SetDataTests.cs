@@ -45,7 +45,7 @@ namespace WebService.Tests.SignalsWebServiceTests
         [TestMethod]
         public void GivenASignal_WhenSettingSignalDataWithInvalidWeekDay_ExpectedException()
         {
-            Assert.IsTrue(IsSetDataTimestampValid(Utils.validTimestamp, Domain.Granularity.Week));
+            Assert.IsTrue(IsSetDataTimestampValid(new DateTime(2016, 8, 28, 1, 0, 0), Domain.Granularity.Week));
         }
 
         [TestMethod]
