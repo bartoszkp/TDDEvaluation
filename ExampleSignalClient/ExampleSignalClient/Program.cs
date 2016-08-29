@@ -9,23 +9,29 @@ namespace ExampleSignalClient
         static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-            var sig = new Signal()
+
+            var id = client.Add(new Signal()
             {
-                DataType = DataType.Integer,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "x", "y" } }
-            };
+                DataType = DataType.String,
+                Granularity = Granularity.Day,
+                Path = new Path() { Components = new[] { "day" } }
+            }).Id.Value;
 
-            client.Add(sig);
-
-            var data = new Datum[]
+            client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.String });
+            client.SetData(id, new Datum[]
             {
-                  new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) }
-            };
+                new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = "first", Quality = Quality.Good },
+            });
 
-            client.SetData(1, data);
+            var result = client.GetData(id, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
+
+            foreach (var d in result)
+            {
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+            }
 
             Console.ReadKey();
+
         }
     }
 }

@@ -1036,6 +1036,38 @@ namespace WebService.Tests
                 DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
             }
 
+            [TestMethod]
+            public void GetData_ZeroOrderMVPOlderSamples_ReturnsIt()
+            {
+                SetupWebService();
+
+                var signal = new Domain.Signal()
+                {
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("a/b/c")
+                };
+                var signalId = 1;
+
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, new Dto.Datum[] { });
+
+                missingValuePolicyRepositoryMock
+                    .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new ZeroOrderMissingValuePolicyInteger());
+
+                signalsDataRepositoryMock
+                    .Setup(f => f.GetDataOlderThan<Int32>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
+                    .Returns(new[] {
+                        new Domain.Datum<Int32>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 32 }
+                    });
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
+
+                DatumArraysAreEqual(
+                    new[] { new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 10), Value = 32 } },
+                    result.ToArray());
+            }
+
 
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
             {
