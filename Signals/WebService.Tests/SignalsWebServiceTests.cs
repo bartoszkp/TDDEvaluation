@@ -728,7 +728,74 @@ namespace WebService.Tests
                 AssertDataDtoEquals(expectedData, result.ToArray());
             }
 
+            [TestMethod]
+            public void GivenAData_WhenGettingData_ReturnsDataWithFilledZeroOrderMissingValuePolicyInEveryTimeStamp()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
 
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (double)2.5 }
+                };
+
+                GivenData(signal.Id.Value, data);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+                int expectedCount = 5;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (double)2.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 5, 1), Value = (double)2.5 },
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+            [TestMethod]
+            public void GivenNoData_WhenGettingData_ReturnsDataWithFilledZeroOrderMissingValuePolicy()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                };
+
+                GivenData(signal.Id.Value, data);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+                int expectedCount = 5;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(double) },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = default(double) },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1), Value = default(double)},
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = default(double) },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1), Value = default(double)},
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
