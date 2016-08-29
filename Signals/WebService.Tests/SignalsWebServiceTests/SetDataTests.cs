@@ -59,6 +59,27 @@ namespace WebService.Tests.SignalsWebServiceTests
         {
             Assert.IsTrue(IsSetDataTimestampValid(Utils.validTimestamp.AddMonths(1)));
         }
+
+        [TestMethod]
+        public void SetData_PassMoreThanOneSignal_NoExceptionOccurred()
+        {
+            SetupGet(Utils.SignalWith(1, Domain.DataType.Boolean, Domain.Granularity.Day));
+            SetupGet(Utils.SignalWith(2, Domain.DataType.Boolean, Domain.Granularity.Day));
+
+            try
+            {
+                signalsWebService.SetData(1,
+                 new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = false } });
+
+                signalsWebService.SetData(2,
+                    new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = true } });
+            }
+            catch(Exception ex)
+            {
+                Assert.Fail("Expected no exception, but got: " + ex.Message);
+            }
+
+        }
         
         private bool IsSetDataTimestampValid(DateTime dt, Domain.Granularity granularity = Domain.Granularity.Year)
         {
