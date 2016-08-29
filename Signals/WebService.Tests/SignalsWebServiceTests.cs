@@ -572,10 +572,16 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("signal")
                 };
 
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
                 GivenASignal(existingSignal);
                 missingValuePolicyRepositoryMock
                     .Setup(sr => sr.Get(It.IsAny<Signal>()))
                     .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal() { Signal = existingSignal });
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
                 var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1, 0, 1, 0));
                 Assert.AreEqual(60, result.Count());
             }
@@ -932,6 +938,52 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(1, new DateTime(2000, 3 , 1), new DateTime(2000,1,1));
 
                 Assert.AreEqual(0, result.Count());
+            }
+
+            [TestMethod]
+            public void GivenASignalAndDatum_WhenGettingDataFromRangeThatIsMoreThanOneStepNewerThanExistingData_ReturnsCorrectlyPropagatedData()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day
+                };
+
+                GivenASignal(existingSignal);
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                var existingDatum = new Datum<double>[]
+                {
+                    new Datum<double>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 }
+                };
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetDataOlderThan<double>(existingSignal, new DateTime(2000, 1, 10), 1))
+                    .Returns(existingDatum);
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<double>(existingSignal, new DateTime(2000, 1, 10), new DateTime(2000, 1 ,11)))
+                    .Returns(Enumerable.Empty<Datum<double>>);
+                
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(existingSignal))
+                    .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble());
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11)).ToArray().ToDomain<IEnumerable<Domain.Datum<double>>>();
+
+                Assert.AreEqual(existingDatum.First().Quality, result.First().Quality);
+                Assert.AreEqual(new DateTime(2000, 1 ,10), result.First().Timestamp);
+                Assert.AreEqual(existingDatum.First().Value, result.First().Value);
             }
 
             private Dto.Signal SignalWith(
