@@ -134,12 +134,12 @@ namespace Domain.Services.Implementation
             {
                 if (filledList.Find(d => d.Timestamp == iterativeTime) != null) continue;
 
-                filledList.Insert(index, GetDatumFilledWithMissingValuePolicy<T>(filledList, policy, signal, iterativeTime));
+                filledList.Insert(index, GetDatumFilledWithMissingValuePolicy<T>(filledList, data, policy, signal, iterativeTime));
             }
             return filledList;
         }
 
-        private Domain.Datum<T> GetDatumFilledWithMissingValuePolicy<T>(List<Domain.Datum<T>> filledList, MissingValuePolicyBase policy, Signal signal,
+        private Domain.Datum<T> GetDatumFilledWithMissingValuePolicy<T>(List<Domain.Datum<T>> filledList, IEnumerable<Domain.Datum<T>> data, MissingValuePolicyBase policy, Signal signal,
             DateTime timestamp)
         {
             if (policy is NoneQualityMissingValuePolicy<T>)
@@ -179,23 +179,16 @@ namespace Domain.Services.Implementation
                 if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                     throw new TypeUnsupportedException();
 
-                var left = filledList.Where(d => d.Timestamp <= timestamp).LastOrDefault();
-                var right = filledList.Where(d => d.Timestamp > timestamp).FirstOrDefault();
+                var left = data.Where(d => d.Timestamp <= timestamp).LastOrDefault();
+                var right = data.Where(d => d.Timestamp > timestamp).FirstOrDefault();
 
                 if (left == null)
-                {
                     left = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).LastOrDefault();
-
-                    if (left == null)
-                        left = Datum<T>.CreateNone(signal, timestamp);
-                }
                 if (right == null)
-                {
                     right = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1).FirstOrDefault();
                     
-                    if (right == null)
-                        right = Datum<T>.CreateNone(signal, timestamp);
-                }
+                if(left == null || right == null)
+                    return Datum<T>.CreateNone(signal, timestamp);
 
                 var value = GenerateLinearInterpolationValue(left, right, timestamp, signal.Granularity);
                 var quality = GenerateLinearInterpolationQuality(left.Quality, right.Quality);
