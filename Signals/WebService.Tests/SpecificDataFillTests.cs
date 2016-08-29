@@ -58,7 +58,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenASignal_WhenGettingData_SpecificGoodQualityPolicy_CorrectlyFillsMissingSecondData()
         {
-            var expectedDatum = SetupSpecificPolicy(Granularity.Second, Dto.Quality.Good, 
+            var expectedDatum = SetupSpecificPolicy(Granularity.Second, Dto.Quality.Good, Domain.Quality.Good, 
                 new DateTime(2000, 1, 1, 0, 0, 2), new DateTime(2000, 1, 1, 0, 0, 3), new DateTime(2000, 1, 1, 0, 0, 4));
 
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5));
@@ -66,7 +66,19 @@ namespace WebService.Tests
             AssertEqual(expectedDatum, result);
         }
 
-        private List<Dto.Datum> SetupSpecificPolicy(Granularity granularity, Dto.Quality expectedSpecificPolicyQuality,
+        [TestMethod]
+        public void GivenASignal_WhenGettingData_SpecificFairQualityPolicy_CorrectlyFillsMissingSecondData()
+        {
+            var expectedDatum = SetupSpecificPolicy(Granularity.Second, Dto.Quality.Fair, Domain.Quality.Fair,
+                new DateTime(2000, 1, 1, 0, 0, 2), new DateTime(2000, 1, 1, 0, 0, 3), new DateTime(2000, 1, 1, 0, 0, 4));
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5));
+
+            AssertEqual(expectedDatum, result);
+        }
+
+        private List<Dto.Datum> SetupSpecificPolicy(Granularity granularity, 
+            Dto.Quality expectedSpecificPolicyQuality, Domain.Quality SpecificPolicyQuality,
             DateTime expectedDateTime1, DateTime expectedDateTime2, DateTime expectedDateTime3)
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
@@ -79,7 +91,7 @@ namespace WebService.Tests
             signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
             mvpRepoMock.Setup(m => m.Get(returnedSignal))
                 .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyDouble()
-                { Id = 1, Quality = Quality.Good, Value = 42.42, Signal = returnedSignal, });
+                { Id = 1, Quality = SpecificPolicyQuality, Value = 42.42, Signal = returnedSignal, });
 
             dataRepoMock.Setup(d => d.GetData<double>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5)))
                 .Returns(new List<Datum<double>>()
