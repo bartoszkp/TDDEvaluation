@@ -463,6 +463,14 @@ namespace WebService.Tests
                 GivenASignal(signal);
 
                 SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble() { });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<double>(It.IsAny<Signal>(), new DateTime(2000, 2, 1), 1)).Returns(new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 }
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<double>(It.IsAny<Signal>(), new DateTime(2000, 4, 1), 1)).Returns(new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() {Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 }
+                });
 
                 var datum = new Datum<double>[] {
                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
