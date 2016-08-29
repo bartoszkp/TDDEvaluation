@@ -47,6 +47,17 @@ namespace Domain.Services.Implementation
             return result;
         }
 
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new SignalNotFoundException();
+
+            missingValuePolicyRepository.Set(signal, null);
+            DeleteSignalsData(signal);
+            signalsRepository.Delete(signal);
+        }
+
         public void SetMissingValuePolicy(MissingValuePolicyBase policy)
         {
             if (policy.Signal == null) throw new ArgumentException();
@@ -120,6 +131,30 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetDataOlderThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount)
         {
             return signalsDataRepository.GetDataOlderThan<T>(signal, excludedUtc, maxSampleCount);
+        }
+
+        private void DeleteSignalsData(Signal signal)
+        {
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    signalsDataRepository.DeleteData<bool>(signal);
+                    return;
+                case DataType.Decimal:
+                    signalsDataRepository.DeleteData<decimal>(signal);
+                    return;
+                case DataType.Double:
+                    signalsDataRepository.DeleteData<double>(signal);
+                    return;
+                case DataType.Integer:
+                    signalsDataRepository.DeleteData<int>(signal);
+                    return;
+                case DataType.String:
+                    signalsDataRepository.DeleteData<string>(signal);
+                    return;
+                default:
+                    return;
+            }
         }
     }
 }
