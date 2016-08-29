@@ -84,7 +84,7 @@ namespace Domain.Services.Implementation
             return current;
         }
 
-        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp,Datum<T> before)
+        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp, Datum<T> before, DateTime toExcludedUtc)
         {
             if (mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
             {
@@ -97,7 +97,13 @@ namespace Domain.Services.Implementation
             }
             else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
             {
-                return Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
+                Datum<T> returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
+                if (returnDatum.Value == null)
+                {
+                    returnDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, toExcludedUtc, 1).FirstOrDefault();
+                    returnDatum.Timestamp = new DateTime(timeStamp.Ticks);
+                }
+                return returnDatum;
             }
             return new Datum<T>();
         }
@@ -120,8 +126,7 @@ namespace Domain.Services.Implementation
 
                 if (i >= data.Count || data[i].Timestamp != current)
                 {
-                    
-                    before = GetMissingValue<T>(mvp, signal, current, before);             
+                    before = GetMissingValue<T>(mvp, signal, current, before, toExcludedUtc);             
                     data.Add(before);
                 }
                 else
