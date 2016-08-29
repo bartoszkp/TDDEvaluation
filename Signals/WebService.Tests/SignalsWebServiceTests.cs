@@ -885,6 +885,24 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(1, date, date.AddMonths(6));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenDeleting_ApproprieteRepositoriesAreCalled()
+            {
+                var dummySignal = new Signal()
+                {
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Id = 1
+                };
+                GivenASignal(dummySignal);
+
+                signalsWebService.Delete(1);
+
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(dummySignal, null));
+                signalsDataRepositoryMock.Verify(sdr => sdr.DeleteData<int>(dummySignal));
+                signalsRepositoryMock.Verify(sr => sr.Delete(dummySignal));
+            }
+
             private void setupGetByPathEntry(IEnumerable<string> paths)
             {
                 paths = paths.ToList();
