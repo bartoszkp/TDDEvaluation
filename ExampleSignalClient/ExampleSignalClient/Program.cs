@@ -6,26 +6,23 @@ namespace ExampleSignalClient
     public class Program
     {
         static void Main(string[] args)
-        {            
+        {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            /*
-            client.Add(new Signal()
+            var id = client.Add(new Signal()
             {
-                ExtensionData = null,
-                DataType = DataType.Integer,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "root", "s1" } }
-            });
-            */
-            var data = new Datum[]
+                DataType = DataType.Double,
+                Granularity = Granularity.Week,
+                Path = new Path() { Components = new[] { "weeklySignal" } }
+            }).Id.Value;
+
+            var result = client.GetData(id, new DateTime(2016, 9, 5), new DateTime(2016, 9, 19));
+
+            foreach (var d in result)
             {
-                new Datum() { Quality = Quality.Bad, Value = 0, Timestamp = new DateTime(2000, 1, 1, 12, 45, 0) }
-            };
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+            }
 
-            client.SetData(1, data);
-
-            Console.Write("Done\n");
             Console.ReadKey();
         }
     }

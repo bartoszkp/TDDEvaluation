@@ -712,6 +712,35 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdr => sdr.SetData(It.Is<IEnumerable<Datum<int>>>(enumerable => enumerable.All(d => d.Signal != null))));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithCorrectTimestamp_RepoGetDataIsCalled()
+            {
+                int dummyId = 1;
+
+                var signal = SignalWith(
+                    dummyId,
+                    DataType.Integer,
+                    Granularity.Week,
+                    Path.FromString(""));
+
+                GivenASignal(signal);
+
+                var data = new []
+               {
+                    new Datum<int>() { Quality = Quality.Bad, Value = 1, Timestamp = new DateTime(2016, 9, 5) },
+                    new Datum<int>() { Quality = Quality.Bad, Value = 2, Timestamp = new DateTime(2016, 9, 12) },
+                    new Datum<int>() { Quality = Quality.Bad, Value = 3, Timestamp = new DateTime(2016, 9, 19) }
+               };
+
+
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<int>(It.Is<Signal>(s => s.Id == dummyId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
+
+                signalsWebService.GetData(dummyId, new DateTime(2016, 9, 5), new DateTime(2016, 9, 19));
+
+                signalsDataRepositoryMock.Verify(gd => gd.GetData<int>(It.Is<Domain.Signal>(s => s.Id == dummyId), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
+            }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
