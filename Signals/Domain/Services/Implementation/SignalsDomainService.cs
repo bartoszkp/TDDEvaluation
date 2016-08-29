@@ -56,8 +56,8 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Signal> GetPathEntry(Path prefix)
         {
-           IEnumerable<Signal> result = signalsRepository.GetAllWithPathPrefix(prefix);
-           return result;
+            IEnumerable<Signal> result = signalsRepository.GetAllWithPathPrefix(prefix);
+            return result;
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
@@ -77,7 +77,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            bool isFromIncludedUtcCorrect = CheckCorrectnessOfFromIncludedUtc(signal, fromIncludedUtc);
+            bool isFromIncludedUtcCorrect = CheckCorrectnessOfDate(signal, fromIncludedUtc);
 
             if (!isFromIncludedUtcCorrect) throw new ArgumentException();
 
@@ -87,10 +87,10 @@ namespace Domain.Services.Implementation
 
             IEnumerable<Datum<T>> filledData = data;
 
-            if (mvp is NoneQualityMissingValuePolicy<T> | mvp is SpecificValueMissingValuePolicy<T> )
+            if (mvp != null)
                 filledData = CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
 
-            if (mvp is ZeroOrderMissingValuePolicy<T>) filledData = (mvp as ZeroOrderMissingValuePolicy<T>).SetMissingValue(signal, data, fromIncludedUtc, toExcludedUtc);
+            //if (mvp is ZeroOrderMissingValuePolicy<T>) filledData = (mvp as ZeroOrderMissingValuePolicy<T>).SetMissingValue(signal, data, fromIncludedUtc, toExcludedUtc);
 
             return filledData;
         }
@@ -100,7 +100,7 @@ namespace Domain.Services.Implementation
             throw new NotImplementedException();
         }
 
-        private bool CheckCorrectnessOfFromIncludedUtc(Signal signal, DateTime fromIncludedUtc)
+        private bool CheckCorrectnessOfDate(Signal signal, DateTime fromIncludedUtc)
         {
             switch (signal.Granularity)
             {
@@ -160,89 +160,17 @@ namespace Domain.Services.Implementation
 
         private bool CheckCorrectnessOfDataTimestamps<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
-            switch (signal.Granularity)
-            {
-                case Granularity.Second:
-                    foreach (var datum in data)
-                    {
-                        if (datum.Timestamp.Millisecond != 0)
-                            return false;
-                    }
-                    break;
-                case Granularity.Minute:
-                    foreach (var datum in data)
-                    {
-                        if (datum.Timestamp.Millisecond != 0 |
-                            datum.Timestamp.Second != 0)
-                            return false;
-                    }
-                    break;
-                case Granularity.Hour:
-                    foreach (var datum in data)
-                    {
-                        if (datum.Timestamp.Millisecond != 0 |
-                            datum.Timestamp.Second != 0 |
-                            datum.Timestamp.Minute != 0)
-                            return false;
-                    }
-                    break;
-                case Granularity.Day:
-                    foreach (var datum in data)
-                    {
-                        if (datum.Timestamp.Millisecond != 0 |
-                            datum.Timestamp.Second != 0 |
-                            datum.Timestamp.Minute != 0 |
-                            datum.Timestamp.Hour != 0)
-                            return false;
-                    }
-                    break;
-                case Granularity.Week:
-                    foreach (var datum in data)
-                    {
-                        if (datum.Timestamp.Millisecond != 0 |
-                            datum.Timestamp.Second != 0 |
-                            datum.Timestamp.Minute != 0 |
-                            datum.Timestamp.Hour != 0 |
-                            datum.Timestamp.DayOfWeek != DayOfWeek.Monday)
-                            return false;
-                    }
-                    break;
-                case Granularity.Month:
-                    foreach (var datum in data)
-                    {
-                        if (datum.Timestamp.Millisecond != 0 |
-                            datum.Timestamp.Second != 0 |
-                            datum.Timestamp.Minute != 0 |
-                            datum.Timestamp.Hour != 0 |
-                            datum.Timestamp.Day != 1)
-                            return false;
-                    }
-                    break;
-                case Granularity.Year:
-                    foreach (var datum in data)
-                    {
-                        if (datum.Timestamp.Millisecond != 0 |
-                            datum.Timestamp.Second != 0 |
-                            datum.Timestamp.Minute != 0 |
-                            datum.Timestamp.Hour != 0 |
-                            datum.Timestamp.Day != 1 |
-                            datum.Timestamp.Month != 1)
-                            return false;
-                    }
-                    break;
-                default:
-                    break;
-            }
+            foreach (var datum in data)
+                if (!CheckCorrectnessOfDate(signal, datum.Timestamp))
+                    return false;
 
             return true;
         }
 
-       
-
 
         private IEnumerable<Datum<T>> CheckMissingValues<T>(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            switch(signal.Granularity)
+            switch (signal.Granularity)
             {
                 case Granularity.Second:
                     return FillMissingRecords(dt => dt.AddSeconds(1), signal, data, fromIncludedUtc, toExcludedUtc);
@@ -271,34 +199,38 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> FillMissingRecords<T>(Func<DateTime, DateTime> dateTimeStep, Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy<T>;
+
+            if (fromIncludedUtc == toExcludedUtc)
+                return new[] { FillMissingRecord(data, signal, fromIncludedUtc, mvp) };
+
             List<Datum<T>> list = new List<Datum<T>>();
+
             for (DateTime d = fromIncludedUtc; d < toExcludedUtc; d = dateTimeStep(d))
-            {
-                FillMissingRecord(data, signal, d, ref list);
-            }
-            if (list.Count == 0 && fromIncludedUtc == toExcludedUtc)
-            {
-                FillMissingRecord(data, signal, fromIncludedUtc, ref list);
-            }
+                list.Add(
+                    data.FirstOrDefault(datum => datum.Timestamp == d) 
+                    ?? FillMissingRecord(data, signal, d, mvp));
+            
             return list;
         }
-        private void FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, ref List<Datum<T>> list)
+        private Datum<T> FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, MissingValuePolicy<T> mvp)
         {
-            var mvp = GetMissingValuePolicy(signal);
-
-            Quality quality = Quality.None;
-            T value = default(T);
-
             if (mvp is NoneQualityMissingValuePolicy<T>)
-                        { quality = Quality.None; value = default(T); }
-            if (mvp is SpecificValueMissingValuePolicy<T>)
-                        { var SpecificMvp = mvp as SpecificValueMissingValuePolicy<T>; quality = SpecificMvp.Quality; value = SpecificMvp.Value; }
-            
-            if (data.Any(time => time.Timestamp == dateTime))
             {
-                list.Add(data.First(t => t.Timestamp == dateTime));
+                return Datum<T>.CreateNone(signal, dateTime);
             }
-            else list.Add(new Datum<T>() { Quality = quality, Timestamp = dateTime, Value = value});
+            else if (mvp is SpecificValueMissingValuePolicy<T>)
+            {
+                var specificMvp = mvp as SpecificValueMissingValuePolicy<T>;
+                return new Datum<T>
+                {
+                    Quality = specificMvp.Quality,
+                    Value = specificMvp.Value,
+                    Signal = signal,
+                    Timestamp = dateTime
+                };
+            }
+            else return Datum<T>.CreateNone(signal, dateTime);
         }
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase policy)
         {
