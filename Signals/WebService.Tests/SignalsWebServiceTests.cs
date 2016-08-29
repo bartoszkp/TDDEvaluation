@@ -108,14 +108,28 @@ namespace WebService.Tests
                 {
                     Id = signalId
                 };
-                GivenASignal(signal);
-                signalsRepositoryMock
-                    .Setup(sr => sr.Delete(It.IsAny<Signal>()));
+                SetupDelete(signal);
 
                 signalsWebService.Delete(signalId);
 
                 signalsRepositoryMock
                     .Verify(sr => sr.Delete(It.Is<Signal>((s => s.Id == signalId))));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingSignal_DataRepositoryDeleteIsCalledWithGivenId()
+            {
+                int signalId = 46486;
+                var signal = new Domain.Signal
+                {
+                    Id = signalId
+                };
+                SetupDelete(signal);
+
+                signalsWebService.Delete(signalId);
+
+                signalsDataRepositoryMock
+                    .Verify(sr => sr.DeleteData<string>(It.Is<Signal>((s => s.Id == signalId))));
             }
             #endregion
 
@@ -1387,6 +1401,19 @@ namespace WebService.Tests
             }
             #endregion
 
+
+            private void SetupDelete (Signal signal)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                signalsWebService = new SignalsWebService(signalDomainService);
+                signalsRepositoryMock
+                    .Setup(sr => sr.Delete(It.IsAny<Signal>()));
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.Is<int>(s => s == signal.Id.Value)))
+                    .Returns(signal);
+            }
 
             private void SetupSetData(Dto.Datum[] existingDatum)
             {
