@@ -780,7 +780,16 @@ namespace WebService.Tests
                 Assert.AreEqual("first", result.First().Value);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_RepoDeleteIsCalled()
+            {
+                int dummyId = 1;
+                var signal = new Signal() { DataType = DataType.String, Granularity = Granularity.Day, Path = Path.FromString("somePath"), Id = dummyId };
 
+                GivenASignal(signal);
+                signalsWebService.Delete(1);
+                signalsRepositoryMock.Verify(d => d.Delete(It.IsAny<Domain.Signal>()));
+            }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
