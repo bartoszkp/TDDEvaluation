@@ -1053,6 +1053,65 @@ namespace WebService.Tests
             }
 
             #endregion
+            #region Issue #20 (Bug: ZeroOrderMissingValuePolicy should correctly propagate samples more than one step old)
+
+            [TestMethod]
+            public void GivenData_WhenGettingSignal_ReturnsFilledDataAccordingToZeroOrderMissingValuePolicy()
+            {
+                SetupWebService();
+
+                var signal = ReturnDefaultSignal_IntegerDay();
+                signal.Id = 5;
+
+                Dto.Datum[] data = new Datum[]
+                {
+                    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 1, Quality = Dto.Quality.Good }
+                };
+
+                SignalsRepositoryMock_SetupGet(signal.ToDomain<Domain.Signal>());
+
+                dataRepositoryMock
+                    .Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns<Domain.Signal,DateTime,DateTime>((sig,from,to) => 
+                        data.ToDomain<IEnumerable<Domain.Datum<int>>>().Where(x => (x.Timestamp >= from && x.Timestamp < to))?.ToArray());
+
+                dataRepositoryMock
+                    .Setup(x => x.GetDataOlderThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
+                    .Returns<Domain.Signal,DateTime,int>((sig,dt,i) => {
+                        var domainData = data.ToDomain<IEnumerable<Datum<int>>>();
+                        var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp < next.Timestamp ? cur : next);
+                        return Enumerable.Repeat(singleResult,1);
+                    });
+
+                dataRepositoryMock
+                    .Setup(x => x.GetDataNewerThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
+                    .Returns<Domain.Signal, DateTime, int>((sig, dt, i) => {
+                        var domainData = data.ToDomain<IEnumerable<Datum<int>>>();
+                        var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp > next.Timestamp ? cur : next);
+                        return Enumerable.Repeat(singleResult, 1);
+                    });
+
+                missingValuePolicyRepositoryMock
+                    .Setup(x => x.Get(It.Is<Domain.Signal>(s => s.DataType == Domain.DataType.Integer)))
+                    .Returns(new ZeroOrderMissingValuePolicyInteger());
+
+                var returnedData = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
+
+                Assert.AreEqual(data.Count(),returnedData.Count());
+                Assert_Datums(data,returnedData.ToArray());
+            }
+
+            #endregion
+
+            private Dto.Signal ReturnDefaultSignal_IntegerDay()
+            {
+                return new Dto.Signal()
+                {
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "x", "y" } },
+                    DataType = Dto.DataType.Integer
+                };
+            }
 
             private void SetupGetAllWithPathPrefix(IEnumerable<Domain.Signal> signals)
             {
@@ -1077,6 +1136,19 @@ namespace WebService.Tests
                 return datum;
             }
 
+            private void Assert_Datums(IEnumerable<Dto.Datum> expectedDatum, IEnumerable<Dto.Datum> actualDatum)
+            {
+                Assert.AreEqual(expectedDatum.Count(),actualDatum.Count());
+
+                for(int i = 0; i < expectedDatum.Count(); ++i)
+                {
+                    Assert.AreEqual(expectedDatum.ElementAt(i).Quality, actualDatum.ElementAt(i).Quality);
+                    Assert.AreEqual(expectedDatum.ElementAt(i).Timestamp, actualDatum.ElementAt(i).Timestamp);
+                    Assert.AreEqual(expectedDatum.ElementAt(i).Value, actualDatum.ElementAt(i).Value);
+                }
+            }
+
+            //doesn't work properly
             private bool CompareDatumArrays(IEnumerable<Datum> a, Datum[] b)
             {
                 if (a.Count() != b.Count()) return false;
@@ -1191,10 +1263,10 @@ namespace WebService.Tests
             private void GivenASignal(Domain.Signal existingSignal)
             {
                 GivenNoSignals();
-                GetSignalSetup(existingSignal);
+                SignalsRepositoryMock_SetupGet(existingSignal);
             }
 
-            private void GetSignalSetup(Domain.Signal existingSignal)
+            private void SignalsRepositoryMock_SetupGet(Domain.Signal existingSignal)
             {
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(existingSignal.Id.Value))
@@ -1249,9 +1321,9 @@ namespace WebService.Tests
 
                 for (int i = 0; i < datum1.Count(); i++)
                 {
-                    if (datum1.ToList()[i].Quality != datum2.ToList()[i].Quality ||
-                        DateTime.Equals(datum1.ToList()[i].Timestamp, datum2.ToList()[i].Timestamp) == false ||
-                        datum1.ToList()[i].Value.ToString() != datum2.ToList()[i].Value.ToString()
+                    if (datum1.ElementAt(i).Quality != datum2.ElementAt(i).Quality ||
+                        DateTime.Equals(datum1.ElementAt(i).Timestamp, datum2.ElementAt(i).Timestamp) == false ||
+                        datum1.ElementAt(i).Value.ToString() != datum2.ElementAt(i).Value.ToString()
                      )
                         return false;
                 }
@@ -1265,6 +1337,12 @@ namespace WebService.Tests
                 dataRepositoryMock
                     .Setup(x => x.GetData<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(datum.ToDomain<IEnumerable<Domain.Datum<T>>>());
+            }
+
+            private void SetupWebService()
+            {
+                MakeMocks();
+                MakeASignalsWebService();
             }
 
             private void MakeASignalsWebService()
