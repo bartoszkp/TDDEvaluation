@@ -61,53 +61,6 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData<T>(dataList);
         }
 
-        private DateTime GetNextDateFromGranularity(DateTime current, Granularity granularity)
-        {
-            switch(granularity)
-            {
-                case Granularity.Second:
-                    return current.AddSeconds(1);
-                case Granularity.Minute:
-                    return current.AddMinutes(1);
-                case Granularity.Hour:
-                    return current.AddHours(1);
-                case Granularity.Day:
-                    return current.AddDays(1);
-                case Granularity.Week:
-                    return current.AddDays(7);
-                case Granularity.Month:
-                    return current.AddMonths(1);
-                case Granularity.Year:
-                    return current.AddYears(1);
-            }
-
-            return current;
-        }
-
-        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp, Datum<T> before, DateTime toExcludedUtc)
-        {
-            if (mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
-            {
-                return Datum<T>.CreateNone(signal, timeStamp);
-            }
-            else if (mvp is MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
-            {
-                var specificMVP = mvp as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
-                return Datum<T>.CreateSpecific(signal, timeStamp, specificMVP.Quality, specificMVP.Value);
-            }
-            else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
-            {
-                Datum<T> returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
-                if (returnDatum.Value == null)
-                {
-                    returnDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, toExcludedUtc, 1).FirstOrDefault();
-                    returnDatum.Timestamp = new DateTime(timeStamp.Ticks);
-                }
-                return returnDatum;
-            }
-            return new Datum<T>();
-        }
-
         public IEnumerable<Domain.Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             Signal signal = GetById(signalId);
@@ -139,7 +92,53 @@ namespace Domain.Services.Implementation
             }
 
             return data.OrderBy(d => d.Timestamp);
+        }
 
+        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp, Datum<T> before, DateTime toExcludedUtc)
+        {
+            if (mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
+            {
+                return Datum<T>.CreateNone(signal, timeStamp);
+            }
+            else if (mvp is MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
+            {
+                var specificMVP = mvp as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
+                return Datum<T>.CreateSpecific(signal, timeStamp, specificMVP.Quality, specificMVP.Value);
+            }
+            else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
+            {
+                Datum<T> returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
+                if (returnDatum.Value == null)
+                {
+                    returnDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, toExcludedUtc, 1).FirstOrDefault();
+                    returnDatum.Timestamp = new DateTime(timeStamp.Ticks);
+                }
+                return returnDatum;
+            }
+            return new Datum<T>();
+        }
+
+        private DateTime GetNextDateFromGranularity(DateTime current, Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return current.AddSeconds(1);
+                case Granularity.Minute:
+                    return current.AddMinutes(1);
+                case Granularity.Hour:
+                    return current.AddHours(1);
+                case Granularity.Day:
+                    return current.AddDays(1);
+                case Granularity.Week:
+                    return current.AddDays(7);
+                case Granularity.Month:
+                    return current.AddMonths(1);
+                case Granularity.Year:
+                    return current.AddYears(1);
+            }
+
+            return current;
         }
 
         public void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
