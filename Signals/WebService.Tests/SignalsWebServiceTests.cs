@@ -776,6 +776,42 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(f => f.GetDataOlderThan<string>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()));
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataWithZOrderMVP_WhenGettingDataWithTimeRangeMoreThenOneGranularityUnitBiggerThenPreviouslySetTimestampValue_ProperValuesAreReturned()
+            {
+                int signalId = 1;
+                var data = new Datum<string>[]
+                {
+                    new Datum<string> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1), Value = "first"}
+                };
+                var policy = new ZeroOrderMissingValuePolicyString();
+
+                var signal = SignalWith(
+                    signalId,
+                    DataType.String,
+                    Granularity.Day,
+                    Path.FromString(""));
+                GivenASignal(signal);
+
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<string>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataOlderThan<string>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns(data);
+
+                signalsMissingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(policy);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
+
+                Assert.AreEqual(new DateTime(2000, 1, 10), result.First().Timestamp);
+                Assert.AreEqual(Quality.Fair, result.First().Quality);
+                Assert.AreEqual("first", result.First().Value);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
