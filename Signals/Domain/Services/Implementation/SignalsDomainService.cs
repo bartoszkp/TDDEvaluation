@@ -188,13 +188,15 @@ namespace Domain.Services.Implementation
             }
             else if (policy is ZeroOrderMissingValuePolicy<T>)
             {
-                if (filledList.Count() == 0) return Domain.Datum<T>.CreateNone(signal, timestamp);
+                var result = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1);
+
+                if (result.Count() == 0) return Domain.Datum<T>.CreateNone(signal, timestamp);
 
                 return new Datum<T>()
                 {
-                    Quality = filledList.Last().Quality,
-                    Signal = filledList.Last().Signal,
-                    Value = filledList.Last().Value,
+                    Quality = result.First().Quality,
+                    Signal = result.First().Signal,
+                    Value = result.First().Value,
                     Timestamp = timestamp
                 };
             }
