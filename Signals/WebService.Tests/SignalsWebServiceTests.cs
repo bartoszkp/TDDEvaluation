@@ -760,11 +760,129 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(1, date.AddMonths(1), date.AddMonths(2));
 
-                foreach(var datum in result)
+                foreach (var datum in result)
                 {
                     Assert.AreEqual(Dto.Quality.Fair, datum.Quality);
                     Assert.AreEqual(2.5, datum.Value);
                 }
+            }
+
+            [TestMethod]
+            public void GivenASignalWithFOMVPAndTwoDatums_WhenGettingDataBetweenThem_ReturnsInterpolatedData()
+            {
+                var dummySignal = new Signal()
+                {
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Id = 1
+                };
+                GivenASignal(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                   .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+
+                var date = new DateTime(2000, 1, 1);
+
+                signalsDataRepositoryMock.Setup(sdr => sdr.GetData<double>(dummySignal, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new[] {
+                        new Datum<double>
+                        {
+                            Quality = Quality.Fair,
+                            Timestamp = date,
+                            Value = 1.0
+                        },
+                        new Datum<double>
+                        {
+                            Quality = Quality.Bad,
+                            Timestamp = date.AddMonths(5),
+                            Value = 6.0
+                        } });
+
+                var result = signalsWebService.GetData(1, date, date.AddMonths(6)).ToArray();
+
+                var expectedResult = new[]
+                {
+                    new Dto.Datum
+                    {
+                        Quality = Dto.Quality.Fair,
+                        Timestamp = date,
+                        Value = 1.0
+                    },
+                    new Dto.Datum
+                    {
+                        Quality = Dto.Quality.Bad,
+                        Timestamp = date.AddMonths(1),
+                        Value = 2.0
+                    },
+                    new Dto.Datum
+                    {
+                        Quality = Dto.Quality.Bad,
+                        Timestamp = date.AddMonths(2),
+                        Value = 3.0
+                    },
+                    new Dto.Datum
+                    {
+                        Quality = Dto.Quality.Bad,
+                        Timestamp = date.AddMonths(3),
+                        Value = 4.0
+                    },
+                    new Dto.Datum
+                    {
+                        Quality = Dto.Quality.Bad,
+                        Timestamp = date.AddMonths(4),
+                        Value = 5.0
+                    },
+                    new Dto.Datum
+                    {
+                        Quality = Dto.Quality.Bad,
+                        Timestamp = date.AddMonths(5),
+                        Value = 6.0
+                    }
+                };
+
+                for (int i = 0; i < expectedResult.Length; i++)
+                {
+                    Assert.AreEqual(expectedResult[i].Quality, result[i].Quality);
+                    Assert.AreEqual(expectedResult[i].Value, result[i].Value);
+                }
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.InvalidPolicyDataTypeException))]
+            public void GivenASignalWithFOMVPOfTypeString_WhenGettingData_ThrowsException()
+            {
+                var dummySignal = new Signal()
+                {
+                    DataType = DataType.String,
+                    Granularity = Granularity.Month,
+                    Id = 1
+                };
+                GivenASignal(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                   .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyString());
+
+                var date = new DateTime(2000, 1, 1);
+                var result = signalsWebService.GetData(1, date, date.AddMonths(6));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.InvalidPolicyDataTypeException))]
+            public void GivenASignalWithFOMVPOfTypeBoolean_WhenGettingData_ThrowsException()
+            {
+                var dummySignal = new Signal()
+                {
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Id = 1
+                };
+                GivenASignal(dummySignal);
+
+                missingValuePolicyRepositoryMock.Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                   .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyBoolean());
+
+                var date = new DateTime(2000, 1, 1);
+                var result = signalsWebService.GetData(1, date, date.AddMonths(6));
             }
 
             private void setupGetByPathEntry(IEnumerable<string> paths)
