@@ -11,12 +11,13 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.Double,
-                Granularity = Granularity.Week,
-                Path = new Path() { Components = new[] { "weeklySignal" } }
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Second,
+                Path = new Path() { Components = new[] { "second35" } }
             }).Id.Value;
 
-            var result = client.GetData(id, new DateTime(2018, 1, 1), new DateTime(2018, 1, 15));
+            var ts = new DateTime(2000, 1, 1, 1, 1, 1);
+            var result = client.GetData(id, ts, ts);
 
             foreach (var d in result)
             {

@@ -80,17 +80,21 @@ namespace Domain.Services.Implementation
         {
             CheckTimestamp(fromIncludedUtc, signal.Granularity);
 
-            bool skipFirst = false;
+         //   bool skipFirst = false;
             Datum<T> lastDatum = null;
             List<Datum<T>> result;
+            var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
             result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp).ToList();
+
+            
+
             if (result.Count == 0)
             {
-                result = new List<Datum<T>>() { new Datum<T>() };
-                skipFirst = true;
+                result = new List<Datum<T>>() { createDatumBaseOnMissingValuePolicy<T>(signal,fromIncludedUtc,missingValuePolicy,lastDatum )};
+               // skipFirst = true;
             }
 
-            var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
+           
             var date = fromIncludedUtc;
 
             while (date < toExcludedUtc)
@@ -107,11 +111,11 @@ namespace Domain.Services.Implementation
                 date = AddTime(signal.Granularity, date);
             }
 
-            if (skipFirst == true)
-            {
-                CheckTimestampCorrectness(result.OrderBy(x => x.Timestamp).Skip(1).ToArray());
-                return result.OrderBy(x => x.Timestamp).Skip(1);
-            }
+            //if (skipFirst == true)
+            //{
+            //    CheckTimestampCorrectness(result.OrderBy(x => x.Timestamp).Skip(1).ToArray());
+            //    return result.OrderBy(x => x.Timestamp).Skip(1);
+            //}
 
             CheckTimestampCorrectness(result.OrderBy(x => x.Timestamp).ToArray());
             return result.OrderBy(x => x.Timestamp);
