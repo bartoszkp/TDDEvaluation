@@ -48,6 +48,8 @@ namespace Domain.Services.Implementation
             if (signal == null) return;
 
             DeleteSignalData(signal);
+            missingValuePolicyRepository.Set(signal, null);
+
             signalsRepository.Delete(signal);
         }
 
