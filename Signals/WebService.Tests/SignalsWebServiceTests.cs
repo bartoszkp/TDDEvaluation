@@ -593,6 +593,31 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareDatum(result, expectedData));
             }
 
+            [TestMethod]
+            public void GivenASignalWithNoneQualityMVPAndData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
+            {
+                var signal = SignalWith(1, DataType.Decimal, Granularity.Second, Path.FromString("x/y"));
+                GivenASignal(signal);
+
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal() { });
+
+                var timestamp = new DateTime(2000, 1, 1, 1, 1, 1);
+
+                SetupGetData<decimal>(new Domain.Datum<decimal>[]
+                {
+                    new Datum<decimal>() {Quality = Quality.Good, Timestamp = timestamp, Value = 7.5m }
+                });
+  
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.Good, Timestamp = timestamp, Value = 7.5m },
+                };
+
+                var result = signalsWebService.GetData(1, timestamp, timestamp);
+
+                Assert.IsTrue(CompareDatum(result, expectedData));
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
