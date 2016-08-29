@@ -16,19 +16,29 @@ namespace ExampleSignalClient
                 Path = new Path() { Components = new[] { "day" } }
             }).Id.Value;
 
-            client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.String });
-            client.SetData(id, new Datum[]
-            {
-    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = "first", Quality = Quality.Good },
-    new Datum() { Timestamp = new DateTime(2000, 1, 2), Value = "second", Quality = Quality.Fair },
-     new Datum() { Timestamp = new DateTime(2000, 1, 3), Value = "third", Quality = Quality.Poor },
-            });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
+            var result = client.GetById(id);
 
-            foreach (var d in result)
+            if (result != null)
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                Console.WriteLine("Sygnał poprawnie utworzony");
+            }
+            else
+            {
+                Console.WriteLine("Błąd - nie udało się utworzyć sygnału");
+            }
+
+            client.Delete(id);
+
+            result = client.GetById(id);
+
+            if (result == null)
+            {
+                Console.WriteLine("Sygnał poprawnie skasowany");
+            }
+            else
+            {
+                Console.WriteLine("Błąd - sygnał nadal istnieje");
             }
 
             Console.ReadKey();

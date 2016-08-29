@@ -205,5 +205,13 @@ namespace Domain.Services.Implementation
 
             missingValuePolicyRepository.Set(signal, (MissingValuePolicyBase)Activator.CreateInstance(policy));
         }
+
+        public void Delete<T>(int signalId)
+        {
+            var signal = signalsRepository.Get(signalId);
+            SetMissingValuePolicy(signalId, null);
+            signalsDataRepository.DeleteData<T>(signal);
+            signalsRepository.Delete(signal);
+        }
     }
 }

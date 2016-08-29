@@ -50,7 +50,17 @@ namespace WebService
 
         public void Delete(int signalId)
         {
-            throw new NotImplementedException();
+            MethodInfo method = GetType()
+                  .GetMethod("DeleteGeneric", BindingFlags.NonPublic | BindingFlags.Instance)
+                  .MakeGenericMethod(new Type[] { GetSignalType(signalId) });
+
+            object[] WTF = new object[] { (object)signalId };
+            method.Invoke(this,WTF);
+        }
+
+        private void DeleteGeneric<T>(int signalId)
+        {
+            signalsDomainService.Delete<T>(signalId);
         }
 
         public PathEntry GetPathEntry(Path pathDto)

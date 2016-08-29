@@ -23,5 +23,6 @@ namespace Domain.Services
         PathEntry GetAllWithPathPrefix(Path prefix);
 
         Type GetSignalType(int signalId);
+        void Delete<T>(int signalId);
     }
 }
