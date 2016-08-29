@@ -58,12 +58,23 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenASignal_WhenGettingData_SpecificGoodQualityPolicy_CorrectlyFillsMissingSecondData()
         {
+            var expectedDatum = SetupSpecificPolicy(Granularity.Second, Dto.Quality.Good, 
+                new DateTime(2000, 1, 1, 0, 0, 2), new DateTime(2000, 1, 1, 0, 0, 3), new DateTime(2000, 1, 1, 0, 0, 4));
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5));
+
+            AssertEqual(expectedDatum, result);
+        }
+
+        private List<Dto.Datum> SetupSpecificPolicy(Granularity granularity, Dto.Quality expectedSpecificPolicyQuality,
+            DateTime expectedDateTime1, DateTime expectedDateTime2, DateTime expectedDateTime3)
+        {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
             signalsWebService = new SignalsWebService(domainService);
 
             int id = 1;
 
-            var returnedSignal = new Signal() { Id = id, Granularity = Granularity.Second, DataType = DataType.Double };
+            var returnedSignal = new Signal() { Id = id, Granularity = granularity, DataType = DataType.Double };
 
             signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
             mvpRepoMock.Setup(m => m.Get(returnedSignal))
@@ -77,25 +88,26 @@ namespace WebService.Tests
                     new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (double)2.5 }
                 });
 
-
-            var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 5));
-            var expectedDatum = new List<Dto.Datum>()
+            return new List<Dto.Datum>()
             {
                 new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)1.5 },
                 new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = (double)42.42 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = (double)42.42 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = (double)42.42 },
+                new Dto.Datum() { Quality = expectedSpecificPolicyQuality, Timestamp = expectedDateTime1, Value = (double)42.42 },
+                new Dto.Datum() { Quality = expectedSpecificPolicyQuality, Timestamp = expectedDateTime2, Value = (double)42.42 },
+                new Dto.Datum() { Quality = expectedSpecificPolicyQuality, Timestamp = expectedDateTime3, Value = (double)42.42 },
             };
+        }
 
+        private void AssertEqual(List<Dto.Datum> expectedDatums, IEnumerable<Dto.Datum> actualDatums)
+        {
             int i = 0;
 
-            Assert.AreEqual(5, result.Count());
-            foreach (var actualData in result)
+            Assert.AreEqual(5, actualDatums.Count());
+            foreach (var actualData in actualDatums)
             {
-                Assert.AreEqual(expectedDatum[i].Quality, actualData.Quality);
-                Assert.AreEqual(expectedDatum[i].Timestamp, actualData.Timestamp);
-                Assert.AreEqual(expectedDatum[i].Value, actualData.Value);
+                Assert.AreEqual(expectedDatums[i].Quality, actualData.Quality);
+                Assert.AreEqual(expectedDatums[i].Timestamp, actualData.Timestamp);
+                Assert.AreEqual(expectedDatums[i].Value, actualData.Value);
 
                 i++;
             }
