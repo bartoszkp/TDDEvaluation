@@ -250,6 +250,13 @@ namespace Domain.Services.Implementation
             return false;
         }
 
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
 
+            missingValuePolicyRepository.Set(signal, null);
+
+            this.signalsRepository.Delete(signal);
+        }
     }
 }
