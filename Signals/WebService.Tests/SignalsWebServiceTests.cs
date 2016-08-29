@@ -750,26 +750,10 @@ namespace WebService.Tests
                 {
                     new Datum<string> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1), Value = "first"}
                 };
-                var policy = new ZeroOrderMissingValuePolicyString();
 
-                var signal = SignalWith(
-                    signalId,
-                    DataType.String,
-                    Granularity.Day,
-                    Path.FromString(""));
-                GivenASignal(signal);
+                GivenASignalWithDataAndZOrderMVP<string>(signalId, DataType.String, data);
 
-                signalsDataRepositoryMock
-                    .Setup(sd => sd.GetData<string>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(data);
-
-                signalsDataRepositoryMock
-                    .Setup(gdot => gdot.GetDataOlderThan<string>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()))
-                    .Returns(data);
-
-                signalsMissingValuePolicyRepositoryMock
-                    .Setup(mvp => mvp.Get(It.Is<Signal>(s => s.Id == signalId)))
-                    .Returns(policy);
+                GivenMissingValuePolicy(signalId, new ZeroOrderMissingValuePolicyString());
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
 
@@ -784,26 +768,10 @@ namespace WebService.Tests
                 {
                     new Datum<string> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1), Value = "first"}
                 };
-                var policy = new ZeroOrderMissingValuePolicyString();
 
-                var signal = SignalWith(
-                    signalId,
-                    DataType.String,
-                    Granularity.Day,
-                    Path.FromString(""));
-                GivenASignal(signal);
+                GivenASignalWithDataAndZOrderMVP<string>(signalId, DataType.String, data);
 
-                signalsDataRepositoryMock
-                    .Setup(sd => sd.GetData<string>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(data);
-
-                signalsDataRepositoryMock
-                    .Setup(gdot => gdot.GetDataOlderThan<string>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()))
-                    .Returns(data);
-
-                signalsMissingValuePolicyRepositoryMock
-                    .Setup(mvp => mvp.Get(It.Is<Signal>(s => s.Id == signalId)))
-                    .Returns(policy);
+                GivenMissingValuePolicy(signalId, new ZeroOrderMissingValuePolicyString());
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
 
@@ -811,6 +779,8 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.Fair, result.First().Quality);
                 Assert.AreEqual("first", result.First().Value);
             }
+
+
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
@@ -894,6 +864,26 @@ namespace WebService.Tests
 
                 signalsDataRepositoryMock
                     .Setup(sd => sd.GetData<T>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
+
+                return signal;
+            }
+
+            private Signal GivenASignalWithDataAndZOrderMVP<T>(int signalId, DataType datatype, IEnumerable<Datum<T>> data)
+            {
+                var signal = SignalWith(
+                    signalId,
+                    datatype,
+                    Granularity.Day,
+                    Path.FromString(""));
+                GivenASignal(signal);
+
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<T>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataOlderThan<T>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()))
                     .Returns(data);
 
                 return signal;
