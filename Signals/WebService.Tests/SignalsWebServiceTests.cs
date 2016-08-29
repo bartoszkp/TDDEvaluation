@@ -895,6 +895,43 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(s => s.GetAllWithPathPrefix(It.IsAny<Path>()));
             }
 
+            //Bug fixing 
+            
+            [TestMethod]
+            public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathWithCollectionOfSignalsFromMainDirectoryAndSubpathsFromMainDirectory()
+            {
+                List<Signal> signalsList = new List<Signal>()
+                {
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/s1")},
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("s0") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s2") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s3") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/subsub/s4") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s5") }
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()))
+                    .Returns(signalsList.AsEnumerable);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                Assert.AreEqual(1, result.Signals.Count());
+                Assert.AreEqual(signalsList.First().ToDto<Dto.Signal>().DataType, result.Signals.First().DataType);
+                CollectionAssert.AreEqual(signalsList.First().ToDto<Dto.Signal>().Path.Components.ToArray(),
+                    result.Signals.First().Path.Components.ToArray());
+
+                Assert.AreEqual(2, result.SubPaths.Count());
+                CollectionAssert.AreEqual(new[] { "root", "sub" }, result.SubPaths.First().Components.ToArray());
+                CollectionAssert.AreEqual(new[] { "root", "subsub" }, result.SubPaths.Last().Components.ToArray());
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,

@@ -44,12 +44,12 @@ namespace ExampleSignalClient
             //    Path = new Signals.Path() { Components = new[] { "root", "podkatalog", "podpodktalog", "s4" } }
             //});
 
-            client.Add(new Signals.Signal()
-            {
-                DataType = DataType.Double,
-                Granularity = Granularity.Month,
-                Path = new Signals.Path() { Components = new[] { "root", "podkatalog2", "s5" } }
-            });
+            //client.Add(new Signals.Signal()
+            //{
+            //    DataType = DataType.Double,
+            //    Granularity = Granularity.Month,
+            //    Path = new Signals.Path() { Components = new[] { "root", "podkatalog2", "s5" } }
+            //});
 
             var result = client.GetPathEntry(new Path() { Components = new[] { "root" } });
 
