@@ -89,7 +89,7 @@ namespace Domain.Services.Implementation
 
             if (mvp != null)
                 filledData = CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
-            
+
             return filledData;
         }
 
@@ -201,18 +201,18 @@ namespace Domain.Services.Implementation
 
             if (fromIncludedUtc == toExcludedUtc)
                 return new[] { data.FirstOrDefault(datum => datum.Timestamp == fromIncludedUtc)
-                                ?? FillMissingRecord(data, signal, fromIncludedUtc, mvp) };
+                                ?? FillMissingRecord(data, signal, fromIncludedUtc, mvp, dateTimeStep) };
 
             List<Datum<T>> list = new List<Datum<T>>();
 
             for (DateTime d = fromIncludedUtc; d < toExcludedUtc; d = dateTimeStep(d))
                 list.Add(
                     data.FirstOrDefault(datum => datum.Timestamp == d)
-                    ?? FillMissingRecord(data, signal, d, mvp));
+                    ?? FillMissingRecord(data, signal, d, mvp, dateTimeStep));
 
             return list;
         }
-        private Datum<T> FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, MissingValuePolicy<T> mvp)
+        private Datum<T> FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, MissingValuePolicy<T> mvp, Func<DateTime, DateTime> dateTimeStep)
         {
             if (mvp is NoneQualityMissingValuePolicy<T>)
             {
@@ -243,8 +243,56 @@ namespace Domain.Services.Implementation
                     Timestamp = dateTime
                 };
             }
+            else if (mvp is FirstOrderMissingValuePolicy<T>)
+            {
+                if (typeof(T) == typeof(string) || typeof(T) == typeof(bool))
+                    throw new InvalidPolicyDataTypeException(typeof(T));
+
+                var previous = data.LastOrDefault(datum => datum.Timestamp < dateTime)
+                    ?? signalsDataRepository.GetDataOlderThan<T>(signal, dateTime, 1).SingleOrDefault();
+                var next = data.FirstOrDefault(datum => datum.Timestamp > dateTime)
+                    ?? signalsDataRepository.GetDataNewerThan<T>(signal, dateTime, 1).SingleOrDefault();
+
+                if (previous == null || next == null)
+                    return Datum<T>.CreateNone(signal, dateTime);
+
+                int count = 0;
+                int part = 0;
+                for (var d = previous.Timestamp; d < next.Timestamp; d = dateTimeStep(d))
+                {
+                    count++;
+                    if (d == dateTime)
+                        part = count - 1;
+                }
+
+                var value = GetPart(previous.Value, next.Value, count, part);
+
+                return new Datum<T>
+                {
+                    Quality = next.Quality > previous.Quality ? previous.Quality : next.Quality,
+                    Value = value,
+                    Signal = signal,
+                    Timestamp = dateTime
+                };
+            }
             else return Datum<T>.CreateNone(signal, dateTime);
         }
+
+        private T GetPart<T>(T previous, T next, int count, int part)
+        {
+            dynamic p = previous;
+            dynamic n = next;
+            try
+            {
+                var unit = (n - p) / count;
+                return (T)(p + unit * part);
+            }
+            catch
+            {
+                throw new InvalidPolicyDataTypeException(typeof(T));
+            }
+        }
+
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase policy)
         {
             if (policy != null)
