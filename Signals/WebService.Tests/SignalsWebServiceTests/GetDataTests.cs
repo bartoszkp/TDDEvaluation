@@ -4,6 +4,7 @@ using System.Linq;
 using DataAccess.GenericInstantiations;
 using System.Collections.Generic;
 using WebService.Tests.SignalsWebServiceTests.Infrastructure;
+using Moq;
 
 namespace WebService.Tests.SignalsWebServiceTests
 {
@@ -215,6 +216,35 @@ namespace WebService.Tests.SignalsWebServiceTests
             };
 
             Assert.IsTrue(Utils.CompareDatum(expected, result));
+        }
+
+        [TestMethod]
+        public void GetData_ExistDataBeforeRequestedTime_ZeroOrderMissingValuePolicyShouldUseThatData()
+        {
+
+            var signalId = 1;
+            var signal = Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month);
+            SetupGet(signal);
+            SetupMVPGet(new ZeroOrderMissingValuePolicyDouble());
+            SetupGetData(new[] {
+                new Domain.Datum<double> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 3.0 },
+                new Domain.Datum<double> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 4.0 }
+            });
+
+            signalsDataRepositoryMock.Setup(sdr => sdr.GetDataOlderThan<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                .Returns(new[] {
+                    new Domain.Datum<double> {Quality = Domain.Quality.Bad, Timestamp = new DateTime(2000,1,1), Value = 1.0 }
+                });
+
+            var result = signalsWebService.GetData(signalId, new DateTime(2000, 2, 1), new DateTime(2000, 5, 1)).ToArray();
+            var expected = new[] {
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 2, 1), Value = 1.0 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 3.0 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 4.0 }
+            };
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+
         }
         
         [TestMethod]
