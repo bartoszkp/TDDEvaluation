@@ -86,7 +86,13 @@ namespace Domain.Services.Implementation
             var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
             result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp).ToList();
 
-            
+            var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
+
+            if (olderData.Count() == 1)
+            {
+                lastDatum = olderData.ToArray()[0];
+            }
+
 
             if (result.Count == 0)
             {
