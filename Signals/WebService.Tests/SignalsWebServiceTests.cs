@@ -808,7 +808,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
 
                 Assert.AreEqual(new DateTime(2000, 1, 10), result.First().Timestamp);
-                Assert.AreEqual(Quality.Fair, result.First().Quality);
+                Assert.AreEqual(Dto.Quality.Fair, result.First().Quality);
                 Assert.AreEqual("first", result.First().Value);
             }
 
