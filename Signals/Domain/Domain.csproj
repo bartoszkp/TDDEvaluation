@@ -88,6 +88,7 @@
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />
     <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />
+    <Compile Include="SpecificDataFillHelper.cs" />
     <Compile Include="ZeroOrderDataFillHelper.cs" />
   </ItemGroup>
   <ItemGroup>

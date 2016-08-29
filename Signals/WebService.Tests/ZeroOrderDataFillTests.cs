@@ -37,10 +37,7 @@ namespace WebService.Tests
             var to = new DateTime(2000, 1, 11);
 
             signalsDataRepositoryMock.Setup(s => s.GetData<string>(It.IsAny<Signal>(), from, to))
-               .Returns(new List<Datum<string>>
-               {
-                 //  new Datum<string>() { Timestamp = new DateTime(2000, 1, 1), Value = "first", Quality = Quality.Good }
-               });
+               .Returns(new List<Datum<string>>());
 
 
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));

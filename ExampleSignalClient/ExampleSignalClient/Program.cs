@@ -13,18 +13,19 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.String,
-                Granularity = Granularity.Day,
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
                 Path = new Path() { Components = new[] { "signal" + random.Next(100) } }
             }).Id.Value;
 
-            client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.String });
+            client.SetMissingValuePolicy(id, new SpecificValueMissingValuePolicy() { DataType = DataType.Double, Value = (double)42.42, Quality = Quality.Fair });
+
             client.SetData(id, new Datum[]
             {
-                new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = "first", Quality = Quality.Good },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
             });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
+            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 
             foreach (var d in result)
             {

@@ -148,7 +148,14 @@ namespace Domain.Services.Implementation
             if (mvp is ZeroOrderMissingValuePolicy<T>)
             {
                 ZeroOrderDataFillHelper.FillMissingData(this, signal,dataList, fromIncludedUTC, toExcludedUTC);
-                return dataList;
+                return dataList.OrderBy(s => s.Timestamp).ToList();
+            }
+
+            if (mvp is SpecificValueMissingValuePolicy<T>)
+            {
+                var specificMvp = mvp as SpecificValueMissingValuePolicy<T>;
+                SpecificDataFillHelper.FillMissingData(specificMvp, dataList, fromIncludedUTC, toExcludedUTC);
+                return dataList.OrderBy(s => s.Timestamp).ToList();
             }
 
 
