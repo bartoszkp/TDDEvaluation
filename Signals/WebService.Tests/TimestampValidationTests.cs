@@ -137,6 +137,18 @@ namespace WebService.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
+        public void WhenSettigDataForHourSignal_WithInvalidSecondTimestamp_InvalidTimestampExceptionIsThrown()
+        {
+            SetupSignalWithSpecificGranularity(Domain.Granularity.Hour);
+
+            List<Dto.Datum> data = new List<Dto.Datum>()
+            { new Dto.Datum() {Quality = Dto.Quality.Bad,Timestamp = new DateTime(2000, 1, 1, 0, 0, 1, 0), Value = 0  } };
+
+            signalsWebService.SetData(1, data);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidTimestampException))]
         public void GetData_DayGranularity_InvalidTimestamp_ExceptionThrown()
         {
             SetupWebService();
