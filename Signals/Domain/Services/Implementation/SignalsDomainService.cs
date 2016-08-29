@@ -181,6 +181,7 @@ namespace Domain.Services.Implementation
             {
                 if (!timestampsFollowingExistingDates)
                 {
+                    var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 100);
                     filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
                     return;
                 }
