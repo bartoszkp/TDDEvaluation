@@ -694,6 +694,25 @@ namespace WebService.Tests
                 signalsWebService.GetData(signalId, new DateTime(2000, 1, 11), new DateTime(2000, 10, 20));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingDataWithCorrectTimestamp_RepoSetDataIsCalled()
+            {
+                int dummyId = 1;
+                GivenASignal(SignalWith(dummyId, DataType.Integer, Granularity.Week, Path.FromString("root/signal")));
+
+                var data = new Dto.Datum[]
+               {
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 1, Timestamp = new DateTime(2016, 9, 5) },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 2, Timestamp = new DateTime(2016, 9, 12) },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Value = 3, Timestamp = new DateTime(2016, 9, 19) }
+               };
+
+                signalsWebService.SetData(dummyId, data);
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.SetData(It.Is<IEnumerable<Datum<int>>>(enumerable => enumerable.All(d => d.Signal != null))));
+            }
+
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
