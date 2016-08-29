@@ -48,7 +48,11 @@ namespace WebService
 
         public void Delete(int signalId)
         {
-            throw new NotImplementedException();
+            var signal = this.signalsDomainService.GetById(signalId);
+            if (signal == null)
+                throw new NoSuchSignalException();
+
+            this.signalsDomainService.Delete(signal);
         }
 
         public PathEntry GetPathEntry(Path pathDto)

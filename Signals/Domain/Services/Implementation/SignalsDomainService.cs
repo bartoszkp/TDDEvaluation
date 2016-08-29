@@ -284,5 +284,11 @@ namespace Domain.Services.Implementation
                 return true;
             return false;
         }
+
+        public void Delete(Signal signal)
+        {
+            this.missingValuePolicyRepository.Set(signal, null);
+            this.signalsRepository.Delete(signal);
+        }
     }
 }
