@@ -81,17 +81,15 @@ namespace Domain.Services.Implementation
 
             if (!isFromIncludedUtcCorrect) throw new ArgumentException();
 
-            var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(datum => datum.Timestamp);
 
-            var mvp = missingValuePolicyRepository.Get(signal);
+            var mvp = GetMissingValuePolicy(signal);
 
             IEnumerable<Datum<T>> filledData = data;
 
             if (mvp != null)
                 filledData = CheckMissingValues(signal, data, fromIncludedUtc, toExcludedUtc);
-
-            //if (mvp is ZeroOrderMissingValuePolicy<T>) filledData = (mvp as ZeroOrderMissingValuePolicy<T>).SetMissingValue(signal, data, fromIncludedUtc, toExcludedUtc);
-
+            
             return filledData;
         }
 
@@ -202,15 +200,16 @@ namespace Domain.Services.Implementation
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy<T>;
 
             if (fromIncludedUtc == toExcludedUtc)
-                return new[] { FillMissingRecord(data, signal, fromIncludedUtc, mvp) };
+                return new[] { data.FirstOrDefault(datum => datum.Timestamp == fromIncludedUtc)
+                                ?? FillMissingRecord(data, signal, fromIncludedUtc, mvp) };
 
             List<Datum<T>> list = new List<Datum<T>>();
 
             for (DateTime d = fromIncludedUtc; d < toExcludedUtc; d = dateTimeStep(d))
                 list.Add(
-                    data.FirstOrDefault(datum => datum.Timestamp == d) 
+                    data.FirstOrDefault(datum => datum.Timestamp == d)
                     ?? FillMissingRecord(data, signal, d, mvp));
-            
+
             return list;
         }
         private Datum<T> FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, MissingValuePolicy<T> mvp)
@@ -226,6 +225,20 @@ namespace Domain.Services.Implementation
                 {
                     Quality = specificMvp.Quality,
                     Value = specificMvp.Value,
+                    Signal = signal,
+                    Timestamp = dateTime
+                };
+            }
+            else if (mvp is ZeroOrderMissingValuePolicy<T>)
+            {
+                var previous = data.LastOrDefault(datum => datum.Timestamp < dateTime)
+                    ?? signalsDataRepository.GetDataOlderThan<T>(signal, dateTime, 1).SingleOrDefault()
+                    ?? Datum<T>.CreateNone(signal, dateTime);
+
+                return new Datum<T>
+                {
+                    Quality = previous.Quality,
+                    Value = previous.Value,
                     Signal = signal,
                     Timestamp = dateTime
                 };
