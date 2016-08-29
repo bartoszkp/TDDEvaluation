@@ -23,5 +23,7 @@ namespace Domain.Services
         Type GetDataTypeById(int signalId);
 
         PathEntry GetPathEntry(Path path);
+
+        void Delete(int signalId);
     }
 }

@@ -40,7 +40,7 @@ namespace Domain.Services.Implementation
             
             var result= this.signalsRepository.Add(newSignal);
 
-            var dataType = result.DataType;       
+            var dataType = result.DataType;
 
             switch (dataType)
             {
@@ -386,6 +386,24 @@ namespace Domain.Services.Implementation
                 default:
                     return false;
             }
+        }
+
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new ArgumentException("This signal does not exist.");
+
+            SetMissingValuePolicy(signalId, null);
+
+            var dataType = signal.DataType.GetNativeType();
+            var deleteDataMethod = signalsDataRepository
+                .GetType()
+                .GetMethod("DeleteData")
+                .MakeGenericMethod(dataType);
+            deleteDataMethod.Invoke(signalsDataRepository, new object[] { signal });
+
+            signalsRepository.Delete(signal);
         }
     } 
 }
