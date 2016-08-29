@@ -128,8 +128,13 @@ namespace Domain.Services.Implementation
                     }
                     goto case Granularity.Month;
                 case Granularity.Month:
-                case Granularity.Week:
                     if (date.Day != 1)
+                    {
+                        throw new IncorrectDatumTimestampException();
+                    }
+                    goto case Granularity.Day;
+                case Granularity.Week:
+                    if (date.DayOfWeek!=DayOfWeek.Monday)
                     {
                         throw new IncorrectDatumTimestampException();
                     }
