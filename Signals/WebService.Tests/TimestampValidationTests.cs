@@ -41,17 +41,12 @@ namespace WebService.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
-        public void WhenSettigDataForMonthlySignal_WithInvalidDataTimestamp_InvalidTimestampExceptionIsThrown()
+        public void WhenSettigDataForMonthlySignal_WithInvalidSecondTimestamp_InvalidTimestampExceptionIsThrown()
         {
-            SetupWebService();
-            var returnedSignal = new Domain.Signal() { Id = 1, Granularity = Domain.Granularity.Month, DataType = Domain.DataType.Integer };
-
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            SetupSignalWithSpecificGranularity(Domain.Granularity.Month);
 
             List<Dto.Datum> data = new List<Dto.Datum>()
-            {
-                new Dto.Datum() {Quality = Dto.Quality.Bad,Timestamp = new DateTime(2000, 1, 1, 0, 0, 1, 0),Value = 0  }
-            };
+            { new Dto.Datum() {Quality = Dto.Quality.Bad,Timestamp = new DateTime(2000, 1, 1, 0, 0, 1, 0), Value = 0  } };
 
             signalsWebService.SetData(1, data);
         }
@@ -74,6 +69,14 @@ namespace WebService.Tests
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
             signalsWebService = new SignalsWebService(domainService);
+        }
+
+        private void SetupSignalWithSpecificGranularity(Domain.Granularity granularity)
+        {
+            SetupWebService();
+            var returnedSignal = new Domain.Signal() { Id = 1, Granularity = granularity, DataType = Domain.DataType.Integer };
+
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
         }
 
         private Mock<ISignalsRepository> signalsRepoMock = new Mock<ISignalsRepository>();
