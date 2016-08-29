@@ -1177,6 +1177,14 @@ namespace WebService.Tests
                 DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
             }
 
+            [TestMethod]
+            public void Delete_NotExistingSignal_NoneExceptionIsThrown()
+            {
+                SetupWebService();
+
+                signalsWebService.Delete(1);
+            }
+
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
             {
                 signalsRepositoryMock
