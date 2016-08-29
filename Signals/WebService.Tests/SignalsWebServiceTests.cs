@@ -1312,6 +1312,9 @@ namespace WebService.Tests
                 var toExcludedUtc = new DateTime(2000, 1, 11);
                 
                 SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, fromIncludedUtc, toExcludedUtc, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetDataOlderThan<string>(It.IsAny<Signal>(), fromIncludedUtc, 1))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<string>>>());
                 var result = signalsWebService.GetData(existingSignal.Id.Value, fromIncludedUtc, toExcludedUtc);
                 AssertDatum(result, filledDatum);
             }

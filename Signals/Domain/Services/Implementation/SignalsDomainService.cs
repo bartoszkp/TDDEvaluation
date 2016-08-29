@@ -102,7 +102,7 @@ namespace Domain.Services.Implementation
             secondaryItem = new Datum<T>() { Signal = signal, Timestamp = toExcludedUtc };
             VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
             var data = this.signalsDataRepository
-                .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+                .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);            
 
             foreach (var item in data)
             {
@@ -128,8 +128,9 @@ namespace Domain.Services.Implementation
                 return data;
             }
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
-            
-            return mvp.FillData(signal, data, fromIncludedUtc, toExcludedUtc).ToArray();
+
+            var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).FirstOrDefault();
+            return mvp.FillData(signal, data, fromIncludedUtc, toExcludedUtc, olderDatum).ToArray();
         }
 
         public Signal GetByPath(Path path)

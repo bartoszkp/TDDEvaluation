@@ -7,7 +7,7 @@ namespace Domain.MissingValuePolicy
 {
     public class NoneQualityMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> olderData)
         {
             dataDictionary = data.ToDictionary(d => d.Timestamp, d => d);
 
