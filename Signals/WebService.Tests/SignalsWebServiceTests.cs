@@ -1185,6 +1185,17 @@ namespace WebService.Tests
                 signalsWebService.Delete(1);
             }
 
+            [TestMethod]
+            public void Delete_NotExistingSignal_ExpectedRepositoryGetCall()
+            {
+                SetupWebService();
+
+                var signalId = 1;
+                signalsWebService.Delete(signalId);
+
+                signalsRepositoryMock.Verify(f => f.Get(It.Is<int>(i => i == signalId)), Times.Once);
+            }
+
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
             {
                 signalsRepositoryMock
