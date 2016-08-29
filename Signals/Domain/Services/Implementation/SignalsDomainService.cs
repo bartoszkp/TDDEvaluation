@@ -258,7 +258,7 @@ namespace Domain.Services.Implementation
             bool minutes = seconds && timestamp.Second == 0;
             bool hours = minutes && timestamp.Minute == 0;
             bool days = hours && timestamp.Hour == 0;
-            bool weeks = days && timestamp.Day % 7 == 1;
+            bool weeks = days && timestamp.DayOfWeek == DayOfWeek.Monday;
             bool months = days && timestamp.Day == 1;
             bool years = months && timestamp.Month == 1;
 
