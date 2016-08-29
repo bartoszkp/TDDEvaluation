@@ -129,18 +129,11 @@ namespace Domain.Services.Implementation
 
             if(mvp is ZeroOrderMissingValuePolicy<T>)
             {
-                if (lastDatum == null)
-                {
-                    result = new Datum<T>() { Quality = Quality.None, Timestamp = timestamp, Value = default(T) };
-                }
+                var datum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).FirstOrDefault();
+                if (datum == null)
+                    result = new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = timestamp };
                 else
-                {
-                    result = new Datum<T>() {
-                        Quality = lastDatum.Quality,
-                        Value = lastDatum.Value,
-                        Timestamp = timestamp
-                    };
-                }
+                    result = new Datum<T>() { Quality = datum.Quality, Value = datum.Value, Timestamp = timestamp };
             }
 
             return result;
