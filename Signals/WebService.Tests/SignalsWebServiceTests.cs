@@ -1214,6 +1214,24 @@ namespace WebService.Tests
                         sig.Granularity == signal.Granularity)), Times.Once);
             }
 
+            [TestMethod]
+            public void Delete_WithExistingSignalAndData_ExpectedDataRepositoryDeleteDataCall()
+            {
+                SetupWebService();
+                var signal = GetDefaultSignal_IntegerMonth();
+                signalsRepositoryMock
+                    .Setup(f => f.Get(It.IsAny<int>()))
+                    .Returns(signal);
+
+                signalsWebService.Delete(1);
+
+                signalsDataRepositoryMock
+                    .Verify(f => f.DeleteData<Int32>(It.Is<Signal>(sig
+                        => sig.DataType == signal.DataType &&
+                        sig.Path.ToString() == signal.Path.ToString() &&
+                        sig.Granularity == signal.Granularity)), Times.Once);
+            }
+
             private void SetupMocks_RepositoryAndDataRepository_ForGettingData(Signal signal,int signalId,Dto.Datum[] datumArray)
             {
                 signalsRepositoryMock
