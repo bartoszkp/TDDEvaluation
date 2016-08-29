@@ -156,6 +156,13 @@ namespace Domain.Services.Implementation
                     return false;
             return true;
         }
+
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
+            SetMissingValuePolicy(signalId, null);
+            signalsRepository.Delete(signal);
+        }
     }
 
 
