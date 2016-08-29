@@ -45,6 +45,9 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
+            if (signal == null) return;
+
+            DeleteSignalData(signal);
             signalsRepository.Delete(signal);
         }
 
@@ -301,6 +304,30 @@ namespace Domain.Services.Implementation
                     return new SpecificValueMissingValuePolicy<int>();
                 case DataType.String:
                     return new SpecificValueMissingValuePolicy<string>();
+                default:
+                    throw new TypeUnsupportedException();
+            }
+        }
+
+        private void DeleteSignalData(Signal signal)
+        {
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    signalsDataRepository.DeleteData<bool>(signal);
+                    break;
+                case DataType.Decimal:
+                    signalsDataRepository.DeleteData<decimal>(signal);
+                    break;
+                case DataType.Double:
+                    signalsDataRepository.DeleteData<double>(signal);
+                    break;
+                case DataType.Integer:
+                    signalsDataRepository.DeleteData<int>(signal);
+                    break;
+                case DataType.String:
+                    signalsDataRepository.DeleteData<string>(signal);
+                    break;
                 default:
                     throw new TypeUnsupportedException();
             }
