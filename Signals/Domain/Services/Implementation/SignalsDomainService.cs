@@ -176,7 +176,7 @@ namespace Domain.Services.Implementation
             }
             else if (policy is FirstOrderMissingValuePolicy<T>)
             {
-                if (signal.DataType == DataType.Boolean)
+                if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                     throw new TypeUnsupportedException();
 
                 var left = filledList.Where(d => d.Timestamp <= timestamp).LastOrDefault();
