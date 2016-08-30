@@ -893,6 +893,32 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(signalId, new FirstOrderMissingValuePolicy() { DataType = Dto.DataType.Boolean } );
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_CheckIfDataGettingProperly()
+            {
+                int signalId = 5;
+                GivenASignal(SignalWith(
+                     id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+
+                List<Datum<double>> datums = new List<Datum<double>>(){
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 }
+                };
+
+                GivenData(signalId, datums);
+
+                List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1)).ToList();
+
+                Assert.AreEqual(result[0].Value, 0.0);
+                Assert.AreEqual(result[2].Value, datums[0].Value);
+                Assert.AreEqual(result[6].Value, datums[1].Value);
+                Assert.AreEqual(result[9].Value, datums[2].Value);
+            }
 
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
