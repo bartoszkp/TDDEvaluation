@@ -824,6 +824,11 @@ namespace WebService.Tests
                     .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
             }
 
+            private void GivenMVP()
+            {
+
+            }
+
             private Mock<ISignalsRepository> signalsRepositoryMock;
             private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
             private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;

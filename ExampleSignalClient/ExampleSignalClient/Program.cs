@@ -9,30 +9,22 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = 1;// client.Add(new Signal() { Path = new Path() { Components = new[] { string.Empty } } }).Id.Value;
+            var id = 1;
 
-            var result = client.GetById(id);
+            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
 
-            if (result != null)
+            client.SetData(id, new Datum[]
             {
-                Console.WriteLine("Sygnał poprawnie utworzony");
-            }
-            else
-            {
-                Console.WriteLine("Błąd - nie udało się utworzyć sygnału");
-            }
+    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
+    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
+    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
+            });
 
-            client.Delete(id);
+            var result = client.GetData(id, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
 
-            result = client.GetById(id);
-
-            if (result == null)
+            foreach (var d in result)
             {
-                Console.WriteLine("Sygnał poprawnie skasowany");
-            }
-            else
-            {
-                Console.WriteLine("Błąd - sygnał nadal istnieje");
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
             }
 
             Console.ReadKey();

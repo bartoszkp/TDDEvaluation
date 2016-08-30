@@ -133,6 +133,11 @@ namespace Domain.Services.Implementation
             return signalsDataRepository.GetDataOlderThan<T>(signal, excludedUtc, maxSampleCount);
         }
 
+        public IEnumerable<Datum<T>> GetDataNewerThan<T>(Signal signal, DateTime includedUtc, int maxSampleCount)
+        {
+            return signalsDataRepository.GetDataNewerThan<T>(signal, includedUtc, maxSampleCount);
+        }
+
         private void DeleteSignalsData(Signal signal)
         {
             switch (signal.DataType)

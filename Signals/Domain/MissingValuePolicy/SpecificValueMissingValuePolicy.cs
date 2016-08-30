@@ -10,7 +10,7 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public override IEnumerable<Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> earlierDatum = null)
+        public override IEnumerable<Datum<T>> SetMissingValue(Signal signal, IEnumerable<Datum<T>> datums, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> earlierDatum = null, Datum<T> laterDatum = null)
         {
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum<T>>();
