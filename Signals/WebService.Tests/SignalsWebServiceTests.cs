@@ -818,6 +818,15 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2000, 1, 1), result[0].Timestamp);
             }
 
+            [TestMethod]
+            public void DeleteSignal_DoesNotThrowNotImplementedException()
+            {
+                int signalId = 6;
+                GivenNoSignals();
+
+                signalsWebService.Delete(signalId);
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
