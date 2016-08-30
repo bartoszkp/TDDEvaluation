@@ -30,11 +30,6 @@ namespace Domain.Services.Implementation
 
         public Signal Add<T>(Signal newSignal, NoneQualityMissingValuePolicy<T> nonePolicy)
         {
-            if (newSignal.Id.HasValue)
-            {
-                throw new IdNotNullException();
-            }
-
             var toReturn = this.signalsRepository.Add(newSignal);
 
             missingValuePolicyRepository.Set(newSignal, nonePolicy);

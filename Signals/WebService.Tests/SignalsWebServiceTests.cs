@@ -323,6 +323,38 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
             }
 
+            [TestMethod]
+            public void WhenTryingDeleteSignal_ThisSignalIsRemoved()
+            {
+                var signalDomain = new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("sfda/xvbc/jhkl")
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                    .Returns<Domain.Signal>(s => s);
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(s => s.Set(It.IsAny<Domain.Signal>(), null));
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var signalDto = signalDomain.ToDto<Dto.Signal>();
+
+                signalsWebService.Add(signalDto);
+                signalsWebService.Delete(signalDomain.Id.Value);
+
+                var result = signalsWebService.GetById(1);
+
+                Assert.IsNull(result);
+            }
+
             private void SetupGetRepositories(DateTime fromIncluded, DateTime toExcluded, List<Dto.Datum> expectedResult)
             {
                 var domainSignal = new Domain.Signal()
