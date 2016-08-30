@@ -1423,16 +1423,16 @@ namespace WebService.Tests
 
                 var existingDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1),  Value = 1 },
-                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 8),  Value = 1 }
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1),  Value = (decimal)1 },
+                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 8),  Value = (decimal)1 }
                 };
                 var filledDatum = new Dto.Datum[]
                 {
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1),  Value = 1 },
-                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 8),  Value = 1 },
-                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 15),  Value = 1 }
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1),  Value = (decimal)1 },
+                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 8),  Value = (decimal)1 },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 8, 15),  Value = default(decimal) }
                 };
-                SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, new DateTime(2016, 8, 1), new DateTime(2016, 8, 22), new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
+                SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, new DateTime(2016, 8, 1), new DateTime(2016, 8, 22), new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDecimal());
                 var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2016, 8, 1), new DateTime(2016, 8, 22));
                 AssertDatum(result, filledDatum);
             }

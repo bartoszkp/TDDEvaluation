@@ -24,8 +24,19 @@ namespace Domain.MissingValuePolicy
                     filledData.Add(fillDatum(signal, fromIncludedUtc, olderDatum, d));
                 }
             }
-            for (; fromIncludedUtc < toExcludedUtc; fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity))
-                filledData.Add(fillDatum(signal, fromIncludedUtc, olderDatum, newestDatum));
+            if (newestDatum != null)
+                for (; fromIncludedUtc < toExcludedUtc; fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity))
+                    filledData.Add(fillDatum(signal, fromIncludedUtc, olderDatum, newestDatum));
+            else
+                for (; fromIncludedUtc < toExcludedUtc; fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity))
+                    filledData.Add(new Datum<T>()
+                    {
+                        Signal = signal,
+                        Timestamp = fromIncludedUtc,
+                        Quality = Quality.None,
+                        Value = default(T)
+                    });
+
             return filledData;
         }
 
