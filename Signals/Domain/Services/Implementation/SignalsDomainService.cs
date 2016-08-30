@@ -158,7 +158,10 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
         {
-            this.missingValuePolicyRepository.Set(signal,policy);
+            if (policy is MissingValuePolicy.FirstOrderMissingValuePolicy<string>
+                || policy is MissingValuePolicy.FirstOrderMissingValuePolicy<bool>)
+                throw new ArgumentException("First order mvp mustn't string or bool");
+            this.missingValuePolicyRepository.Set(signal, policy);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
