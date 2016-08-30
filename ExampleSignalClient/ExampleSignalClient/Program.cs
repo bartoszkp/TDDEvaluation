@@ -13,16 +13,16 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.String,
                 Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "day88" } }
+                Path = new Path() { Components = new[] { "d101" } }
             }).Id.Value;
 
             client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.String });
             client.SetData(id, new Datum[]
             {
-                 new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = "first", Quality = Quality.Good },
+             new Datum() { Timestamp = new DateTime(2000, 1, 10), Value = "first", Quality = Quality.Good },
             });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
+            var result = client.GetData(id, new DateTime(2000, 1, 7), new DateTime(2000, 1, 11));
 
             foreach (var d in result)
             {
@@ -30,6 +30,7 @@ namespace ExampleSignalClient
             }
 
             Console.ReadKey();
+
         }
     }
 }

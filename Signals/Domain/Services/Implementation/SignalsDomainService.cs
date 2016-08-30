@@ -108,10 +108,15 @@ namespace Domain.Services.Implementation
             else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
             {
                 Datum<T> returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
+                //if datums value is null find older datum
                 if (returnDatum.Value == null)
                 {
-                    returnDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, toExcludedUtc, 1).FirstOrDefault();
-                    returnDatum.Timestamp = new DateTime(timeStamp.Ticks);
+                    returnDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).FirstOrDefault();
+                    //if any old datum does not exist, create new datum with default value
+                    if (returnDatum == null)
+                        returnDatum = Datum<T>.CreateNone(signal, timeStamp);
+                    else
+                        returnDatum.Timestamp = new DateTime(timeStamp.Ticks);
                 }
                 return returnDatum;
             }
