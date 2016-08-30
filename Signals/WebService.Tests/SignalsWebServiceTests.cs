@@ -1068,9 +1068,7 @@ namespace WebService.Tests
                     new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 1, Quality = Dto.Quality.Good }
                 };
 
-                SignalsRepositoryMock_SetupGet(signal.ToDomain<Domain.Signal>());
-                DataRepositoryMock_SetupGetData<int>(data);
-                DataRepositoryMock_SetupGetDataOlderThan<int>(data);
+                SetupMocks_ForCheckingDatums<int>(signal, data);
 
                 missingValuePolicyRepositoryMock
                     .Setup(x => x.Get(It.Is<Domain.Signal>(s => s.DataType == Domain.DataType.Integer)))
@@ -1104,9 +1102,7 @@ namespace WebService.Tests
                     new Datum() { Timestamp = new DateTime(2000, 1, 3), Value = 6, Quality = Dto.Quality.Fair }
                 };
 
-                SignalsRepositoryMock_SetupGet(signal.ToDomain<Domain.Signal>());
-                DataRepositoryMock_SetupGetData<int>(data);
-                DataRepositoryMock_SetupGetDataOlderThan<int>(data);
+                SetupMocks_ForCheckingDatums<int>(signal, data);
 
                 missingValuePolicyRepositoryMock
                     .Setup(x => x.Get(It.Is<Domain.Signal>(s => s.DataType == Domain.DataType.Integer)))
@@ -1126,6 +1122,13 @@ namespace WebService.Tests
             }
 
             #endregion
+
+            private void SetupMocks_ForCheckingDatums<T>(Dto.Signal signal, IEnumerable<Dto.Datum> data)
+            {
+                SignalsRepositoryMock_SetupGet(signal.ToDomain<Domain.Signal>());
+                DataRepositoryMock_SetupGetData<T>(data);
+                DataRepositoryMock_SetupGetDataOlderThan<T>(data);
+            }
 
             private Dto.Signal ReturnDefaultSignal_IntegerDay()
             {
