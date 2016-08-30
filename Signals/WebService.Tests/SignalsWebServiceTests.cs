@@ -1229,6 +1229,7 @@ namespace WebService.Tests
                 SignalsRepositoryMock_SetupGet(signal.ToDomain<Domain.Signal>());
                 DataRepositoryMock_SetupGetData<T>(data);
                 DataRepositoryMock_SetupGetDataOlderThan<T>(data);
+                DataRepositoryMock_SetupGetDataNewerThan<T>(data);
             }
 
             private Dto.Signal ReturnDefaultSignal_IntegerDay()
@@ -1255,10 +1256,23 @@ namespace WebService.Tests
                     .Setup(x => x.GetDataOlderThan<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
                     .Returns<Domain.Signal, DateTime, int>((sig, dt, i) => {
                         var domainData = data.ToDomain<IEnumerable<Datum<T>>>().Where(x => x.Timestamp < dt);
-                        if(domainData.Count() == 0)
-                            return Enumerable.Repeat<Domain.Datum<T>>(null, 1);
+                        if (domainData.Count() == 0)
+                            return null;
                         var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp > next.Timestamp ? cur : next);
-                        return Enumerable.Repeat(singleResult, 1);
+                        return Enumerable.Repeat<Datum<T>>(singleResult, 1);
+                    });
+            }
+
+            private void DataRepositoryMock_SetupGetDataNewerThan<T>(IEnumerable<Dto.Datum> data)
+            {
+                dataRepositoryMock
+                    .Setup(x => x.GetDataNewerThan<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
+                    .Returns<Domain.Signal, DateTime, int>((sig, dt, i) => {
+                        var domainData = data.ToDomain<IEnumerable<Datum<T>>>().Where(x => x.Timestamp > dt);
+                        if (domainData.Count() == 0)
+                            return null;
+                        var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp > next.Timestamp ? cur : next);
+                        return Enumerable.Repeat<Datum<T>>(singleResult, 1);
                     });
             }
 

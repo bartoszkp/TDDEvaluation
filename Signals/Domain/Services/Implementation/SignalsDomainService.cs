@@ -54,8 +54,6 @@ namespace Domain.Services.Implementation
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
             var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
-            if (olderData.Count() == 1 && olderData.ElementAt(0) == null)
-               olderData = null;
             var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1);
             var mvp = Get(signal);
 
@@ -70,8 +68,8 @@ namespace Domain.Services.Implementation
 
                 if (datum == null)
                 {
-                    var tempDatums = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc,signal.Granularity, res, olderData,newerData);
-                    foreach (var tempDatum in tempDatums)
+                    var tempDatums = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc,signal.Granularity, res, olderData, newerData);
+                    foreach (var tempDatum in tempDatums.Where(x => x.Timestamp < toExcludedUtc && x.Timestamp >= fromIncludedUtc))
                     {
                         tempDatum.Signal = signal;
                         res.Insert(index, tempDatum);
