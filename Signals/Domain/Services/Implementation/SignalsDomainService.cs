@@ -210,7 +210,23 @@ namespace Domain.Services.Implementation
 
             else if (policy is FirstOrderMissingValuePolicy<T>)
             {
-                throw new NotImplementedException();
+                var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1);
+                var ealierData = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1);
+
+                if (olderData != null && olderData.Count() > 0) // jesli znalazlem wczesniejsza probke
+                {
+                    var diffNumberOlder_Newer = NumberOfPeriods(olderData.First().Timestamp, ealierData.First().Timestamp, signal.Granularity);
+                    var diffNumberOlder_Actual = NumberOfPeriods(olderData.First().Timestamp, timestamp, signal.Granularity);
+                    var stepValue = ValueStep<T>(signal, olderData.First().Value, ealierData.First().Value, diffNumberOlder_Newer, diffNumberOlder_Actual);
+
+                    filledArray[current_index] = new Datum<T>()
+                    {
+                        Quality = olderData.First().Quality,
+                        Signal = olderData.First().Signal,
+                        Value = stepValue,
+                        Timestamp = timestamp
+                    };
+                }
             }
 
             else
