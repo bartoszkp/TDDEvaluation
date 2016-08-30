@@ -67,7 +67,7 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> domain_data)
         {
-            if(domain_data != null)
+            if(domain_data != null && domain_data.Count() > 0)
             {
                 TimestampsCheck<T>(domain_data);
             }
