@@ -47,7 +47,7 @@ namespace WebService
 
         public void Delete(int signalId)
         {
-            throw new NotImplementedException();
+            signalsDomainService.Delete(signalId);
         }
 
         public PathEntry GetPathEntry(Path pathDto)

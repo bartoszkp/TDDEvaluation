@@ -52,6 +52,11 @@ namespace Domain.Services.Implementation
             return signal;
         }
 
+        public void Delete(int signalId)
+        {
+            
+        }
+
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
         {
             List<Datum<T>> dataList = data.ToList();
