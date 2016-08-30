@@ -983,7 +983,22 @@ namespace WebService.Tests
                 signalsWebService.Delete(316);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenDeletingThisSignal_GetByIdShouldReturnNull()
+            {
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                });
 
+                signalsWebService.Delete(1);
+                var deletedSignal = signalsWebService.GetById(1);
+
+                Assert.IsNull(deletedSignal);
+            }
 
             private List<Datum<T>> DetDefaultDatumCollection<T>(DateTime startDate, DateTime endDate)
             {
