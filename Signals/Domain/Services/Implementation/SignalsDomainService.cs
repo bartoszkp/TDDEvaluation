@@ -298,6 +298,7 @@ namespace Domain.Services.Implementation
         public void Delete(int signalId)
         {
             Signal signal = signalsRepository.Get(signalId);
+            missingValuePolicyRepository.Set(signal, null);
             signalsRepository.Delete(signal);
         }
     }
