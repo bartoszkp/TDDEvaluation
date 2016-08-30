@@ -144,6 +144,24 @@ namespace Domain.Services.Implementation
                     result = new Datum<T>() { Quality = datum.Quality, Value = datum.Value, Timestamp = timestamp };
             }
 
+            if (mvp is FirstOrderMissingValuePolicy<int> || mvp is FirstOrderMissingValuePolicy<double> || mvp is FirstOrderMissingValuePolicy<decimal>)
+            {
+                var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).FirstOrDefault();
+                var newerDatum = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1).FirstOrDefault();
+                if (olderDatum != null && newerDatum != null)
+                {
+                    var timestampDifferenceOlderNewerDatum = Datum<T>.GetTimeStampsDifference(signal, olderDatum.Timestamp, newerDatum.Timestamp);
+                    var timestampDifferenceOlderMissingDatum = Datum<T>.GetTimeStampsDifference(signal, olderDatum.Timestamp, timestamp);
+                    var missingValue = newerDatum.GetFirstOrderValueToAdd(olderDatum.Value, timestampDifferenceOlderNewerDatum, timestampDifferenceOlderMissingDatum);
+                    if (newerDatum.Quality > olderDatum.Quality)
+                        result = new Datum<T>() { Quality = newerDatum.Quality, Signal = signal, Timestamp = timestamp, Value = missingValue };
+                    else
+                        result = new Datum<T>() { Quality = olderDatum.Quality, Signal = signal, Timestamp = timestamp, Value = missingValue };
+                }
+                else
+                    result = new Datum<T>() { Quality = Quality.None, Value = default(T), Signal = signal, Timestamp = timestamp }; 
+            }
+
             return result;
         }
 
