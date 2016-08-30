@@ -102,7 +102,7 @@ namespace Domain.Services.Implementation
             return signalsRepository.Get(path);
         }
 
-        private DateTime AddTime(Granularity granuality,DateTime date)
+        public static DateTime AddTime(Granularity granuality,DateTime date)
         {
             if (granuality == Granularity.Second) return  date.AddSeconds(1);
             if (granuality == Granularity.Minute) return date.AddMinutes(1);
