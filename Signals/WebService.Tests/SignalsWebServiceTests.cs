@@ -984,20 +984,37 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenDeletingThisSignal_GetByIdShouldReturnNull()
+            public void GivenASignal_WhenDeletingExistingSignal_DataRepositoryDeleteIsCalled()
             {
-                GivenASignal(new Domain.Signal()
+                var signalToDelete = new Domain.Signal()
                 {
                     Id = 1,
                     DataType = Domain.DataType.Boolean,
                     Granularity = Domain.Granularity.Day,
-                    Path = Domain.Path.FromString("example/path"),
-                });
+                    Path = Domain.Path.FromString("example/path")
+                };
+
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.DeleteData<bool>(It.IsAny<Domain.Signal>()));
+
+                GivenASignal(signalToDelete);
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock.Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), null));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, 
+                    signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
                 signalsWebService.Delete(1);
-                var deletedSignal = signalsWebService.GetById(1);
 
-                Assert.IsNull(deletedSignal);
+                signalsRepositoryMock.Verify(x => x.Delete(
+                    It.Is<Domain.Signal>(z => 
+                    z.Id == 1 &&
+                    z.DataType == Domain.DataType.Boolean &&
+                    z.Granularity == Domain.Granularity.Day &&
+                    z.Path == Domain.Path.FromString("example/path"))));
             }
 
             private List<Datum<T>> DetDefaultDatumCollection<T>(DateTime startDate, DateTime endDate)
