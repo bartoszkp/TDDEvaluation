@@ -21,6 +21,17 @@ namespace Domain.MissingValuePolicy
                         fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity);
                         break;
                     }
+                    if (olderDatum == null)
+                    {
+                        filledData.Add(new Datum<T>()
+                        {
+                            Signal = signal,
+                            Timestamp = fromIncludedUtc,
+                            Quality = Quality.None,
+                            Value = default(T)
+                        });
+                        continue;
+                    }
                     filledData.Add(fillDatum(signal, fromIncludedUtc, olderDatum, d));
                 }
             }
