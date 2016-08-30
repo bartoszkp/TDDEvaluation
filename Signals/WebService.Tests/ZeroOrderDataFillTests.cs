@@ -297,7 +297,7 @@ namespace WebService.Tests
                 new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 17, 0, 0, 0), Value = (double)2.5 },
                 new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 24, 0, 0, 0), Value = (double)2.5 },
                 new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 31, 0, 0, 0), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 7, 0, 0, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 7, 0, 0, 0), Value = (double)2.5 },
             };
 
             AssertEqual(expectedDatum, result);
