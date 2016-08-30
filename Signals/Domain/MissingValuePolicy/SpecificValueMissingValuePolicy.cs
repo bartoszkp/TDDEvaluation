@@ -11,13 +11,16 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public override Datum<T> GetDatum(DateTime timeStamp, IEnumerable<Datum<T>> otherData = null,
+        public override IEnumerable<Datum<T>> GetDatum(DateTime timeStamp, Granularity granularity, IEnumerable<Datum<T>> otherData = null,
             IEnumerable<Datum<T>> previousSamples = null, IEnumerable<Datum<T>> nextSamples = null)
         {
-            return new Datum<T>()
-            {
-                Quality = Quality,
-                Value = Value
+            return new Datum<T>[] {
+                new Datum<T>()
+                {
+                    Quality = Quality,
+                    Value = Value,
+                    Timestamp = timeStamp
+                }
             };
         }
     }

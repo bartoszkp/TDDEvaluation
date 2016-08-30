@@ -70,11 +70,12 @@ namespace Domain.Services.Implementation
 
                 if (datum == null)
                 {
-                    var tempDatum = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc, res, olderData,newerData);
-                    tempDatum.Signal = signal;
-                    tempDatum.Timestamp = fromIncludedUtc;
-
-                    res.Insert(index,tempDatum);
+                    var tempDatums = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc,signal.Granularity, res, olderData,newerData);
+                    foreach (var tempDatum in tempDatums)
+                    {
+                        tempDatum.Signal = signal;
+                        res.Insert(index, tempDatum);
+                    }
                 }
                 ++index;
                 fromIncludedUtc = AddTime(signal.Granularity, fromIncludedUtc);

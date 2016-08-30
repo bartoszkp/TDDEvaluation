@@ -7,7 +7,7 @@ namespace Domain.MissingValuePolicy
 {
     public class ZeroOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override Datum<T> GetDatum(DateTime timeStamp, IEnumerable<Datum<T>> otherData = null,
+        public override IEnumerable<Datum<T>> GetDatum(DateTime timeStamp, Granularity granularity, IEnumerable<Datum<T>> otherData = null,
             IEnumerable<Datum<T>> previousSamples = null, IEnumerable<Datum<T>> nextSamples = null)
         {
             var previousData = otherData?.Where(d => d.Timestamp < timeStamp);
@@ -22,19 +22,25 @@ namespace Domain.MissingValuePolicy
                 date = otherData.ToList(); 
 
             if (date == null || date.Count() == 0)
-                return new Datum<T>()
-                {
-                    Value = default(T),
-                    Quality = Quality.None
+                return new Datum<T>[] {
+                    new Datum<T>()
+                    {
+                        Value = default(T),
+                        Quality = Quality.None,
+                        Timestamp = timeStamp
+                    }
                 };
 
 
             var previousDatum = date.Aggregate((a,b) => a.Timestamp > b.Timestamp ? a : b);
 
-            return new Datum<T>()
-            {
-                Quality = previousDatum.Quality,
-                Value = previousDatum.Value
+            return new Datum<T>[] {
+                new Datum<T>()
+                {
+                    Quality = previousDatum.Quality,
+                    Value = previousDatum.Value,
+                    Timestamp = timeStamp
+                }
             };
         }
     }
