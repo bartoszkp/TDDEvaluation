@@ -132,6 +132,27 @@ namespace WebService.Tests
                 signalsDataRepositoryMock
                     .Verify(sr => sr.DeleteData<string>(It.Is<Signal>((s => s.Id == signalId))));
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingSignal_SettingMVPToNull()
+            {
+                int signalId = 46486;
+                var signal = new Domain.Signal
+                {
+                    Id = signalId,
+                    DataType = DataType.String
+                };
+                SetupDelete(signal);
+                missingValuePolicyRepositoryMock
+                    .Setup(mvpr => mvpr.Set(It.IsAny<Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+
+                signalsWebService.Delete(signalId);
+
+                missingValuePolicyRepositoryMock
+                    .Verify(sr => sr.Set(
+                        It.Is<Signal>(s => s.Id == signal.Id && s.DataType == signal.DataType),
+                        It.Is<Domain.MissingValuePolicy.MissingValuePolicyBase>(mvp => mvp == null)));
+            }
             #endregion
 
             #region GetById
@@ -1407,8 +1428,11 @@ namespace WebService.Tests
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                signalDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalDomainService);
+
                 signalsRepositoryMock
                     .Setup(sr => sr.Delete(It.IsAny<Signal>()));
                 signalsRepositoryMock
