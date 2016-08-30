@@ -52,7 +52,31 @@ namespace WebService
 
         public void Delete(int signalId)
         {
-            throw new NotImplementedException();
+            var sig = signalsDomainService.GetById(signalId);
+
+        
+
+            switch (sig.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    signalsDomainService.DeleteData<Boolean>(sig);
+                    break;
+                case Domain.DataType.Decimal:
+                    signalsDomainService.DeleteData<decimal>(sig);
+                    break;
+                case Domain.DataType.Double:
+                    signalsDomainService.DeleteData<double>(sig);
+                    break;
+                case Domain.DataType.Integer:
+                    signalsDomainService.DeleteData<int>(sig);
+                    break;
+                case Domain.DataType.String:
+                    signalsDomainService.DeleteData<string>(sig);
+                    break;
+            }
+
+            signalsDomainService.Delete(sig);
+
         }
 
         public PathEntry GetPathEntry(Path pathDto)

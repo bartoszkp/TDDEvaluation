@@ -294,5 +294,16 @@ namespace Domain.Services.Implementation
 
             return new PathEntry(pathEntrySignals,subPaths);
         }
+
+        public void Delete(Signal signal)
+        {
+            missingValuePolicyRepository.Set(signal, null);
+            signalsRepository.Delete(signal);
+        }
+
+        public void DeleteData<T>(Signal signal)
+        {
+            signalsDataRepository.DeleteData<T>(signal);
+        }
     }
 }
