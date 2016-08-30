@@ -218,6 +218,16 @@ namespace Domain.Services.Implementation
 
         }
 
+        private T ValueStep<T>(Signal signal, T v1, T v2, int numberOfPeriods1, int numberOfPeriods2)
+        {
+            switch (signal.DataType)
+            {
+                case DataType.Double: return (T)(Math.Round(((Convert.ToDouble(v1) - Convert.ToDouble(v2))* numberOfPeriods2 / numberOfPeriods1),5).Adapt(v1.GetType(), typeof(double)));
+
+                default: throw new NotImplementedException();
+            }
+        }
+
         private Func<DateTime, DateTime> DateModifier(Granularity granularity)
         {
             switch (granularity)

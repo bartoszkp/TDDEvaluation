@@ -832,6 +832,33 @@ namespace WebService.Tests
                 signalsWebService.GetData(dummyId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
             }
 
+            [TestMethod]
+            public void GivenASignal_HavingEalierData_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDouble_ReturnsProperData()
+            {
+                int dummyId = 1;
+
+                var data = new[] {new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 }};
+                var oldData = new[]{new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(1998, 1, 1), Value = 2 }};
+
+                GivenASignalWithData(dummyId, data);
+                GivenMissingValuePolicy(dummyId, new FirstOrderMissingValuePolicyDouble());
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataOlderThan<double>(It.Is<Signal>(s => s.Id == dummyId), new DateTime(1999, 12, 1), 1))
+                    .Returns(oldData);
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataNewerThan<double>(It.Is<Signal>(s => s.Id == dummyId), new DateTime(1999, 12, 1), 1))
+                    .Returns(data);
+
+                var resultData = signalsWebService.GetData(dummyId, new DateTime(1999, 12, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(1, resultData.Count());
+                Assert.AreEqual("Good", resultData.First().Quality.ToString());
+                Assert.AreEqual(0.95833, resultData.First().Value);
+                Assert.AreEqual(new DateTime(1999, 12, 1), resultData.First().Timestamp);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
