@@ -974,6 +974,17 @@ namespace WebService.Tests
                 Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, specificMvpMock.Object.Value);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalDoesNotExists))]
+            public void GivenNoSignal_WhenDeletingNotExistingSignal_ThrowsException()
+            {
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, 
+                    signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsWebService.Delete(316);
+            }
+
 
 
             private List<Datum<T>> DetDefaultDatumCollection<T>(DateTime startDate, DateTime endDate)
