@@ -1461,6 +1461,27 @@ namespace WebService.Tests
                 AssertDatum(result, filledDatum);
             }
 
+            [TestMethod]
+            public void FirstOrderMissingValuePolicyFillStartingDataWhenOlderDataNonExist()
+            {
+                var existingSignal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("root/signal1"));
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1),  Value = (double)2 }
+                };
+
+                var filledDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1),  Value = default(double) },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1),  Value = (double)2 }
+                };
+                SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, new DateTime(2000, 2, 1), new DateTime(2000, 4, 1), new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+                
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 2, 1), new DateTime(2000, 4, 1));
+                AssertDatum(result, filledDatum);
+            }
+
             #endregion
 
             #region PathEntry
