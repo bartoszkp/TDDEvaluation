@@ -11,7 +11,8 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public override Datum<T> GetDatum(DateTime timeStamp, IEnumerable<Datum<T>> otherData = null, IEnumerable<Datum<T>> dataOutOfRange = null)
+        public override Datum<T> GetDatum(DateTime timeStamp, IEnumerable<Datum<T>> otherData = null,
+            IEnumerable<Datum<T>> previousSamples = null, IEnumerable<Datum<T>> nextSamples = null)
         {
             return new Datum<T>()
             {

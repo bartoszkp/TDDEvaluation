@@ -7,14 +7,15 @@ namespace Domain.MissingValuePolicy
 {
     public class ZeroOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override Datum<T> GetDatum(DateTime timeStamp, IEnumerable<Datum<T>> otherData = null, IEnumerable<Datum<T>> dataOutOfRange = null)
+        public override Datum<T> GetDatum(DateTime timeStamp, IEnumerable<Datum<T>> otherData = null,
+            IEnumerable<Datum<T>> previousSamples = null, IEnumerable<Datum<T>> nextSamples = null)
         {
             var previousData = otherData?.Where(d => d.Timestamp < timeStamp);
 
             List<Datum<T>> date;
-            if (dataOutOfRange != null && dataOutOfRange.Count() > 0)
+            if (previousSamples != null && previousSamples.Count() > 0)
             {
-                date = dataOutOfRange.ToList();
+                date = previousSamples.ToList();
                 date.InsertRange(date.Count(), previousData);
             }
             else
