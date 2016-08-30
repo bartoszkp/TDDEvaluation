@@ -15,7 +15,7 @@ namespace Domain.MissingValuePolicy
 
             if (previousSamples != null && previousSamples.Count() > 0)
                 previousData.InsertRange(0,previousSamples);
-            if(nextSamples != null && nextSamples.Count() > 0)
+            if (nextSamples != null && nextSamples.Count() > 0)
                 nextData.InsertRange(nextData.Count, nextSamples);
 
             Domain.Datum<T> previousDatum = null; 

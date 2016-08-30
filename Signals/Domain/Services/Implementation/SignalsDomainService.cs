@@ -53,10 +53,10 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
-            var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).ToList();
+            var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
             if (olderData.Count() == 1 && olderData.ElementAt(0) == null)
-                olderData.Clear();
-            var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1).ToList();
+               olderData = null;
+            var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1);
             var mvp = Get(signal);
 
             if (mvp == null) mvp = new NoneQualityMissingValuePolicy<T>();
