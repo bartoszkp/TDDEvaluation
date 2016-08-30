@@ -376,7 +376,7 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Week:
                         {
-                            int countElementOfList = toExcludedUtc.DayOfYear / 7 - fromIncludedUtc.Second / 7;
+                            int countElementOfList = toExcludedUtc.DayOfYear / 7 - fromIncludedUtc.DayOfYear / 7;
                             if (countElementOfList + 1 == gettingList.Length)
                                 return gettingList;
                             for (int i = 0; i < countElementOfList; i++)
