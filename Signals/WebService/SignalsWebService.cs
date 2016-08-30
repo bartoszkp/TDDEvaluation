@@ -50,14 +50,14 @@ namespace WebService
 
         public void Delete(int signalId)
         {
-            var signal = signalsDomainService.GetById(signalId)?.ToDomain<Domain.Signal>();
-            switch(signal.DataType)
+            var signalDataType = signalsDomainService.GetById(signalId).DataType;
+            switch(signalDataType)
             {
-                case Domain.DataType.Boolean: signalsDomainService.Delete<bool>(signal); break;
-                case Domain.DataType.Decimal: signalsDomainService.Delete<decimal>(signal); break;
-                case Domain.DataType.Double: signalsDomainService.Delete<double>(signal); break;
-                case Domain.DataType.Integer: signalsDomainService.Delete<int>(signal); break;
-                case Domain.DataType.String: signalsDomainService.Delete<string>(signal); break;
+                case Domain.DataType.Boolean: signalsDomainService.Delete<bool>(signalId); break;
+                case Domain.DataType.Decimal: signalsDomainService.Delete<decimal>(signalId); break;
+                case Domain.DataType.Double: signalsDomainService.Delete<double>(signalId); break;
+                case Domain.DataType.Integer: signalsDomainService.Delete<int>(signalId); break;
+                case Domain.DataType.String: signalsDomainService.Delete<string>(signalId); break;
             }
             
         }

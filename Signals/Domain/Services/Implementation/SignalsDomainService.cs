@@ -295,8 +295,9 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void Delete<T>(Signal signal)
+        public void Delete<T>(int signalId)
         {
+            var signal = signalsRepository.Get(signalId);
             missingValuePolicyRepository.Set(signal, null);
             signalsDataRepository.DeleteData<T>(signal);
             signalsRepository.Delete(signal);
