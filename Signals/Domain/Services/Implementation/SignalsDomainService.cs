@@ -207,6 +207,12 @@ namespace Domain.Services.Implementation
                     Timestamp = timestamp
                 };
             }
+
+            else if (policy is FirstOrderMissingValuePolicy<T>)
+            {
+                throw new NotImplementedException();
+            }
+
             else
                 filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
 
