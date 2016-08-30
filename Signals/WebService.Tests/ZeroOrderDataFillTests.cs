@@ -177,6 +177,25 @@ namespace WebService.Tests
             AssertEqual(expectedDatum, result);
         }
 
+        [TestMethod]
+        public void GivenAMonthSignal_WhenGettingDataFromMoreThanOneStepOlder_WithZeroPolicy_ItCorrectlyFillsMissingData()
+        {
+            SetupMockRepositories(Granularity.Month, 1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0),
+                new List<Datum<double>>() { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = 2.5 } },
+                new DateTime(2000, 1, 1, 0, 0, 0));
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
+            var expectedDatum = new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1, 0, 0, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1, 0, 0, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1, 0, 0, 0), Value = (double)2.5 },
+            };
+
+            AssertEqual(expectedDatum, result);
+        }
+
         private void SetupMockRepositories(Granularity granularity, int maxSampleCount,
             DateTime fromIncluded, DateTime toExluded, 
             List<Datum<double>> actualDatumsToBeReturnedByMockGetDataOlderThan, DateTime dateTimeForGettingOlderThan)
