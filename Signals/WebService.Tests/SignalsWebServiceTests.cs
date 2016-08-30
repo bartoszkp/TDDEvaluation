@@ -986,6 +986,15 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenDeletingExistingSignal_DataRepositoryDeleteIsCalled()
             {
+                SetupMockDeleteFunction();
+                
+                signalsWebService.Delete(1);
+
+                signalsRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain.Signal>()));
+            }
+
+            private void SetupMockDeleteFunction()
+            {
                 var signalToDelete = new Domain.Signal()
                 {
                     Id = 1,
@@ -1002,14 +1011,10 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
                 missingValuePolicyRepositoryMock.Setup(mvp => mvp.Set(It.IsAny<Domain.Signal>(), null));
 
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, 
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
                     signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
-
-                signalsWebService.Delete(1);
-
-                signalsRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain.Signal>()));
             }
 
             private List<Datum<T>> DetDefaultDatumCollection<T>(DateTime startDate, DateTime endDate)
