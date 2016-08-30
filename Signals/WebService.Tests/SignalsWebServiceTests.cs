@@ -824,6 +824,12 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.None, result.ElementAt(0).Quality);
             }
 
+            [TestMethod]
+            public void Delete_GivenASignal_WhenDeleteSignal_DeleteIsCalled()
+            {
+                signalsWebService.Delete(1);
+                signalsRepositoryMock.Verify(c => c.Delete(It.IsAny<Signal>()));
+            }
 
 
 
