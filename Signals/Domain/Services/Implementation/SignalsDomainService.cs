@@ -82,21 +82,18 @@ namespace Domain.Services.Implementation
 
 
             Datum<T> lastDatum = null;
+            Datum<T> nextDatum = null;
             List<Datum<T>> result;
             var missingValuePolicy = this.missingValuePolicyRepository.Get(signal);
             result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(d => d.Timestamp).ToList();
 
-            var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
-
-            if (olderData.Count() == 1)
-            {
-                lastDatum = olderData.ToArray()[0];
-            }
-
+             lastDatum = getOlderData<T>(signal, fromIncludedUtc);
+             nextDatum = getNewerData<T>(signal, toExcludedUtc);
+           
 
             if (result.Count == 0)
             {
-                result = new List<Datum<T>>() { createDatumBaseOnMissingValuePolicy<T>(signal,fromIncludedUtc,missingValuePolicy,lastDatum )};
+                result = new List<Datum<T>>() { createDatumBaseOnMissingValuePolicy<T>(signal,fromIncludedUtc,missingValuePolicy,lastDatum,nextDatum )};
 
             }
 
@@ -108,21 +105,44 @@ namespace Domain.Services.Implementation
                 var datum = (from x in result
                              where x.Timestamp == date
                              select x).FirstOrDefault();
-                
+
+                nextDatum = getNewerData<T>(signal, date);
+                lastDatum = getOlderData<T>(signal, date);
+
                 if (datum == null)
                 {
-                    Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy,lastDatum);
+                    Datum<T> tempDatum = createDatumBaseOnMissingValuePolicy<T>(signal, date, missingValuePolicy,lastDatum,nextDatum);
                     result.Add(tempDatum);
                     datum = tempDatum;
                 }
-                lastDatum = datum;
+                
+               
+
                 date = AddTime(signal.Granularity, date);
+
+               
+
+             
+
+               
             }
 
             CheckTimestampCorrectness(result.OrderBy(x => x.Timestamp).ToArray());
             return result.OrderBy(x => x.Timestamp);
         }
 
+        private Datum<T> getNewerData<T>(Signal signal, DateTime date)
+        {
+            var data = signalsDataRepository.GetDataNewerThan<T>(signal, date, 1);
+            if (data.Count() == 0) return null;
+            return data.ToArray()[0];
+        }
+        private Datum<T> getOlderData<T>(Signal signal, DateTime date)
+        {
+            var data = signalsDataRepository.GetDataOlderThan<T>(signal, date, int.MaxValue);
+            if (data.Count() == 0) return null;
+            return data.ToArray()[data.Count()-1];
+        }
         private void CheckTimestamp(DateTime date, Granularity granularity)
         {
             switch (granularity)
@@ -184,11 +204,11 @@ namespace Domain.Services.Implementation
             }
         }
 
-        private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy,Datum<T> lastDatum)
+        private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy,Datum<T> lastDatum, Datum<T> nextDatum)
         {
             if (missingValuePolicy is NoneQualityMissingValuePolicy<T>)
             {
-                return Domain.Datum<T>.CreateNone(signal,date);
+                return Domain.Datum<T>.CreateNone(signal, date);
             }
             else if (missingValuePolicy is SpecificValueMissingValuePolicy<T>)
             {
@@ -200,7 +220,7 @@ namespace Domain.Services.Implementation
                     Value = (missingValuePolicy as SpecificValueMissingValuePolicy<T>).Value
                 };
             }
-            else if(missingValuePolicy is ZeroOrderMissingValuePolicy<T>)
+            else if (missingValuePolicy is ZeroOrderMissingValuePolicy<T>)
             {
                 if (lastDatum == null)
                 {
@@ -217,6 +237,35 @@ namespace Domain.Services.Implementation
                     };
                 }
             }
+            else if (missingValuePolicy is FirstOrderMissingValuePolicy<T>&&typeof(T)!=typeof(bool)&&typeof(T)!=typeof(string))
+            {
+                if (nextDatum == null || lastDatum == null)
+                {
+                    return Domain.Datum<T>.CreateNone(signal, date);
+                }
+
+                dynamic val1 = lastDatum.Value;
+                dynamic val2 = nextDatum.Value;
+                var val3 = NumeratorFromDate(date, lastDatum.Timestamp, nextDatum.Timestamp, signal.Granularity);
+                var val4 = DenominatorFromDate( lastDatum.Timestamp, nextDatum.Timestamp, signal.Granularity);
+           
+               
+              dynamic  result = val1 + ((val2 - val1) * val3) / val4;
+       
+                      
+               
+
+               
+                return new Datum<T>
+                {
+                    Quality = nextDatum.Quality,
+                    Signal = signal,
+                    Timestamp = date,
+                    Value = result
+                };
+
+
+            }
             return new Datum<T>()
             {
                 Signal = signal,
@@ -224,6 +273,34 @@ namespace Domain.Services.Implementation
             };
         }
 
+        private int NumeratorFromDate(DateTime date, DateTime timestamp1, DateTime timestamp2,Granularity granularity)
+        {
+            int i = 0;
+            var time = timestamp1;
+            while (time < timestamp2)
+            {
+                if (time < date)
+                {
+                    i++;
+                }
+                time = AddTime(granularity, time);
+            }
+            
+
+            return i;
+        }
+        private int DenominatorFromDate( DateTime timestamp1, DateTime timestamp2, Granularity granularity)
+        {
+            int j = 0;
+            var time = timestamp1;
+            while (time < timestamp2)
+            {
+                j++;
+                
+                time = AddTime(granularity, time);
+            }
+            return j;
+        }
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
             var result = this.missingValuePolicyRepository.Get(signal);

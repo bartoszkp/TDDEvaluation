@@ -744,9 +744,12 @@ namespace WebService.Tests
 
                 GivenData(signal.Id.Value, data);
 
+              
+
                 Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<double>();
                 policy.Signal = signal;
                 GivenMissingValuePolicy(policy);
+
 
                 var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
                 int expectedCount = 5;
@@ -931,7 +934,7 @@ namespace WebService.Tests
                 {
                     for (int i = 0; i < data1.Count(); i++)
                     {
-                        Assert.AreEqual(data1.ElementAt(i).Quality, data2.ElementAt(i).Quality);
+                       Assert.AreEqual(data1.ElementAt(i).Quality, data2.ElementAt(i).Quality);
                         Assert.AreEqual(data1.ElementAt(i).Timestamp, data2.ElementAt(i).Timestamp);
                         Assert.AreEqual(data1.ElementAt(i).Value, data2.ElementAt(i).Value);
                     }
@@ -964,6 +967,15 @@ namespace WebService.Tests
                 signalsDataRepositoryMock
                     .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns<Domain.Signal, DateTime, DateTime>((s, from, to) => data.Where(d => d.Timestamp >= from && d.Timestamp < to));
+
+                signalsDataRepositoryMock
+                  .Setup(sdr => sdr.GetDataNewerThan<T>(It.Is<Domain.Signal>(s => s.Id == 5), It.Is<DateTime>(t => true), It.IsAny<int>()))
+                  .Returns<Domain.Signal, DateTime, int>((s, from, i) => data.Where(d => d.Timestamp > from));
+
+                signalsDataRepositoryMock
+                .Setup(sdr => sdr.GetDataOlderThan<T>(It.Is<Domain.Signal>(s => s.Id == 5), It.Is<DateTime>(t => true), It.IsAny<int>()))
+                .Returns<Domain.Signal, DateTime, int>((s, to, i) => data.Where(d => d.Timestamp < to));
+
             }
 
             private Domain.Signal SignalWith(
