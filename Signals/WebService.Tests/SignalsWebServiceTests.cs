@@ -870,6 +870,15 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(sr => sr.Delete(It.Is<Domain.Signal>(s => s.Id == signalId)));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignals_WhenDeletingSignal_ExpectedException()
+            {
+                GivenNoSignals();
+
+                signalsWebService.Delete(5);
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
