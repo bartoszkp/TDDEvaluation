@@ -978,10 +978,8 @@ namespace WebService.Tests
             [ExpectedException(typeof(Domain.Exceptions.SignalDoesNotExists))]
             public void GivenNoSignal_WhenDeletingNotExistingSignal_ThrowsException()
             {
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, 
-                    signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                GivenNoSignals();
 
-                signalsWebService = new SignalsWebService(signalsDomainService);
                 signalsWebService.Delete(316);
             }
 
