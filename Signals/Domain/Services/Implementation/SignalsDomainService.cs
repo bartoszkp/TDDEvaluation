@@ -54,7 +54,8 @@ namespace Domain.Services.Implementation
 
         public void Delete(int signalId)
         {
-            
+            Signal signalToDelete = GetById(signalId);
+            SetMissingValuePolicy(signalToDelete, null);
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
