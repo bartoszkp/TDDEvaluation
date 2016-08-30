@@ -834,6 +834,67 @@ namespace WebService.Tests
                 AssertDataDtoEquals(expectedData, result.ToArray());
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingASignal_DeleteDatumIsCalled()
+            {
+                //arrange
+                var dummyId = 2;
+                GivenASignal(new Signal() { Id = dummyId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") });
+
+                //act
+                signalsWebService.Delete(dummyId);
+                //assert
+                signalsDataRepositoryMock.Verify(sr => sr.DeleteData<double>(It.Is<Domain.Signal>(passedSignal
+                   => passedSignal.DataType == DataType.Double
+                       && passedSignal.Granularity == Granularity.Month
+                       && passedSignal.Path.ToString() == "x/y")));
+            }
+            [TestMethod]
+            public void GivenASignal_WhenDeletingASignal_SetMissingValuePolicyIsCalled()
+            {
+                //arrange
+                var dummyId = 2;
+                GivenASignal(new Signal() { Id = dummyId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") });
+
+                //act
+                signalsWebService.Delete(dummyId);
+                //assert
+                missingValuePolicyRepositoryMock.Verify(sr => sr.Set(It.Is<Domain.Signal>(passedSignal
+                   => passedSignal.DataType == DataType.Double
+                       && passedSignal.Granularity == Granularity.Month
+                       && passedSignal.Path.ToString() == "x/y"),It.Is< Domain.MissingValuePolicy.MissingValuePolicyBase>( mvp=>mvp==null)));
+            }
+            [TestMethod]
+            public void GivenASignal_WhenDeletingASignal_DeleteSignalIsCalled()
+            {
+                //arrange
+                var dummyId = 2;
+                GivenASignal(new Signal() { Id = dummyId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") });
+
+                //act
+                signalsWebService.Delete(dummyId);
+                //assert
+                signalsRepositoryMock.Verify(sr => sr.Delete(It.Is<Domain.Signal>(passedSignal
+                   => passedSignal.DataType == DataType.Double
+                       && passedSignal.Granularity == Granularity.Month
+                       && passedSignal.Path.ToString() == "x/y")));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignal_WhenDeletingASignal_ExceptionIsThrown()
+            {
+                //arrange
+                var dummyId = 2;
+                var wrongId = 5;
+                GivenASignal(new Signal() { Id = dummyId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("x/y") });
+
+                //act
+                signalsWebService.Delete(wrongId);
+                //assert
+                
+            }
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
