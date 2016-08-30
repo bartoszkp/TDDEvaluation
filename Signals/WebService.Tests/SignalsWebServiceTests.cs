@@ -227,6 +227,14 @@ namespace WebService.Tests
                 signalsWebService.SetData(id, dtoData);
                 signalsDataRepoMock.Verify(sd => sd.SetData(It.IsAny<IEnumerable<Datum<string>>>()));
             }
+            [TestMethod]
+            public void GivenASignalAndEmptyData_WhenSettingDataForSignal_doesNotThorw()
+            {
+                GivenASignal(SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x")));
+
+                signalsWebService.SetData(1, new Dto.Datum[0]);
+            }
+
 
             [ExpectedException(typeof(SignalNotFoundException))]
             [TestMethod]
