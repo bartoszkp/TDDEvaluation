@@ -618,6 +618,88 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareDatum(result, expectedData));
             }
 
+            [TestMethod]
+            public void GivenASignalWithFirstOrderMVPAndNoData_WhenGettingData_DataIsFilledWithDefaultValues()
+            {
+                var signal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x/y"));
+                GivenASignal(signal);
+
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+                SetupGetData<double>(new Domain.Datum<double>[] { });
+
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<double>(It.IsAny<Signal>(), new DateTime(2000, 1, 1), 1)).Returns(new Domain.Datum<double>[] { });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<double>(It.IsAny<Signal>(), new DateTime(2000, 2, 1), 1)).Returns(new Domain.Datum<double>[] { });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataNewerThan<double>(It.IsAny<Signal>(), new DateTime(2000, 1, 1), 1)).Returns(new Domain.Datum<double>[] { });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataNewerThan<double>(It.IsAny<Signal>(), new DateTime(2000, 2, 1), 1)).Returns(new Domain.Datum<double>[] { });
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(double) },
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = default(double) }
+                };
+
+                var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 3, 1));
+
+                Assert.IsTrue(CompareDatum(result, expectedData));
+            }
+
+            [TestMethod]
+            public void GivenASignalWithFirstOrderMVPAndData_WhenGettingData_DataIsFilledWithCorrectValues()
+            {
+                var signal = SignalWith(1, DataType.Integer, Granularity.Day, Path.FromString("x/y"));
+                GivenASignal(signal);
+
+                SetupMissingValuePolicyMock(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
+                SetupGetData<int>(new Domain.Datum<int>[]
+                {
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 2 },
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 4 },
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 5), Value = 2 }
+                });
+
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<int>(It.IsAny<Signal>(), new DateTime(1999, 12, 31), 1)).Returns(new Domain.Datum<int>[] { });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<int>(It.IsAny<Signal>(), new DateTime(2000, 1, 2), 1)).Returns(new Domain.Datum<int>[] 
+                {
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 2 }
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<int>(It.IsAny<Signal>(), new DateTime(2000, 1, 4), 1)).Returns(new Domain.Datum<int>[] 
+                {
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 4 }
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataOlderThan<int>(It.IsAny<Signal>(), new DateTime(2000, 1, 6), 1)).Returns(new Domain.Datum<int>[]
+                {
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 5), Value = 2 }
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataNewerThan<int>(It.IsAny<Signal>(), new DateTime(1999, 12, 31), 1)).Returns(new Domain.Datum<int>[]
+                {
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 2 }
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataNewerThan<int>(It.IsAny<Signal>(), new DateTime(2000, 1, 2), 1)).Returns(new Domain.Datum<int>[] 
+                {
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 4 }
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataNewerThan<int>(It.IsAny<Signal>(), new DateTime(2000, 1, 4), 1)).Returns(new Domain.Datum<int>[] 
+                {
+                    new DataAccess.GenericInstantiations.DatumInteger() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 5), Value = 2 }
+                });
+                signalsDataRepositryMock.Setup(sdrm => sdrm.GetDataNewerThan<int>(It.IsAny<Signal>(), new DateTime(1999, 1, 6), 1)).Returns(new Domain.Datum<int>[] { });
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 12, 31), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = 3 },
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 4 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 4), Value = 3 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 5), Value = 2 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 6), Value = default(int) }
+                };
+
+                var result = signalsWebService.GetData(1, new DateTime(1999, 12, 31), new DateTime(2000, 1, 7));
+
+                Assert.IsTrue(CompareDatum(result, expectedData));
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
