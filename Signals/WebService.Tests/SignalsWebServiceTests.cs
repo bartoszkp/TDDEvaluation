@@ -819,12 +819,21 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void DeleteSignal_DoesNotThrowNotImplementedException()
+            public void GivenASignalAndMissingValuePolicy_WhenDeletingSignal_CheckIfMVPIsSettedNull()
             {
                 int signalId = 6;
-                GivenNoSignals();
+
+                var signal = SignalWith(
+                     id: signalId,
+                    dataType: Domain.DataType.Decimal,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
 
                 signalsWebService.Delete(signalId);
+
+                missingValuePolicyRepositoryMock.Verify(mvprm => mvprm.Set(It.Is<Domain.Signal>(s => s.Id == signalId),
+                    It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<double>>(svm => svm == null)));
             }
 
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
