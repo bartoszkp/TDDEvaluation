@@ -1430,9 +1430,7 @@ namespace WebService.Tests
                 signalDomainService = new SignalsDomainService(
                     signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalDomainService);
-
-                signalsRepositoryMock
-                    .Setup(sr => sr.Delete(It.IsAny<Signal>()));
+                
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(It.Is<int>(s => s == signal.Id.Value)))
                     .Returns(signal);
