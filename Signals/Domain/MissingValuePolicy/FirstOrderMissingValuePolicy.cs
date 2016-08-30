@@ -37,7 +37,7 @@ namespace Domain.MissingValuePolicy
             {
                 Signal = signal,
                 Timestamp = fromIncludedUtc,
-                Quality = olderDatum.Quality,
+                Quality = olderDatum.Quality > newestDatum.Quality ? olderDatum.Quality : newestDatum.Quality,
                 Value = calculateValue(olderDatum.Value, newestDatum.Value, diff, pos)
             };
         }
