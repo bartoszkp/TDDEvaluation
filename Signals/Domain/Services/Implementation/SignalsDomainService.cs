@@ -58,6 +58,8 @@ namespace Domain.Services.Implementation
             SetMissingValuePolicy(signalToDelete, null);
 
             signalsDataRepository.DeleteData<T>(signalToDelete);
+
+            signalsRepository.Delete(signalToDelete);
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
