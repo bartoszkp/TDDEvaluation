@@ -11,7 +11,7 @@ namespace Domain.Services
 
         Signal GetByPath(Path signalPath);
         
-        void Delete(int signalId);
+        void Delete<T>(int signalId);
 
         void SetData<T>(Signal signalId, IEnumerable<Datum<T>> data);
 

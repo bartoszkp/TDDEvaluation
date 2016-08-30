@@ -52,10 +52,12 @@ namespace Domain.Services.Implementation
             return signal;
         }
 
-        public void Delete(int signalId)
+        public void Delete<T>(int signalId)
         {
             Signal signalToDelete = GetById(signalId);
             SetMissingValuePolicy(signalToDelete, null);
+
+            signalsDataRepository.DeleteData<T>(signalToDelete);
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)

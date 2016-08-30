@@ -47,7 +47,30 @@ namespace WebService
 
         public void Delete(int signalId)
         {
-            signalsDomainService.Delete(signalId);
+            Signal signal = GetById(signalId);
+            if (signal == null)
+                throw new CouldntGetASignalException();
+
+            switch (signal.DataType)
+            {
+                case Dto.DataType.Double:
+                    signalsDomainService.Delete<double>(signalId);
+                    break;
+                case Dto.DataType.Integer:
+                    signalsDomainService.Delete<int>(signalId);
+                    break;
+                case Dto.DataType.Boolean:
+                    signalsDomainService.Delete<bool>(signalId);
+                    break;
+                case Dto.DataType.Decimal:
+                    signalsDomainService.Delete<decimal>(signalId);
+                    break;
+                case Dto.DataType.String:
+                    signalsDomainService.Delete<string>(signalId);
+                    break;
+            }
+
+            signalsDomainService.Delete<int>(signalId);
         }
 
         public PathEntry GetPathEntry(Path pathDto)
