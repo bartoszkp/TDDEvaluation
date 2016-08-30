@@ -881,7 +881,7 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
-            public void SetMissingValuePolicyStringOrBool_ExpectedException()
+            public void SetFirstOrderMissingValuePolicyStringOrBool_ExpectedException()
             {
                 int signalId = 5;
                 GivenASignal(SignalWith(
