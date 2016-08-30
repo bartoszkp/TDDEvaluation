@@ -299,8 +299,20 @@ namespace Domain.Services.Implementation
         public void Delete(int signalId)
         {
             this.missingValuePolicyRepository.Set(GetById(signalId), null);
-
+            SignalDataRemove(GetById(signalId));
             this.signalsRepository.Delete(GetById(signalId));
+        }
+
+        private void SignalDataRemove(Signal signal)
+        {
+            switch(signal.DataType)
+            {
+                case DataType.Boolean: signalsDataRepository.DeleteData<bool>(signal); break;
+                case DataType.Decimal: signalsDataRepository.DeleteData<decimal>(signal); break;
+                case DataType.Double: signalsDataRepository.DeleteData<double>(signal); break;
+                case DataType.Integer: signalsDataRepository.DeleteData<int>(signal); break;
+                case DataType.String: signalsDataRepository.DeleteData<string>(signal); break;
+            }
         }
     }
 }
