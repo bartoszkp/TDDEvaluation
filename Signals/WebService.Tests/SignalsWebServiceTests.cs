@@ -853,6 +853,23 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdr => sdr.DeleteData<decimal>(It.Is<Domain.Signal>(s => s.Id == signalId)));
             }
 
+            [TestMethod]
+            public void GivenASignalAndMissingValuePolicy_WhenDeletingSignal_CheckIfSignalIsDeleted()
+            {
+                int signalId = 6;
+
+                var signal = SignalWith(
+                     id: signalId,
+                    dataType: Domain.DataType.Decimal,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                signalsWebService.Delete(signalId);
+
+                signalsRepositoryMock.Verify(sr => sr.Delete(It.Is<Domain.Signal>(s => s.Id == signalId)));
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
