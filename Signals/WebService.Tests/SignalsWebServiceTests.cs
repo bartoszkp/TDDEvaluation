@@ -594,7 +594,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalWithNoneQualityMVPAndData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
+            public void GivenASignalWithNoneQualityMVPAndData_WhenGettingDataWithEqualTimestamps_SingleDatumWithCorrectValuesIsReturned()
             {
                 var signal = SignalWith(1, DataType.Decimal, Granularity.Second, Path.FromString("x/y"));
                 GivenASignal(signal);
