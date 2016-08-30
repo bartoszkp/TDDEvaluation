@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\InvalidTimestampException.cs" />
+    <Compile Include="Exceptions\SignalDoesNotExists.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />
