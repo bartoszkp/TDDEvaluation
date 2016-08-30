@@ -793,13 +793,47 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2000, 1, 10), result[0].Timestamp);
             }
 
-            private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatum, int signalId)
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithZeroOrderMissingValuePolicy_CheckIfSetDefaultValueWhenEarlierSignalDoesNotExist()
             {
-                signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetDataOlderThan<string>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()))
-                    .Returns(givenDatum);
+                int signalId = 5;
+                List<Domain.Datum<string>> givenDatums = new List<Domain.Datum<string>>()
+                { new Domain.Datum<string> { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = "first" },
+                  new Domain.Datum<string> { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 4), Value = "second" } };
+
+                var signal = SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.String,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
+                GivenData(signalId, givenDatums);
+                SetupSignalsRepoGetDataOlderThan_ReturnsEmptyList(signal);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5)).ToArray();
+
+                Assert.AreEqual(default(string), result[0].Value);
+                Assert.AreEqual(Dto.Quality.None, result[0].Quality);
+                Assert.AreEqual(new DateTime(2000, 1, 1), result[0].Timestamp);
             }
 
+            private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
+            {
+                Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
+                List<Datum<string>> returnDatumList = new List<Datum<string>>(new Datum<string>[] { oneDatum });
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetDataOlderThan<string>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns(returnDatumList);
+            }
+
+            private void SetupSignalsRepoGetDataOlderThan_ReturnsEmptyList(Signal signal)
+            {
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetDataOlderThan<string>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns(new List<Datum<string>>());
+
+            }
             private void MakeASignalWebServiceForZeroOrderMissingValuePolicy(int signalId)
             {       
                 var signal = SignalWith(
