@@ -130,6 +130,10 @@ namespace Domain.Services.Implementation
                 }
                 return returnDatum;
             }
+            else if (mvp is MissingValuePolicy.FirstOrderMissingValuePolicy<T>)
+            {
+                return Datum<T>.CreateNone(signal, timeStamp);
+            }
             return new Datum<T>();
         }
 
