@@ -1437,6 +1437,30 @@ namespace WebService.Tests
                 AssertDatum(result, filledDatum);
             }
 
+            [TestMethod]
+            public void FirstOrderMissingValuePolicyFillStartingDataWhenOlderDataExist()
+            {
+                var existingSignal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("root/signal1"));
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1),  Value = (double)2 }
+                };
+
+                var filledDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1),  Value = (double)1.5 },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1),  Value = (double)2 }
+                };
+                SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, new DateTime(2000, 2, 1), new DateTime(2000, 4, 1), new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetDataOlderThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.Is<int>(msc => msc==1)))
+                    .Returns(new Datum<double>[] { new Datum<double> { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 } });
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 2, 1), new DateTime(2000, 4, 1));
+                AssertDatum(result, filledDatum);
+            }
+
             #endregion
 
             #region PathEntry
