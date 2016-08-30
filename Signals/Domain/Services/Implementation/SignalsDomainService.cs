@@ -176,9 +176,7 @@ namespace Domain.Services.Implementation
         public void Delete(int signalId)
         {
             Signal signal = GetById(signalId);
-            signalsRepository.Delete(signal);
-
-            Type T;
+            missingValuePolicyRepository.Set(signal, null);
             switch (signal.DataType)
             {
                 case DataType.Boolean:
@@ -201,6 +199,7 @@ namespace Domain.Services.Implementation
                     signalsDataRepository.DeleteData<string>(signal);
                     break;
             }
+            signalsRepository.Delete(signal);
         }
 
 

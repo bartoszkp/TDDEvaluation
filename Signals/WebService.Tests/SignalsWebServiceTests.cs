@@ -143,8 +143,6 @@ namespace WebService.Tests
                     DataType = DataType.String
                 };
                 SetupDelete(signal);
-                missingValuePolicyRepositoryMock
-                    .Setup(mvpr => mvpr.Set(It.IsAny<Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
 
                 signalsWebService.Delete(signalId);
 

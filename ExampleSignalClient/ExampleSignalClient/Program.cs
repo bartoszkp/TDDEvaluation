@@ -9,7 +9,7 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal() { Path = new Path() { Components = new[] { string.Empty } } })
+            var id = client.Add(new Signal() { DataType = DataType.Decimal, Path = new Path() { Components = new[] { string.Empty } } })
                 .Id.Value;
 
             var result = client.GetById(id);
