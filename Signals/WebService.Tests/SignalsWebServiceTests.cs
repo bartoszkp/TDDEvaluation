@@ -1121,6 +1121,42 @@ namespace WebService.Tests
                 Assert_Datums(expectedData, returnedData.ToArray());
             }
 
+            [TestMethod]
+            public void GivenData_WhenGettingData_ReturnsFilledDataAccordingToFirstOrderMVPWithOuterSamples()
+            {
+                SetupWebService();
+
+                var signal = ReturnDefaultSignal_IntegerDay();
+                signal.Id = 5;
+
+                Dto.Datum[] data = new Datum[]
+                {
+                    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 1, Quality = Dto.Quality.Good },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 3), Value = 6, Quality = Dto.Quality.Fair }
+                };
+
+                SetupMocks_ForCheckingDatums<int>(signal, data);
+
+                missingValuePolicyRepositoryMock
+                    .Setup(x => x.Get(It.Is<Domain.Signal>(s => s.DataType == Domain.DataType.Integer)))
+                    .Returns(new FirstOrderMissingValuePolicyInteger());
+
+                var returnedData = signalsWebService.GetData(signal.Id.Value, new DateTime(1999, 12, 31), new DateTime(2000, 1, 5));
+
+                Dto.Datum[] expectedData = new Datum[]
+                {
+
+                    new Datum() { Timestamp = new DateTime(1999, 12, 31), Value = default(int), Quality = Dto.Quality.None },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 1, Quality = Dto.Quality.Good },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 2), Value = 3, Quality = Dto.Quality.Fair },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 3), Value = 6, Quality = Dto.Quality.Fair },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 4), Value = default(int), Quality = Dto.Quality.None }
+                };
+
+                Assert.AreEqual(expectedData.Count(), returnedData.Count());
+                Assert_Datums(expectedData, returnedData.ToArray());
+            }
+
             #endregion
 
             private void SetupMocks_ForCheckingDatums<T>(Dto.Signal signal, IEnumerable<Dto.Datum> data)
