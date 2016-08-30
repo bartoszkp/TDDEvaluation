@@ -11,12 +11,12 @@ namespace Domain.MissingValuePolicy
         private Quality Quality = Quality.None;
         private T Value = default(T);
 
-        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> olderData)
+        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> olderDatum, Datum<T> newestDatum)
         {
-            if (olderData != null)
+            if (olderDatum != null)
             {
-                Quality = olderData.Quality;
-                Value = olderData.Value;
+                Quality = olderDatum.Quality;
+                Value = olderDatum.Value;
             }
 
             returnListDatum = new List<Datum<T>>();
