@@ -621,6 +621,11 @@ namespace Domain.Services.Implementation
             return false;
         }
 
-
+        public void Delete(int signalId)
+        {
+            var signalToDelete = GetById(signalId);
+            if (signalToDelete == null)
+                throw new Exceptions.SignalDoesNotExists();
+        }
     }
 }
