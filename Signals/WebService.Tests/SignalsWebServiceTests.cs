@@ -791,6 +791,17 @@ namespace WebService.Tests
                 signalsRepositoryMock.Verify(d => d.Delete(It.IsAny<Domain.Signal>()));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_RepoSetMVPIsCalled()
+            {
+                int dummyId = 1;
+                var signal = new Signal() { DataType = DataType.String, Granularity = Granularity.Day, Path = Path.FromString("somePath"), Id = dummyId };
+
+                GivenASignal(signal);
+                signalsWebService.Delete(dummyId);
+                signalsMissingValuePolicyRepositoryMock.Verify(d => d.Set(It.IsAny<Domain.Signal>(),null));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
