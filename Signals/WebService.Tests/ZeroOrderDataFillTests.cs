@@ -119,6 +119,24 @@ namespace WebService.Tests
         }
 
         [TestMethod]
+        public void NoPreviousDatumForHourSignal_DefaultDatumIsInserted()
+        {
+            SetupMockRepositories(Granularity.Hour, 1, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 5, 0, 0),
+                new List<Datum<double>>(), new DateTime(2000, 1, 1, 1, 0, 0));
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 5, 0, 0));
+            var expectedDatum = new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 1, 0, 0), Value = default(double) },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 2, 0, 0), Value = default(double) },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 3, 0, 0), Value = default(double) },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 4, 0, 0), Value = default(double) },
+            };
+
+            AssertEqual(expectedDatum, result);
+        }
+
+        [TestMethod]
         public void GivenASecondSignal_WhenGettingDataFromMoreThanOneStepOlder_WithZeroPolicy_ItCorrectlyFillsMissingData()
         {
             SetupMockRepositories(Granularity.Second, 1, new DateTime(2000, 1, 1, 0, 0, 1), new DateTime(2000, 1, 1, 0, 0, 5),
