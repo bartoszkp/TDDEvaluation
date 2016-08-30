@@ -22,6 +22,6 @@ namespace Domain.Services
 
         PathEntry GetPathEntry(Path path);
 
-        void Delete(Signal signalDomain);
+        void Delete(int signalId);
     }
 }

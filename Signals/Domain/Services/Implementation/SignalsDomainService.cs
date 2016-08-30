@@ -296,9 +296,9 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void Delete(Signal signalDomain)
+        public void Delete(int signalId)
         {
-            this.signalsRepository.Delete(signalDomain);
+            this.signalsRepository.Delete(GetById(signalId));
         }
     }
 }
