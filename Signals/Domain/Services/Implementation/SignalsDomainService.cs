@@ -136,6 +136,52 @@ namespace Domain.Services.Implementation
                 DateTime checkedDateTime = fromIncludedUtc;
                 switch (granulitary)
                 {
+                    case Granularity.Second:
+                        {
+                            var time = toExcludedUtc - fromIncludedUtc;
+
+                            int countElementOfList = (int)time.TotalSeconds;
+                            if (countElementOfList + 1 == gettingList?.Length)
+                                return gettingList;
+                            for (int i = 0; i < countElementOfList; i++)
+                            {
+
+                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                                if (xx == null)
+                                {
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+
+                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        if (i == 0)
+                                        {
+                                            addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                        }
+                                        else
+                                        {
+                                            var previousItem = returnList.ElementAt(i - 1);
+                                            addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
+                                        }
+                                    }
+
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
+                                    returnList.Add(addingItem);
+                                }
+                                else
+                                    returnList.Add(xx);
+                                checkedDateTime = checkedDateTime.AddSeconds(1);
+                            }
+                            break;
+                        }
                     case Granularity.Minute:
                         {
                             int countElementOfList = toExcludedUtc.Minute - fromIncludedUtc.Minute;
@@ -165,9 +211,7 @@ namespace Domain.Services.Implementation
                                         {
                                             var previousItem = returnList.ElementAt(i - 1);
                                             addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                        }
-
-                                        
+                                        }   
                                     }
 
                                     else
@@ -179,50 +223,6 @@ namespace Domain.Services.Implementation
                                 else
                                     returnList.Add(xx);
                                 checkedDateTime = checkedDateTime.AddMinutes(1);
-                            }
-                            break;
-                        }
-                    case Granularity.Month:
-                        {
-                            int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
-                            if (countElementOfList+1 == gettingList.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
-                                {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                        }
-                                        else
-                                        {
-                                            var previousItem = returnList.ElementAt(i - 1);
-                                            addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                        }
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    returnList.Add(addingItem);
-                                }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddMonths(1);
                             }
                             break;
                         }
@@ -272,7 +272,7 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Day:
                         {
-                            int countElementOfList = toExcludedUtc.Day-fromIncludedUtc.Day;
+                            int countElementOfList = toExcludedUtc.Day - fromIncludedUtc.Day;
                             if (countElementOfList + 1 == gettingList.Length)
                                 return gettingList;
                             for (int i = 0; i < countElementOfList; i++)
@@ -312,57 +312,11 @@ namespace Domain.Services.Implementation
                                     returnList.Add(xx);
                                 checkedDateTime = checkedDateTime.AddDays(1);
                             }
-                                break;
-                        }
-                    case Granularity.Second:
-                        {
-                            var time = toExcludedUtc - fromIncludedUtc;
-
-                            int countElementOfList = (int)time.TotalSeconds;
-                            if (countElementOfList + 1 == gettingList?.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
-                                {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                        }
-                                        else
-                                        {
-                                            var previousItem = returnList.ElementAt(i - 1);
-                                            addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                        }
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    returnList.Add(addingItem);
-                                }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddSeconds(1);
-                            }
                             break;
                         }
                     case Granularity.Week:
                         {
-                            int countElementOfList = toExcludedUtc.DayOfYear/7 - fromIncludedUtc.Second/7;
+                            int countElementOfList = toExcludedUtc.DayOfYear / 7 - fromIncludedUtc.Second / 7;
                             if (countElementOfList + 1 == gettingList.Length)
                                 return gettingList;
                             for (int i = 0; i < countElementOfList; i++)
@@ -401,6 +355,50 @@ namespace Domain.Services.Implementation
                                 else
                                     returnList.Add(xx);
                                 checkedDateTime = checkedDateTime.AddDays(7);
+                            }
+                            break;
+                        }
+                    case Granularity.Month:
+                        {
+                            int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
+                            if (countElementOfList+1 == gettingList.Length)
+                                return gettingList;
+                            for (int i = 0; i < countElementOfList; i++)
+                            {
+
+                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                                if (xx == null)
+                                {
+
+                                    Datum<T> addingItem;
+
+                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                                    {
+                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                    }
+
+                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    {
+                                        if (i == 0)
+                                        {
+                                            addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                        }
+                                        else
+                                        {
+                                            var previousItem = returnList.ElementAt(i - 1);
+                                            addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
+                                        }
+                                    }
+
+                                    else
+                                    {
+                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                    }
+                                    returnList.Add(addingItem);
+                                }
+                                else
+                                    returnList.Add(xx);
+                                checkedDateTime = checkedDateTime.AddMonths(1);
                             }
                             break;
                         }
