@@ -67,6 +67,7 @@
     <Compile Include="SignalsWebServiceTests\GetMissingValuePolicyTests.cs" />
     <Compile Include="SignalsWebServiceTests\GetPathEntryTests.cs" />
     <Compile Include="SignalsWebServiceTests\GetTests.cs" />
+    <Compile Include="SignalsWebServiceTests\DeleteTests.cs" />
     <Compile Include="SignalsWebServiceTests\Infrastructure\Repository.cs" />
     <Compile Include="SignalsWebServiceTests\AddTests.cs" />
     <Compile Include="SignalsWebServiceTests\SetDataTests.cs" />

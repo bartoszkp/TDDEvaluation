@@ -209,6 +209,8 @@ namespace Domain.Services.Implementation
         public void Delete<T>(int signalId)
         {
             var signal = signalsRepository.Get(signalId);
+            if (signal == null) throw new ArgumentException("there is no signals with given id");
+
             SetMissingValuePolicy(signalId, null);
             signalsDataRepository.DeleteData<T>(signal);
             signalsRepository.Delete(signal);
