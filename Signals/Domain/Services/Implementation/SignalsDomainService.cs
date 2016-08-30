@@ -294,5 +294,11 @@ namespace Domain.Services.Implementation
                     throw new NotImplementedException();
             }
         }
+
+        public void Delete(int signalId)
+        {
+            Signal signal = signalsRepository.Get(signalId);
+            signalsRepository.Delete(signal);
+        }
     }
 }

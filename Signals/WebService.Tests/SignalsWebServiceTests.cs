@@ -825,8 +825,9 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void Delete_GivenASignal_WhenDeleteSignal_DeleteIsCalled()
+            public void Delete_GivenNoSignal_WhenDeleteSignal_DeleteIsCalled()
             {
+                GivenNoSignals();
                 signalsWebService.Delete(1);
                 signalsRepositoryMock.Verify(c => c.Delete(It.IsAny<Signal>()));
             }
