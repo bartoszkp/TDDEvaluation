@@ -626,6 +626,33 @@ namespace Domain.Services.Implementation
             var signalToDelete = GetById(signalId);
             if (signalToDelete == null)
                 throw new Exceptions.SignalDoesNotExists();
+
+            missingValuePolicyRepository.Set(signalToDelete, null);
+
+            switch (signalToDelete.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    signalsDataRepository.DeleteData<bool>(signalToDelete);
+                    break;
+
+                case Domain.DataType.Decimal:
+                    signalsDataRepository.DeleteData<decimal>(signalToDelete);
+                    break;
+
+                case Domain.DataType.Double:
+                    signalsDataRepository.DeleteData<double>(signalToDelete);
+                    break;
+
+                case Domain.DataType.Integer:
+                    signalsDataRepository.DeleteData<int>(signalToDelete);
+                    break;
+
+                case Domain.DataType.String:
+                    signalsDataRepository.DeleteData<string>(signalToDelete);
+                    break;
+            }
+
+            signalsRepository.Delete(signalToDelete);
         }
     }
 }
