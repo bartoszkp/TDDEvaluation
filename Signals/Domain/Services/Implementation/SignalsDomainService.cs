@@ -82,10 +82,10 @@ namespace Domain.Services.Implementation
             var items = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToList();
 
             var mvp = GetMissingValuePolicy(signal.Id.GetValueOrDefault());
-
+            
             var dataFillStrategy = DataFillStrategyProvider.GetStrategy(signal.Granularity, mvp);
 
-            dataFillStrategy.FillMissingData(items, fromIncludedUtc, toExcludedUtc);
+            dataFillStrategy.FillMissingData(signal,items, fromIncludedUtc, toExcludedUtc,this.signalsDataRepository);
 
 
             var result = from d in items

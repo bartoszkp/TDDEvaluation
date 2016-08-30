@@ -1,5 +1,6 @@
 ﻿using Domain.Infrastructure;
 using Domain.MissingValuePolicy;
+using Domain.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,13 @@ namespace Domain.DataFillStrategy
     [NHibernateIgnore]
     public abstract class DataFillStrategy
     {
+        
+        
         protected MissingValuePolicyBase missingValuePolicy;
 
         protected abstract void incrementData(ref DateTime date);
 
-        public void FillMissingData<T>(List<Domain.Datum<T>> datums, DateTime after, DateTime before)
+        public void FillMissingData<T>(Signal signal, List<Domain.Datum<T>> datums, DateTime after, DateTime before, ISignalsDataRepository signalsDataRepository)
         {
             var dict = new Dictionary<DateTime, Datum<T>>();
             var datum = new Datum<T>();
@@ -38,8 +41,13 @@ namespace Domain.DataFillStrategy
             }
             else if(this.missingValuePolicy is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
             {
-                if(datums.Find(d => d.Timestamp == after) == null)
-                    dict.Add(after, new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                var xx = signalsDataRepository.GetDataOlderThan<T>(signal, after, 1).ToList();
+
+                if (datums.Find(d => d.Timestamp < after) == null)
+                {
+                    Domain.Datum<T> aa = xx.Single();
+                    dict.Add(after, new Datum<T>() { Quality = aa.Quality, Value = aa.Value });
+                }
                 foreach (var item in datums)
                 {
                     dict.Add(item.Timestamp, item);
