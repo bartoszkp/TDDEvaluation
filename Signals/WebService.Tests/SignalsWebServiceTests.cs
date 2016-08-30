@@ -841,7 +841,14 @@ namespace WebService.Tests
                 mvpRepositoryMock.Verify(c => c.Set(It.IsAny<Signal>(), null));
             }
 
+            [TestMethod]
+            public void Delete_GivenASignal_WhenDeleteSignal_DeleteAllDatumsForThisSignal()
+            {
+                GivenNoSignals();
+                signalsWebService.Delete(1);
 
+                signalsDataRepoMock.Verify(c => c.DeleteData<double>(It.IsAny<Signal>()));
+            }
 
 
 
