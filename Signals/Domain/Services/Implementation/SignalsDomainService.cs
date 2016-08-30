@@ -498,12 +498,22 @@ namespace Domain.Services.Implementation
                                         if (i == 0)
                                         {
                                             returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            addingItem = null;
+                                            if (returnList.Count == 0)
+                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                            else
+                                                addingItem = null;
                                         }
                                         else
                                         {
-                                            var previousItem = returnList.ElementAt(i - 1);
-                                            addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
+                                            if (returnList.Count == 0)
+                                            {
+                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                            }
+                                            else
+                                            {
+                                                var previousItem = returnList.ElementAt(i - 1);
+                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
+                                            }
                                         }
                                     }
 
