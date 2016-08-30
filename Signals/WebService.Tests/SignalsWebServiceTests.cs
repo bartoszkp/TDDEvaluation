@@ -825,9 +825,9 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void Delete_GivenNoSignal_WhenDeleteSignal_DeleteIsCalled()
+            public void Delete_GivenASignal_WhenDeleteSignal_DeleteIsCalled()
             {
-                GivenNoSignals();
+                GivenASignal(SignalWith(1 ,Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x")));
                 signalsWebService.Delete(1);
                 signalsRepositoryMock.Verify(c => c.Delete(It.IsAny<Signal>()));
             }
@@ -835,7 +835,7 @@ namespace WebService.Tests
             [TestMethod]
             public void Delete_GivenASignal_WhenDeleteSignal_SetMissingValueForNull()
             {
-                GivenNoSignals();
+                GivenASignal(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x")));
                 signalsWebService.Delete(1);
 
                 mvpRepositoryMock.Verify(c => c.Set(It.IsAny<Signal>(), null));
@@ -844,7 +844,7 @@ namespace WebService.Tests
             [TestMethod]
             public void Delete_GivenASignal_WhenDeleteSignal_DeleteAllDatumsForThisSignal()
             {
-                GivenNoSignals();
+                GivenASignal(SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("x")));
                 signalsWebService.Delete(1);
 
                 signalsDataRepoMock.Verify(c => c.DeleteData<double>(It.IsAny<Signal>()));

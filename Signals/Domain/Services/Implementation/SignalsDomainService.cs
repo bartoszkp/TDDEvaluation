@@ -295,10 +295,10 @@ namespace Domain.Services.Implementation
             }
         }
 
-        public void Delete(int signalId)
+        public void Delete<T>(Signal signal)
         {
-            Signal signal = signalsRepository.Get(signalId);
             missingValuePolicyRepository.Set(signal, null);
+            signalsDataRepository.DeleteData<T>(signal);
             signalsRepository.Delete(signal);
         }
     }
