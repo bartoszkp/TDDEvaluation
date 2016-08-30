@@ -59,55 +59,15 @@ namespace Domain.MissingValuePolicy
                 tmp = DateHelper.NextDate(tmp, signal.Granularity);
                 ++count;
             }
-
-            switch(signal.DataType)
-            {
-                case DataType.Decimal:
-                    FillDatums(filledList as List<Datum<decimal>>, earlierDatum as Datum<decimal>, laterDatum as Datum<decimal>, count, firstMultiplier);
-                    break;
-                case DataType.Double:
-                    FillDatums(filledList as List<Datum<double>>, earlierDatum as Datum<double>, laterDatum as Datum<double>, count, firstMultiplier);
-                    break;
-                case DataType.Integer:
-                    FillDatums(filledList as List<Datum<int>>, earlierDatum as Datum<int>, laterDatum as Datum<int>, count, firstMultiplier);
-                    break;
-                default:
-                    throw new Exception();
-            }
-            
+                        
+            FillDatums(filledList, earlierDatum, laterDatum, count, firstMultiplier);            
         }
 
-        private void FillDatums(List<Datum<decimal>> filledList, Datum<decimal> earlierDatum, Datum<decimal> laterDatum, int count, int firstMultiplier)
+        private void FillDatums(List<Datum<T>> filledList, Datum<T> earlierDatum, Datum<T> laterDatum, int count, int firstMultiplier)
         {
-            var firstVal = earlierDatum.Value;
-            var lastVal = laterDatum.Value;
-            var delta = (lastVal - firstVal)/ count;
-
-            for (int i = 0; i < filledList.Count; ++i)
-            {
-                filledList[i].Value = firstVal + delta * (firstMultiplier + i);
-                filledList[i].Quality = laterDatum.Quality;
-            }
-        }
-
-        private void FillDatums(List<Datum<double>> filledList, Datum<double> earlierDatum, Datum<double> laterDatum, int count, int firstMultiplier)
-        {
-            var firstVal = earlierDatum.Value;
-            var lastVal = laterDatum.Value;
-            var delta = (firstVal + lastVal) / count;
-
-            for (int i = 0; i < filledList.Count; ++i)
-            {
-                filledList[i].Value = firstVal + delta * (firstMultiplier + i);
-                filledList[i].Quality = laterDatum.Quality;
-            }
-        }
-
-        private void FillDatums(List<Datum<int>> filledList, Datum<int> earlierDatum, Datum<int> laterDatum, int count, int firstMultiplier)
-        {
-            var firstVal = earlierDatum.Value;
-            var lastVal = laterDatum.Value;
-            var delta = (firstVal + lastVal) / count;
+            dynamic firstVal = earlierDatum.Value;
+            dynamic lastVal = laterDatum.Value;
+            dynamic delta = (lastVal - firstVal) / count;
 
             for (int i = 0; i < filledList.Count; ++i)
             {
@@ -177,72 +137,24 @@ namespace Domain.MissingValuePolicy
                 interLast++;
         }
 
-        private void RunInterpolation<T>(DataType datatype, List<Datum<T>> filledList, ref int interFirst, ref int interLast, ref bool interpolating)
+        private void RunInterpolation(DataType datatype, List<Datum<T>> filledList, ref int interFirst, ref int interLast, ref bool interpolating)
         {
-            if(datatype == DataType.Decimal)
-                InterpolateValues(filledList as List<Datum<decimal>>, interFirst, interLast);
-            else if (datatype == DataType.Double)
-                InterpolateValues(filledList as List<Datum<double>>, interFirst, interLast);
-            else if (datatype == DataType.Integer)
-                InterpolateValues(filledList as List<Datum<int>>, interFirst, interLast);
-
+            InterpolateValues(filledList, interFirst, interLast);
             interpolating = false;
             interFirst = -1;
             interLast = -1;
         }
 
-        private void InterpolateValues(List<Datum<double>> filledList, int first, int last)
-        {
-            if (first <= 0 || last > filledList.Count - 1)
-                throw new ArgumentException("Trying to interpolate values for wrong indexes.");
-                        
-            var count = (last - first) + 2;
-            var firstVal = filledList[first - 1].Value;
-            var lastVal = filledList[last + 1].Value;
-            var quality = filledList[last + 1].Quality;
-            var delta = (lastVal-firstVal)/count;
-
-            int i = first;
-            int j = 1;
-            while(i <= last)
-            {
-                filledList[i].Value = firstVal + delta*j;
-                filledList[i].Quality = quality;
-                ++i;++j;
-            }
-        }
-
-        private void InterpolateValues(List<Datum<decimal>> filledList, int first, int last)
+        private void InterpolateValues(List<Datum<T>> filledList, int first, int last)
         {
             if (first <= 0 || last > filledList.Count - 1)
                 throw new ArgumentException("Trying to interpolate values for wrong indexes.");
 
             var count = (last - first) + 2;
-            var firstVal = filledList[first - 1].Value;
-            var lastVal = filledList[last + 1].Value;
+            dynamic firstVal = filledList[first - 1].Value;
+            dynamic lastVal = filledList[last + 1].Value;
             var quality = filledList[last + 1].Quality;
-            var delta = (lastVal - firstVal) / count;
-
-            int i = first;
-            int j = 1;
-            while (i <= last)
-            {
-                filledList[i].Value = firstVal + delta * j;
-                filledList[i].Quality = quality;
-                ++i; ++j;
-            }
-        }
-
-        private void InterpolateValues(List<Datum<int>> filledList, int first, int last)
-        {
-            if (first <= 0 || last > filledList.Count - 1)
-                throw new ArgumentException("Trying to interpolate values for wrong indexes.");
-
-            var count = (last - first) + 2;
-            var firstVal = filledList[first - 1].Value;
-            var lastVal = filledList[last + 1].Value;
-            var quality = filledList[last + 1].Quality;
-            var delta = (lastVal - firstVal) / count;
+            dynamic delta = (lastVal - firstVal) / count;
 
             int i = first;
             int j = 1;
