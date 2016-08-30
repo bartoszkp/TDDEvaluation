@@ -201,5 +201,37 @@ namespace Domain.Services.Implementation
                     && (dateTime.TimeOfDay.Ticks != 0 || DateTime.Compare(dateTime, new DateTime(dateTime.Year, 1, 1)) != 0)) )
                 throw new ArgumentException("DateTime is incorrect");
         }
+
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new ArgumentException("Signal with given Id does not exist.");
+
+            this.missingValuePolicyRepository.Set(signal, null);
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    this.signalsDataRepository.DeleteData<bool>(signal);
+                    break;
+                case DataType.Integer:
+                    this.signalsDataRepository.DeleteData<int>(signal);
+                    break;
+                case DataType.Double:
+                    this.signalsDataRepository.DeleteData<double>(signal);
+                    break;
+                case DataType.Decimal:
+                    this.signalsDataRepository.DeleteData<decimal>(signal);
+                    break;
+                case DataType.String:
+                    this.signalsDataRepository.DeleteData<string>(signal);
+                    break;
+                default:
+                    this.signalsDataRepository.DeleteData<bool>(signal);
+                    break;
+            }
+
+            this.signalsRepository.Delete(signal);
+        }
     }
 }

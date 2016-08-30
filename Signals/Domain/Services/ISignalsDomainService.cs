@@ -16,5 +16,6 @@ namespace Domain.Services
         IEnumerable<Domain.Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
         PathEntry GetPathEntry(Path pathDomain);
+        void Delete(int signalId);
     }
 }
