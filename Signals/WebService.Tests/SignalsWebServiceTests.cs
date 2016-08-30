@@ -22,15 +22,6 @@ namespace WebService.Tests
             private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
 
             [TestMethod]
-            [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
-            public void GivenNoSignals_WhenAddingASignalWithId_ThrowIdNotNullException()
-            {
-                GivenNoSignals();
-
-                var result = signalsWebService.Add(SignalWith(id: 1));
-            }
-
-            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsIt()
             {
                 GivenNoSignals();
