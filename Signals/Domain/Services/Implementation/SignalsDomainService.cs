@@ -391,7 +391,8 @@ namespace Domain.Services.Implementation
                                     {
                                         if (i == 0)
                                         {
-                                            addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
+                                            addingItem = null;
                                         }
                                         else
                                         {
@@ -404,7 +405,8 @@ namespace Domain.Services.Implementation
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                     }
-                                    returnList.Add(addingItem);
+                                    if (addingItem != null)
+                                        returnList.Add(addingItem);
                                 }
                                 else
                                     returnList.Add(xx);
