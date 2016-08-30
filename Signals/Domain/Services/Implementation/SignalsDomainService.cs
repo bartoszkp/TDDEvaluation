@@ -53,11 +53,15 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var res = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(x => x.Timestamp).ToList();
-            var dataOutOfDateRange = signalsDataRepository.GetDataOlderThan<T>(signal,toExcludedUtc,1).ToList();
+            var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).ToList();
+            if (olderData.Count() == 1 && olderData.ElementAt(0) == null)
+                olderData.Clear();
+            var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1).ToList();
             var mvp = Get(signal);
 
             if (mvp == null) mvp = new NoneQualityMissingValuePolicy<T>();
 
+            int index = 0;
             while(fromIncludedUtc < toExcludedUtc)
             {
                 var datum = (from x in res
@@ -66,13 +70,13 @@ namespace Domain.Services.Implementation
 
                 if (datum == null)
                 {
-                    var tempDatum = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc, res, dataOutOfDateRange);
+                    var tempDatum = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc, res, olderData,newerData);
                     tempDatum.Signal = signal;
                     tempDatum.Timestamp = fromIncludedUtc;
 
-                    res.Add(tempDatum);
+                    res.Insert(index,tempDatum);
                 }
-
+                ++index;
                 fromIncludedUtc = AddTime(signal.Granularity, fromIncludedUtc);
             }
              

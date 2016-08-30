@@ -1145,7 +1145,6 @@ namespace WebService.Tests
 
                 Dto.Datum[] expectedData = new Datum[]
                 {
-
                     new Datum() { Timestamp = new DateTime(1999, 12, 31), Value = default(int), Quality = Dto.Quality.None },
                     new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 1, Quality = Dto.Quality.Good },
                     new Datum() { Timestamp = new DateTime(2000, 1, 2), Value = 3, Quality = Dto.Quality.Fair },
@@ -1190,6 +1189,8 @@ namespace WebService.Tests
                     .Setup(x => x.GetDataOlderThan<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.Is<int>(c => c == 1)))
                     .Returns<Domain.Signal, DateTime, int>((sig, dt, i) => {
                         var domainData = data.ToDomain<IEnumerable<Datum<T>>>().Where(x => x.Timestamp < dt);
+                        if(domainData.Count() == 0)
+                            return Enumerable.Repeat<Domain.Datum<T>>(null, 1);
                         var singleResult = domainData.Aggregate((cur, next) => cur.Timestamp > next.Timestamp ? cur : next);
                         return Enumerable.Repeat(singleResult, 1);
                     });

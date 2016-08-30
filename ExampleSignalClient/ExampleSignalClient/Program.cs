@@ -10,12 +10,12 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal()
-            {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "FirstOrderTests" } }
-            }).Id.Value;
+            var id = 1;//client.Add(new Signal()
+            //{
+            //    DataType = DataType.Decimal,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "FirstOrderTests" } }
+            //}).Id.Value;
 
             client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
 
