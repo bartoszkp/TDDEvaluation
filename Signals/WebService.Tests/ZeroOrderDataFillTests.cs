@@ -104,7 +104,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAMinuteSignal_WhenGettingDataFromMoreThanOneStepOlder_WithZeroPolicy_ItCorrectlyFillsMissingData()
         {
-            SetupMockRepositories(Granularity.Minute, 1, new DateTime(2000, 1, 1, 0, 1, 0), new DateTime(2000, 1, 1, 0, 5, 1),
+            SetupMockRepositories(Granularity.Minute, 1, new DateTime(2000, 1, 1, 0, 1, 0), new DateTime(2000, 1, 1, 0, 5, 0),
                 new List<Datum<double>>() { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 1, 0), Value = 2.5 } },
                 new DateTime(2000, 1, 1, 0, 1, 0));
 
