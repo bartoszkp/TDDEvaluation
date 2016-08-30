@@ -85,27 +85,10 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenASecondSignal_WhenGettingDataFromMoreThanOneStepOlder_WithZeroPolicy_ItCorrectlyFillsMissingData()
         {
-            SetupWebService();
-            var returnedSignal = new Signal() { Id = 1, Granularity = Granularity.Second, DataType = DataType.Double };
-
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
-            mvpRepoMock
-                .Setup(mvp => mvp.Get(returnedSignal))
-                .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble()
-                {
-                    Id = 1,
-                    Signal = returnedSignal
-                });
-            dataRepoMock
-                .Setup(drm => drm.GetData<double>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 1), new DateTime(2000, 1, 1, 0, 0, 5)))
-                .Returns(new List<Datum<double>>());
-            dataRepoMock
-                .Setup(drm => drm.GetDataOlderThan<double>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 1), 1))
-                .Returns(new List<Datum<double>>()
-                {
-                    new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = 2.5 }
-                });
-
+            SetupMockRepositories(Granularity.Second, 1, new DateTime(2000, 1, 1, 0, 0, 1), new DateTime(2000, 1, 1, 0, 0, 5),
+                new List<Datum<double>>() { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = 2.5 } },
+                new DateTime(2000, 1, 1, 0, 0, 1));
+            
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 1), new DateTime(2000, 1, 1, 0, 0, 5));
             var expectedDatum = new List<Dto.Datum>()
             {
@@ -116,7 +99,29 @@ namespace WebService.Tests
             };
 
             AssertEqual(expectedDatum, result);
+        }
 
+        private void SetupMockRepositories(Granularity granularity, int maxSampleCount,
+            DateTime fromIncluded, DateTime toExluded, 
+            List<Datum<double>> actualDatumsToBeReturnedByMockGetDataOlderThan, DateTime dateTimeForGettingOlderThan)
+        {
+            SetupWebService();
+            var returnedSignal = new Signal() { Id = 1, Granularity = granularity, DataType = DataType.Double };
+
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            mvpRepoMock
+                .Setup(mvp => mvp.Get(returnedSignal))
+                .Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble()
+                {
+                    Id = 1,
+                    Signal = returnedSignal
+                });
+            dataRepoMock
+                .Setup(drm => drm.GetData<double>(returnedSignal, fromIncluded, toExluded))
+                .Returns(new List<Datum<double>>());
+            dataRepoMock
+                .Setup(drm => drm.GetDataOlderThan<double>(returnedSignal, dateTimeForGettingOlderThan, maxSampleCount))
+                .Returns(actualDatumsToBeReturnedByMockGetDataOlderThan);
         }
 
         private void AssertEqual(List<Dto.Datum> expectedDatums, IEnumerable<Dto.Datum> actualDatums)
