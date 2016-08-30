@@ -230,17 +230,17 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAMinuteSignal_WhenGettingDataFromMoreThanOneStepOlder_WithZeroPolicy_ItCorrectlyFillsMissingData()
         {
-            SetupMockRepositories(Granularity.Minute, 1, new DateTime(2000, 1, 1, 0, 1, 0), new DateTime(2000, 1, 1, 0, 5, 0),
+            SetupMockRepositories(Granularity.Minute, 1, new DateTime(2000, 1, 1, 0, 5, 0), new DateTime(2000, 1, 1, 0, 9, 0),
                 new List<Datum<double>>() { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 1, 0), Value = 2.5 } },
-                new DateTime(2000, 1, 1, 0, 1, 0));
+                new DateTime(2000, 1, 1, 0, 5, 0));
 
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 1, 0), new DateTime(2000, 1, 1, 0, 5, 0));
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 5, 0), new DateTime(2000, 1, 1, 0, 9, 0));
             var expectedDatum = new List<Dto.Datum>()
             {
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 1, 0), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 2, 0), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 3, 0), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 4, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 5, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 6, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 7, 0), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 8, 0), Value = (double)2.5 },
             };
 
             AssertEqual(expectedDatum, result);
