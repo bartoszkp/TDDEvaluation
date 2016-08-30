@@ -91,10 +91,10 @@ namespace WebService.Tests
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 1), new DateTime(2000, 1, 1, 0, 0, 5));
             var expectedDatum = new List<Dto.Datum>()
             {
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = (double)2.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = (double)2.5 },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = default(double) },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = default(double) },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = default(double) },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = default(double) },
             };
 
             AssertEqual(expectedDatum, result);
