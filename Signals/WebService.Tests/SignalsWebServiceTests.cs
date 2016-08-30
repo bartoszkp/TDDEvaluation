@@ -1416,6 +1416,27 @@ namespace WebService.Tests
                 AssertDatum(result, filledDatum);
             }
 
+            [TestMethod]
+            public void FirstOrderMissingValuePolicyFillEndingData()
+            {
+                var existingSignal = SignalWith(1, DataType.Decimal, Granularity.Week, Path.FromString("root/signal1"));
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1),  Value = 1 },
+                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 8),  Value = 1 }
+                };
+                var filledDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 1),  Value = 1 },
+                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 8),  Value = 1 },
+                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 8, 15),  Value = 1 }
+                };
+                SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, new DateTime(2016, 8, 1), new DateTime(2016, 8, 22), new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2016, 8, 1), new DateTime(2016, 8, 22));
+                AssertDatum(result, filledDatum);
+            }
+
             #endregion
 
             #region PathEntry
