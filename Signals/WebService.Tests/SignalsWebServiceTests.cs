@@ -813,6 +813,25 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(d => d.DeleteData<string>(signal));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(NotImplementedException))]
+            public void GivenASignal_WhenGettingDataWithFirstOrderMVP_ThrowException()
+            {
+                int dummyId = 1;
+
+                var data = new[]
+                    {
+                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2 },
+                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5 }
+                    };
+
+                GivenASignalWithData(dummyId, data);
+                GivenMissingValuePolicy(dummyId, new FirstOrderMissingValuePolicyDouble());
+
+                signalsWebService.GetData(dummyId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()

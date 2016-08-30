@@ -177,13 +177,13 @@ namespace Domain.Services.Implementation
                     Timestamp = timestamp
                 };
             }
-            else if(policy is ZeroOrderMissingValuePolicy<T>)
+            else if (policy is ZeroOrderMissingValuePolicy<T>)
             {
                 if (!timestampsFollowingExistingDates)
                 {
                     var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 100);
 
-                    if(olderDatum == null || olderDatum.Count() < 1) filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
+                    if (olderDatum == null || olderDatum.Count() < 1) filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
 
                     else
                     {
