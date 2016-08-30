@@ -1088,6 +1088,44 @@ namespace WebService.Tests
             }
 
             #endregion
+            #region Issue #23 (Feature:FirstOrderMissingValuePolicy should correctly fill missing data)
+
+            [TestMethod]
+            public void GivenData_WhenGettingData_ReturnsFilledDataAccordingToFirstOrderMissingValuePolicy()
+            {
+                SetupWebService();
+
+                var signal = ReturnDefaultSignal_IntegerDay();
+                signal.Id = 5;
+
+                Dto.Datum[] data = new Datum[]
+                {
+                    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 1, Quality = Dto.Quality.Good },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 3), Value = 6, Quality = Dto.Quality.Fair }
+                };
+
+                SignalsRepositoryMock_SetupGet(signal.ToDomain<Domain.Signal>());
+                DataRepositoryMock_SetupGetData<int>(data);
+                DataRepositoryMock_SetupGetDataOlderThan<int>(data);
+
+                missingValuePolicyRepositoryMock
+                    .Setup(x => x.Get(It.Is<Domain.Signal>(s => s.DataType == Domain.DataType.Integer)))
+                    .Returns(new FirstOrderMissingValuePolicyInteger());
+
+                var returnedData = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 4));
+
+                Dto.Datum[] expectedData = new Datum[]
+                {
+                    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 1, Quality = Dto.Quality.Good },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 2), Value = 3, Quality = Dto.Quality.Fair },
+                    new Datum() { Timestamp = new DateTime(2000, 1, 3), Value = 6, Quality = Dto.Quality.Fair }
+                };
+
+                Assert.AreEqual(expectedData.Count(), returnedData.Count());
+                Assert_Datums(expectedData, returnedData.ToArray());
+            }
+
+            #endregion
 
             private Dto.Signal ReturnDefaultSignal_IntegerDay()
             {
