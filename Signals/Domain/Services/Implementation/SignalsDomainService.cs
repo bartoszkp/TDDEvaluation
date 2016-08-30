@@ -198,10 +198,10 @@ namespace Domain.Services.Implementation
 
                                     if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                                     {
-                                        addingItem = new Datum<T>() { Quality = Quality.Fair, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
                                     }
 
-                                    if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                                     {
                                         if (i == 0)
                                         {
