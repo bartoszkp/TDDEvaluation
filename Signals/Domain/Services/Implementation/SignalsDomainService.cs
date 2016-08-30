@@ -135,7 +135,7 @@ namespace Domain.Services.Implementation
                     break;
 
                 case Granularity.Week:
-                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, 0, 0, 0) && timestamp.DayOfWeek == DayOfWeek.Monday) throw new DatumTimestampException();
+                    if (timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, 0, 0, 0) || timestamp.DayOfWeek != DayOfWeek.Monday) throw new DatumTimestampException();
                     break;
 
                 case Granularity.Year:
