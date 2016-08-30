@@ -700,6 +700,56 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareDatum(result, expectedData));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignals_WhenDeletingASignal_ArgumentExceptionIsThrown()
+            {
+                GivenNoSignals();
+                signalsWebService.Delete(5);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingData_SetIsCalledOnMVPRepository()
+            {
+                GivenASignal(new Signal() { Id = 5, DataType = DataType.Decimal, Granularity = Granularity.Week, Path = Path.FromString("x/y") });
+                signalsWebService.Delete(5);
+
+                missingValuePolicyMock.Verify(mvpm => mvpm.Set(It.Is<Signal>(s => 
+                    s.Id == 5 && 
+                    s.DataType == DataType.Decimal && 
+                    s.Granularity == Granularity.Week && 
+                    s.Path.ToString().Equals("x/y")), null), 
+                    Times.Once);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingData_DeleteDataIsCalledOnSignalsDataRepository()
+            {
+                GivenASignal(new Signal() { Id = 7, DataType = DataType.String, Granularity = Granularity.Minute, Path = Path.FromString("y/z") });
+                signalsWebService.Delete(7);
+
+                signalsDataRepositryMock.Verify(sdrm => sdrm.DeleteData<string>(It.Is<Signal>(s =>
+                    s.Id == 7 &&
+                    s.DataType == DataType.String &&
+                    s.Granularity == Granularity.Minute &&
+                    s.Path.ToString().Equals("y/z"))), 
+                    Times.Once);
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingData_DeleteIsCalledOnSignalsRepository()
+            {
+                GivenASignal(new Signal() { Id = 15, DataType = DataType.Boolean, Granularity = Granularity.Hour, Path = Path.FromString("a/b/c") });
+                signalsWebService.Delete(15);
+
+                signalsRepositoryMock.Verify(srm => srm.Delete(It.Is<Signal>(s =>
+                    s.Id == 15 &&
+                    s.Granularity == Granularity.Hour &&
+                    s.DataType == DataType.Boolean &&
+                    s.Path.ToString().Equals("a/b/c"))), 
+                    Times.Once);
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
