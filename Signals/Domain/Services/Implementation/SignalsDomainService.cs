@@ -224,19 +224,22 @@ namespace Domain.Services.Implementation
                                             if (returnList.Count == 0)
                                                 addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                             else
+                                            {
+                                                returnList[0].Timestamp = checkedDateTime;
                                                 addingItem = null;
+                                            }
                                         } 
                                         else
                                         {
                                             if (returnList.Count == 0)
                                             {
                                                 addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }
-                                            else
+                                            }else
                                             {
                                                 var previousItem = returnList.ElementAt(i - 1);
                                                 addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                             }
+                                            
                                         }   
                                     }
 
