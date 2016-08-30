@@ -789,7 +789,7 @@ namespace WebService.Tests
                     .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
                     .Returns(new ZeroOrderMissingValuePolicyDouble());
 
-                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                var policy = new Dto.MissingValuePolicy.ZeroOrderMissingValuePolicy();
                 signalsWebService.SetMissingValuePolicy(signalId, policy);
 
 
@@ -798,6 +798,30 @@ namespace WebService.Tests
                 Assert.AreEqual(4, result.Count());
                 Assert.AreEqual(result.ElementAt(1).Quality, Dto.Quality.Fair);
                 Assert.AreEqual(result.ElementAt(3).Value, 5.0);
+            }
+
+            [TestMethod]
+            public void GivenASignal_GivenNOData_HavingZeroOrderMVPAdded_GetData_ReturnsDefaultData()
+            {
+                int signalId = 1;
+
+                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
+
+                GivenASignal(someSignal);
+
+                GivenData(signalId, new Datum<double>[0]);
+
+                mvpRepositoryMock
+                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(new ZeroOrderMissingValuePolicyDouble());
+
+                var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2018, 1, 1), new DateTime(2018, 2, 1));
+
+                Assert.AreEqual(Quality.None, result.ElementAt(1).Quality);
             }
 
 
