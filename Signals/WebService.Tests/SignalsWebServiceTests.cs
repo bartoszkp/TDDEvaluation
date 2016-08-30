@@ -1009,12 +1009,7 @@ namespace WebService.Tests
 
                 signalsWebService.Delete(1);
 
-                signalsRepositoryMock.Verify(x => x.Delete(
-                    It.Is<Domain.Signal>(z => 
-                    z.Id == 1 &&
-                    z.DataType == Domain.DataType.Boolean &&
-                    z.Granularity == Domain.Granularity.Day &&
-                    z.Path == Domain.Path.FromString("example/path"))));
+                signalsRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain.Signal>()));
             }
 
             private List<Datum<T>> DetDefaultDatumCollection<T>(DateTime startDate, DateTime endDate)
