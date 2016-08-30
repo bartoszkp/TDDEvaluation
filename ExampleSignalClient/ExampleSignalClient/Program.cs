@@ -14,19 +14,19 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Decimal,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "FirstOrderTests" } }
+                Path = new Path() { Components = new[] { "FirstOrderTests2" } }
             }).Id.Value;
 
             client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
 
             client.SetData(id, new Datum[]
             {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
-                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
+    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
+    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
+    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
             });
 
-            var result = client.GetData(id, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1));
+            var result = client.GetData(id, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
 
             foreach (var d in result)
             {

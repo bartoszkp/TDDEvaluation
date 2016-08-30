@@ -57,6 +57,12 @@ namespace Domain.Services.Implementation
             var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1);
             var mvp = Get(signal);
 
+            if(signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
+            {
+                if (mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                    throw new NotSupportedException();
+            }
+
             if (mvp == null) mvp = new NoneQualityMissingValuePolicy<T>();
 
             int index = 0;
