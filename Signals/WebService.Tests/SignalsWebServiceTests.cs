@@ -879,6 +879,21 @@ namespace WebService.Tests
                 signalsWebService.Delete(5);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void SetMissingValuePolicyStringOrBool_ExpectedException()
+            {
+                int signalId = 5;
+                GivenASignal(SignalWith(
+                     id: signalId,
+                    dataType: Domain.DataType.Boolean,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString("root/signal")));
+
+                signalsWebService.SetMissingValuePolicy(signalId, new FirstOrderMissingValuePolicy() { DataType = Dto.DataType.Boolean } );
+            }
+
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
