@@ -756,6 +756,21 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(DatumTimestampException))]
+            public void GivenASignal_HavingInAproppriateDatumTimestamp_GetData_ThrowException1()
+            {
+                int signalId = 1;
+
+                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Week, Path = Domain.Path.FromString("root/s1") };
+
+                GivenASignal(someSignal);
+
+                GivenData(signalId, new Datum<double>[0]);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2018, 1, 2), new DateTime(2018, 1, 8));
+            }
+
+            [TestMethod]
             public void GivenASignal_HavingZeroOrderMVPAdded_GetData_ReturnsProperData()
             {
                 int signalId = 1;
