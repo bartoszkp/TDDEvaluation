@@ -192,7 +192,7 @@ namespace Domain.Services.Implementation
                         if(date == fromIncluded)
                         {
                             datum = result.FirstOrDefault(d => d.Timestamp == date);
-                            if (datum == null) throw new ZeroOrderMVPException();
+                            if (datum == null) datum = new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = date};
                             newData.Add(datum);
                         }
 

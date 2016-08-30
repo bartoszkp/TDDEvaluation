@@ -821,7 +821,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(signalId, new DateTime(2018, 1, 1), new DateTime(2018, 2, 1));
 
-                Assert.AreEqual(Quality.None, result.ElementAt(1).Quality);
+                Assert.AreEqual(Dto.Quality.None, result.ElementAt(0).Quality);
             }
 
 
