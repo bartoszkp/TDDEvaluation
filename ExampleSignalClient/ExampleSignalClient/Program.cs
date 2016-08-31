@@ -9,31 +9,27 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal() { Path = new Path() { Components = new[] { "23" } } })
-                .Id.Value;
-
-            var result = client.GetById(id);
-
-            if (result != null)
+            var id = client.Add(new Signal()
             {
-                Console.WriteLine("Sygnał poprawnie utworzony");
-            }
-            else
-            {
-                Console.WriteLine("Błąd - nie udało się utworzyć sygnału");
-            }
+                DataType = DataType.Double,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "FirstOrderTe4" } }
+            }).Id.Value;
 
-            client.Delete(id);
+            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Double });
 
-            result = client.GetById(id);
+            client.SetData(id, new Datum[]
+            {
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
+                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 }
+            });
 
-            if (result == null)
+            var result = client.GetData(id, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1));
+
+            foreach (var d in result)
             {
-                Console.WriteLine("Sygnał poprawnie skasowany");
-            }
-            else
-            {
-                Console.WriteLine("Błąd - sygnał nadal istnieje");
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
             }
 
             Console.ReadKey();

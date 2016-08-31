@@ -133,14 +133,44 @@ namespace Domain.Services.Implementation
             else if (mvp is MissingValuePolicy.FirstOrderMissingValuePolicy<T>)
             {
                 Datum<T> returnDatum = null;
-                List<Datum<T>> olderDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).ToList();
-                List<Datum<T>> newerDatum = this.signalsDataRepository.GetDataNewerThan<T>(signal, timeStamp, 1).ToList();
-                if (olderDatum.Count() == 0 || newerDatum.Count == 0)
-                    returnDatum = new Datum<T>() { Timestamp = new DateTime(timeStamp.Ticks), Value = (T)(object)5.0 };
+                List<Datum<T>> olderDatums = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).ToList();
+                List<Datum<T>> newerDatums = this.signalsDataRepository.GetDataNewerThan<T>(signal, timeStamp, 1).ToList();
+                if (olderDatums.Count() == 0 || newerDatums.Count == 0)
+                    return Datum<T>.CreateNone(signal, timeStamp);
+                else
+                {
+                    Datum<T> olderDatum = olderDatums.FirstOrDefault();
+                    Datum<T> newerDatum = newerDatums.FirstOrDefault();
 
-                return returnDatum;
+                    double DiferenceBetweenOlderNewer = Convert.ToDouble(newerDatum.Value) - Convert.ToDouble(olderDatum.Value);
+
+                    int monthDiffereceBetweenOlderAndNewer = 0;
+                    int monthDifferenceBetweenOlderAndCurrent = 0;
+
+                    if (olderDatum.Signal.Granularity == Granularity.Month)
+                    {
+                        monthDiffereceBetweenOlderAndNewer = MonthDifference(newerDatum.Timestamp, olderDatum.Timestamp);
+                        monthDifferenceBetweenOlderAndCurrent = MonthDifference(timeStamp, olderDatum.Timestamp);
+                    }
+
+                    double addingValue = DiferenceBetweenOlderNewer / monthDiffereceBetweenOlderAndNewer;
+
+                    double result = Convert.ToDouble(olderDatum.Value);
+                    for (int i = 0; i < monthDifferenceBetweenOlderAndCurrent; i++)
+                    {
+                        result += addingValue;
+                    }
+                    returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, newerDatum.Quality, (T)(object)(result));
+
+                    return returnDatum;
+                }
             }
             return new Datum<T>();
+        }
+
+        public int MonthDifference(DateTime olderValue, DateTime newerValue)
+        {
+            return (olderValue.Month - newerValue.Month) + 12 * (olderValue.Year - newerValue.Year);
         }
 
         private DateTime GetNextDateFromGranularity(DateTime current, Granularity granularity)
