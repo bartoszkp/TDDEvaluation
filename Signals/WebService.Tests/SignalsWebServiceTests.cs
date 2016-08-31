@@ -920,6 +920,28 @@ namespace WebService.Tests
                 Assert.AreEqual(result[9].Value, datums[2].Value);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_VerifyGetDataOlderThan()
+            {
+                int signalId = 5;
+
+                var signal = SignalWith(
+                      id: signalId,
+                     dataType: Domain.DataType.Double,
+                     granularity: Domain.Granularity.Day,
+                     path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+
+                List<Datum<double>> datums = new List<Datum<double>>();
+
+                GivenData(signalId, datums);
+
+                signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
+
+                signalsDataRepositoryMock.Verify(sdr => sdr.GetDataOlderThan<double>(signal, new DateTime(1999, 11, 1), 1));
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
