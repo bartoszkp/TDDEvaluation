@@ -411,7 +411,7 @@ namespace WebService.Tests
                     break;
 
                 case Granularity.Day:
-                    var firstTimestampDay = new DateTime(2000, 1, 1, 0, 0, 0);
+                    var firstTimestampDay = new DateTime(2000, 1, 2, 0, 0, 0);
                     var secondTimestampDay = new DateTime(2000, 1, 6, 0, 0, 0);
                     var thirdTimestampDay = new DateTime(2000, 1, 10, 0, 0, 0);
                     var fourthTimestampDay = new DateTime(2000, 1, 13, 0, 0, 0);
