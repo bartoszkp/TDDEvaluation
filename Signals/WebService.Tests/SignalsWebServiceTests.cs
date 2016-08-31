@@ -894,15 +894,25 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingData_CheckIfDataGettingProperly()
+            public void GivenASignalAndFirsOrderMvp_WhenGettingData_CheckIfDataGettingProperly()
             {
                 int signalId = 5;
-                GivenASignal(SignalWith(
+                var signal = SignalWith(
                      id: signalId,
                     dataType: Domain.DataType.Double,
                     granularity: Domain.Granularity.Month,
-                    path: Domain.Path.FromString("root/signal")));
+                    path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
                 GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+
+                signalsDataRepositoryMock.Setup(sdr =>
+                sdr.GetDataOlderThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
+                .Returns(new List<Datum<double>>());
+
+                signalsDataRepositoryMock.Setup(sdr =>
+                sdr.GetDataNewerThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
+                .Returns(new List<Datum<double>>());
 
                 List<Datum<double>> datums = new List<Datum<double>>(){
                     new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
@@ -914,7 +924,7 @@ namespace WebService.Tests
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1)).ToList();
 
-                Assert.AreEqual(result[0].Value, 0.0);
+                Assert.AreEqual(result[0].Value, 5.0);
                 Assert.AreEqual(result[2].Value, datums[0].Value);
                 Assert.AreEqual(result[6].Value, datums[1].Value);
                 Assert.AreEqual(result[9].Value, datums[2].Value);
