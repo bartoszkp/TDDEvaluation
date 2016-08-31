@@ -54,6 +54,46 @@ namespace WebService.Tests
             dataRepoMock.Setup(d => d.GetData<double>(returnedSignal, fromIncluded, toExluded))
                 .Returns(actualToBeReturnedByMockDatums);
 
+            SetupGetDataOlderAndNewerThanForSecondSignal(returnedSignal);
+        }
+
+        private void AssertEqual(List<Dto.Datum> expectedDatums, IEnumerable<Dto.Datum> actualDatums)
+        {
+            int i = 0;
+
+            Assert.AreEqual(13, actualDatums.Count());
+            foreach (var actualData in actualDatums)
+            {
+                Assert.AreEqual(expectedDatums[i].Quality, actualData.Quality);
+                Assert.AreEqual(expectedDatums[i].Timestamp, actualData.Timestamp);
+                Assert.AreEqual(expectedDatums[i].Value, actualData.Value);
+
+                i++;
+            }
+        }
+
+        private List<Dto.Datum> GetExpectedDatums()
+        {
+            return new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)1 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (double)3 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = (double)5 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = (double)7 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = (double)9 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (double)11 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 6), Value = (double)9.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 7), Value = (double)8 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 8), Value = (double)6.5 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 9), Value = (double)5 },
+                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 10), Value = (double)10 },
+                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 11), Value = (double)15 },
+                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12), Value = (double)20 },
+            };
+        }
+
+        private void SetupGetDataOlderAndNewerThanForSecondSignal(Signal returnedSignal)
+        {
             var firstTimestamp = new DateTime(2000, 1, 1, 0, 0, 1);
             var secondTimestamp = new DateTime(2000, 1, 1, 0, 0, 5);
             var thirdTimestamp = new DateTime(2000, 1, 1, 0, 0, 9);
@@ -65,7 +105,7 @@ namespace WebService.Tests
                 {
                     new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = firstTimestamp.AddSeconds(-1), Value = (double)1 }
                 });
-            
+
             dataRepoMock
                 .Setup(d => d.GetDataNewerThan<double>(returnedSignal, firstTimestamp, 1))
                 .Returns(new List<Datum<double>>()
@@ -80,7 +120,7 @@ namespace WebService.Tests
                 {
                     new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (double)11 }
                 });
-            
+
             dataRepoMock
                 .Setup(d => d.GetDataNewerThan<double>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
                 .Returns(new List<Datum<double>>()
@@ -117,42 +157,6 @@ namespace WebService.Tests
                 {
                     new Datum<double>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = fourthTimestamp.AddSeconds(1), Value = default(double) }
                 });
-
-        }
-
-        private void AssertEqual(List<Dto.Datum> expectedDatums, IEnumerable<Dto.Datum> actualDatums)
-        {
-            int i = 0;
-
-            Assert.AreEqual(13, actualDatums.Count());
-            foreach (var actualData in actualDatums)
-            {
-                Assert.AreEqual(expectedDatums[i].Quality, actualData.Quality);
-                Assert.AreEqual(expectedDatums[i].Timestamp, actualData.Timestamp);
-                Assert.AreEqual(expectedDatums[i].Value, actualData.Value);
-
-                i++;
-            }
-        }
-
-        private List<Dto.Datum> GetExpectedDatums()
-        {
-            return new List<Dto.Datum>()
-            {
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)1 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (double)3 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = (double)5 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = (double)7 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = (double)9 },
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (double)11 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 6), Value = (double)9.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 7), Value = (double)8 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 8), Value = (double)6.5 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 9), Value = (double)5 },
-                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 10), Value = (double)10 },
-                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 11), Value = (double)15 },
-                new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12), Value = (double)20 },
-            };
         }
     }
 }
