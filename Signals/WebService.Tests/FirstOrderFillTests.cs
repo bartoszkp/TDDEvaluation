@@ -75,14 +75,14 @@ namespace WebService.Tests
 
 
             dataRepoMock
-                .Setup(d => d.GetDataOlderThan<double>(returnedSignal, secondTimestamp, 1))
+                .Setup(d => d.GetDataOlderThan<double>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
                 .Returns(new List<Datum<double>>()
                 {
-                    new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = firstTimestamp.AddSeconds(-1), Value = (double)1 }
+                    new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (double)11 }
                 });
             
             dataRepoMock
-                .Setup(d => d.GetDataNewerThan<double>(returnedSignal, secondTimestamp, 1))
+                .Setup(d => d.GetDataNewerThan<double>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
                 .Returns(new List<Datum<double>>()
                 {
                     new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (double)5 }
@@ -90,14 +90,14 @@ namespace WebService.Tests
 
 
             dataRepoMock
-                .Setup(d => d.GetDataOlderThan<double>(returnedSignal, thirdTimestamp, 1))
+                .Setup(d => d.GetDataOlderThan<double>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
                 .Returns(new List<Datum<double>>()
                 {
-                    new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (double)11 }
+                    new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (double)5 }
                 });
 
             dataRepoMock
-                .Setup(d => d.GetDataNewerThan<double>(returnedSignal, thirdTimestamp, 1))
+                .Setup(d => d.GetDataNewerThan<double>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
                 .Returns(new List<Datum<double>>()
                 {
                     new Datum<double>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (double)20 }
@@ -105,14 +105,14 @@ namespace WebService.Tests
 
 
             dataRepoMock
-                .Setup(d => d.GetDataOlderThan<double>(returnedSignal, fourthTimestamp, 1))
+                .Setup(d => d.GetDataOlderThan<double>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
                 .Returns(new List<Datum<double>>()
                 {
-                    new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (double)5 }
+                    new Datum<double>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (double)20 }
                 });
 
             dataRepoMock
-                .Setup(d => d.GetDataNewerThan<double>(returnedSignal, fourthTimestamp, 1))
+                .Setup(d => d.GetDataNewerThan<double>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
                 .Returns(new List<Datum<double>>()
                 {
                     new Datum<double>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = fourthTimestamp.AddSeconds(1), Value = default(double) }
