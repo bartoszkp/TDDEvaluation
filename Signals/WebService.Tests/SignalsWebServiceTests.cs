@@ -990,7 +990,7 @@ namespace WebService.Tests
 
                 Assert.AreEqual(1, resultData.Count());
                 Assert.AreEqual("Good", resultData.First().Quality.ToString());
-                Assert.AreEqual(1, resultData.First().Value);
+                Assert.AreEqual(0, resultData.First().Value);
                 Assert.AreEqual(new DateTime(1999, 12, 1), resultData.First().Timestamp);
             }
 
