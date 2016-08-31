@@ -219,9 +219,18 @@ namespace Domain.Services.Implementation
                     var diffNumberOlder_Actual = NumberOfPeriods(olderData.First().Timestamp, timestamp, signal.Granularity);
                     var stepValue = ValueStep<T>(signal, olderData.First().Value, newerData.First().Value, diffNumberOlder_Newer, diffNumberOlder_Actual, olderData.First().Value);
 
+                    Quality quality;
+                    if (olderData.First().Quality != newerData.First().Quality)
+                    {
+                        if (olderData.First().Quality == Quality.None || newerData.First().Quality == Quality.None) quality = Quality.None;
+                        else quality = (olderData.First().Quality > newerData.First().Quality) ? olderData.First().Quality : newerData.First().Quality;
+                    }
+
+                    else quality = olderData.First().Quality;
+
                     filledArray[current_index] = new Datum<T>()
                     {
-                        Quality = olderData.First().Quality,
+                        Quality = quality,
                         Signal = olderData.First().Signal,
                         Value = stepValue,
                         Timestamp = timestamp
