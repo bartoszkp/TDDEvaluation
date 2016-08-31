@@ -51,10 +51,32 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new ArgumentException();
 
-            signalsDataRepository.DeleteData<int>(signal);
+            DeleteDataByDataType(signal);
             missingValuePolicyRepository.Set(signal, null);
 
             signalsRepository.Delete(signal);
+        }
+
+        private void DeleteDataByDataType(Signal signal)
+        {
+            switch (signal.DataType) {
+                case DataType.Boolean:
+                    signalsDataRepository.DeleteData<bool>(signal);
+                    break;
+                case DataType.Integer:
+                    signalsDataRepository.DeleteData<int>(signal);
+                    break;
+                case DataType.Double:
+                    signalsDataRepository.DeleteData<double>(signal);
+                    break;
+                case DataType.Decimal:
+                    signalsDataRepository.DeleteData<decimal>(signal);
+                    break;
+                case DataType.String:
+                    signalsDataRepository.DeleteData<string>(signal);
+                    break;
+                default: throw new NotSupportedException("Signals DataType is currently not supported");
+            }
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> data)
