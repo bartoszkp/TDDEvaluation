@@ -900,7 +900,37 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Verify(srm => srm.Delete(existingSignal));
             }
-            
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingThisSignal_CheckIfItsMissingValuePolicyIsSetToNull()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+                
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Set(existingSignal, null));
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(existingSignal.Id.Value);
+
+                missingValuePolicyRepositoryMock
+                    .Verify(mvprm => mvprm.Set(existingSignal, null));
+            }
+
             //Bug fixing 
 
             [TestMethod]
