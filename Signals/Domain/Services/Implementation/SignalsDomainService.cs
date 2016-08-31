@@ -99,17 +99,26 @@ namespace Domain.Services.Implementation
                     Value = svmvp.Value
                 };
             }
+            if(mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+            {
+                datum = new Datum<T>()
+                {
+                    Quality = Quality.None,
+                    Value = default(T)
+                };
+            }
 
             var gettingList = this.signalsDataRepository?.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
             if (fromIncludedUtc == toExcludedUtc)
             {
                 return gettingList;
             }
-            
+
             Datum<T> xx = null;
+            T step = default(T);
             while (fromIncludedUtc < toExcludedUtc)
             {
-                if (gettingList != null)
+                if (gettingList != null) { }
                     xx = gettingList.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
                 if (xx == null)
                 {
@@ -137,10 +146,91 @@ namespace Domain.Services.Implementation
                                 Value = returnList.Last().Value
                             };
                     }
+                    else if(mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                    {
+                        var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
+                        var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUtc, 1);
+                        if(olderData.Count() == 0)
+                        {
+                            datum = new Datum<T>()
+                            {
+                                Quality = Quality.None,
+                                Value = default(T)
+                            };
+                        }
+                        else if(newerData.Count() == 0)
+                        {
+                            datum = new Datum<T>()
+                            {
+                                Quality = Quality.None,
+                                Value = default(T)
+                            };
+                        }
+                        else
+                        {
+                            T value = olderData.First().Value;
+                            Quality quality;
+                            if (olderData.First().Quality == newerData.First().Quality)
+                                quality = olderData.First().Quality;
+                            else if (olderData.First().Quality > newerData.First().Quality)
+                                quality = olderData.First().Quality;
+                            else
+                                quality = newerData.First().Quality;
+                            
+                            var valueDifference = Convert.ChangeType((dynamic)newerData.First().Value - (dynamic)olderData.First().Value, typeof(T));
+                            var granularity = signal.Granularity;
+                            int totalSteps = 0;
+                            switch (granularity)
+                            {
+                                case Granularity.Second:
+                                    totalSteps = (int)newerData.First().Timestamp.Subtract(olderData.First().Timestamp).TotalSeconds;
+                                    break;
+                                case Granularity.Minute:
+                                    totalSteps = (int)newerData.First().Timestamp.Subtract(olderData.First().Timestamp).TotalMinutes;
+                                    break;
+                                case Granularity.Hour:
+                                    totalSteps = (int)newerData.First().Timestamp.Subtract(olderData.First().Timestamp).TotalHours;
+                                    break;
+                                case Granularity.Day:
+                                    totalSteps = (int)newerData.First().Timestamp.Subtract(olderData.First().Timestamp).TotalDays;
+                                    break;
+                                case Granularity.Week:
+                                    totalSteps = (int)newerData.First().Timestamp.Subtract(olderData.First().Timestamp).TotalDays / 7;
+                                    break;
+                                case Granularity.Month:
+                                    totalSteps = (int)newerData.First().Timestamp.Subtract(olderData.First().Timestamp).TotalDays / 30;
+                                    break;
+                                case Granularity.Year:
+                                    totalSteps = (int)newerData.First().Timestamp.Subtract(olderData.First().Timestamp).TotalDays / 365;
+                                    break;
+                            }
+                            
+                            if(valueDifference > 0)
+                            {
+                                step += valueDifference / totalSteps;
+
+                                value = (dynamic)value + step;
+                            }
+                            else if(valueDifference < 0)
+                            {
+                                step += -(valueDifference / totalSteps);
+                                value = (dynamic)value + step;
+                            }
+
+                            datum = new Datum<T>()
+                            {
+                                Quality = quality,
+                                Value = value
+                            };
+                        }
+                    }
                     returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
                 }
                 else
+                {
                     returnList.Add(xx);
+                    step = default(T);
+                }
                 fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
             }
             return returnList;
