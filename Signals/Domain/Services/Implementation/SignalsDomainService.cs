@@ -227,6 +227,8 @@ namespace Domain.Services.Implementation
                         Timestamp = timestamp
                     };
                 }
+
+                else filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
             }
 
             else
