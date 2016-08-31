@@ -211,13 +211,13 @@ namespace Domain.Services.Implementation
             else if (policy is FirstOrderMissingValuePolicy<T>)
             {
                 var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1);
-                var ealierData = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1);
+                var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1);
 
                 if (olderData != null && olderData.Count() > 0 && olderData.First().Quality != Quality.None) // jesli znalazlem wczesniejsza probke
                 {
-                    var diffNumberOlder_Newer = NumberOfPeriods(olderData.First().Timestamp, ealierData.First().Timestamp, signal.Granularity);
+                    var diffNumberOlder_Newer = NumberOfPeriods(olderData.First().Timestamp, newerData.First().Timestamp, signal.Granularity);
                     var diffNumberOlder_Actual = NumberOfPeriods(olderData.First().Timestamp, timestamp, signal.Granularity);
-                    var stepValue = ValueStep<T>(signal, olderData.First().Value, ealierData.First().Value, diffNumberOlder_Newer, diffNumberOlder_Actual);
+                    var stepValue = ValueStep<T>(signal, olderData.First().Value, newerData.First().Value, diffNumberOlder_Newer, diffNumberOlder_Actual);
 
                     filledArray[current_index] = new Datum<T>()
                     {
