@@ -60,11 +60,16 @@ namespace Domain.Services.Implementation
 
             if (MVP is ZeroOrderMissingValuePolicy<T>)
             {
-                var data = signalsDataRepository.GetDataOlderThan<T>(signal, toExcludedUtc, int.MaxValue);
+                var fillledData = (MVP as ZeroOrderMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
 
-                (MVP as ZeroOrderMissingValuePolicy<T>).SetMissingValues(ref data, signal.Granularity, fromIncludedUtc, toExcludedUtc);
+                return fillledData;
+            }
 
-                return data;
+            if (MVP is FirstOrderMissingValuePolicy<T>)
+            {
+                var fillledData = (MVP as FirstOrderMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
+
+                return fillledData;
             }
 
             List<Datum<T>> datumList = new List<Datum<T>>();
@@ -212,14 +217,26 @@ namespace Domain.Services.Implementation
                 .Select(signal => signal.Path.GetPrefix(lengthEntryPath))
                 .Distinct();
             PathEntry pathEntry = new PathEntry(signals, subPaths);
-            return pathEntry;
-
-            
+            return pathEntry;           
         }
 
         public void Delete(int signalId)
         {
             var signal = signalsRepository.Get(signalId);
+
+            if (signal == null) return;
+
+            missingValuePolicyRepository.Set(signal, null);
+
+            switch (signal.DataType)
+            {
+                case DataType.Boolean: signalsDataRepository.DeleteData<bool>(signal); break;
+                case DataType.Integer: signalsDataRepository.DeleteData<int>(signal); break;
+                case DataType.Double: signalsDataRepository.DeleteData<double>(signal); break;
+                case DataType.Decimal: signalsDataRepository.DeleteData<decimal>(signal); break;
+                case DataType.String: signalsDataRepository.DeleteData<string>(signal); break;
+                default: break;
+            }
 
             signalsRepository.Delete(signal);
         }

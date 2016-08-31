@@ -7,30 +7,29 @@ namespace Domain.MissingValuePolicy
 {
     public class ZeroOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public virtual void SetMissingValues(ref IEnumerable<Datum<T>> data, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
-        { 
-            List<Datum<T>> filledList = new List<Datum<T>>();
+        public virtual IEnumerable<Datum<T>> SetMissingValues(Repositories.ISignalsDataRepository repository, Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            if (fromIncludedUtc > toExcludedUtc)  return new List<Datum<T>>(); 
 
+            var filledData = new List<Datum<T>>();
             DateTime tmp = fromIncludedUtc;
 
-            if (fromIncludedUtc > toExcludedUtc) data = filledList;
-
-            else if (fromIncludedUtc == toExcludedUtc)
+            if (fromIncludedUtc == toExcludedUtc)
             {
-                AddToListSuitableDatum(filledList, data, tmp);
+                AddToListSuitableDatum(repository, signal, filledData, tmp); 
 
-                data = filledList;
+                return filledData;
             }
 
             else
             {
-                switch (granularity)
+                switch (signal.Granularity)
                 {
                     case Granularity.Second:
 
                         while (tmp < toExcludedUtc)
                         {
-                            AddToListSuitableDatum(filledList, data, tmp);
+                            AddToListSuitableDatum(repository, signal, filledData, tmp);
 
                             tmp = tmp.AddSeconds(1);
                         }
@@ -41,7 +40,7 @@ namespace Domain.MissingValuePolicy
 
                         while (tmp < toExcludedUtc)
                         {
-                            AddToListSuitableDatum(filledList, data, tmp);
+                            AddToListSuitableDatum(repository, signal, filledData, tmp);
 
                             tmp = tmp.AddMinutes(1);
                         }
@@ -52,7 +51,7 @@ namespace Domain.MissingValuePolicy
 
                         while (tmp < toExcludedUtc)
                         {
-                            AddToListSuitableDatum(filledList, data, tmp);
+                            AddToListSuitableDatum(repository, signal, filledData, tmp);
 
                             tmp = tmp.AddHours(1);
                         }
@@ -63,7 +62,7 @@ namespace Domain.MissingValuePolicy
 
                         while (tmp < toExcludedUtc)
                         {
-                            AddToListSuitableDatum(filledList, data, tmp);
+                            AddToListSuitableDatum(repository, signal, filledData, tmp);
 
                             tmp = tmp.AddDays(1);
                         }
@@ -74,7 +73,7 @@ namespace Domain.MissingValuePolicy
 
                         while (tmp < toExcludedUtc)
                         {
-                            AddToListSuitableDatum(filledList, data, tmp);
+                            AddToListSuitableDatum(repository, signal, filledData, tmp);
 
                             tmp = tmp.AddDays(7);
                         }
@@ -85,7 +84,7 @@ namespace Domain.MissingValuePolicy
 
                         while (tmp < toExcludedUtc)
                         {
-                            AddToListSuitableDatum(filledList, data, tmp);
+                            AddToListSuitableDatum(repository, signal, filledData, tmp);
 
                             tmp = tmp.AddMonths(1);
                         }
@@ -96,7 +95,7 @@ namespace Domain.MissingValuePolicy
 
                         while (tmp < toExcludedUtc)
                         {
-                            AddToListSuitableDatum(filledList, data, tmp);
+                            AddToListSuitableDatum(repository, signal, filledData, tmp);
 
                             tmp = tmp.AddYears(1);
                         }
@@ -104,54 +103,20 @@ namespace Domain.MissingValuePolicy
                         break;
 
                     default: break;
-
                 }
-
-                data = filledList;
             }
+
+            return filledData;
+
         }
 
-
-        private void AddToListSuitableDatum(List<Datum<T>> filledList, IEnumerable<Datum<T>> data, DateTime tmp)
+        private void AddToListSuitableDatum(Repositories.ISignalsDataRepository repository, Signal signal, List<Datum<T>> filledData, DateTime tmp)
         {
-            Datum<T> previousDatum = null;
+            var previousDatum = repository.GetDataOlderThan<T>(signal, tmp.AddSeconds(1), 1).FirstOrDefault();
 
-            Datum<T> newDatum = null;
+            if (previousDatum == null) filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = tmp });
 
-            if (filledList.Count != 0) previousDatum = filledList.Last();
-
-            if (previousDatum == null)
-            {
-                newDatum = new Datum<T>()
-                {
-                    Timestamp = tmp,
-                    Quality = Quality.None,
-                    Value = default(T)
-                };
-            }
-
-            else
-            {
-                newDatum = new Datum<T>()
-                {
-                    Timestamp = tmp,
-                    Quality = previousDatum.Quality,
-                    Value = previousDatum.Value,
-                };
-            }
-
-            foreach (var datum in data)
-            {
-                if (newDatum.Timestamp == datum.Timestamp)
-                {
-                    newDatum.Value = datum.Value;
-                    newDatum.Signal = datum.Signal;
-                    newDatum.Quality = datum.Quality;
-                    break;
-                }
-            }
-
-            filledList.Add(newDatum);
+            else filledData.Add (new Datum<T>() { Quality = previousDatum.Quality, Value = previousDatum.Value, Timestamp = tmp });
         }
     }
 }
