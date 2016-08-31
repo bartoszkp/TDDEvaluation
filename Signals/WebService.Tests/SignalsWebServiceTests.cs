@@ -1229,7 +1229,7 @@ namespace WebService.Tests
             [ExpectedException(typeof(ArgumentException))]
             public void GivenNoSignals_WhenDeletingSignal_ThrowsArgumentException()
             {
-                GivenNoSignals();
+                SetupWebService();
 
                 int nonExistngSignalId = 7;
                 signalsWebService.Delete(nonExistngSignalId);
@@ -1240,8 +1240,9 @@ namespace WebService.Tests
             {
                 var signal = ReturnDefaultSignal_IntegerDay().ToDomain<Domain.Signal>();
                 signal.Id = 4;
-                GivenASignal(signal);
-                
+                SetupWebService();
+                SignalsRepositoryMock_SetupGet(signal);
+
                 signalsWebService.Delete(signal.Id.Value);
                 signalsRepositoryMock.Verify(x => x.Delete(signal));
             }
@@ -1252,6 +1253,7 @@ namespace WebService.Tests
                 var signal = ReturnDefaultSignal_IntegerDay().ToDomain<Domain.Signal>();
                 signal.Id = 4;
                 SetupWebService();
+                SignalsRepositoryMock_SetupGet(signal);
 
                 signalsWebService.Delete(signal.Id.Value);
                 signalsRepositoryMock.Verify(x => x.Delete(signal));

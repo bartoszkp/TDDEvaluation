@@ -51,6 +51,9 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new ArgumentException();
 
+            signalsDataRepository.DeleteData<int>(signal);
+            missingValuePolicyRepository.Set(signal, null);
+
             signalsRepository.Delete(signal);
         }
 
