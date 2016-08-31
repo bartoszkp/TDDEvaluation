@@ -921,7 +921,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenGettingData_VerifyGetDataOlderThan()
+            public void GivenASignal_WhenGettingData_VerifyGetDataNewerThan()
             {
                 int signalId = 5;
 
@@ -939,7 +939,7 @@ namespace WebService.Tests
 
                 signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
 
-                signalsDataRepositoryMock.Verify(sdr => sdr.GetDataOlderThan<double>(signal, new DateTime(1999, 11, 1), 1));
+                signalsDataRepositoryMock.Verify(sdr => sdr.GetDataNewerThan<double>(signal, new DateTime(1999, 11, 1), 1));
             }
 
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
