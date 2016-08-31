@@ -98,9 +98,9 @@ namespace WebService.Tests
         public void GivenAnIntegerWeeklySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
             SetupFirstOrderPolicy(Granularity.Week,
-                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 4, 3, 0, 0, 0), new List<Datum<int>>()
+                new DateTime(2000, 1, 3, 0, 0, 0), new DateTime(2000, 4, 3, 0, 0, 0), new List<Datum<int>>()
                 {
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 3, 0, 0, 0), Value = (int)1 },
                     new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 7, 0, 0, 0), Value = (int)11 },
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 6, 0, 0, 0), Value = (int)5 },
                     new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 27, 0, 0, 0), Value = (int)20 }
@@ -514,7 +514,7 @@ namespace WebService.Tests
                     break;
 
                 case Granularity.Week:
-                    var firstTimestampWeek = new DateTime(2000, 1, 3, 0, 0, 0);
+                    var firstTimestampWeek = new DateTime(2000, 1, 10, 0, 0, 0);
                     var secondTimestampWeek = new DateTime(2000, 2, 7, 0, 0, 0);
                     var thirdTimestampWeek = new DateTime(2000, 3, 6, 0, 0, 0);
                     var fourthTimestampWeek = new DateTime(2000, 3, 27, 0, 0, 0);
