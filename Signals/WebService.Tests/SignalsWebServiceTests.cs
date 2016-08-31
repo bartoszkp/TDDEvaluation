@@ -852,6 +852,49 @@ namespace WebService.Tests
                 Assert.AreEqual(expectedResults[0].Value, result[0].Value);
             }
 
+            [TestMethod]
+            public void GivenASignalAndDataWithFOMVP_WhenGettingDataUsingTheSameDateThatsOutsideOfExistingTimestampBounds_ReturnsOneDatumOfNoneQuality()
+            {
+                int signalId = 1;
+                var signal = SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                var data = new Datum<double>[]
+                {
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,2,1), Value = 1.0},
+                    new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,5,1), Value = 5.0}
+                };
+
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new Datum<double>[] { });
+
+                var policy = new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(policy);
+
+                var fromDate = new DateTime(2000, 1, 1);
+                var toDate = new DateTime(2000, 1, 1);
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetDataOlderThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(d => d == fromDate), 1))
+                    .Returns(new Datum<double>[] { });
+                signalsDataRepositoryMock.Setup(sd => sd.GetDataNewerThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(d => d == toDate), 1))
+                    .Returns(new Datum<double>[] { data[0] });
+                
+                var expectedResults = new Dto.Datum[] {
+                    new Dto.Datum() {Quality = Dto.Quality.None, Value = default(double)}
+                };
+
+                var result = signalsWebService.GetData(signalId, fromDate, toDate).ToArray();
+
+                const int expectedNumberOfResults = 1;
+                Assert.AreEqual(expectedNumberOfResults, result.Length);
+                Assert.AreEqual(fromDate, result[0].Timestamp);
+                Assert.AreEqual(expectedResults[0].Quality, result[0].Quality);
+                Assert.AreEqual(expectedResults[0].Value, result[0].Value);
+            }
+
             private void SetupDataRepository<T>()
             {
                 signalsDataRepositoryMock
