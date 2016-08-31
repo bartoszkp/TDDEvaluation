@@ -160,7 +160,7 @@ namespace Domain.Services.Implementation
                 fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);
             }
 
-            return returnList;
+            return returnList.ToArray();
         }
 
         private Datum<T> SetDatumForSpecificOrderMissingValuePolicy<T>(Signal signal, DateTime fromIncludedUtc)
