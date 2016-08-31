@@ -213,7 +213,7 @@ namespace Domain.Services.Implementation
                 var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1);
                 var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1);
 
-                if (olderData != null && olderData.Count() > 0 && olderData.First().Quality != Quality.None && newerData.Count() > 0 && newerData != null) // jesli znalazlem wczesniejsza probke
+                if (olderData != null && olderData.Count() > 0 && olderData.First().Quality != Quality.None && newerData.Count() > 0 && newerData != null && newerData.First().Quality != Quality.None) // jesli znalazlem wczesniejsza probke
                 {
                     var diffNumberOlder_Newer = NumberOfPeriods(olderData.First().Timestamp, newerData.First().Timestamp, signal.Granularity);
                     var diffNumberOlder_Actual = NumberOfPeriods(olderData.First().Timestamp, timestamp, signal.Granularity);
