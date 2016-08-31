@@ -65,6 +65,7 @@
     <Compile Include="Exceptions\InvalidTimeStampException.cs" />
     <Compile Include="Exceptions\NoSuchSignalException.cs" />
     <Compile Include="FirstOrderDataFillHelperDecimal.cs" />
+    <Compile Include="FirstOrderDataFillHelperDouble.cs" />
     <Compile Include="FirstOrderDataFillHelperInt.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />

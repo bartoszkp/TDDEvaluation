@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    static class FirstOrderDataFillHelperInt
+    static class FirstOrderDataFillHelperDouble
     {
-        public static List<Datum<int>> FillMissingData(Signal signal, SignalsDomainService service,
-            List<Datum<int>> data, DateTime from, DateTime to)
+        public static List<Datum<double>> FillMissingData(Signal signal, SignalsDomainService service,
+            List<Datum<double>> data, DateTime from, DateTime to)
         {
             switch (signal.Granularity)
             {
@@ -49,7 +49,7 @@ namespace Domain
             return data;
         }
 
-        private static void FillWeekGranularityData(Signal signal, SignalsDomainService service, List<Datum<int>> data,
+        private static void FillWeekGranularityData(Signal signal, SignalsDomainService service, List<Datum<double>> data,
             DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
@@ -58,15 +58,15 @@ namespace Domain
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
-                    var previousDatumCollection = service.GetDataOlderThan<int>(signal, currentDate, 1);
-                    var nextDatumCollection = service.GetDataNewerThan<int>(signal, currentDate, 1);
-                    Datum<int> previousDatum = null;
-                    Datum<int> nextDatum = null;
+                    var previousDatumCollection = service.GetDataOlderThan<double>(signal, currentDate, 1);
+                    var nextDatumCollection = service.GetDataNewerThan<double>(signal, currentDate, 1);
+                    Datum<double> previousDatum = null;
+                    Datum<double> nextDatum = null;
                     bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
-                        previousDatum = new Datum<int>()
+                        previousDatum = new Datum<double>()
                         {
                             Timestamp = currentDate.AddDays(-7),
                             Value = 0,
@@ -81,7 +81,7 @@ namespace Domain
                     {
                         var timestamp = currentDate.AddDays(7);
 
-                        nextDatum = new Datum<int>()
+                        nextDatum = new Datum<double>()
                         {
                             Timestamp = timestamp,
                             Value = 0,
@@ -105,7 +105,7 @@ namespace Domain
 
                         while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
-                            var missingDatum = new Datum<int>()
+                            var missingDatum = new Datum<double>()
                             {
                                 Quality = quality,
                                 Timestamp = new DateTime(tempDate.Ticks),
@@ -120,7 +120,7 @@ namespace Domain
                     }
                     else
                     {
-                        var missingDatum = new Datum<int>()
+                        var missingDatum = new Datum<double>()
                         {
                             Timestamp = new DateTime(currentDate.Ticks),
                             Quality = quality,
@@ -142,7 +142,7 @@ namespace Domain
             }
         }
 
-        private static void FillDayGranularityData(Signal signal, SignalsDomainService service, List<Datum<int>> data,
+        private static void FillDayGranularityData(Signal signal, SignalsDomainService service, List<Datum<double>> data,
             DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
@@ -151,15 +151,15 @@ namespace Domain
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
-                    var previousDatumCollection = service.GetDataOlderThan<int>(signal, currentDate, 1);
-                    var nextDatumCollection = service.GetDataNewerThan<int>(signal, currentDate, 1);
-                    Datum<int> previousDatum = null;
-                    Datum<int> nextDatum = null;
+                    var previousDatumCollection = service.GetDataOlderThan<double>(signal, currentDate, 1);
+                    var nextDatumCollection = service.GetDataNewerThan<double>(signal, currentDate, 1);
+                    Datum<double> previousDatum = null;
+                    Datum<double> nextDatum = null;
                     bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
-                        previousDatum = new Datum<int>()
+                        previousDatum = new Datum<double>()
                         {
                             Timestamp = currentDate.AddDays(-1),
                             Value = 0,
@@ -174,7 +174,7 @@ namespace Domain
                     {
                         var timestamp = currentDate.AddDays(1);
 
-                        nextDatum = new Datum<int>()
+                        nextDatum = new Datum<double>()
                         {
                             Timestamp = timestamp,
                             Value = 0,
@@ -198,7 +198,7 @@ namespace Domain
 
                         while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
-                            var missingDatum = new Datum<int>()
+                            var missingDatum = new Datum<double>()
                             {
                                 Quality = quality,
                                 Timestamp = new DateTime(tempDate.Ticks),
@@ -213,7 +213,7 @@ namespace Domain
                     }
                     else
                     {
-                        var missingDatum = new Datum<int>()
+                        var missingDatum = new Datum<double>()
                         {
                             Timestamp = new DateTime(currentDate.Ticks),
                             Quality = quality,
@@ -235,7 +235,7 @@ namespace Domain
             }
         }
 
-        private static void FillYearGranularityData(Signal signal, SignalsDomainService service, List<Datum<int>> data,
+        private static void FillYearGranularityData(Signal signal, SignalsDomainService service, List<Datum<double>> data,
             DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
@@ -244,15 +244,15 @@ namespace Domain
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
-                    var previousDatumCollection = service.GetDataOlderThan<int>(signal, currentDate, 1);
-                    var nextDatumCollection = service.GetDataNewerThan<int>(signal, currentDate, 1);
-                    Datum<int> previousDatum = null;
-                    Datum<int> nextDatum = null;
+                    var previousDatumCollection = service.GetDataOlderThan<double>(signal, currentDate, 1);
+                    var nextDatumCollection = service.GetDataNewerThan<double>(signal, currentDate, 1);
+                    Datum<double> previousDatum = null;
+                    Datum<double> nextDatum = null;
                     bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
-                        previousDatum = new Datum<int>()
+                        previousDatum = new Datum<double>()
                         {
                             Timestamp = currentDate.AddYears(-1),
                             Value = 0,
@@ -267,7 +267,7 @@ namespace Domain
                     {
                         var timestamp = currentDate.AddYears(1);
 
-                        nextDatum = new Datum<int>()
+                        nextDatum = new Datum<double>()
                         {
                             Timestamp = timestamp,
                             Value = 0,
@@ -291,7 +291,7 @@ namespace Domain
 
                         while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
-                            var missingDatum = new Datum<int>()
+                            var missingDatum = new Datum<double>()
                             {
                                 Quality = quality,
                                 Timestamp = new DateTime(tempDate.Ticks),
@@ -306,7 +306,7 @@ namespace Domain
                     }
                     else
                     {
-                        var missingDatum = new Datum<int>()
+                        var missingDatum = new Datum<double>()
                         {
                             Timestamp = new DateTime(currentDate.Ticks),
                             Quality = quality,
@@ -328,7 +328,7 @@ namespace Domain
             }
         }
 
-        private static void FillHourGranularityData(Signal signal, SignalsDomainService service, List<Datum<int>> data,
+        private static void FillHourGranularityData(Signal signal, SignalsDomainService service, List<Datum<double>> data,
             DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
@@ -337,15 +337,15 @@ namespace Domain
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
-                    var previousDatumCollection = service.GetDataOlderThan<int>(signal, currentDate, 1);
-                    var nextDatumCollection = service.GetDataNewerThan<int>(signal, currentDate, 1);
-                    Datum<int> previousDatum = null;
-                    Datum<int> nextDatum = null;
+                    var previousDatumCollection = service.GetDataOlderThan<double>(signal, currentDate, 1);
+                    var nextDatumCollection = service.GetDataNewerThan<double>(signal, currentDate, 1);
+                    Datum<double> previousDatum = null;
+                    Datum<double> nextDatum = null;
                     bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
-                        previousDatum = new Datum<int>()
+                        previousDatum = new Datum<double>()
                         {
                             Timestamp = currentDate.AddHours(-1),
                             Value = 0,
@@ -360,7 +360,7 @@ namespace Domain
                     {
                         var timestamp = currentDate.AddHours(1);
 
-                        nextDatum = new Datum<int>()
+                        nextDatum = new Datum<double>()
                         {
                             Timestamp = timestamp,
                             Value = 0,
@@ -384,7 +384,7 @@ namespace Domain
 
                         while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
-                            var missingDatum = new Datum<int>()
+                            var missingDatum = new Datum<double>()
                             {
                                 Quality = quality,
                                 Timestamp = new DateTime(tempDate.Ticks),
@@ -399,7 +399,7 @@ namespace Domain
                     }
                     else
                     {
-                        var missingDatum = new Datum<int>()
+                        var missingDatum = new Datum<double>()
                         {
                             Timestamp = new DateTime(currentDate.Ticks),
                             Quality = quality,
@@ -421,7 +421,7 @@ namespace Domain
             }
         }
 
-        private static void FillMinuteGranularityData(Signal signal, SignalsDomainService service, List<Datum<int>> data,
+        private static void FillMinuteGranularityData(Signal signal, SignalsDomainService service, List<Datum<double>> data,
             DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
@@ -430,15 +430,15 @@ namespace Domain
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
-                    var previousDatumCollection = service.GetDataOlderThan<int>(signal, currentDate, 1);
-                    var nextDatumCollection = service.GetDataNewerThan<int>(signal, currentDate, 1);
-                    Datum<int> previousDatum = null;
-                    Datum<int> nextDatum = null;
+                    var previousDatumCollection = service.GetDataOlderThan<double>(signal, currentDate, 1);
+                    var nextDatumCollection = service.GetDataNewerThan<double>(signal, currentDate, 1);
+                    Datum<double> previousDatum = null;
+                    Datum<double> nextDatum = null;
                     bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
-                        previousDatum = new Datum<int>()
+                        previousDatum = new Datum<double>()
                         {
                             Timestamp = currentDate.AddMinutes(-1),
                             Value = 0,
@@ -453,7 +453,7 @@ namespace Domain
                     {
                         var timestamp = currentDate.AddMinutes(-1);
 
-                        nextDatum = new Datum<int>()
+                        nextDatum = new Datum<double>()
                         {
                             Timestamp = timestamp,
                             Value = 0,
@@ -477,7 +477,7 @@ namespace Domain
 
                         while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
-                            var missingDatum = new Datum<int>()
+                            var missingDatum = new Datum<double>()
                             {
                                 Quality = quality,
                                 Timestamp = new DateTime(tempDate.Ticks),
@@ -492,7 +492,7 @@ namespace Domain
                     }
                     else
                     {
-                        var missingDatum = new Datum<int>()
+                        var missingDatum = new Datum<double>()
                         {
                             Timestamp = new DateTime(currentDate.Ticks),
                             Quality = quality,
@@ -514,7 +514,7 @@ namespace Domain
             }
         }
 
-        private static void FillSecondGranularityData(Signal signal, SignalsDomainService service, List<Datum<int>> data,
+        private static void FillSecondGranularityData(Signal signal, SignalsDomainService service, List<Datum<double>> data,
             DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
@@ -523,15 +523,15 @@ namespace Domain
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
-                    var previousDatumCollection = service.GetDataOlderThan<int>(signal, currentDate, 1);
-                    var nextDatumCollection = service.GetDataNewerThan<int>(signal, currentDate, 1);
-                    Datum<int> previousDatum = null;
-                    Datum<int> nextDatum = null;
+                    var previousDatumCollection = service.GetDataOlderThan<double>(signal, currentDate, 1);
+                    var nextDatumCollection = service.GetDataNewerThan<double>(signal, currentDate, 1);
+                    Datum<double> previousDatum = null;
+                    Datum<double> nextDatum = null;
                     bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
-                        previousDatum = new Datum<int>()
+                        previousDatum = new Datum<double>()
                         {
                             Timestamp = currentDate.AddSeconds(-1),
                             Value = 0,
@@ -546,7 +546,7 @@ namespace Domain
                     {
                         var timestamp = currentDate.AddSeconds(1);
 
-                        nextDatum = new Datum<int>()
+                        nextDatum = new Datum<double>()
                         {
                             Timestamp = timestamp,
                             Value = 0,
@@ -570,7 +570,7 @@ namespace Domain
 
                         while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
-                            var missingDatum = new Datum<int>()
+                            var missingDatum = new Datum<double>()
                             {
                                 Quality = quality,
                                 Timestamp = new DateTime(tempDate.Ticks),
@@ -585,7 +585,7 @@ namespace Domain
                     }
                     else
                     {
-                        var missingDatum = new Datum<int>()
+                        var missingDatum = new Datum<double>()
                         {
                             Timestamp = new DateTime(currentDate.Ticks),
                             Quality = quality,
@@ -608,7 +608,7 @@ namespace Domain
         }
 
 
-        private static void FillMonthGranularityData(Signal signal, SignalsDomainService service, List<Datum<int>> data,
+        private static void FillMonthGranularityData(Signal signal, SignalsDomainService service, List<Datum<double>> data,
             DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
@@ -617,15 +617,15 @@ namespace Domain
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                 {
-                    var previousDatumCollection = service.GetDataOlderThan<int>(signal, currentDate, 1);
-                    var nextDatumCollection = service.GetDataNewerThan<int>(signal, currentDate, 1);
-                    Datum<int> previousDatum = null;
-                    Datum<int> nextDatum = null;
+                    var previousDatumCollection = service.GetDataOlderThan<double>(signal, currentDate, 1);
+                    var nextDatumCollection = service.GetDataNewerThan<double>(signal, currentDate, 1);
+                    Datum<double> previousDatum = null;
+                    Datum<double> nextDatum = null;
                     bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
-                        previousDatum = new Datum<int>()
+                        previousDatum = new Datum<double>()
                         {
                             Timestamp = currentDate.AddMonths(-1),
                             Value = 0,
@@ -640,7 +640,7 @@ namespace Domain
                     {
                         var timestamp = currentDate.AddMonths(1);
 
-                        nextDatum = new Datum<int>()
+                        nextDatum = new Datum<double>()
                         {
                             Timestamp = timestamp,
                             Value = 0,
@@ -664,7 +664,7 @@ namespace Domain
 
                         while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
-                            var missingDatum = new Datum<int>()
+                            var missingDatum = new Datum<double>()
                             {
                                 Quality = quality,
                                 Timestamp = new DateTime(tempDate.Ticks),
@@ -679,7 +679,7 @@ namespace Domain
                     }
                     else
                     {
-                        var missingDatum = new Datum<int>()
+                        var missingDatum = new Datum<double>()
                         {
                             Timestamp = new DateTime(currentDate.Ticks),
                             Quality = quality,

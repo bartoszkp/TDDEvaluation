@@ -62,43 +62,48 @@ namespace Domain
                     var nextDatumCollection = service.GetDataNewerThan<decimal>(signal, currentDate, 1);
                     Datum<decimal> previousDatum = null;
                     Datum<decimal> nextDatum = null;
-
+                    bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
                         previousDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day - 7),
+                            Timestamp = currentDate.AddDays(-7),
                             Value = 0,
                             Quality = Quality.None
                         };
+                        previousDatumExisted = false;
                     }
                     else previousDatum = previousDatumCollection.ElementAt(0);
 
 
-                    if (nextDatumCollection.Count() == 0)
+                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
+                        var timestamp = currentDate.AddDays(7);
+
                         nextDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day + 7),
+                            Timestamp = timestamp,
                             Value = 0,
                             Quality = Quality.None
                         };
+                        if (nextDatum.Timestamp < toExcluded)
+                            data.Add(nextDatum);
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var tempDate = new DateTime(currentDate.Ticks);
-
-                    var timeDifference = currentDate - previousDatum.Timestamp;
-
-                    var weeksDifference = (int)timeDifference.TotalDays / 7;
-                    var valueToAdd = (nextDatum.Value - previousDatum.Value) / weeksDifference;
-                    var value = valueToAdd;
                     var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
+                    var weeksDifference = (int)timeDifference.TotalDays / 7;
 
-                    if (nextDatum.Timestamp.Day - currentDate.Day != 7)
+                    if (weeksDifference > 2)
                     {
-                        while (tempDate < nextDatum.Timestamp)
+                        var tempDate = new DateTime(currentDate.Ticks);
+                        var valueToAdd = (nextDatum.Value - previousDatum.Value) / weeksDifference;
+                        var value = valueToAdd + previousDatum.Value;
+
+
+                        while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
                             var missingDatum = new Datum<decimal>()
                             {
@@ -110,7 +115,7 @@ namespace Domain
                             data.Add(missingDatum);
 
                             value += valueToAdd;
-                            tempDate = tempDate.AddDays(7);
+                            tempDate = tempDate.AddDays(1);
                         }
                     }
                     else
@@ -133,7 +138,7 @@ namespace Domain
                     }
                 }
 
-                currentDate = currentDate.AddDays(7);
+                currentDate = currentDate.AddDays(1);
             }
         }
 
@@ -150,43 +155,48 @@ namespace Domain
                     var nextDatumCollection = service.GetDataNewerThan<decimal>(signal, currentDate, 1);
                     Datum<decimal> previousDatum = null;
                     Datum<decimal> nextDatum = null;
-
+                    bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
                         previousDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day - 1),
+                            Timestamp = currentDate.AddDays(-1),
                             Value = 0,
                             Quality = Quality.None
                         };
+                        previousDatumExisted = false;
                     }
                     else previousDatum = previousDatumCollection.ElementAt(0);
 
 
-                    if (nextDatumCollection.Count() == 0)
+                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
+                        var timestamp = currentDate.AddDays(1);
+
                         nextDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day + 1),
+                            Timestamp = timestamp,
                             Value = 0,
                             Quality = Quality.None
                         };
+                        if (nextDatum.Timestamp < toExcluded)
+                            data.Add(nextDatum);
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var tempDate = new DateTime(currentDate.Ticks);
-
-                    var timeDifference = currentDate - previousDatum.Timestamp;
-
-                    var daysDifference = (int)timeDifference.TotalDays;
-                    var valueToAdd = (nextDatum.Value - previousDatum.Value) / daysDifference;
-                    var value = valueToAdd;
                     var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
+                    var daysDifference = (int)timeDifference.TotalDays;
 
-                    if (nextDatum.Timestamp.Day - currentDate.Day != 1)
+                    if (daysDifference > 2)
                     {
-                        while (tempDate < nextDatum.Timestamp)
+                        var tempDate = new DateTime(currentDate.Ticks);
+                        var valueToAdd = (nextDatum.Value - previousDatum.Value) / daysDifference;
+                        var value = valueToAdd + previousDatum.Value;
+
+
+                        while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
                             var missingDatum = new Datum<decimal>()
                             {
@@ -238,41 +248,48 @@ namespace Domain
                     var nextDatumCollection = service.GetDataNewerThan<decimal>(signal, currentDate, 1);
                     Datum<decimal> previousDatum = null;
                     Datum<decimal> nextDatum = null;
-
+                    bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
                         previousDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year - 1, currentDate.Month, currentDate.Day),
+                            Timestamp = currentDate.AddYears(-1),
                             Value = 0,
                             Quality = Quality.None
                         };
+                        previousDatumExisted = false;
                     }
                     else previousDatum = previousDatumCollection.ElementAt(0);
 
 
-                    if (nextDatumCollection.Count() == 0)
+                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
+                        var timestamp = currentDate.AddYears(1);
+
                         nextDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year + 1, currentDate.Month, currentDate.Day),
+                            Timestamp = timestamp,
                             Value = 0,
                             Quality = Quality.None
                         };
+                        if (nextDatum.Timestamp < toExcluded)
+                            data.Add(nextDatum);
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var tempDate = new DateTime(currentDate.Ticks);
-
-                    var yearsDifference = currentDate.Year - previousDatum.Timestamp.Year;
-                    var valueToAdd = (nextDatum.Value - previousDatum.Value) / yearsDifference;
-                    var value = valueToAdd;
                     var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
+                    var yearsDifference = (int)timeDifference.TotalDays/30/12;
 
-                    if (nextDatum.Timestamp.Year - currentDate.Year != 1)
+                    if (yearsDifference > 2)
                     {
-                        while (tempDate < nextDatum.Timestamp)
+                        var tempDate = new DateTime(currentDate.Ticks);
+                        var valueToAdd = (nextDatum.Value - previousDatum.Value) / yearsDifference;
+                        var value = valueToAdd + previousDatum.Value;
+
+
+                        while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
                             var missingDatum = new Datum<decimal>()
                             {
@@ -324,45 +341,48 @@ namespace Domain
                     var nextDatumCollection = service.GetDataNewerThan<decimal>(signal, currentDate, 1);
                     Datum<decimal> previousDatum = null;
                     Datum<decimal> nextDatum = null;
-
+                    bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
                         previousDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, currentDate.Hour,
-                                currentDate.Hour - 1, currentDate.Second),
+                            Timestamp = currentDate.AddHours(-1),
                             Value = 0,
                             Quality = Quality.None
                         };
+                        previousDatumExisted = false;
                     }
                     else previousDatum = previousDatumCollection.ElementAt(0);
 
 
-                    if (nextDatumCollection.Count() == 0)
+                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
+                        var timestamp = currentDate.AddHours(1);
+
                         nextDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, currentDate.Hour,
-                                currentDate.Hour + 1, currentDate.Second),
+                            Timestamp = timestamp,
                             Value = 0,
                             Quality = Quality.None
                         };
+                        if (nextDatum.Timestamp < toExcluded)
+                            data.Add(nextDatum);
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var tempDate = new DateTime(currentDate.Ticks);
-
-                    var timeDifference = currentDate - previousDatum.Timestamp;
-
-                    var hoursDifference = (int)timeDifference.TotalHours;
-                    var valueToAdd = (nextDatum.Value - previousDatum.Value) / hoursDifference;
-                    var value = valueToAdd;
                     var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
+                    var hoursDifference = (int)timeDifference.TotalHours;
 
-                    if (nextDatum.Timestamp.Hour - currentDate.Hour != 1 || currentDate.Day > nextDatum.Timestamp.Day)
+                    if (hoursDifference > 2)
                     {
-                        while (tempDate < nextDatum.Timestamp)
+                        var tempDate = new DateTime(currentDate.Ticks);
+                        var valueToAdd = (nextDatum.Value - previousDatum.Value) / hoursDifference;
+                        var value = valueToAdd + previousDatum.Value;
+
+
+                        while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
                             var missingDatum = new Datum<decimal>()
                             {
@@ -414,45 +434,48 @@ namespace Domain
                     var nextDatumCollection = service.GetDataNewerThan<decimal>(signal, currentDate, 1);
                     Datum<decimal> previousDatum = null;
                     Datum<decimal> nextDatum = null;
-
+                    bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
                         previousDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, currentDate.Hour,
-                                currentDate.Minute - 1, currentDate.Second),
+                            Timestamp = currentDate.AddMinutes(-1),
                             Value = 0,
                             Quality = Quality.None
                         };
+                        previousDatumExisted = false;
                     }
                     else previousDatum = previousDatumCollection.ElementAt(0);
 
 
-                    if (nextDatumCollection.Count() == 0)
+                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
+                        var timestamp = currentDate.AddMinutes(-1);
+
                         nextDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, currentDate.Hour,
-                                currentDate.Minute + 1, currentDate.Second),
+                            Timestamp = timestamp,
                             Value = 0,
                             Quality = Quality.None
                         };
+                        if (nextDatum.Timestamp < toExcluded)
+                            data.Add(nextDatum);
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var tempDate = new DateTime(currentDate.Ticks);
-
-                    var timeDifference = currentDate - previousDatum.Timestamp;
-
-                    var minutesDifference = (int)timeDifference.TotalMinutes;
-                    var valueToAdd = (nextDatum.Value - previousDatum.Value) / minutesDifference;
-                    var value = valueToAdd;
                     var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
+                    var minutesDifference = (int)timeDifference.TotalMinutes;
 
-                    if (nextDatum.Timestamp.Minute - currentDate.Minute != 1 || currentDate.Hour < nextDatum.Timestamp.Hour)
+                    if (minutesDifference > 2)
                     {
-                        while (tempDate < nextDatum.Timestamp)
+                        var tempDate = new DateTime(currentDate.Ticks);
+                        var valueToAdd = (nextDatum.Value - previousDatum.Value) / minutesDifference;
+                        var value = valueToAdd + previousDatum.Value;
+
+
+                        while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
                             var missingDatum = new Datum<decimal>()
                             {
@@ -504,45 +527,48 @@ namespace Domain
                     var nextDatumCollection = service.GetDataNewerThan<decimal>(signal, currentDate, 1);
                     Datum<decimal> previousDatum = null;
                     Datum<decimal> nextDatum = null;
-
+                    bool previousDatumExisted = true;
 
                     if (previousDatumCollection.Count() == 0)
                     {
                         previousDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, currentDate.Hour,
-                                currentDate.Minute, currentDate.Second - 1),
+                            Timestamp = currentDate.AddSeconds(-1),
                             Value = 0,
                             Quality = Quality.None
                         };
+                        previousDatumExisted = false;
                     }
                     else previousDatum = previousDatumCollection.ElementAt(0);
 
 
-                    if (nextDatumCollection.Count() == 0)
+                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
+                        var timestamp = currentDate.AddSeconds(1);
+
                         nextDatum = new Datum<decimal>()
                         {
-                            Timestamp = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, currentDate.Hour,
-                                currentDate.Minute, currentDate.Second + 1),
+                            Timestamp = timestamp,
                             Value = 0,
                             Quality = Quality.None
                         };
+                        if (nextDatum.Timestamp < toExcluded)
+                            data.Add(nextDatum);
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var tempDate = new DateTime(currentDate.Ticks);
-
-                    var timeDifference = currentDate - previousDatum.Timestamp;
-
-                    var secondsDifference = (int)timeDifference.TotalSeconds;
-                    var valueToAdd = (nextDatum.Value - previousDatum.Value) / secondsDifference;
-                    var value = valueToAdd;
                     var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
+                    var secondsDifference = (int)timeDifference.TotalSeconds;
 
-                    if (nextDatum.Timestamp.Second - currentDate.Second != 1 || currentDate.Minute < nextDatum.Timestamp.Minute)
+                    if (secondsDifference > 2)
                     {
-                        while (tempDate < nextDatum.Timestamp)
+                        var tempDate = new DateTime(currentDate.Ticks);
+                        var valueToAdd = (nextDatum.Value - previousDatum.Value) / secondsDifference;
+                        var value = valueToAdd + previousDatum.Value;
+
+
+                        while (tempDate < nextDatum.Timestamp && tempDate < toExcluded)
                         {
                             var missingDatum = new Datum<decimal>()
                             {
@@ -601,7 +627,7 @@ namespace Domain
                     {
                         previousDatum = new Datum<decimal>()
                         {
-                            Timestamp = currentDate.AddMonths(-1), //new DateTime(currentDate.Year, currentDate.Month - 1, currentDate.Day),
+                            Timestamp = currentDate.AddMonths(-1),
                             Value = 0,
                             Quality = Quality.None
                         };
@@ -610,7 +636,7 @@ namespace Domain
                     else previousDatum = previousDatumCollection.ElementAt(0);
 
 
-                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted /*|| DateTime.Compare(currentDate,fromIncluded) == 0*/)
+                    if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
                         var timestamp = currentDate.AddMonths(1);
 
@@ -626,7 +652,7 @@ namespace Domain
                     else nextDatum = nextDatumCollection.ElementAt(0);
                     
                     var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
-                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp; //currentDate - previousDatum.Timestamp;
+                    var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var monthsDifference = (int)timeDifference.TotalDays / 30;
 
                     if (monthsDifference > 2)
