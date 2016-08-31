@@ -1260,6 +1260,22 @@ namespace WebService.Tests
                 dataRepositoryMock.Verify(x => x.DeleteData<int>(signal));
                 missingValuePolicyRepositoryMock.Verify(x => x.Set(signal,null));
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeletingSignal_DeletingDifferentDataTypeSignals()
+            {
+                var signal = ReturnDefaultSignal_IntegerDay().ToDomain<Domain.Signal>();
+                signal.DataType = Domain.DataType.Double;
+                signal.Id = 4;
+                SetupWebService();
+                SignalsRepositoryMock_SetupGet(signal);
+
+                signalsWebService.Delete(signal.Id.Value);
+                signalsRepositoryMock.Verify(x => x.Delete(signal));
+                dataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+                missingValuePolicyRepositoryMock.Verify(x => x.Set(signal, null));
+            }
+
             #endregion
 
             private void SetupMocks_ForCheckingDatums<T>(Dto.Signal signal, IEnumerable<Dto.Datum> data)
