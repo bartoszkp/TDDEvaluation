@@ -241,6 +241,7 @@ namespace Domain.Services.Implementation
             switch (signal.DataType)
             {
                 case DataType.Double: return (T)(Math.Round(((Convert.ToDouble(v1) - Convert.ToDouble(v2))* numberOfPeriods2 / numberOfPeriods1),5).Adapt(v1.GetType(), typeof(double)));
+                case DataType.Decimal: return (T)(Math.Round(((Convert.ToDecimal(v1) - Convert.ToDecimal(v2)) * numberOfPeriods2 / numberOfPeriods1), 5).Adapt(v1.GetType(), typeof(decimal)));
 
                 default: throw new NotImplementedException();
             }
