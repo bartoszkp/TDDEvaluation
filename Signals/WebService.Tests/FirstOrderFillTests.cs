@@ -51,7 +51,7 @@ namespace WebService.Tests
 
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 13, 0));
 
-            var expectedDatum = GetExpectedDatums(Granularity.Second);
+            var expectedDatum = GetExpectedDatums(Granularity.Minute);
 
             AssertEqual(expectedDatum, result);
         }
@@ -205,10 +205,10 @@ namespace WebService.Tests
                     break;
 
                 case Granularity.Minute:
-                    var firstTimestampMinute = new DateTime(2000, 1, 1, 0, 0, 1);
-                    var secondTimestampMinute = new DateTime(2000, 1, 1, 0, 0, 5);
-                    var thirdTimestampMinute = new DateTime(2000, 1, 1, 0, 0, 9);
-                    var fourthTimestampMinute = new DateTime(2000, 1, 1, 0, 0, 12);
+                    var firstTimestampMinute = new DateTime(2000, 1, 1, 0, 1, 0);
+                    var secondTimestampMinute = new DateTime(2000, 1, 1, 0, 5, 0);
+                    var thirdTimestampMinute = new DateTime(2000, 1, 1, 0, 9, 0);
+                    var fourthTimestampMinute = new DateTime(2000, 1, 1, 0, 12, 0);
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, firstTimestampMinute, 1))
