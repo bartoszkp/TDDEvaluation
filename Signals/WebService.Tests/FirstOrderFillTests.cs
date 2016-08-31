@@ -21,7 +21,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenADoubleSecondSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
-            SetupFirstOrderPolicy(Granularity.Second, Domain.Quality.Fair,
+            SetupFirstOrderPolicy<double>(Granularity.Second, Domain.Quality.Fair,
                 new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13), new List<Datum<double>>()
                 {
                     new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)1 },
@@ -32,14 +32,33 @@ namespace WebService.Tests
 
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13));
 
-            var expectedDatum = GetExpectedDatums(Granularity.Second);
+            var expectedDatum = GetExpectedDatums(Granularity.Second, DataType.Double);
+
+            AssertEqual(expectedDatum, result);
+        }
+
+        [TestMethod]
+        public void GivenAnIntegerSecondSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
+        {
+            SetupFirstOrderPolicy<int>(Granularity.Second, Domain.Quality.Fair,
+                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13), new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (int)11 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 9), Value = (int)5 },
+                    new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12), Value = (int)20 }
+                }, DataType.Integer);
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13));
+
+            var expectedDatum = GetExpectedDatums(Granularity.Second, DataType.Integer);
 
             AssertEqual(expectedDatum, result);
         }
 
 
-        private void SetupFirstOrderPolicy(Granularity granularity, Domain.Quality FirstOrderPolicyQuality,
-            DateTime fromIncluded, DateTime toExluded, List<Datum<double>> actualToBeReturnedByMockDatums, DataType signalDataType)
+        private void SetupFirstOrderPolicy<T>(Granularity granularity, Domain.Quality FirstOrderPolicyQuality,
+            DateTime fromIncluded, DateTime toExluded, List<Datum<T>> actualToBeReturnedByMockDatums, DataType signalDataType)
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
             signalsWebService = new SignalsWebService(domainService);
@@ -68,10 +87,10 @@ namespace WebService.Tests
                     break;
             }
 
-            dataRepoMock.Setup(d => d.GetData<double>(returnedSignal, fromIncluded, toExluded))
+            dataRepoMock.Setup(d => d.GetData<T>(returnedSignal, fromIncluded, toExluded))
                 .Returns(actualToBeReturnedByMockDatums);
 
-            SetupGetDataOlderAndNewerThanForSecondSignal(returnedSignal);
+            SetupGetDataOlderAndNewerThanForSignal(returnedSignal);
         }
 
         private void AssertEqual(List<Dto.Datum> expectedDatums, IEnumerable<Dto.Datum> actualDatums)
@@ -89,99 +108,187 @@ namespace WebService.Tests
             }
         }
 
-        private List<Dto.Datum> GetExpectedDatums(Granularity granularity)
+        private List<Dto.Datum> GetExpectedDatums(Granularity granularity, DataType signalDataType)
         {
             switch (granularity)
             {
                 case Granularity.Second:
-                    return new List<Dto.Datum>()
-                    {
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)1 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (double)3 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = (double)5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = (double)7 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = (double)9 },
-                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (double)11 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 6), Value = (double)9.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 7), Value = (double)8 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 8), Value = (double)6.5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 9), Value = (double)5 },
-                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 10), Value = (double)10 },
-                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 11), Value = (double)15 },
-                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12), Value = (double)20 },
-                    };
+                    if(signalDataType == DataType.Double)
+                        return new List<Dto.Datum>()
+                        {
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)1 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (double)3 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = (double)5 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = (double)7 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = (double)9 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (double)11 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 6), Value = (double)9.5 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 7), Value = (double)8 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 8), Value = (double)6.5 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 9), Value = (double)5 },
+                            new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 10), Value = (double)10 },
+                            new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 11), Value = (double)15 },
+                            new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12), Value = (double)20 },
+                        };
+                    else if(signalDataType == DataType.Integer)
+                        return new List<Dto.Datum>()
+                        {
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 1), Value = (int)3 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 2), Value = (int)5 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = (int)7 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = (int)9 },
+                            new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (int)11 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 6), Value = (int)10 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 7), Value = (int)9 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 8), Value = (int)8 },
+                            new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 9), Value = (int)7 },
+                            new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 10), Value = (int)14 },
+                            new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 11), Value = (int)21 },
+                            new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12), Value = (int)28 },
+                        };
+                    break;
             }
             return null;
         }
 
-        private void SetupGetDataOlderAndNewerThanForSecondSignal(Signal returnedSignal)
+        private void SetupGetDataOlderAndNewerThanForSignal(Signal returnedSignal)
         {
             switch (returnedSignal.Granularity)
             {
                 case Granularity.Second:
-                    var firstTimestamp = new DateTime(2000, 1, 1, 0, 0, 1);
-                    var secondTimestamp = new DateTime(2000, 1, 1, 0, 0, 5);
-                    var thirdTimestamp = new DateTime(2000, 1, 1, 0, 0, 9);
-                    var fourthTimestamp = new DateTime(2000, 1, 1, 0, 0, 12);
+                    if (returnedSignal.DataType == DataType.Double)
+                    {
+                        var firstTimestamp = new DateTime(2000, 1, 1, 0, 0, 1);
+                        var secondTimestamp = new DateTime(2000, 1, 1, 0, 0, 5);
+                        var thirdTimestamp = new DateTime(2000, 1, 1, 0, 0, 9);
+                        var fourthTimestamp = new DateTime(2000, 1, 1, 0, 0, 12);
 
-                    dataRepoMock
-                        .Setup(d => d.GetDataOlderThan<double>(returnedSignal, firstTimestamp, 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = firstTimestamp.AddSeconds(-1), Value = (double)1 }
-                        });
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<double>(returnedSignal, firstTimestamp, 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = firstTimestamp.AddSeconds(-1), Value = (double)1 }
+                            });
 
-                    dataRepoMock
-                        .Setup(d => d.GetDataNewerThan<double>(returnedSignal, firstTimestamp, 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (double)11 }
-                        });
-
-
-                    dataRepoMock
-                        .Setup(d => d.GetDataOlderThan<double>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (double)11 }
-                        });
-
-                    dataRepoMock
-                        .Setup(d => d.GetDataNewerThan<double>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (double)5 }
-                        });
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<double>(returnedSignal, firstTimestamp, 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (double)11 }
+                            });
 
 
-                    dataRepoMock
-                        .Setup(d => d.GetDataOlderThan<double>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (double)5 }
-                        });
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<double>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (double)11 }
+                            });
 
-                    dataRepoMock
-                        .Setup(d => d.GetDataNewerThan<double>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (double)20 }
-                        });
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<double>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (double)5 }
+                            });
 
 
-                    dataRepoMock
-                        .Setup(d => d.GetDataOlderThan<double>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (double)20 }
-                        });
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<double>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (double)5 }
+                            });
 
-                    dataRepoMock
-                        .Setup(d => d.GetDataNewerThan<double>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
-                        .Returns(new List<Datum<double>>()
-                        {
-                                new Datum<double>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = fourthTimestamp.AddSeconds(1), Value = default(double) }
-                        });
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<double>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (double)20 }
+                            });
+
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<double>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (double)20 }
+                            });
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<double>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<double>>()
+                            {
+                                    new Datum<double>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = fourthTimestamp.AddSeconds(1), Value = default(double) }
+                            });
+                    }
+                    else if(returnedSignal.DataType == DataType.Integer)
+                    {
+                        var firstTimestamp = new DateTime(2000, 1, 1, 0, 0, 1);
+                        var secondTimestamp = new DateTime(2000, 1, 1, 0, 0, 5);
+                        var thirdTimestamp = new DateTime(2000, 1, 1, 0, 0, 9);
+                        var fourthTimestamp = new DateTime(2000, 1, 1, 0, 0, 12);
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<int>(returnedSignal, firstTimestamp, 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = firstTimestamp.AddSeconds(-1), Value = (int)1 }
+                            });
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<int>(returnedSignal, firstTimestamp, 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (int)11 }
+                            });
+
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<int>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (int)11 }
+                            });
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<int>(returnedSignal, secondTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (int)7 }
+                            });
+
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<int>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestamp, Value = (int)7 }
+                            });
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<int>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (int)28 }
+                            });
+
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataOlderThan<int>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestamp, Value = (int)28 }
+                            });
+
+                        dataRepoMock
+                            .Setup(d => d.GetDataNewerThan<int>(returnedSignal, fourthTimestamp.AddSeconds(1), 1))
+                            .Returns(new List<Datum<int>>()
+                            {
+                    new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = fourthTimestamp.AddSeconds(1), Value = default(int) }
+                            });
+                    }
                     break;
             }
         }
