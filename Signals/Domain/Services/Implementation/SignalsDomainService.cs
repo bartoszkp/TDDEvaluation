@@ -133,7 +133,9 @@ namespace Domain.Services.Implementation
             else if (mvp is MissingValuePolicy.FirstOrderMissingValuePolicy<T>)
             {
                 Datum<T> olderDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).FirstOrDefault();
-                return Datum<T>.CreateNone(signal, timeStamp);
+                Datum<T> newerDatum = this.signalsDataRepository.GetDataNewerThan<T>(signal, timeStamp, 1).FirstOrDefault();
+
+                    return Datum<T>.CreateNone(signal, timeStamp);
             }
             return new Datum<T>();
         }
