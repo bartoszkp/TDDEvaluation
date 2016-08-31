@@ -170,16 +170,17 @@ namespace Domain.Services.Implementation
                     dataList.Clear();
                     foreach (var item in dataIntList)
                     {
-                        dataList.Add(new Datum<T>()
-                        {
-                            Value = (T)Convert.ChangeType(item.Value, typeof(T)),
-                            Timestamp = item.Timestamp,
-                            Quality = item.Quality
-                            
-                        });
+                        if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
+                            dataList.Add(new Datum<T>()
+                            {
+                                Value = (T)Convert.ChangeType(item.Value, typeof(T)),
+                                Timestamp = item.Timestamp,
+                                Quality = item.Quality
+
+                            });
                     }
 
-                    return dataList.OrderBy(s => s.Timestamp).ToList(); 
+                    return dataList.OrderBy(s => s.Timestamp).ToList();
 
                 }
 
@@ -192,19 +193,43 @@ namespace Domain.Services.Implementation
                     dataList.Clear();
                     foreach (var item in dataDecimalList)
                     {
-                        dataList.Add(new Datum<T>()
-                        {
-                            Value = (T)Convert.ChangeType(item.Value, typeof(T)),
-                            Timestamp = item.Timestamp,
-                            Quality = item.Quality
 
-                        });
+                        if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
+                            dataList.Add(new Datum<T>()
+                            {
+                                Value = (T)Convert.ChangeType(item.Value, typeof(T)),
+                                Timestamp = item.Timestamp,
+                                Quality = item.Quality
+
+                            });
                     }
 
                     return dataList.OrderBy(s => s.Timestamp).ToList();
 
                 }
 
+                else if (typeof(T) == typeof(double))
+                {
+                    var dataDoubleList = this.signalsDataRepository
+                        .GetData<double>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
+
+                    FirstOrderDataFillHelperDouble.FillMissingData(signal, this, dataDoubleList, fromIncludedUTC, toExcludedUTC);
+                    dataList.Clear();
+                    foreach (var item in dataDoubleList)
+                    {
+                        if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
+                            dataList.Add(new Datum<T>()
+                            {
+                                Value = (T)Convert.ChangeType(item.Value, typeof(T)),
+                                Timestamp = item.Timestamp,
+                                Quality = item.Quality
+
+                            });
+                    }
+
+                    return dataList.OrderBy(s => s.Timestamp).ToList();
+
+                }
 
             }
 
