@@ -244,7 +244,7 @@ namespace Domain.Services.Implementation
                 case DataType.Decimal: return (T)(Math.Round(((Convert.ToDecimal(v1) - Convert.ToDecimal(v2)) * numberOfPeriods2 / numberOfPeriods1), 5).Adapt(v1.GetType(), typeof(decimal)));
                 case DataType.Integer: return (T)((Convert.ToInt32(v1) - Convert.ToInt32(v2)) * numberOfPeriods2 / numberOfPeriods1).Adapt(v1.GetType(), typeof(Int32));
 
-                default: throw new NotImplementedException();
+                default: throw new ArgumentException();
             }
         }
 
