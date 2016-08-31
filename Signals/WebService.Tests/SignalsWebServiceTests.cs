@@ -894,7 +894,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndFirsOrderMvp_WhenGettingData_CheckIfDataGettingProperly()
+            public void GivenASignalAndFirsOrderMvp_WhenGettingData_CheckIfReturnedDataIsCorrect()
             {
                 int signalId = 5;
                 var signal = SignalWith(
@@ -902,32 +902,35 @@ namespace WebService.Tests
                     dataType: Domain.DataType.Double,
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal"));
-                GivenASignal(signal);
 
+                Datum<double> olderDatum = new Datum<double>()
+                { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0, Signal = signal };
+                Datum<double> newerDatum = new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 };
+
+                List<Datum<double>> datums = new List<Datum<double>>(){
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
+                    olderDatum,
+                    newerDatum
+                };
+
+                GivenASignal(signal);
+               
                 GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
 
                 signalsDataRepositoryMock.Setup(sdr =>
                 sdr.GetDataOlderThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
-                .Returns(new List<Datum<double>>());
+                .Returns(new List<Datum<double>>(new Datum<double>[] { olderDatum }));
 
                 signalsDataRepositoryMock.Setup(sdr =>
                 sdr.GetDataNewerThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
-                .Returns(new List<Datum<double>>());
-
-                List<Datum<double>> datums = new List<Datum<double>>(){
-                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
-                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
-                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 }
-                };
+                .Returns(new List<Datum<double>>(new Datum<double>[] { newerDatum }));       
 
                 GivenData(signalId, datums);
 
-                List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1)).ToList();
+                List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1)).ToList();
 
-                Assert.AreEqual(result[0].Value, 5.0);
-                Assert.AreEqual(result[2].Value, datums[0].Value);
-                Assert.AreEqual(result[6].Value, datums[1].Value);
-                Assert.AreEqual(result[9].Value, datums[2].Value);
+                Assert.AreEqual(3.0, result[0].Value);
+                Assert.AreEqual(Dto.Quality.Fair, result[0].Quality);
             }
 
             [TestMethod]
