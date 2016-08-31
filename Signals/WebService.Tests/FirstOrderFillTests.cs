@@ -21,7 +21,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenADoubleSecondSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
-            SetupFirstOrderPolicy<double>(Granularity.Second, Domain.Quality.Fair,
+            SetupFirstOrderPolicy<double>(Granularity.Second,
                 new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13), new List<Datum<double>>()
                 {
                     new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (double)1 },
@@ -40,7 +40,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerSecondSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
-            SetupFirstOrderPolicy<int>(Granularity.Second, Domain.Quality.Fair,
+            SetupFirstOrderPolicy<int>(Granularity.Second,
                 new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13), new List<Datum<int>>()
                 {
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
@@ -57,7 +57,7 @@ namespace WebService.Tests
         }
 
 
-        private void SetupFirstOrderPolicy<T>(Granularity granularity, Domain.Quality FirstOrderPolicyQuality,
+        private void SetupFirstOrderPolicy<T>(Granularity granularity,
             DateTime fromIncluded, DateTime toExluded, List<Datum<T>> actualToBeReturnedByMockDatums, DataType signalDataType)
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
