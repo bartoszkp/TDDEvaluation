@@ -902,6 +902,31 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.SignalDoesNotExist))]
+            public void GivenASignal_WhenDeletingSignalWithWrongId_ExceptionIsThrown()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+                
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(2);
+            }
+
+            [TestMethod]
             public void GivenASignal_WhenDeletingThisSignal_CheckIfItsMissingValuePolicyIsSetToNull()
             {
                 var existingSignal = new Signal()
