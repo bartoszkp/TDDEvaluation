@@ -840,6 +840,28 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(1999, 12, 1), resultData.First().Timestamp);
             }
 
+            [TestMethod]
+            public void GivenASignal_WithoutEalierData_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDouble_ReturnsNoneQualityData()
+            {
+                int dummyId = 1;
+
+                var data = new[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 } };
+
+                GivenASignalWithData(dummyId, data);
+                GivenMissingValuePolicy(dummyId, new FirstOrderMissingValuePolicyDouble());
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataNewerThan<double>(It.Is<Signal>(s => s.Id == dummyId), new DateTime(1999, 12, 1), 1))
+                    .Returns(data);
+
+                var resultData = signalsWebService.GetData(dummyId, new DateTime(1999, 12, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(1, resultData.Count());
+                Assert.AreEqual("None", resultData.First().Quality.ToString());
+                Assert.AreEqual(Convert.ToDouble(0), resultData.First().Value);
+                Assert.AreEqual(new DateTime(1999, 12, 1), resultData.First().Timestamp);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
