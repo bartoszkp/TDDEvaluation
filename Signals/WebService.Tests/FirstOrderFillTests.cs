@@ -127,7 +127,7 @@ namespace WebService.Tests
 
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2001, 2, 1, 0, 0, 0));
 
-            var expectedDatum = GetExpectedDatums(Granularity.Day);
+            var expectedDatum = GetExpectedDatums(Granularity.Month);
 
             AssertEqual(expectedDatum, result);
         }
@@ -273,7 +273,7 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 7, 1, 0, 0, 0), Value = (int)10 },
                         new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 8, 1, 0, 0, 0), Value = (int)9 },
                         new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 9, 1, 0, 0, 0), Value = (int)8 },
-                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 11, 1, 0, 0, 0), Value = (int)7 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 10, 1, 0, 0, 0), Value = (int)7 },
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 11, 1, 0, 0, 0), Value = (int)14 },
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 12, 1, 0, 0, 0), Value = (int)21 },
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2001, 1, 1, 0, 0, 0), Value = (int)28 },

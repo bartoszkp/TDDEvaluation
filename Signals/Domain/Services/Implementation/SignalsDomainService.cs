@@ -590,7 +590,7 @@ namespace Domain.Services.Implementation
                         }
                     case Granularity.Month:
                         {
-                            int countElementOfList = toExcludedUtc.Month - fromIncludedUtc.Month;
+                            int countElementOfList = ((toExcludedUtc.Year - fromIncludedUtc.Year) * 12) + toExcludedUtc.Month - fromIncludedUtc.Month;
                             if (countElementOfList+1 == gettingList.Length)
                                 return gettingList;
                             for (int i = 0; i < countElementOfList; i++)
@@ -632,6 +632,38 @@ namespace Domain.Services.Implementation
                                                 addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
                                             }
                                         }
+                                    }
+
+                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                                    {
+                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
+                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
+
+                                        var timeDifference = ((x1.ElementAt(0).Timestamp.Year - x0.ElementAt(0).Timestamp.Year) * 12) 
+                                            + (x1.ElementAt(0).Timestamp.Month - x0.ElementAt(0).Timestamp.Month);
+
+                                        var qualityToAdd = x1.ElementAt(0).Quality;
+
+                                        decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
+                                        decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
+
+                                        for (int j = 0; j < timeDifference; j++, i++)
+                                        {
+                                            valueToAdd += avarage;
+                                            var itemToAdd = new Datum<T>()
+                                            {
+                                                Quality = qualityToAdd,
+                                                Signal = signal,
+                                                Timestamp = checkedDateTime,
+                                                Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                            };
+
+                                            returnList.Add(itemToAdd);
+                                            checkedDateTime = checkedDateTime.AddMonths(1);
+                                        }
+
+                                        checkedDateTime = checkedDateTime.AddMonths(-1);
+                                        addingItem = null;
                                     }
 
                                     else
