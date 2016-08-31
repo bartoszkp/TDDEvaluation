@@ -19,8 +19,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -39,7 +39,7 @@ namespace Domain.Services.Implementation
             {
                 return signal;
             }
-            
+
             string typeName = signal.DataType.GetNativeType().Name;
 
             switch (typeName)
@@ -106,13 +106,13 @@ namespace Domain.Services.Implementation
                 throw new Domain.Exceptions.InvalidTimeStampException();
             }
 
-            if(data == null)
+            if (data == null)
             {
                 this.signalsDataRepository.SetData<T>(data);
                 return;
             }
 
-            foreach(var d in data)
+            foreach (var d in data)
             {
                 d.Signal = signal;
             }
@@ -129,7 +129,7 @@ namespace Domain.Services.Implementation
 
             if (!isTimeStampValid(signal, dataToCheck))
             {
-                throw new Domain.Exceptions.InvalidTimeStampException();
+                throw new InvalidTimeStampException();
             }
 
             MissingValuePolicy<T> missingValuePolicy;
@@ -144,11 +144,11 @@ namespace Domain.Services.Implementation
 
             if (data == null)
                 return null;
-            
+
 
             if (mvp is ZeroOrderMissingValuePolicy<T>)
             {
-                ZeroOrderDataFillHelper.FillMissingData(this, signal,dataList, fromIncludedUTC, toExcludedUTC);
+                ZeroOrderDataFillHelper.FillMissingData(this, signal, dataList, fromIncludedUTC, toExcludedUTC);
                 return dataList.OrderBy(s => s.Timestamp).ToList();
             }
 
@@ -157,6 +157,55 @@ namespace Domain.Services.Implementation
                 var specificMvp = mvp as SpecificValueMissingValuePolicy<T>;
                 SpecificDataFillHelper.FillMissingData(specificMvp, dataList, fromIncludedUTC, toExcludedUTC);
                 return dataList.OrderBy(s => s.Timestamp).ToList();
+            }
+
+            if (mvp is FirstOrderMissingValuePolicy<T>)
+            {
+                if (typeof(T) == typeof(int))
+                {
+                    var dataIntList = this.signalsDataRepository
+                        .GetData<int>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
+
+                    FirstOrderDataFillHelperInt.FillMissingData(signal, this, dataIntList, fromIncludedUTC, toExcludedUTC);
+                    dataList.Clear();
+                    foreach (var item in dataIntList)
+                    {
+                        dataList.Add(new Datum<T>()
+                        {
+                            Value = (T)Convert.ChangeType(item.Value, typeof(T)),
+                            Timestamp = item.Timestamp,
+                            Quality = item.Quality
+                            
+                        });
+                    }
+
+                    return dataList.OrderBy(s => s.Timestamp).ToList(); 
+
+                }
+
+                else if (typeof(T) == typeof(decimal))
+                {
+                    var dataDecimalList = this.signalsDataRepository
+                        .GetData<decimal>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
+
+                    FirstOrderDataFillHelperDecimal.FillMissingData(signal, this, dataDecimalList, fromIncludedUTC, toExcludedUTC);
+                    dataList.Clear();
+                    foreach (var item in dataDecimalList)
+                    {
+                        dataList.Add(new Datum<T>()
+                        {
+                            Value = (T)Convert.ChangeType(item.Value, typeof(T)),
+                            Timestamp = item.Timestamp,
+                            Quality = item.Quality
+
+                        });
+                    }
+
+                    return dataList.OrderBy(s => s.Timestamp).ToList();
+
+                }
+
+
             }
 
 
@@ -183,7 +232,7 @@ namespace Domain.Services.Implementation
             var timestampEnd = toExcludedUTC;
             var dateTimeComparator = DateTime.Compare(timestampBegin, timestampEnd);
 
-            if(dateTimeComparator > 0)
+            if (dateTimeComparator > 0)
             {
                 for (int i = 0; i < data.Count(); i++)
                 {
@@ -199,7 +248,7 @@ namespace Domain.Services.Implementation
                 missingValuePolicy = GetMissingValuePolicy(signal)
                 as MissingValuePolicy.MissingValuePolicy<T>;
 
-                return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
+            return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
         }
 
         public PathEntry GetPathEntry(Path path)
@@ -211,7 +260,7 @@ namespace Domain.Services.Implementation
 
             foreach (var signal in result)
             {
-                if(signal.Path.ToString().LastIndexOf('/') == path.ToString().Length)
+                if (signal.Path.ToString().LastIndexOf('/') == path.ToString().Length)
                     signals.Add(signal);
 
                 var pathToAdd = signal.Path.GetPrefix(path.Length + 1);
@@ -225,6 +274,11 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetDataOlderThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount)
         {
             return this.signalsDataRepository.GetDataOlderThan<T>(signal, excludedUtc, maxSampleCount);
+        }
+
+        public IEnumerable<Datum<T>> GetDataNewerThan<T>(Signal signal, DateTime excludedUtc, int maxSampleCount)
+        {
+            return this.signalsDataRepository.GetDataNewerThan<T>(signal, excludedUtc, maxSampleCount);
         }
 
 
@@ -290,5 +344,7 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository.Set(signal, null);
             this.signalsRepository.Delete(signal);
         }
+
+
     }
 }
