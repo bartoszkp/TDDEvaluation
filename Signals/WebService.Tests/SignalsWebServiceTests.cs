@@ -870,9 +870,39 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(s => s.GetAllWithPathPrefix(It.IsAny<Path>()));
             }
-
-            //Bug fixing 
             
+            [TestMethod]
+            public void GivenASignal_WhenDeletingASignal_ProperSignalRepositoryDeleteIsCalled()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Delete(existingSignal));
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(existingSignal.Id.Value);
+
+                signalsRepositoryMock
+                    .Verify(srm => srm.Delete(existingSignal));
+            }
+            
+            //Bug fixing 
+
             [TestMethod]
             public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathWithCollectionOfSignalsFromMainDirectoryAndSubpathsFromMainDirectory()
             {
