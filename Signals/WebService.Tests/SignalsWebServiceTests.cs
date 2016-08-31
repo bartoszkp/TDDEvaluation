@@ -1223,7 +1223,7 @@ namespace WebService.Tests
             }
 
             #endregion
-            #region #24 (Feature: Deleting a signal)
+            #region Issue #24 (Feature: Deleting a signal)
 
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
@@ -1236,18 +1236,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenDeletingSignal_VerifyIfRepositoryFunctionWasUsed()
-            {
-                var signal = ReturnDefaultSignal_IntegerDay().ToDomain<Domain.Signal>();
-                signal.Id = 4;
-                SetupWebService();
-                SignalsRepositoryMock_SetupGet(signal);
-
-                signalsWebService.Delete(signal.Id.Value);
-                signalsRepositoryMock.Verify(x => x.Delete(signal));
-            }
-
-            [TestMethod]
             public void GivenASignal_WhenDeletingSignal_DeletingSignalsDataAndPolicy()
             {
                 var signal = ReturnDefaultSignal_IntegerDay().ToDomain<Domain.Signal>();
@@ -1255,10 +1243,7 @@ namespace WebService.Tests
                 SetupWebService();
                 SignalsRepositoryMock_SetupGet(signal);
 
-                signalsWebService.Delete(signal.Id.Value);
-                signalsRepositoryMock.Verify(x => x.Delete(signal));
-                dataRepositoryMock.Verify(x => x.DeleteData<int>(signal));
-                missingValuePolicyRepositoryMock.Verify(x => x.Set(signal,null));
+                DeleteAndVerifyDeletedSignal<int>(signal);
             }
 
             [TestMethod]
@@ -1270,13 +1255,18 @@ namespace WebService.Tests
                 SetupWebService();
                 SignalsRepositoryMock_SetupGet(signal);
 
-                signalsWebService.Delete(signal.Id.Value);
-                signalsRepositoryMock.Verify(x => x.Delete(signal));
-                dataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
-                missingValuePolicyRepositoryMock.Verify(x => x.Set(signal, null));
+                DeleteAndVerifyDeletedSignal<double>(signal);
             }
 
             #endregion
+
+            private void DeleteAndVerifyDeletedSignal<T>(Domain.Signal signal)
+            {
+                signalsWebService.Delete(signal.Id.Value);
+                signalsRepositoryMock.Verify(x => x.Delete(signal));
+                dataRepositoryMock.Verify(x => x.DeleteData<T>(signal));
+                missingValuePolicyRepositoryMock.Verify(x => x.Set(signal, null));
+            }
 
             private void SetupMocks_ForCheckingDatums<T>(Dto.Signal signal, IEnumerable<Dto.Datum> data)
             {
