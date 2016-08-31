@@ -725,6 +725,37 @@ namespace Domain.Services.Implementation
                                         }
                                     }
 
+                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                                    {
+                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
+                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
+
+                                        var timeDifference = x1.ElementAt(0).Timestamp.Year - x0.ElementAt(0).Timestamp.Year;
+
+                                        var qualityToAdd = x1.ElementAt(0).Quality;
+
+                                        decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
+                                        decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
+
+                                        for (int j = 0; j < timeDifference; j++, i++)
+                                        {
+                                            valueToAdd += avarage;
+                                            var itemToAdd = new Datum<T>()
+                                            {
+                                                Quality = qualityToAdd,
+                                                Signal = signal,
+                                                Timestamp = checkedDateTime,
+                                                Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                            };
+
+                                            returnList.Add(itemToAdd);
+                                            checkedDateTime = checkedDateTime.AddYears(1);
+                                        }
+
+                                        checkedDateTime = checkedDateTime.AddYears(-1);
+                                        addingItem = null;
+                                    }
+
                                     else
                                     {
                                         addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };

@@ -720,10 +720,10 @@ namespace WebService.Tests
                     break;
 
                 case Granularity.Year:
-                    var firstTimestampYear = new DateTime(2000, 2, 1, 0, 0, 0);
-                    var secondTimestampYear = new DateTime(2000, 6, 1, 0, 0, 0);
-                    var thirdTimestampYear = new DateTime(2000, 10, 1, 0, 0, 0);
-                    var fourthTimestampYear = new DateTime(2001, 1, 1, 0, 0, 0);
+                    var firstTimestampYear = new DateTime(2001, 1, 1, 0, 0, 0);
+                    var secondTimestampYear = new DateTime(2005, 1, 1, 0, 0, 0);
+                    var thirdTimestampYear = new DateTime(2009, 1, 1, 0, 0, 0);
+                    var fourthTimestampYear = new DateTime(2012, 1, 1, 0, 0, 0);
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, firstTimestampYear, 1))
