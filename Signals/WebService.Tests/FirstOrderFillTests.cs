@@ -94,6 +94,25 @@ namespace WebService.Tests
             AssertEqual(expectedDatum, result);
         }
 
+        [TestMethod]
+        public void GivenAnIntegerWeeklySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
+        {
+            SetupFirstOrderPolicy(Granularity.Week,
+                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 4, 3, 0, 0, 0), new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 7, 0, 0, 0), Value = (int)11 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 6, 0, 0, 0), Value = (int)5 },
+                    new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 27, 0, 0, 0), Value = (int)20 }
+                });
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 3, 0, 0, 0), new DateTime(2000, 4, 3, 0, 0, 0));
+
+            var expectedDatum = GetExpectedDatums(Granularity.Week);
+
+            AssertEqual(expectedDatum, result);
+        }
+
         private void SetupFirstOrderPolicy(Granularity granularity,
             DateTime fromIncluded, DateTime toExluded, List<Datum<int>> actualToBeReturnedByMockDatums)
         {
@@ -203,6 +222,24 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 11, 0, 0, 0), Value = (int)14 },
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 12, 0, 0, 0), Value = (int)21 },
                         new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 13, 0, 0, 0), Value = (int)28 },
+                    };
+
+                case Granularity.Week:
+                    return new List<Dto.Datum>()
+                    {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 3, 0, 0, 0), Value = (int)1 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 10, 0, 0, 0), Value = (int)3 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 17, 0, 0, 0), Value = (int)5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 24, 0, 0, 0), Value = (int)7 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 31, 0, 0, 0), Value = (int)9 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 7, 0, 0, 0), Value = (int)11 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 2, 14, 0, 0, 0), Value = (int)10 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 2, 21, 0, 0, 0), Value = (int)9 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 2, 28, 0, 0, 0), Value = (int)8 },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 6, 0, 0, 0), Value = (int)7 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 13, 0, 0, 0), Value = (int)14 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 20, 0, 0, 0), Value = (int)21 },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 27, 0, 0, 0), Value = (int)28 },
                     };
             }
             return null;
@@ -473,6 +510,72 @@ namespace WebService.Tests
                         .Returns(new List<Datum<int>>()
                         {
                             new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = fourthTimestampDay.AddDays(1), Value = default(int) }
+                        });
+                    break;
+
+                case Granularity.Week:
+                    var firstTimestampWeek = new DateTime(2000, 1, 3, 0, 0, 0);
+                    var secondTimestampWeek = new DateTime(2000, 2, 7, 0, 0, 0);
+                    var thirdTimestampWeek = new DateTime(2000, 3, 6, 0, 0, 0);
+                    var fourthTimestampWeek = new DateTime(2000, 3, 27, 0, 0, 0);
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, firstTimestampWeek, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = firstTimestampWeek.AddDays(-7), Value = (int)1 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, firstTimestampWeek, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestampWeek, Value = (int)11 }
+                        });
+
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, secondTimestampWeek.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = secondTimestampWeek, Value = (int)11 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, secondTimestampWeek.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestampWeek, Value = (int)7 }
+                        });
+
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, thirdTimestampWeek.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = thirdTimestampWeek, Value = (int)7 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, thirdTimestampWeek.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestampWeek, Value = (int)28 }
+                        });
+
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, fourthTimestampWeek.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Poor, Signal = returnedSignal, Timestamp = fourthTimestampWeek, Value = (int)28 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, fourthTimestampWeek.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = fourthTimestampWeek.AddDays(7), Value = default(int) }
                         });
                     break;
             }
