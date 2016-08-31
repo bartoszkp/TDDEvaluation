@@ -21,6 +21,9 @@ namespace Domain.MissingValuePolicy
                 return filledList;
             }
 
+            if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
+                throw new Exception("First Order MVP can be set only for numeric types.");
+
             if (datumsArray.Length == 0)
                 EmptyDatumsCase(signal, filledList, fromIncludedUtc, toExcludedUtc, earlierDatum, laterDatum);
             else
