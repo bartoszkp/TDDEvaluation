@@ -160,6 +160,8 @@ namespace Domain.Services.Implementation
         public void Delete(int signalId)
         {
             var signal = GetById(signalId);
+            if (signal == null)
+                throw new IdNotNullException();
             SetMissingValuePolicy(signalId, null);
             signalsRepository.Delete(signal);
         }

@@ -9,4 +9,12 @@ namespace Domain.Exceptions
         {
         }
     }
+
+    public class DataTypeWrongFormatException: Exception
+    {
+        public DataTypeWrongFormatException(): base("Datatype must be Decimal, Double or Integer format.")
+        {
+
+        }
+    }
 }
