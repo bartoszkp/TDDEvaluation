@@ -45,6 +45,15 @@ namespace Domain.Services.Implementation
             return this.signalsRepository.Get(signalId);
         }
 
+        public void Delete(int signalId)
+        {
+            var signal = signalsRepository.Get(signalId);
+            if (signal == null)
+                throw new ArgumentException();
+
+            signalsRepository.Delete(signal);
+        }
+
         public void SetData<T>(IEnumerable<Datum<T>> data)
         {
             signalsDataRepository.SetData(data);

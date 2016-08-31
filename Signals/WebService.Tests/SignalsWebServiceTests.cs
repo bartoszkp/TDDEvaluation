@@ -1236,14 +1236,14 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenDeletingSignal_ReturnsNullIfDeletedSignalIsNotExisting()
+            public void GivenASignal_WhenDeletingSignal_VerifyIfRepositoryFunctionWasUsed()
             {
-                var signal = ReturnDefaultSignal_IntegerDay();
+                var signal = ReturnDefaultSignal_IntegerDay().ToDomain<Domain.Signal>();
                 signal.Id = 4;
-                GivenASignal(signal.ToDomain<Domain.Signal>());
+                GivenASignal(signal);
                 
                 signalsWebService.Delete(signal.Id.Value);
-                Assert.IsNull(signalsWebService.GetById(signal.Id.Value));
+                signalsRepositoryMock.Verify(x => x.Delete(signal));
             }
 
             #endregion
