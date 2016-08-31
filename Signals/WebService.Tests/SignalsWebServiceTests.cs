@@ -1223,6 +1223,19 @@ namespace WebService.Tests
             }
 
             #endregion
+            #region #24 (Feature: Deleting a signal)
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenNoSignals_WhenDeletingSignal_ThrowsArgumentException()
+            {
+                GivenNoSignals();
+
+                int nonExistngSignalId = 7;
+                signalsWebService.Delete(nonExistngSignalId);
+            }
+
+            #endregion
 
             private void SetupMocks_ForCheckingDatums<T>(Dto.Signal signal, IEnumerable<Dto.Datum> data)
             {
