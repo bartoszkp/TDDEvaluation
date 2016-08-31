@@ -1235,6 +1235,17 @@ namespace WebService.Tests
                 signalsWebService.Delete(nonExistngSignalId);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenDeletingSignal_ReturnsNullIfDeletedSignalIsNotExisting()
+            {
+                var signal = ReturnDefaultSignal_IntegerDay();
+                signal.Id = 4;
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+                
+                signalsWebService.Delete(signal.Id.Value);
+                Assert.IsNull(signalsWebService.GetById(signal.Id.Value));
+            }
+
             #endregion
 
             private void SetupMocks_ForCheckingDatums<T>(Dto.Signal signal, IEnumerable<Dto.Datum> data)
