@@ -956,6 +956,156 @@ namespace WebService.Tests
                     .Verify(mvprm => mvprm.Set(existingSignal, null));
             }
 
+            [TestMethod]
+            public void GivenADoubleSignal_WhenDeletingThisSignal_CheckIfItsDataIsDeleted()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.DeleteData<double>(existingSignal));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(existingSignal.Id.Value);
+
+                signalDataRepositoryMock
+                    .Verify(sdrm => sdrm.DeleteData<double>(existingSignal));
+            }
+
+            [TestMethod]
+            public void GivenAnIntegerSignal_WhenDeletingThisSignal_CheckIfItsDataIsDeleted()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.DeleteData<int>(existingSignal));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(existingSignal.Id.Value);
+
+                signalDataRepositoryMock
+                    .Verify(sdrm => sdrm.DeleteData<int>(existingSignal));
+            }
+
+            [TestMethod]
+            public void GivenADecimalSignal_WhenDeletingThisSignal_CheckIfItsDataIsDeleted()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Decimal
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.DeleteData<decimal>(existingSignal));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(existingSignal.Id.Value);
+
+                signalDataRepositoryMock
+                    .Verify(sdrm => sdrm.DeleteData<decimal>(existingSignal));
+            }
+
+            [TestMethod]
+            public void GivenABooleanSignal_WhenDeletingThisSignal_CheckIfItsDataIsDeleted()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.DeleteData<bool>(existingSignal));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(existingSignal.Id.Value);
+
+                signalDataRepositoryMock
+                    .Verify(sdrm => sdrm.DeleteData<bool>(existingSignal));
+            }
+            [TestMethod]
+            public void GivenAStringSignal_WhenDeletingThisSignal_CheckIfItsDataIsDeleted()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.String
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.DeleteData<string>(existingSignal));
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                signalsWebService.Delete(existingSignal.Id.Value);
+
+                signalDataRepositoryMock
+                    .Verify(sdrm => sdrm.DeleteData<string>(existingSignal));
+            }
+
+
             //Bug fixing 
 
             [TestMethod]
