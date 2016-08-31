@@ -898,6 +898,140 @@ namespace WebService.Tests
                 //assert
                 
             }
+
+            [TestMethod]
+            public void GivenAData_WhenGettingDataOutOfDataRange_ReturnsDefaultValuesFirstOrderMissingValuePolicy()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<int>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+                Domain.Datum<int>[] data = new Domain.Datum<int>[]
+              {
+                    new Domain.Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(1999, 12, 1), Value = (int)2 },
+                    new Domain.Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 2, 1), Value = (int)4 },
+
+              };
+                GivenData(signal.Id.Value, data);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 5, 1));
+                int expectedCount = 2;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1),Value= default(Int32)},
+                      new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1),Value= default(Int32)}
+
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenNoData_WhenGettingData_ReturnsDefaultValuesFirstOrderMissingValuePolicy()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Decimal;
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<decimal>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+                int expectedCount = 1;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = default(decimal)},
+
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenAData_WhenGettingDataWithFromIncludedUtcEqualsToExcluededUtc_ReturnsDataWithFilledFirstOrderMissingValuePolicy()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+                
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+              {
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(1999, 12, 1), Value = (double)2 },
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 2, 1), Value = (double)4 },
+
+              };
+                double expectedValue = 3;
+                GivenData(signal.Id.Value, data);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+                int expectedCount = 1;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = expectedValue},
+
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenAData_WhenGettingDataWithWithDateTimeOutOfDataRange_ReturnsDataWithFilledFirstOrderMissingValuePolicy()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+              {
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(1999, 12, 1), Value = (double)2.5 },
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3 },
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (double)4.5 },
+                    new Domain.Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 6, 1), Value = (double)3.5 },
+
+              };
+                double expectedValue = 3;
+                GivenData(signal.Id.Value, data);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(1999, 11, 1), new DateTime(2000, 8, 1));
+                int expectedCount = 9;
+                Assert.AreEqual(expectedCount, result.Count());
+
+                Dto.Datum[] expectedData = new Dto.Datum[]
+                {
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 11, 1), Value = default(double)},
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(1999, 12, 1), Value = (double)2.5},
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3},
+
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)3.5},
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)4},
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (double)4.5},
+
+                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 5, 1), Value = (double)4},
+                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 6, 1), Value = (double)3.5},
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = default(double)},
+                };
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
