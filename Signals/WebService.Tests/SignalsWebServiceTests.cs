@@ -994,6 +994,29 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(1999, 12, 1), resultData.First().Timestamp);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_HavingBothEalierAndOlderData_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDifferentThenDoubleDecimalOrInteger_ThrowsException()
+            {
+                int dummyId = 1;
+
+                var data = new[] { new Datum<string>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "someSignal" } };
+                var oldData = new[] { new Datum<string>() { Quality = Quality.Good, Timestamp = new DateTime(1998, 1, 1), Value = "oldSignal" } };
+
+                GivenASignalWithDataOfType(dummyId, data, DataType.String);
+                GivenMissingValuePolicy(dummyId, new FirstOrderMissingValuePolicyString());
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataOlderThan<string>(It.Is<Signal>(s => s.Id == dummyId), new DateTime(1999, 12, 1), 1))
+                    .Returns(oldData);
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataNewerThan<string>(It.Is<Signal>(s => s.Id == dummyId), new DateTime(1999, 12, 1), 1))
+                    .Returns(data);
+
+                signalsWebService.GetData(dummyId, new DateTime(1999, 12, 1), new DateTime(2000, 1, 1));
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
