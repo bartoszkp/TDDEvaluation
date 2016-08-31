@@ -11,14 +11,15 @@ namespace Domain.MissingValuePolicy
         {
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum<T>>();
-            else if (fromIncludedUtc == toExcludedUtc)
-            {
-                var datum = datums.FirstOrDefault(d => d.Timestamp == fromIncludedUtc);
-                return new[] { datum ?? Datum<T>.CreateNone(signal, fromIncludedUtc) };
-            }
 
             List<Datum<T>> filledList = new List<Datum<T>>();
             var datumsArray = datums.ToArray();
+
+            if (fromIncludedUtc == toExcludedUtc && datumsArray.Length == 1)
+            {
+                filledList.Add(datumsArray[0]);
+                return filledList;
+            }
 
             if (datumsArray.Length == 0)
                 EmptyDatumsCase(signal, filledList, fromIncludedUtc, toExcludedUtc, earlierDatum, laterDatum);
@@ -32,6 +33,12 @@ namespace Domain.MissingValuePolicy
         {
             if(earlierDatum == null || laterDatum == null)
             {
+                if (fromIncludedUtc == toExcludedUtc)
+                {
+                    filledList.Add(Datum<T>.CreateNone(signal, fromIncludedUtc));
+                    return;
+                }
+                                    
                 var stamp = fromIncludedUtc;
                 while(stamp < toExcludedUtc)
                 {
@@ -53,7 +60,7 @@ namespace Domain.MissingValuePolicy
             {
                 if (tmp == fromIncludedUtc)
                     firstMultiplier = count;
-                if (tmp >= fromIncludedUtc && tmp < toExcludedUtc)
+                if ((tmp >= fromIncludedUtc && tmp < toExcludedUtc) || (fromIncludedUtc == toExcludedUtc && tmp == fromIncludedUtc))
                     filledList.Add(Datum<T>.CreateNone(signal, tmp));
 
                 tmp = DateHelper.NextDate(tmp, signal.Granularity);
