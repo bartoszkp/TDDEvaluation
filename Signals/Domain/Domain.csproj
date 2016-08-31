@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\PathIsEmptyException.cs" />
+    <Compile Include="Exceptions\SignalDoesNotExist.cs" />
     <Compile Include="Exceptions\SignalsNullException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />

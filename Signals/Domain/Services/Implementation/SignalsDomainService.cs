@@ -240,5 +240,44 @@ namespace Domain.Services.Implementation
             return date.Ticks == correctDate.Ticks;
         }
 
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
+
+            if(signal == null)
+            {
+                throw new Domain.Exceptions.SignalDoesNotExist();
+            }
+
+            missingValuePolicyRepository.Set(signal, null);
+
+            var typename = signal.DataType.GetNativeType().Name;
+
+            switch (typename)
+            {
+                case "Int32":
+                    DeleteSignalData<int>(signal);
+                    break;
+                case "Double":
+                    DeleteSignalData<double>(signal);
+                    break;
+                case "Decimal":
+                    DeleteSignalData<decimal>(signal);
+                    break;
+                case "Boolean":
+                    DeleteSignalData<bool>(signal);
+                    break;
+                case "String":
+                    DeleteSignalData<string>(signal);
+                    break;
+            }
+
+            signalsRepository.Delete(signal);
+        }
+
+        private void DeleteSignalData<T>(Signal signal)
+        {
+            signalsDataRepository.DeleteData<T>(signal);
+        }
     }
 }
