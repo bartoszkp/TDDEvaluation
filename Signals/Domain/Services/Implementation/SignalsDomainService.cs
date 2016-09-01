@@ -193,9 +193,20 @@ namespace Domain.Services.Implementation
 
         private int CalcDifferenceDependOnGranularity(Granularity granularity, DateTime olderTimestamp, DateTime newerTimestamp)
         {
-            if (granularity == Granularity.Month)
-                return MonthDifference(olderTimestamp, newerTimestamp);
+            switch (granularity)
+            {
+                case Granularity.Month:
+                    return MonthDifference(olderTimestamp, newerTimestamp);
+                case Granularity.Year:
+                    return YearDifference(olderTimestamp, newerTimestamp);
+
+            }
             return int.MinValue;
+        }
+
+        private int YearDifference(DateTime olderValue, DateTime newerValue)
+        {
+            return olderValue.Year - newerValue.Year;
         }
 
         private int MonthDifference(DateTime olderValue, DateTime newerValue)
