@@ -199,9 +199,16 @@ namespace Domain.Services.Implementation
                     return MonthDifference(olderTimestamp, newerTimestamp);
                 case Granularity.Year:
                     return YearDifference(olderTimestamp, newerTimestamp);
+                case Granularity.Day:
+                    return DayDifference(olderTimestamp, newerTimestamp);
 
             }
             throw new ArgumentException("This granularity is not supported");
+        }
+
+        private int DayDifference(DateTime olderDate, DateTime newerDate)
+        {
+            return Convert.ToInt32((olderDate - newerDate).TotalDays);
         }
 
         private int YearDifference(DateTime olderValue, DateTime newerValue)
