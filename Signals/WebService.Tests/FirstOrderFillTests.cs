@@ -1511,11 +1511,15 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerSecondSignal_WhenGettingDataWithTimeStampMiddleOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
-            SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(Granularity.Second, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5));
+            DateTime fromIncluded = new DateTime(2000, 1, 1, 0, 0, 4);
+            DateTime toExcluded = new DateTime(2000, 1, 1, 0, 0, 5);
+            var granularity = Granularity.Second;
 
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5));
+            SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(granularity, fromIncluded, toExcluded);
 
-            var expectedDatum = GetExpectedSingleDatum(Granularity.Second);
+            var result = signalsWebService.GetData(1, fromIncluded, toExcluded);
+
+            var expectedDatum = GetExpectedSingleDatum(granularity);
 
             AssertEqual(expectedDatum, result);
         }
@@ -1523,11 +1527,15 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerMinuteSignal_WhenGettingDataWithTimeStampMiddleOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
-            SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(Granularity.Minute, new DateTime(2000, 1, 1, 0, 4, 0), new DateTime(2000, 1, 1, 0, 5, 0));
+            DateTime fromIncluded = new DateTime(2000, 1, 1, 0, 4, 0);
+            DateTime toExcluded = new DateTime(2000, 1, 1, 0, 5, 0);
+            var granularity = Granularity.Minute;
 
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 4, 0), new DateTime(2000, 1, 1, 0, 5, 0));
+            SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(granularity, fromIncluded, toExcluded);
 
-            var expectedDatum = GetExpectedSingleDatum(Granularity.Minute);
+            var result = signalsWebService.GetData(1, fromIncluded, toExcluded);
+
+            var expectedDatum = GetExpectedSingleDatum(granularity);
 
             AssertEqual(expectedDatum, result);
         }
@@ -1540,6 +1548,10 @@ namespace WebService.Tests
             mvpRepoMock.Setup(m => m.Get(returnedSignal))
                 .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
                 { Id = 1, Signal = returnedSignal });
+
+            dataRepoMock
+                .Setup(d => d.GetData<int>(returnedSignal, fromIncluded, toExcluded))
+                .Returns(new List<Datum<int>>());
 
             SetupDataRepoForSignleDatum(returnedSignal);
 
@@ -1565,9 +1577,6 @@ namespace WebService.Tests
             switch (returnedSignal.Granularity)
             {
                 case Granularity.Second:
-                    dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5)))
-                        .Returns(new List<Datum<int>>());
-
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
                         .Returns(new List<Datum<int>>()
@@ -1583,9 +1592,6 @@ namespace WebService.Tests
                     break;
 
                 case Granularity.Minute:
-                    dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 4, 0), new DateTime(2000, 1, 1, 0, 5, 0)))
-                        .Returns(new List<Datum<int>>());
-
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 4, 0), 1))
                         .Returns(new List<Datum<int>>()
