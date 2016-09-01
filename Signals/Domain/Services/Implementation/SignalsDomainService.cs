@@ -608,29 +608,45 @@ namespace Domain.Services.Implementation
                                         var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
                                         var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
 
-                                        var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Days / 7;
 
-                                        var qualityToAdd = x1.ElementAt(0).Quality;
-
-                                        decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                        decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                        for (int j = 0; j < timeDifference; j++, i++)
+                                        if (x0.ElementAt(0).Quality == Quality.None || x1.ElementAt(0).Quality == Quality.None)
                                         {
-                                            valueToAdd += avarage;
-                                            var itemToAdd = new Datum<T>()
+                                            returnList.Add(new Datum<T>()
                                             {
-                                                Quality = qualityToAdd,
+                                                Quality = Quality.None,
                                                 Signal = signal,
                                                 Timestamp = checkedDateTime,
-                                                Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                            };
-
-                                            returnList.Add(itemToAdd);
-                                            checkedDateTime = checkedDateTime.AddDays(7);
+                                                Value = default(T),
+                                            });
                                         }
 
-                                        checkedDateTime = checkedDateTime.AddDays(-7);
+                                        else
+                                        {
+                                            var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Days / 7;
+
+                                            var qualityToAdd = x1.ElementAt(0).Quality;
+
+                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
+                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
+
+                                            for (int j = 0; j < timeDifference; j++, i++)
+                                            {
+                                                valueToAdd += avarage;
+                                                var itemToAdd = new Datum<T>()
+                                                {
+                                                    Quality = qualityToAdd,
+                                                    Signal = signal,
+                                                    Timestamp = checkedDateTime,
+                                                    Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                                };
+
+                                                returnList.Add(itemToAdd);
+                                                checkedDateTime = checkedDateTime.AddDays(7);
+                                            }
+
+                                            checkedDateTime = checkedDateTime.AddDays(-7);
+                                        }
+                                        
                                         addingItem = null;
                                     }
 
