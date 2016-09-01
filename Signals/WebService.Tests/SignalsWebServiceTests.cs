@@ -977,17 +977,23 @@ namespace WebService.Tests
 
                 signalsDataRepoMock
                     .Setup(q => q.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<Datum<double>>());
+                    .Returns<Signal, DateTime, DateTime>((s, fromE, toE) => 
+                    {
+                        return datums.Where(q => q.Timestamp >= fromE && q.Timestamp <= toE); //new List<Datum<double>>();                            
+                    });
 
                 signalsDataRepoMock
-                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == from), 1))
-                    .Returns(new[] { datums.First() });
+                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
+                    .Returns<Signal, DateTime, int>((s, d, m) => {
+                        if (datums.FirstOrDefault(q => q.Timestamp >= d) == null) return new[] { datums.Last() };
+                        return new[] { datums.FirstOrDefault(q => q.Timestamp >= d) };
+                    });
 
                 signalsDataRepoMock
                     .Setup(q => q.GetDataOlderThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
                     .Returns<Signal, DateTime, int>((s, d, m) => {
-                        if (datums.FirstOrDefault(q => q.Timestamp >= d) == null) return new[] { datums.Last() };
-                        return new[] { datums.FirstOrDefault(q => q.Timestamp >= d) };
+                        if (datums.FirstOrDefault(q => q.Timestamp <= d) == null) return new[] { datums.First() };
+                        return new[] { datums.FirstOrDefault(q => q.Timestamp <= d) };
                     });
 
 
@@ -997,7 +1003,7 @@ namespace WebService.Tests
 
                 Assert.AreEqual(0.0, result.ElementAt(0).Value);
 
-                Assert.AreEqual(2.0, result.ElementAt(2).Value);
+                Assert.AreEqual(1.0, result.ElementAt(2).Value);
 
                 Assert.AreEqual(3.0, result.ElementAt(7).Value);
 

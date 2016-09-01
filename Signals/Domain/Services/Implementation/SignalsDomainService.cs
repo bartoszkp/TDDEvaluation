@@ -214,27 +214,39 @@ namespace Domain.Services.Implementation
 
                 else if (policy is FirstOrderMissingValuePolicy<T>)
                 {
-                    var newerData = getNewerDatum<T>(signal, fromIncluded);
-                    var olderData = getOlderDatum<T>(signal, toExcluded);
+                    var newerData = getNewerDatum<T>(signal, toExcluded);
+                    if (newerData == null) newerData = result.Last();
+                    var olderData = getOlderDatum<T>(signal, fromIncluded);
+                    if (olderData == null) olderData = result.First();
 
                     dynamic step = 0;
                     while (date < toExcluded)
                     {
                         Datum<T> datum = null;
 
-                        if (date < newerData.Timestamp || date > olderData.Timestamp)
+                        if (date > newerData.Timestamp || date < olderData.Timestamp)
                         {
                             datum = new Datum<T>() { Quality = Quality.None, Timestamp = new DateTime(), Value = default(T) };
                             newData.Add(datum);
+                            date = timeNextMethod(date);
+                            continue;
                         }
-                        
-                        step = GetStep<T>(signal, newerData, olderData);
-                        
-                        if (date > newerData.Timestamp)
+
+
+                        var nextExsistingDatum = getNewerDatum<T>(signal, timeNextMethod(date));
+                        var currentDatum = result.FirstOrDefault<Datum<T>>(d => d.Timestamp == date);
+                        if (currentDatum != null)
+                        {
+                            newData.Add(currentDatum);
+                            olderData = currentDatum;
+                            if (nextExsistingDatum != null)step = GetStep<T>(signal, currentDatum, nextExsistingDatum);
+                        }
+
+                        if (date > olderData.Timestamp)
                         {
                             var previousDatum = newData.Last();
                             Quality quality;
-                            if (previousDatum.Quality > olderData.Quality) quality = previousDatum.Quality; else quality = olderData.Quality;
+                            if (previousDatum.Quality > nextExsistingDatum.Quality) quality = previousDatum.Quality; else quality = nextExsistingDatum.Quality;
 
                             datum = new Datum<T>() { Timestamp = previousDatum.Timestamp, Value = previousDatum.Value + step, Quality = quality };
 
@@ -271,16 +283,16 @@ namespace Domain.Services.Implementation
             return valuesDifference / timeDifference;
         }
 
-        private Datum<T> getNewerDatum<T>(Signal signal, DateTime from)
-        {
-            var datum = signalsDataRepository.GetData<T>(signal, from, from);
-            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataNewerThan<T>(signal, from, 1); }
-            return datum.FirstOrDefault();
-        }
-        private Datum<T> getOlderDatum<T>(Signal signal, DateTime to)
+        private Datum<T> getNewerDatum<T>(Signal signal, DateTime to)
         {
             var datum = signalsDataRepository.GetData<T>(signal, to, to);
-            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataOlderThan<T>(signal, to, 1); }
+            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataNewerThan<T>(signal, to, 1); }
+            return datum.FirstOrDefault();
+        }
+        private Datum<T> getOlderDatum<T>(Signal signal, DateTime from)
+        {
+            var datum = signalsDataRepository.GetData<T>(signal, from, from);
+            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataOlderThan<T>(signal, from, 1); }
             return datum.FirstOrDefault();
         }
 
