@@ -926,18 +926,18 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndFirsOrderMvp_WhenGettingDataIntegerAndYearGranularity_CheckIfReturnedDataIsCorrect()
+            public void GivenASignalAndFirsOrderMvp_WhenGettingDataIntegerAndDayGranularity_CheckIfReturnedDataIsCorrect()
             {
                 int signalId = 5;
                 var signal = SignalWith(
                      id: signalId,
                     dataType: Domain.DataType.Integer,
-                    granularity: Domain.Granularity.Year,
+                    granularity: Domain.Granularity.Day,
                     path: Domain.Path.FromString("root/signal"));
 
                 Datum<int> olderDatum = new Datum<int>()
-                { Quality = Quality.Good, Timestamp = new DateTime(2005, 1, 1), Value = 2, Signal = signal };
-                Datum<int> newerDatum = new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2008, 1, 1), Value = 5 };
+                { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 5), Value = 2, Signal = signal };
+                Datum<int> newerDatum = new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 8), Value = 5 };
 
                 List<Datum<int>> datums = new List<Datum<int>>(){
                     new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
@@ -951,7 +951,7 @@ namespace WebService.Tests
 
                 GivenData(signalId, datums);
 
-                List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(2006, 1, 1), new DateTime(2007, 1, 1)).ToList();
+                List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 6), new DateTime(2000, 1, 7)).ToList();
 
                 Assert.AreEqual(3, result[0].Value);
                 Assert.AreEqual(Dto.Quality.Fair, result[0].Quality);
