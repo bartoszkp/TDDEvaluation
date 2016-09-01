@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Calculations\CompareDates.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\SignalForDatumHasNotBeenSet.cs" />
     <Compile Include="Exceptions\CouldntGetASignalException.cs" />

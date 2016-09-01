@@ -5,6 +5,7 @@ using Domain.Exceptions;
 using Domain.Infrastructure;
 using Domain.Repositories;
 using Mapster;
+using Domain.Calculations;
 
 namespace Domain.Services.Implementation
 {
@@ -104,6 +105,46 @@ namespace Domain.Services.Implementation
             return data.OrderBy(d => d.Timestamp);
         }
 
+        public void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
+        {
+            if (policy is MissingValuePolicy.FirstOrderMissingValuePolicy<string>
+                || policy is MissingValuePolicy.FirstOrderMissingValuePolicy<bool>)
+                throw new ArgumentException("First order mvp mustn't string or bool");
+            this.missingValuePolicyRepository.Set(signal, policy);
+        }
+
+        public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
+        {
+            var mvp = this.missingValuePolicyRepository.Get(signal);
+
+            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+               as MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        public PathEntry GetPathEntry(Path path)
+        {
+            var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
+            var signalsInDir = new List<Signal>();
+            var subPaths = new List<Path>();
+            int pathDomainComponentsCount = path.Components.Count();
+
+            foreach (var signal in allSignals)
+            {
+                int signalPathComponentsCount = signal.Path.Components.Count();
+
+                if (signalPathComponentsCount - 1 == pathDomainComponentsCount)
+                {
+                    signalsInDir.Add(signal);
+                }
+                else if (signalPathComponentsCount - 1 > pathDomainComponentsCount)
+                {
+                    subPaths.Add(Path.FromString(Path.JoinComponents(signal.Path.Components.Take(pathDomainComponentsCount + 1))));
+                }
+            }
+
+            return new PathEntry(signalsInDir, subPaths.Distinct());
+        }
+
         private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp, Datum<T> before)
         {
             if (mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
@@ -195,56 +236,24 @@ namespace Domain.Services.Implementation
         {
             switch (granularity)
             {
-                case Granularity.Month:
-                    return MonthDifference(olderTimestamp, newerTimestamp);
                 case Granularity.Year:
-                    return YearDifference(olderTimestamp, newerTimestamp);
-                case Granularity.Day:
-                    return DayDifference(olderTimestamp, newerTimestamp);
+                    return CompareDates.YearDifference(olderTimestamp, newerTimestamp);
+                case Granularity.Month:
+                    return CompareDates.MonthDifference(olderTimestamp, newerTimestamp);         
                 case Granularity.Week:
-                    return WeekDifference(olderTimestamp, newerTimestamp);
+                    return CompareDates.WeekDifference(olderTimestamp, newerTimestamp);
+                case Granularity.Day:
+                    return CompareDates.DayDifference(olderTimestamp, newerTimestamp);               
                 case Granularity.Hour:
-                    return HourDifference(olderTimestamp, newerTimestamp);
+                    return CompareDates.HourDifference(olderTimestamp, newerTimestamp);
                 case Granularity.Minute:
-                    return MinuteDifference(olderTimestamp, newerTimestamp);
+                    return CompareDates.MinuteDifference(olderTimestamp, newerTimestamp);
                 case Granularity.Second:
-                    return SecondDifference(olderTimestamp, newerTimestamp);
+                    return CompareDates.SecondDifference(olderTimestamp, newerTimestamp);
             }
+
             throw new ArgumentException("This granularity is not supported");
-        }
-
-        private int SecondDifference(DateTime olderTimestamp, DateTime newerTimestamp)
-        {
-            return Convert.ToInt32((olderTimestamp - newerTimestamp).TotalSeconds);
-        }
-
-        private int MinuteDifference(DateTime olderTimestamp, DateTime newerTimestamp)
-        {
-            return Convert.ToInt32((olderTimestamp - newerTimestamp).TotalMinutes);
-        }
-
-        private int HourDifference(DateTime olderDate, DateTime newerDate)
-        {
-            return Convert.ToInt32((olderDate - newerDate).TotalHours);
-        }
-        private int WeekDifference(DateTime olderDate, DateTime newerDate)
-        {
-            return Convert.ToInt32((olderDate - newerDate).TotalDays) / 7;
-        }
-        private int DayDifference(DateTime olderDate, DateTime newerDate)
-        {
-            return Convert.ToInt32((olderDate - newerDate).TotalDays);
-        }
-
-        private int YearDifference(DateTime olderValue, DateTime newerValue)
-        {
-            return olderValue.Year - newerValue.Year;
-        }
-
-        private int MonthDifference(DateTime olderValue, DateTime newerValue)
-        {
-            return (olderValue.Month - newerValue.Month) + 12 * YearDifference(olderValue, newerValue);
-        }
+        } 
 
         private DateTime GetNextDateFromGranularity(DateTime current, Granularity granularity)
         {
@@ -267,46 +276,6 @@ namespace Domain.Services.Implementation
             }
 
             return current;
-        }
-
-        public void SetMissingValuePolicy(Signal signal, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
-        {
-            if (policy is MissingValuePolicy.FirstOrderMissingValuePolicy<string>
-                || policy is MissingValuePolicy.FirstOrderMissingValuePolicy<bool>)
-                throw new ArgumentException("First order mvp mustn't string or bool");
-            this.missingValuePolicyRepository.Set(signal, policy);
-        }
-
-        public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
-        {
-            var mvp = this.missingValuePolicyRepository.Get(signal);
-
-            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-               as MissingValuePolicy.MissingValuePolicyBase;
-        }
-
-        public PathEntry GetPathEntry(Path path)
-        {
-            var allSignals = this.signalsRepository.GetAllWithPathPrefix(path);
-            var signalsInDir = new List<Signal>();
-            var subPaths = new List<Path>();
-            int pathDomainComponentsCount = path.Components.Count();
-
-            foreach (var signal in allSignals)
-            {
-                int signalPathComponentsCount = signal.Path.Components.Count();
-
-                if (signalPathComponentsCount - 1 == pathDomainComponentsCount)
-                {
-                    signalsInDir.Add(signal);
-                }
-                else if (signalPathComponentsCount - 1 > pathDomainComponentsCount)
-                {
-                    subPaths.Add(Path.FromString(Path.JoinComponents(signal.Path.Components.Take(pathDomainComponentsCount + 1))));
-                }
-            }
-
-            return new PathEntry(signalsInDir, subPaths.Distinct());
         }
     }
 }
