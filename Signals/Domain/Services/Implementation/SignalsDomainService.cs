@@ -160,8 +160,6 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(IEnumerable<Datum<T>> data, Signal signal)
         {
-            bool comparationResult;
-
             if (data == null)
                 throw new ArgumentNullException("Attempted to set null data for a signal");
 
@@ -169,67 +167,13 @@ namespace Domain.Services.Implementation
 
             SetSignalForDatumCollection(data, signal);
 
-            if (signal.Granularity == Granularity.Year)
+            foreach(var item in data)
             {
-                comparationResult = TimestampCorrectCheckerForYear<T>(data, signal);
-
-                if (comparationResult == true)
-                {
-                    throw new Domain.Exceptions.BadDateFormatForSignalException();
-                }
-                else return;
+                if (!VeryfiTimeStamp(signal.Granularity, item.Timestamp))
+                    throw new BadDateFormatForSignalException();
             }
-            else if (signal.Granularity == Granularity.Month)
-            {
-                comparationResult = TimestampCorrectCheckerForMonth<T>(data, signal);
 
-                if (comparationResult == true)
-                {
-                    throw new Domain.Exceptions.BadDateFormatForSignalException();
-                }
-                else return;
-            }
-            else if (signal.Granularity == Granularity.Day)
-            {
-                comparationResult = TimestampCorrectCheckerForDay<T>(data, signal);
-
-                if (comparationResult == true)
-                {
-                    throw new Domain.Exceptions.BadDateFormatForSignalException();
-                }
-                else return;
-            }
-            else if (signal.Granularity == Granularity.Hour)
-            {
-                comparationResult = TimestampCorrectCheckerForHour<T>(data, signal);
-
-                if (comparationResult == true)
-                {
-                    throw new Domain.Exceptions.BadDateFormatForSignalException();
-                }
-                else return;
-            }
-            else if (signal.Granularity == Granularity.Minute)
-            {
-                comparationResult = TimestampCorrectCheckerForMinute<T>(data, signal);
-
-                if (comparationResult == true)
-                {
-                    throw new Domain.Exceptions.BadDateFormatForSignalException();
-                }
-                else return;
-            }
-            else if (signal.Granularity == Granularity.Second)
-            {
-                comparationResult = TimestampCorrectCheckerForSecond<T>(data, signal);
-
-                if (comparationResult == true)
-                {
-                    throw new Domain.Exceptions.BadDateFormatForSignalException();
-                }
-                else return;
-            }
-            else signalsDataRepository.SetData(data);
+            signalsDataRepository.SetData(data);
         }
 
         private void SetSignalForDatumCollection<T>(IEnumerable<Domain.Datum<T>> data, Signal signal)
