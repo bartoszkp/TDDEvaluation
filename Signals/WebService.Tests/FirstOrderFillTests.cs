@@ -916,6 +916,43 @@ namespace WebService.Tests
             AssertEqual(expectedDatum, result);
         }
 
+        [TestMethod]
+        public void GivenAnIntegerSecondSignal_WhenGettingDataWithTimeStampMiddleOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
+        {
+            var returnedSignal = new Signal() { Id = 1, Granularity = Granularity.Second, DataType = DataType.Integer };
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+
+            mvpRepoMock.Setup(m => m.Get(returnedSignal))
+                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
+                { Id = 1, Signal = returnedSignal });
+
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5)))
+                .Returns(new List<Datum<int>>());
+
+            dataRepoMock
+                .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = 3 }
+                });
+            dataRepoMock
+                .Setup(d => d.GetDataNewerThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = 5 }
+                });
+
+            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
+            signalsWebService = new SignalsWebService(domainService);
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5));
+
+            var expectedDatum = new List<Dto.Datum>() {
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = 4 }, };
+
+            AssertEqual(expectedDatum, result);
+        }
+
         private void SetupFirstOrderPolicy(Granularity granularity,
             DateTime fromIncluded, DateTime toExluded, List<Datum<int>> actualToBeReturnedByMockDatums)
         {
@@ -929,7 +966,6 @@ namespace WebService.Tests
                 .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
                 { Id = 1, Signal = returnedSignal });
 
-
             dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, fromIncluded, toExluded))
                 .Returns(actualToBeReturnedByMockDatums);
 
@@ -940,7 +976,7 @@ namespace WebService.Tests
         {
             int i = 0;
 
-            Assert.AreEqual(6, actualDatums.Count());
+            Assert.AreEqual(expectedDatums.Count(), actualDatums.Count());
             foreach (var actualData in actualDatums)
             {
                 Assert.AreEqual(expectedDatums[i].Quality, actualData.Quality);
