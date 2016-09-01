@@ -46,9 +46,33 @@ namespace WebService.Tests
 
 
             signalsDataRepoMock.Verify(x => x.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
+        }
+
+        [TestMethod]
+        public void SignalExists_SetEData_DataIsPassed()
+        {
+            SetupWebService();
+
+            var newSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Month,
+            };
+
+            var dtoDatum = new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 2 }
+            };
+
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(newSignal);
+
+            signalsWebService.SetData(1, dtoDatum);
 
 
-
+            signalsDataRepoMock.Verify(x => x.SetData<int>(
+                It.Is<IEnumerable<Datum<int>>>(z => z.First().Value == 1 & z.ElementAt(1).Value == 2)));
         }
 
         [TestMethod]
