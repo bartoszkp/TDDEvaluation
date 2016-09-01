@@ -29,6 +29,27 @@ namespace WebService.Tests
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
         }
 
+        [TestMethod]
+        public void SignalExists_SetEmptyData()
+        {
+            SetupWebService();
+
+            var newSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Month,
+            };
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(newSignal);
+
+            signalsWebService.SetData(1, new List<Dto.Datum>());
+
+
+            signalsDataRepoMock.Verify(x => x.SetData<int>(It.IsAny<IEnumerable<Datum<int>>>()));
+
+
+
+        }
 
         [TestMethod]
         public void SignalExists_GetData_WithSameTimestaps_SingleDatumReturned()
