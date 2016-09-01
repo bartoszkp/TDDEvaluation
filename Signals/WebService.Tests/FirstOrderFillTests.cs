@@ -1268,10 +1268,7 @@ namespace WebService.Tests
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftNoneDatumTimestamp, 1))
-                        .Returns(new List<Datum<int>>()
-                        {
-                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = leftNoneDatumTimestamp.AddDays(-7), Value = default(int) }
-                        });
+                        .Returns(new List<Datum<int>>());
 
                     dataRepoMock
                         .Setup(d => d.GetDataNewerThan<int>(returnedSignal, leftNoneDatumTimestamp, 1))
@@ -1282,10 +1279,7 @@ namespace WebService.Tests
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftNoneDatumTimestamp.AddDays(7), 1))
-                        .Returns(new List<Datum<int>>()
-                        {
-                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = leftNoneDatumTimestamp, Value = default(int) }
-                        });
+                        .Returns(new List<Datum<int>>());
 
                     dataRepoMock
                         .Setup(d => d.GetDataNewerThan<int>(returnedSignal, leftNoneDatumTimestamp.AddDays(7), 1))
@@ -1304,10 +1298,7 @@ namespace WebService.Tests
 
                     dataRepoMock
                         .Setup(d => d.GetDataNewerThan<int>(returnedSignal, rightNoneDatumTimestamp.AddDays(-7), 1))
-                        .Returns(new List<Datum<int>>()
-                        {
-                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = rightNoneDatumTimestamp, Value = default(int) }
-                        });
+                        .Returns(new List<Datum<int>>());
 
 
                     dataRepoMock
@@ -1319,10 +1310,7 @@ namespace WebService.Tests
 
                     dataRepoMock
                         .Setup(d => d.GetDataNewerThan<int>(returnedSignal, rightNoneDatumTimestamp, 1))
-                        .Returns(new List<Datum<int>>()
-                        {
-                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = rightNoneDatumTimestamp.AddDays(7), Value = default(int) }
-                        });
+                        .Returns(new List<Datum<int>>());
 
                     break;
 
