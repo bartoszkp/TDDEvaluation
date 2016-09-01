@@ -926,6 +926,38 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalAndFirsOrderMvp_WhenGettingDataDecinmal_CheckIfReturnedDataIsCorrect()
+            {
+                int signalId = 5;
+                var signal = SignalWith(
+                     id: signalId,
+                    dataType: Domain.DataType.Decimal,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal"));
+
+                Datum<decimal> olderDatum = new Datum<decimal>()
+                { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0m, Signal = signal };
+                Datum<decimal> newerDatum = new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0m };
+
+                List<Datum<decimal>> datums = new List<Datum<decimal>>(){
+                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0m },
+                    olderDatum,
+                    newerDatum
+                };
+
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDecimal());
+                SetupSignalsDataRepository_ReturnsOlderAndNewerDatums(signalId, olderDatum, newerDatum);
+
+                GivenData(signalId, datums);
+
+                List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1)).ToList();
+
+                Assert.AreEqual(3.0m, result[0].Value);
+                Assert.AreEqual(Dto.Quality.Fair, result[0].Quality);
+            }
+
+            [TestMethod]
             public void GivenASignal_WhenGettingData_VerifyGetDataNewerThan()
             {
                 int signalId = 5;
@@ -975,15 +1007,15 @@ namespace WebService.Tests
                 GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } });
             }
 
-            private void SetupSignalsDataRepository_ReturnsOlderAndNewerDatums(int signalId, Datum<double> olderDatum, Datum<double> newerDatum)
+            private void SetupSignalsDataRepository_ReturnsOlderAndNewerDatums<T>(int signalId, Datum<T> olderDatum, Datum<T> newerDatum)
             {
                 signalsDataRepositoryMock.Setup(sdr =>
-                sdr.GetDataOlderThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
-                .Returns(new List<Datum<double>>(new Datum<double>[] { olderDatum }));
+                sdr.GetDataOlderThan<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
+                .Returns(new List<Datum<T>>(new Datum<T>[] { olderDatum }));
 
                 signalsDataRepositoryMock.Setup(sdr =>
-                sdr.GetDataNewerThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
-                .Returns(new List<Datum<double>>(new Datum<double>[] { newerDatum }));
+                sdr.GetDataNewerThan<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
+                .Returns(new List<Datum<T>>(new Datum<T>[] { newerDatum }));
             }
 
             private void GivenSignals(IEnumerable<Signal> signals)
