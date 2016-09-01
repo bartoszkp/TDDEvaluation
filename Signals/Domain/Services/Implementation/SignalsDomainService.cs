@@ -89,7 +89,7 @@ namespace Domain.Services.Implementation
 
                 if (i >= data.Count || data[i].Timestamp != current)
                 {
-                    before = GetMissingValue<T>(mvp, signal, current, before, toExcludedUtc);             
+                    before = GetMissingValue<T>(mvp, signal, current, before);             
                     data.Add(before);
                 }
                 else
@@ -104,7 +104,7 @@ namespace Domain.Services.Implementation
             return data.OrderBy(d => d.Timestamp);
         }
 
-        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp, Datum<T> before, DateTime toExcludedUtc)
+        private Datum<T> GetMissingValue<T>(MissingValuePolicy.MissingValuePolicyBase mvp, Signal signal, DateTime timeStamp, Datum<T> before)
         {
             if (mvp is MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
             {
@@ -132,40 +132,58 @@ namespace Domain.Services.Implementation
             }
             else if (mvp is MissingValuePolicy.FirstOrderMissingValuePolicy<T>)
             {
-                Datum<T> returnDatum = null;
-                List<Datum<T>> olderDatums = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).ToList();
-                List<Datum<T>> newerDatums = this.signalsDataRepository.GetDataNewerThan<T>(signal, timeStamp, 1).ToList();
-                if (olderDatums.Count() == 0 || newerDatums.Count == 0)
-                    return Datum<T>.CreateNone(signal, timeStamp);
-                else
-                {
-                    Datum<T> olderDatum = olderDatums.FirstOrDefault();
-                    Datum<T> newerDatum = newerDatums.FirstOrDefault();
-
-                    double DiferenceBetweenOlderNewer = Convert.ToDouble(newerDatum.Value) - Convert.ToDouble(olderDatum.Value);
-
-                    int monthDiffereceBetweenOlderAndNewer = 0;
-                    int monthDifferenceBetweenOlderAndCurrent = 0;
-
-                    if (olderDatum.Signal.Granularity == Granularity.Month)
-                    {
-                        monthDiffereceBetweenOlderAndNewer = MonthDifference(newerDatum.Timestamp, olderDatum.Timestamp);
-                        monthDifferenceBetweenOlderAndCurrent = MonthDifference(timeStamp, olderDatum.Timestamp);
-                    }
-
-                    double addingValue = DiferenceBetweenOlderNewer / monthDiffereceBetweenOlderAndNewer;
-
-                    double result = Convert.ToDouble(olderDatum.Value);
-                    for (int i = 0; i < monthDifferenceBetweenOlderAndCurrent; i++)
-                    {
-                        result += addingValue;
-                    }
-                    returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, newerDatum.Quality, (T)(object)(result));
-
-                    return returnDatum;
-                }
+                return ReturnDatumFirstOrderMissingValuePolicy<T>(signal, timeStamp);
             }
             return new Datum<T>();
+        }
+
+        private Datum<T> ReturnDatumFirstOrderMissingValuePolicy<T>(Signal signal, DateTime timeStamp)
+        {
+            Datum<T> returnDatum = null;
+            List<Datum<T>> olderDatums = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).ToList();
+            List<Datum<T>> newerDatums = this.signalsDataRepository.GetDataNewerThan<T>(signal, timeStamp, 1).ToList();
+
+            if (olderDatums.Count() == 0 || newerDatums.Count == 0)
+                return Datum<T>.CreateNone(signal, timeStamp);
+            else
+            {
+                Datum<T> olderDatum = olderDatums.FirstOrDefault();
+                Datum<T> newerDatum = newerDatums.FirstOrDefault();
+
+                var result = CalcLinearInterpolation(olderDatum, newerDatum, timeStamp);
+
+                returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, newerDatum.Quality, (T)result);
+
+            }
+            return returnDatum;
+        }
+
+        private object CalcLinearInterpolation<T>(Datum<T> olderDatum, Datum<T> newerDatum, DateTime timeStamp)
+        {
+            int monthDifferenceBetweenOlderAndNewer =
+                 CalcDifferenceDependOnGranularity(olderDatum.Signal.Granularity, newerDatum.Timestamp, olderDatum.Timestamp);
+            int monthDifferenceBetweenOlderAndCurrent =
+                CalcDifferenceDependOnGranularity(olderDatum.Signal.Granularity, timeStamp, olderDatum.Timestamp);
+
+            double DiferenceBetweenOlderNewer = Convert.ToDouble(newerDatum.Value) - Convert.ToDouble(olderDatum.Value);
+
+            double addingValue = DiferenceBetweenOlderNewer / monthDifferenceBetweenOlderAndNewer;
+
+            double result = Convert.ToDouble(olderDatum.Value);
+
+            for (int i = 0; i < monthDifferenceBetweenOlderAndCurrent; i++)
+            {
+                result += addingValue;
+            }
+
+            return result;
+        }
+
+        private int CalcDifferenceDependOnGranularity(Granularity granularity, DateTime olderTimestamp, DateTime newerTimestamp)
+        {
+            if (granularity == Granularity.Month)
+                return MonthDifference(olderTimestamp, newerTimestamp);
+            return int.MinValue;
         }
 
         public int MonthDifference(DateTime olderValue, DateTime newerValue)

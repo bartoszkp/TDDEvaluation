@@ -913,17 +913,9 @@ namespace WebService.Tests
                     newerDatum
                 };
 
-                GivenASignal(signal);
-               
+                GivenASignal(signal);         
                 GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
-
-                signalsDataRepositoryMock.Setup(sdr =>
-                sdr.GetDataOlderThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
-                .Returns(new List<Datum<double>>(new Datum<double>[] { olderDatum }));
-
-                signalsDataRepositoryMock.Setup(sdr =>
-                sdr.GetDataNewerThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
-                .Returns(new List<Datum<double>>(new Datum<double>[] { newerDatum }));       
+                SetupSignalsDataRepository_ReturnsOlderAndNewerDatums(signalId, olderDatum, newerDatum);                    
 
                 GivenData(signalId, datums);
 
@@ -981,6 +973,17 @@ namespace WebService.Tests
                 GivenASignal(signal);
                 GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
                 GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } });
+            }
+
+            private void SetupSignalsDataRepository_ReturnsOlderAndNewerDatums(int signalId, Datum<double> olderDatum, Datum<double> newerDatum)
+            {
+                signalsDataRepositoryMock.Setup(sdr =>
+                sdr.GetDataOlderThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
+                .Returns(new List<Datum<double>>(new Datum<double>[] { olderDatum }));
+
+                signalsDataRepositoryMock.Setup(sdr =>
+                sdr.GetDataNewerThan<double>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
+                .Returns(new List<Datum<double>>(new Datum<double>[] { newerDatum }));
             }
 
             private void GivenSignals(IEnumerable<Signal> signals)
