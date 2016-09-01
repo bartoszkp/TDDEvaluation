@@ -201,11 +201,16 @@ namespace Domain.Services.Implementation
                     return YearDifference(olderTimestamp, newerTimestamp);
                 case Granularity.Day:
                     return DayDifference(olderTimestamp, newerTimestamp);
-
+                case Granularity.Week:
+                    return WeekDifference(olderTimestamp, newerTimestamp);
             }
             throw new ArgumentException("This granularity is not supported");
         }
 
+        private int WeekDifference(DateTime olderDate, DateTime newerDate)
+        {
+            return Convert.ToInt32((olderDate - newerDate).TotalDays) / 7;
+        }
         private int DayDifference(DateTime olderDate, DateTime newerDate)
         {
             return Convert.ToInt32((olderDate - newerDate).TotalDays);
