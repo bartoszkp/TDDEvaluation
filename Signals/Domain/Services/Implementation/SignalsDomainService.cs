@@ -185,6 +185,8 @@ namespace Domain.Services.Implementation
             {
                 case DataType.Double:
                     return Convert.ToDouble(result);
+                case DataType.Integer:
+                    return (int)Math.Round(result, MidpointRounding.ToEven);
             }
             return result; //if decimal
         }
