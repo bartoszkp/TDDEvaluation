@@ -948,6 +948,60 @@ namespace WebService.Tests
 
 
 
+            [TestMethod]
+            public void GetData_FirstOrderMissingValuePolicy_WhenTimeIsOutOfBounds_SetValidValue()
+            {
+                int signalId = 1;
+
+                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
+
+                GivenASignal(someSignal);
+
+                var datums = new Datum<double>[]
+                    {
+                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
+                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
+                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 }
+                    };
+                GivenData(signalId, datums);
+
+                mvpRepositoryMock
+                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(new FirstOrderMissingValuePolicyDouble());
+                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
+
+                var from = new DateTime(1999, 11, 1);
+                var to = new DateTime(2000, 11, 1);
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<Datum<double>>());
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == from), 1))
+                    .Returns(new[] { datums.First() });
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetDataOlderThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
+                    .Returns<Signal, DateTime, int>((s, d, m) => {
+                        if (datums.FirstOrDefault(q => q.Timestamp >= d) == null) return new[] { datums.Last() };
+                        return new[] { datums.FirstOrDefault(q => q.Timestamp >= d) };
+                    });
+
+
+
+
+                var result = signalsWebService.GetData(signalId, from, to);
+
+                Assert.AreEqual(0.0, result.ElementAt(0).Value);
+
+                Assert.AreEqual(2.0, result.ElementAt(2).Value);
+
+                Assert.AreEqual(3.0, result.ElementAt(7).Value);
+
+            }
 
 
 
