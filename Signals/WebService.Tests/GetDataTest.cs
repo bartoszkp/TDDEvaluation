@@ -30,41 +30,28 @@ namespace WebService.Tests
         }
 
 
-
+        [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
         [TestMethod]
-        public void SignalExists_GetData_WithSameTimestaps_SingleDatumReturned()
+        public void SetData_VerifyTimeStamp_Week_Exception()
         {
             SetupWebService();
 
             var signal = new Signal()
             {
                 Id = 1,
-                DataType = Domain.DataType.Integer,
-                Granularity = Domain.Granularity.Month
+                DataType = Domain.DataType.Double,
+                Granularity = Granularity.Week
             };
 
-            var timestamp = new DateTime(2000, 1, 1);
 
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(signal);
-            Mock<NoneQualityMissingValuePolicy<int>> mvp = new Mock<NoneQualityMissingValuePolicy<int>>();
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
 
-            mvpRepoMock.Setup(m => m.Get(signal)).Returns(mvp.Object);
-
-
-            signalsDataRepoMock.Setup(s => s.GetData<int>(signal, timestamp, timestamp))
-                .Returns(new List<Datum<int>>());
-
-            var result = signalsWebService.GetData(1, timestamp, timestamp);
-
-            var fetchedDatumObject = result.ElementAt(0);
-
-            Assert.AreEqual(1, result.Count());
-            Assert.AreEqual(Dto.Quality.None, fetchedDatumObject.Quality);
-            Assert.AreEqual(0, fetchedDatumObject.Value);
-            Assert.AreEqual(timestamp, fetchedDatumObject.Timestamp);
-
+            signalsWebService.SetData(1, new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 2), Value = (double)2 }
+            });
         }
-
 
         #region TimeStampVerifyTests
         [ExpectedException(typeof(QuerryAboutDateWithIncorrectFormatException))]
