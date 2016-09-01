@@ -52,7 +52,7 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, startvalue);
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
-            Assert.AreEqual(returnCollection.Last().Value, endvalue);
+            Assert.AreEqual(returnCollection.Last().Value, middlevalue);
         }
 
         [TestMethod]
@@ -87,7 +87,7 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, startvalue);
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
-            Assert.AreEqual(returnCollection.Last().Value, endvalue);
+            Assert.AreEqual(returnCollection.Last().Value, middlevalue);
 
         }
 
@@ -126,7 +126,7 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, startvalue);
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
-            Assert.AreEqual(returnCollection.Last().Value, endvalue);
+            Assert.AreEqual(returnCollection.Last().Value, middlevalue);
         }
 
         [TestMethod]
@@ -161,7 +161,7 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, startvalue);
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
-            Assert.AreEqual(returnCollection.Last().Value, endvalue);
+            Assert.AreEqual(returnCollection.Last().Value, middlevalue);
         }
 
         [TestMethod]
@@ -199,7 +199,7 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, startvalue);
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
-            Assert.AreEqual(returnCollection.Last().Value, endvalue);
+            Assert.AreEqual(returnCollection.Last().Value, (decimal)5);
         }
 
         [TestMethod]
@@ -237,7 +237,7 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, startvalue);
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[2].Value, returnCollection[3].Value);
-            Assert.AreEqual(returnCollection.Last().Value, endvalue);
+            Assert.AreEqual(returnCollection.Last().Value, middlevalue);
         }
 
         private List<Datum<T>> GenerateFillCollection<T>(T startvalue, T middlevalue, T endvalue, Domain.Granularity granulatiry)

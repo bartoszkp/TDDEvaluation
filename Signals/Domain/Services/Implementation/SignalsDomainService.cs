@@ -136,7 +136,7 @@ namespace Domain.Services.Implementation
                 if (mvp != null)
                 {
                     List<Datum<T>> datums = new List<Datum<T>>();
-                    var date = new DateTime(fromIncludedUtc.Year, 1, 1);
+                var date = fromIncludedUtc;
                     while (date < fromIncludedUtc)
                         increaseDate(ref date, signal.Granularity);
 
