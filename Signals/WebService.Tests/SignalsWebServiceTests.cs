@@ -899,6 +899,52 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GetData_FirstOrderMissingValuePolicy_CalculateStep_ReturnCorrectlyStep()
+            {
+                int signalId = 1;
+
+                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
+
+                GivenASignal(someSignal);
+
+                var datums = new Datum<double>[]
+                    {
+                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
+                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 10, 1), Value = 10.0 }
+                    };
+                GivenData(signalId, datums);
+
+                mvpRepositoryMock
+                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(new FirstOrderMissingValuePolicyDouble());
+                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
+
+                var from = new DateTime(1999, 11, 1);
+                var to = new DateTime(2000, 11, 1);
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<Datum<double>>());
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == from), 1))
+                    .Returns(new[] { datums.First() });
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetDataOlderThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == to), 1))
+                    .Returns(new[] { datums.Last() });
+
+
+
+                double correctStep = 1.0;
+
+                var result = signalsWebService.GetData(signalId, from, to).ToDomain<IEnumerable<Domain.Datum<double>>>();
+
+                Assert.AreEqual(correctStep, result.ElementAt(5).Value - result.ElementAt(4).Value);
+            }
 
 
 
