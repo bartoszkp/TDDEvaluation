@@ -227,7 +227,19 @@ namespace Domain.Services.Implementation
                             datum = new Datum<T>() { Quality = Quality.None, Timestamp = new DateTime(), Value = default(T) };
                             newData.Add(datum);
                         }
+                        
+                        step = GetStep<T>(signal, newerData, olderData);
+                        
+                        if (date > newerData.Timestamp)
+                        {
+                            var previousDatum = newData.Last();
+                            Quality quality;
+                            if (previousDatum.Quality > olderData.Quality) quality = previousDatum.Quality; else quality = olderData.Quality;
 
+                            datum = new Datum<T>() { Timestamp = previousDatum.Timestamp, Value = previousDatum.Value + step, Quality = quality };
+
+                            newData.Add(datum);
+                        }
                         date = timeNextMethod(date);
                     }
                 }
@@ -240,7 +252,25 @@ namespace Domain.Services.Implementation
             return result;
         }
 
-        
+        private dynamic GetStep<T>(Signal signal, Datum<T> currentDatum, Datum<T> nextDatum)
+        {
+            int timeDifference = 0;
+            switch (signal.Granularity)
+            {
+                case Granularity.Second: timeDifference = nextDatum.Timestamp.Second - currentDatum.Timestamp.Second; break;
+                case Granularity.Minute: timeDifference = nextDatum.Timestamp.Minute - currentDatum.Timestamp.Minute; break;
+                case Granularity.Hour: timeDifference = nextDatum.Timestamp.Hour - currentDatum.Timestamp.Hour; break;
+                case Granularity.Day: timeDifference = nextDatum.Timestamp.Day - currentDatum.Timestamp.Day; break;
+                //case Granularity.Week: timeDifference = nextDatum.Timestamp.Week - currentDatum.Timestamp.Week; break;  --------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                case Granularity.Month: timeDifference = nextDatum.Timestamp.Month - currentDatum.Timestamp.Month; break;
+                case Granularity.Year: timeDifference = nextDatum.Timestamp.Year - currentDatum.Timestamp.Year; break;
+            }
+
+            var valuesDifference = (dynamic)nextDatum.Value - (dynamic)currentDatum.Value;
+            if (timeDifference == 0) timeDifference = 1;
+            return valuesDifference / timeDifference;
+        }
+
         private Datum<T> getNewerDatum<T>(Signal signal, DateTime from)
         {
             var datum = signalsDataRepository.GetData<T>(signal, from, from);
