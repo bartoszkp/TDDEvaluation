@@ -63,6 +63,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalDataTests.cs" />
     <Compile Include="SignalsWebServiceTests.cs" />
+    <Compile Include="ZeroFillTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">
