@@ -4,7 +4,7 @@
     {
         None,
         Good,
-        Fair,
+        Fair, 
         Poor,
         Bad,
     }

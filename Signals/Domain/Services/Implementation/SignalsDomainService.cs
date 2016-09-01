@@ -104,21 +104,30 @@ namespace Domain.Services.Implementation
             var index = 0;
 
             if (fromIncludedUtc == toExcludedUtc) toExcludedUtc = toExcludedUtc.AddTicks(1);
+            
+            var dataBeforeRequest = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();
 
-            var dataOlderThanRequest = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();
-
-            for (DateTime dt = fromIncludedUtc; dt < toExcludedUtc; AddToDateTime(ref dt, signal.Granularity), index++)
-                if (sortedData.FirstOrDefault(d => d.Timestamp == dt) == null) {
-                    if (dataOlderThanRequest == null) {
-                        sortedData.Insert(index, policy.GetMissingDatum(sortedData, dt));
-                    } else {
-                        dataOlderThanRequest.Timestamp = dt;
-                        sortedData.Insert(index, dataOlderThanRequest);
-                        dataOlderThanRequest = null;
+            if (policy is FirstOrderMissingValuePolicy<T>) sortedData = FirstOrderMissingValuePolicyFunction<T>(fromIncludedUtc, toExcludedUtc, sortedData, signal, policy);
+            else
+            {
+                for (DateTime dt = fromIncludedUtc; dt < toExcludedUtc; AddToDateTime(ref dt, signal.Granularity), index++)
+                    if (sortedData.FirstOrDefault(d => d.Timestamp == dt) == null)
+                    {
+                        if (dataBeforeRequest == null)
+                        {
+                            sortedData.Insert(index, policy.GetMissingDatum(sortedData, dt));
+                        }
+                        else
+                        {
+                            dataBeforeRequest.Timestamp = dt;
+                            sortedData.Insert(index, dataBeforeRequest);
+                            dataBeforeRequest = null;
+                        }
                     }
-                }
-                    
-            return sortedData;
+            }
+
+
+            return sortedData.Where(x => x.Timestamp >= fromIncludedUtc && x.Timestamp < toExcludedUtc).ToList();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp)
@@ -172,6 +181,71 @@ namespace Domain.Services.Implementation
             if (signal == null) throw new SignalNotExistException();
 
             return DataTypeUtils.GetNativeType(signal.DataType);
+        }
+
+        private List<Datum<T>> FirstOrderMissingValuePolicyFunction<T>(DateTime fromIncludedUtc, DateTime toExcludedUtc, List<Datum<T>> data, Signal signal, MissingValuePolicy.MissingValuePolicy<T> policy )
+        {
+            int index = 0;
+            var tempFromIncludeUtc = fromIncludedUtc;
+            Quality quality;
+            int length;
+            dynamic value;
+            Datum<T> leftNeighbor = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();
+            Datum<T> rightNeighbor;
+
+            if (leftNeighbor != null) tempFromIncludeUtc = leftNeighbor.Timestamp;
+            for (DateTime dt = tempFromIncludeUtc; dt < toExcludedUtc; AddToDateTime(ref dt, signal.Granularity), index++)
+            {
+                rightNeighbor = signalsDataRepository.GetDataNewerThan<T>(signal, dt, 1).FirstOrDefault();
+
+                if (data.FirstOrDefault(d => d.Timestamp == dt) == null)
+                {
+                    if (leftNeighbor != null && rightNeighbor != null)
+                    {
+                        if (rightNeighbor.Timestamp == dt)
+                        {
+                            data.Insert(index, new Datum<T>() { Id = rightNeighbor.Id, Quality = rightNeighbor.Quality, Signal = rightNeighbor.Signal, Timestamp = dt, Value = rightNeighbor.Value });
+                            continue;
+                        }
+
+                        length = LenghtBetweenDatums(rightNeighbor, leftNeighbor, signal.Granularity);
+                        value = (dynamic)leftNeighbor.Value + (((dynamic)rightNeighbor.Value - (dynamic)leftNeighbor.Value) / (length));
+                        quality = worstQuality(leftNeighbor.Quality, rightNeighbor.Quality);
+
+                        data.Insert(index, new Datum<T>() { Quality = quality, Timestamp = dt, Value = value });
+                        leftNeighbor = data.FirstOrDefault(d => d.Timestamp == dt);
+                    }
+                    else
+                    {
+                        data.Insert(index, policy.GetMissingDatum(data, dt));
+                    }
+                }
+                else
+                {
+                    leftNeighbor = data.FirstOrDefault(d => d.Timestamp == dt);
+                }
+
+            }
+            return data;
+        }
+
+        private int LenghtBetweenDatums<T>(Datum<T> datum1, Datum<T> datum2, Granularity granuality)
+        {
+            if (granuality == Granularity.Second) return (int)(datum1.Timestamp - datum2.Timestamp).TotalSeconds;
+            if (granuality == Granularity.Minute) return (int)(datum1.Timestamp - datum2.Timestamp).TotalMinutes;
+            if (granuality == Granularity.Hour) return (int)(datum1.Timestamp - datum2.Timestamp).TotalHours;
+            if (granuality == Granularity.Day) return (int)(datum1.Timestamp - datum2.Timestamp).TotalDays;
+            if (granuality == Granularity.Week) return (int)(datum1.Timestamp - datum2.Timestamp).TotalDays;
+            if (granuality == Granularity.Month) return ((datum1.Timestamp.Year - datum2.Timestamp.Year) * 12) + datum1.Timestamp.Month - datum2.Timestamp.Month;
+            if (granuality == Granularity.Year) return (new DateTime(1, 1, 1) + (datum2.Timestamp - datum1.Timestamp)).Year - 1;
+
+            return 0;
+        }
+
+        private Quality worstQuality(Quality quality1, Quality quality2)
+        {
+            if ((int)quality1 > (int)quality2) return quality1;
+            return quality2;
         }
 
         private Path CreatePath(IEnumerable<string> components)

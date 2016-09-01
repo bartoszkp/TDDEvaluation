@@ -105,6 +105,7 @@ namespace WebService
 
         public void SetDataGeneric<T>(int signalId, IEnumerable<Datum> data)
         {
+            var cos = data.ToDomain<IEnumerable<Domain.Datum<T>>>();
             signalsDomainService
                 .SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<T>>>());
         }
