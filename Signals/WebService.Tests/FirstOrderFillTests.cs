@@ -865,6 +865,23 @@ namespace WebService.Tests
             AssertEqual(expectedDatum, result);
         }
 
+        [TestMethod]
+        public void GivenAnIntegerWeekSignal_WhenGettingDataWithTimeStampLeftAndRightOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
+        {
+            SetupFirstOrderPolicy(Granularity.Week,
+                new DateTime(2000, 1, 3, 0, 0, 0), new DateTime(2000, 2, 14, 0, 0, 0), new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 17, 0, 0, 0), Value = (int)5 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 24, 0, 0, 0), Value = (int)6 },
+                });
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 3, 0, 0, 0), new DateTime(2000, 2, 14, 0, 0, 0));
+
+            var expectedDatum = GetExpectedDatums(Granularity.Week);
+
+            AssertEqual(expectedDatum, result);
+        }
+
         private void SetupFirstOrderPolicy(Granularity granularity,
             DateTime fromIncluded, DateTime toExluded, List<Datum<int>> actualToBeReturnedByMockDatums)
         {
@@ -946,6 +963,17 @@ namespace WebService.Tests
                         new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 6, 0, 0, 0), Value = (int)6 },
                         new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 7, 0, 0, 0), Value = default(int) },
                         new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 8, 0, 0, 0), Value = default(int) },
+                    };
+
+                case Granularity.Week:
+                    return new List<Dto.Datum>()
+                    {
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 3, 0, 0, 0), Value = default(int) },
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 10, 0, 0, 0), Value = default(int) },
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 17, 0, 0, 0), Value = (int)5 },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 24, 0, 0, 0), Value = (int)6 },
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 31, 0, 0, 0), Value = default(int) },
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 7, 0, 0, 0), Value = default(int) },
                     };
             }
 
@@ -1221,6 +1249,72 @@ namespace WebService.Tests
                         .Returns(new List<Datum<int>>()
                         {
                             new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = rightNoneDatumTimestamp.AddDays(1), Value = default(int) }
+                        });
+
+                    break;
+
+                case Granularity.Week:
+                    leftNoneDatumTimestamp = new DateTime(2000, 1, 3, 0, 0, 0);
+                    middleFairDatumTimestamp = new DateTime(2000, 1, 17, 0, 0, 0);
+                    middleGoodDatumTimestamp = new DateTime(2000, 1, 24, 0, 0, 0);
+                    rightNoneDatumTimestamp = new DateTime(2000, 2, 7, 0, 0, 0);
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftNoneDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = leftNoneDatumTimestamp.AddDays(-7), Value = default(int) }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, leftNoneDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = middleFairDatumTimestamp, Value = (int)5 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftNoneDatumTimestamp.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = leftNoneDatumTimestamp, Value = default(int) }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, leftNoneDatumTimestamp.AddDays(7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = middleFairDatumTimestamp, Value = (int)5 }
+                        });
+
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, rightNoneDatumTimestamp.AddDays(-7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = middleGoodDatumTimestamp, Value = (int)6 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, rightNoneDatumTimestamp.AddDays(-7), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = rightNoneDatumTimestamp, Value = default(int) }
+                        });
+
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, rightNoneDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = middleGoodDatumTimestamp, Value = (int)6 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, rightNoneDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = rightNoneDatumTimestamp.AddDays(7), Value = default(int) }
                         });
 
                     break;
