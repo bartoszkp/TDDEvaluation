@@ -926,21 +926,21 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndFirsOrderMvp_WhenGettingDataIntegerAndHourGranularity_CheckIfReturnedDataIsCorrect()
+            public void GivenASignalAndFirsOrderMvp_WhenGettingDataIntegerAndMinuteGranularity_CheckIfReturnedDataIsCorrect()
             {
                 int signalId = 5;
                 var signal = SignalWith(
                      id: signalId,
                     dataType: Domain.DataType.Integer,
-                    granularity: Domain.Granularity.Hour,
+                    granularity: Domain.Granularity.Minute,
                     path: Domain.Path.FromString("root/signal"));
 
                 Datum<int> olderDatum = new Datum<int>()
-                { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 5, 0, 0), Value = 2, Signal = signal };
-                Datum<int> newerDatum = new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 8, 0, 0), Value = 5 };
+                { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 5, 0), Value = 2, Signal = signal };
+                Datum<int> newerDatum = new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 1, 8, 0), Value = 5 };
 
                 List<Datum<int>> datums = new List<Datum<int>>(){
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 0 ,0), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1 ,0), Value = 1 },
                     olderDatum,
                     newerDatum
                 };
@@ -951,8 +951,8 @@ namespace WebService.Tests
 
                 GivenData(signalId, datums);
 
-                List<Dto.Datum> result = 
-                    signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 6, 0, 0), new DateTime(2000, 1, 1, 7, 0, 0)).ToList();
+                List<Dto.Datum> result =
+                    signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 1, 6, 0), new DateTime(2000, 1, 1, 1, 7, 0)).ToList();
 
                 Assert.AreEqual(3, result[0].Value);
                 Assert.AreEqual(Dto.Quality.Fair, result[0].Quality);
