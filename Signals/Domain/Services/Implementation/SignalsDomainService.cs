@@ -201,7 +201,7 @@ namespace Domain.Services.Implementation
                     return YearDifference(olderTimestamp, newerTimestamp);
 
             }
-            return int.MinValue;
+            throw new ArgumentException("This granularity is not supported");
         }
 
         private int YearDifference(DateTime olderValue, DateTime newerValue)
@@ -211,7 +211,7 @@ namespace Domain.Services.Implementation
 
         private int MonthDifference(DateTime olderValue, DateTime newerValue)
         {
-            return (olderValue.Month - newerValue.Month) + 12 * (olderValue.Year - newerValue.Year);
+            return (olderValue.Month - newerValue.Month) + 12 * YearDifference(olderValue, newerValue);
         }
 
         private DateTime GetNextDateFromGranularity(DateTime current, Granularity granularity)
