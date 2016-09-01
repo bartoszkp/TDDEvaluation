@@ -419,7 +419,7 @@ namespace Domain.Services.Implementation
                                             decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
                                             decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
 
-                                            for (int j = 0; j < timeDifference; j++, i++)
+                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
                                             {
                                                 valueToAdd += avarage;
                                                 var itemToAdd = new Datum<T>()
