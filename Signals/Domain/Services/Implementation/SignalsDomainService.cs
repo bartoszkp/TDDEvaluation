@@ -118,6 +118,8 @@ namespace Domain.Services.Implementation
                     });
                     return resultList;
                 }
+                else
+                    return result;
             }
                 
 
