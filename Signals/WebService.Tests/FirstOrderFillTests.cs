@@ -1520,9 +1520,21 @@ namespace WebService.Tests
             AssertEqual(expectedDatum, result);
         }
 
+        [TestMethod]
+        public void GivenAnIntegerMinuteSignal_WhenGettingDataWithTimeStampMiddleOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
+        {
+            SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(Granularity.Minute, new DateTime(2000, 1, 1, 0, 4, 0), new DateTime(2000, 1, 1, 0, 5, 0));
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 4, 0), new DateTime(2000, 1, 1, 0, 5, 0));
+
+            var expectedDatum = GetExpectedSingleDatum(Granularity.Minute);
+
+            AssertEqual(expectedDatum, result);
+        }
+
         private void SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(Granularity granularity, DateTime fromIncluded, DateTime toExcluded)
         {
-            var returnedSignal = new Signal() { Id = 1, Granularity = Granularity.Second, DataType = DataType.Integer };
+            var returnedSignal = new Signal() { Id = 1, Granularity = granularity, DataType = DataType.Integer };
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
 
             mvpRepoMock.Setup(m => m.Get(returnedSignal))
@@ -1541,27 +1553,54 @@ namespace WebService.Tests
             {
                 case Granularity.Second:
                     return new List<Dto.Datum>() { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = 4 }, };
+
+                case Granularity.Minute:
+                    return new List<Dto.Datum>() { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 4, 0), Value = 4 }, };
             }
             return null;
         }
 
         private void SetupDataRepoForSignleDatum(Signal returnedSignal)
         {
-            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5)))
-                .Returns(new List<Datum<int>>());
+            switch (returnedSignal.Granularity)
+            {
+                case Granularity.Second:
+                    dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5)))
+                        .Returns(new List<Datum<int>>());
 
-            dataRepoMock
-                .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
-                .Returns(new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = 3 }
-                });
-            dataRepoMock
-                .Setup(d => d.GetDataNewerThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
-                .Returns(new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = 5 }
-                });
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = 3 }
+                        });
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = 5 }
+                        });
+                    break;
+
+                case Granularity.Minute:
+                    dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 4, 0), new DateTime(2000, 1, 1, 0, 5, 0)))
+                        .Returns(new List<Datum<int>>());
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 4, 0), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 3, 0), Value = 3 }
+                        });
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 4, 0), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 5, 0), Value = 5 }
+                        });
+                    break;
+            }
+            
         }
     }
 }
