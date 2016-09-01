@@ -203,10 +203,20 @@ namespace Domain.Services.Implementation
                     return DayDifference(olderTimestamp, newerTimestamp);
                 case Granularity.Week:
                     return WeekDifference(olderTimestamp, newerTimestamp);
+                case Granularity.Hour:
+                    return HourDifference(olderTimestamp, newerTimestamp);
+                    //case Granularity.Minute:
+                    //    return MinuteDifference(olderTimestamp, newerTimestamp);
+                    //case Granularity.Second:
+                    //    return SecondDifference(olderTimestamp, newerTimestamp);
             }
             throw new ArgumentException("This granularity is not supported");
         }
 
+        private int HourDifference(DateTime olderDate, DateTime newerDate)
+        {
+            return Convert.ToInt32((olderDate - newerDate).TotalHours);
+        }
         private int WeekDifference(DateTime olderDate, DateTime newerDate)
         {
             return Convert.ToInt32((olderDate - newerDate).TotalDays) / 7;
