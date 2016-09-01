@@ -893,6 +893,20 @@ namespace WebService.Tests
                             new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (int)1 }
                         });
 
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, firstTimestamp.AddSeconds(1), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.None, Signal = returnedSignal, Timestamp = firstTimestamp, Value = default(int) }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, firstTimestamp.AddSeconds(1), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                            new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = secondTimestamp, Value = (int)1 }
+                        });
+
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, thirdTimestamp.AddSeconds(1), 1))
