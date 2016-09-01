@@ -715,7 +715,7 @@ namespace Domain.Services.Implementation
                                         var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
 
 
-                                        if (x0.ElementAt(0).Quality == Quality.None || x1.ElementAt(0).Quality == Quality.None)
+                                        if (x0.Count() == 0 || x1.Count() == 0)
                                         {
                                             returnList.Add(new Datum<T>()
                                             {
@@ -750,6 +750,7 @@ namespace Domain.Services.Implementation
                                                 returnList.Add(itemToAdd);
                                                 checkedDateTime = checkedDateTime.AddMonths(1);
                                             }
+                                            i--;
 
                                             checkedDateTime = checkedDateTime.AddMonths(-1);
                                         }
