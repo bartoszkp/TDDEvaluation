@@ -96,52 +96,9 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            if (signal.Granularity == Granularity.Year && fromIncludedUtc.Month != 1 && fromIncludedUtc.Day >= 1 && fromIncludedUtc.Hour >= 0
-                && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.Month == 1 && fromIncludedUtc.Day != 1
-                && fromIncludedUtc.Hour >= 0 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.Month == 1
-                && fromIncludedUtc.Day == 1 && fromIncludedUtc.Hour != 0 && fromIncludedUtc.Minute >= 0
-                && fromIncludedUtc.Second >= 0 || fromIncludedUtc.Month == 1 && fromIncludedUtc.Day == 1 && fromIncludedUtc.Hour == 0
-                && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.Month == 1 && fromIncludedUtc.Day == 1
-                && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute == 0 && fromIncludedUtc.Second != 0)
-            {
+
+            if (!VeryfiTimeStamp(signal.Granularity, fromIncludedUtc))
                 throw new QuerryAboutDateWithIncorrectFormatException();
-            }
-            else if(signal.Granularity == Granularity.Month && fromIncludedUtc.Day != 1 && fromIncludedUtc.Hour >= 0
-                && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.Day == 1
-                && fromIncludedUtc.Hour != 0 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.Day == 1 
-                && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.Day == 1 
-                && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute == 0 && fromIncludedUtc.Second != 0)
-            {
-                throw new QuerryAboutDateWithIncorrectFormatException();
-            }
-            else if (signal.Granularity == Granularity.Week && fromIncludedUtc.DayOfWeek != System.DayOfWeek.Monday && fromIncludedUtc.Hour >= 0
-                && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
-                && fromIncludedUtc.Hour != 0 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
-                && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0 || fromIncludedUtc.DayOfWeek == System.DayOfWeek.Monday
-                && fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute == 0 && fromIncludedUtc.Second != 0)
-            {
-                throw new QuerryAboutDateWithIncorrectFormatException();
-            }
-            else if (signal.Granularity == Granularity.Day && fromIncludedUtc.Hour != 0 && fromIncludedUtc.Minute >= 0 && fromIncludedUtc.Second >= 0
-                || fromIncludedUtc.Hour == 0 && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0 ||  fromIncludedUtc.Hour == 0 
-                && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second != 0)
-            {
-                throw new QuerryAboutDateWithIncorrectFormatException();
-            }
-            else if (signal.Granularity == Granularity.Hour && fromIncludedUtc.Minute != 0 && fromIncludedUtc.Second >= 0
-                || fromIncludedUtc.Minute == 0 && fromIncludedUtc.Second != 0)
-            {
-                throw new QuerryAboutDateWithIncorrectFormatException();
-            }
-            else if (signal.Granularity == Granularity.Minute && fromIncludedUtc.Second != 0 && fromIncludedUtc.Millisecond >= 0
-                || fromIncludedUtc.Second == 0 && fromIncludedUtc.Millisecond !=0)
-            {
-                throw new QuerryAboutDateWithIncorrectFormatException();
-            }
-            else if (signal.Granularity == Granularity.Second && fromIncludedUtc.Millisecond != 0)
-            {
-                throw new QuerryAboutDateWithIncorrectFormatException();
-            }
 
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
 
@@ -455,6 +412,66 @@ namespace Domain.Services.Implementation
             }
 
             return new PathEntry(signalsToAdd, subPaths);
+        }
+
+        private bool VeryfiTimeStamp(Granularity granularity, DateTime timeStamp)
+        {
+            switch (granularity)
+            {
+                case Granularity.Day:
+                    {
+                        if (timeStamp.Hour == 0 && timeStamp.Minute == 0
+                            && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Hour:
+                    {
+                        if (timeStamp.Minute == 0 && timeStamp.Second == 0
+                            && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Minute:
+                    {
+                        if (timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Month:
+                    {
+                        if (timeStamp.Day == 1 && timeStamp.Hour == 0 && timeStamp.Minute == 0
+                            && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Second:
+                    {
+                        if (timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Week:
+                    {
+                        if (timeStamp.DayOfWeek == DayOfWeek.Monday && timeStamp.Hour == 0 && timeStamp.Minute == 0
+                             && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                case Granularity.Year:
+                    {
+                        if (timeStamp.DayOfYear == 1 && timeStamp.Hour == 0 && timeStamp.Minute == 0
+                             && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
+                            return true;
+                        break;
+                    }
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
+            }
+
+            return false;
         }
     }
 }
