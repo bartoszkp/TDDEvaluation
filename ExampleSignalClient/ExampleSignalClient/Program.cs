@@ -11,18 +11,18 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.Double,
+                DataType = DataType.Decimal,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "FirstOrderTe4" } }
+                Path = new Path() { Components = new[] { "FirstOrderTe9" } }
             }).Id.Value;
 
-            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Double });
+            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
 
             client.SetData(id, new Datum[]
             {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
-                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 }
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0m },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0m },
+                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0m }
             });
 
             var result = client.GetData(id, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1));

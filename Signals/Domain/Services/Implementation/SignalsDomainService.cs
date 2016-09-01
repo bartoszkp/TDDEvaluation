@@ -165,18 +165,28 @@ namespace Domain.Services.Implementation
             int monthDifferenceBetweenOlderAndCurrent =
                 CalcDifferenceDependOnGranularity(olderDatum.Signal.Granularity, timeStamp, olderDatum.Timestamp);
 
-            double DiferenceBetweenOlderNewer = Convert.ToDouble(newerDatum.Value) - Convert.ToDouble(olderDatum.Value);
+            decimal DiferenceBetweenOlderNewer = Convert.ToDecimal(newerDatum.Value) - Convert.ToDecimal(olderDatum.Value);
 
-            double addingValue = DiferenceBetweenOlderNewer / monthDifferenceBetweenOlderAndNewer;
+            decimal addingValue = DiferenceBetweenOlderNewer / monthDifferenceBetweenOlderAndNewer;
 
-            double result = Convert.ToDouble(olderDatum.Value);
+            decimal result = Convert.ToDecimal(olderDatum.Value);
 
             for (int i = 0; i < monthDifferenceBetweenOlderAndCurrent; i++)
             {
                 result += addingValue;
             }
 
-            return result;
+            return ConvertResultToRightType(result, olderDatum.Signal.DataType);
+        }
+
+        private object ConvertResultToRightType(decimal result, DataType dataType)
+        {
+            switch (dataType)
+            {
+                case DataType.Double:
+                    return Convert.ToDouble(result);
+            }
+            return result; //if decimal
         }
 
         private int CalcDifferenceDependOnGranularity(Granularity granularity, DateTime olderTimestamp, DateTime newerTimestamp)
@@ -186,7 +196,7 @@ namespace Domain.Services.Implementation
             return int.MinValue;
         }
 
-        public int MonthDifference(DateTime olderValue, DateTime newerValue)
+        private int MonthDifference(DateTime olderValue, DateTime newerValue)
         {
             return (olderValue.Month - newerValue.Month) + 12 * (olderValue.Year - newerValue.Year);
         }
