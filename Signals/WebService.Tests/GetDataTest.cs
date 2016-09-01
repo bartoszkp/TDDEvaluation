@@ -30,6 +30,35 @@ namespace WebService.Tests
         }
 
 
+        [TestMethod]
+        public void SignalExists_GetData_WithSameTimestaps_SingleDatumReturned()
+        {
+            SetupWebService();
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Integer,
+                Granularity = Domain.Granularity.Month
+            };
+            var timestamp = new DateTime(2000, 1, 1);
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(signal);
+            Mock<NoneQualityMissingValuePolicy<int>> mvp = new Mock<NoneQualityMissingValuePolicy<int>>();
+            mvpRepoMock.Setup(m => m.Get(signal)).Returns(mvp.Object);
+
+            signalsDataRepoMock.Setup(s => s.GetData<int>(signal, timestamp, timestamp))
+                .Returns(new List<Datum<int>>());
+
+            var result = signalsWebService.GetData(1, timestamp, timestamp);
+
+            var fetchedDatumObject = result.ElementAt(0);
+
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(Dto.Quality.None, fetchedDatumObject.Quality);
+            Assert.AreEqual(0, fetchedDatumObject.Value);
+            Assert.AreEqual(timestamp, fetchedDatumObject.Timestamp);
+
+
+
         [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
         [TestMethod]
         public void SetData_VerifyTimeStamp_Week_Exception()
@@ -50,6 +79,30 @@ namespace WebService.Tests
             signalsWebService.SetData(1, new List<Dto.Datum>()
             {
                 new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 2), Value = (double)2 }
+            });
+        }
+
+
+        [ExpectedException(typeof(Domain.Exceptions.BadDateFormatForSignalException))]
+        [TestMethod]
+        public void SetData_VerifyTimeStamp_Second_Exception()
+        {
+            SetupWebService();
+
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = Domain.DataType.Double,
+                Granularity = Granularity.Week
+            };
+
+
+            signalsRepoMock.Setup(x => x.Get(It.Is<int>(z => z == 1)))
+                .Returns(signal);
+
+            signalsWebService.SetData(1, new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1, 11, DateTimeKind.Utc), Value = (double)2 }
             });
         }
 
