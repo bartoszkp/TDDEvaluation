@@ -207,10 +207,15 @@ namespace Domain.Services.Implementation
                     return HourDifference(olderTimestamp, newerTimestamp);
                 case Granularity.Minute:
                     return MinuteDifference(olderTimestamp, newerTimestamp);
-                    //case Granularity.Second:
-                    //    return SecondDifference(olderTimestamp, newerTimestamp);
+                case Granularity.Second:
+                    return SecondDifference(olderTimestamp, newerTimestamp);
             }
             throw new ArgumentException("This granularity is not supported");
+        }
+
+        private int SecondDifference(DateTime olderTimestamp, DateTime newerTimestamp)
+        {
+            return Convert.ToInt32((olderTimestamp - newerTimestamp).TotalSeconds);
         }
 
         private int MinuteDifference(DateTime olderTimestamp, DateTime newerTimestamp)
