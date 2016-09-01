@@ -18,7 +18,7 @@ namespace WebService.Tests
         private SignalsWebService signalsWebService;
 
         [TestMethod]
-        public void GetData_FillsDecimalGranularityData()
+        public void GetData_FillsDecimalData_WithMonthGranularity()
         {
             SetupWebService();
 
@@ -67,6 +67,57 @@ namespace WebService.Tests
             Assert.AreEqual(3m, resultDatum.Value);
             Assert.AreEqual(Dto.Quality.Fair, resultDatum.Quality);
 
+        }
+
+        [TestMethod]
+        public void GetData_FillsIntegerDataWithDayGranularity()
+        {
+            SetupWebService();
+
+            var returnedSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Day
+            };
+
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<int>(returnedSignal,
+                It.Is<DateTime>(d => d.Day == 6), 1)).Returns(new List<Datum<int>>()
+                {
+                    new Datum<int> { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 8), Value = 5 }
+                });
+
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<int>(returnedSignal,
+                It.Is<DateTime>(d => d.Day == 6), 1)).Returns(new List<Datum<int>>()
+                {
+                    new Datum<int> { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 5), Value = 2 }
+                });
+
+
+            signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+
+            var genericInstance = new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger();
+
+            missingValuePolicyRepositoryMock.Setup(m => m.Get(returnedSignal)).Returns(genericInstance);
+
+            var from = new DateTime(2000, 5, 6);
+            var to = new DateTime(2000, 5, 7);
+
+            signalsDataRepositoryMock.Setup(s => s.GetData<int>(returnedSignal, from, to))
+               .Returns(new List<Datum<int>>()
+               {
+                   new Datum<int> { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 1 },
+                   new Datum<int> { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 5), Value = 2 },
+                   new Datum<int> { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 8), Value = 5 }
+               });
+
+            var result = signalsWebService.GetData(1, from, to);
+            var resultDatum = result.ElementAt(0);
+
+
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(3, resultDatum.Value);
+            Assert.AreEqual(Dto.Quality.Fair, resultDatum.Quality);
         }
 
 
