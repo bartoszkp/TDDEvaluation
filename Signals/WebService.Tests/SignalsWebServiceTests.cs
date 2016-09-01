@@ -877,21 +877,6 @@ namespace WebService.Tests
                 var from = new DateTime(1999, 11, 1);
                 var to = new DateTime(2000, 11, 1);
 
-                signalsDataRepoMock
-                    .Setup(q => q.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<Datum<double>>());
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == from), 1))
-                    .Returns(new[] { datums.First() });
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetDataOlderThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == to), 1))
-                    .Returns(new[] { datums.Last() });
-
-
-
-
                 var result = signalsWebService.GetData(signalId, from, to);
 
                 Assert.AreEqual(Dto.Quality.None, result.ElementAt(0).Quality);
@@ -924,20 +909,6 @@ namespace WebService.Tests
 
                 var from = new DateTime(1999, 11, 1);
                 var to = new DateTime(2000, 11, 1);
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<Datum<double>>());
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == from), 1))
-                    .Returns(new[] { datums.First() });
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetDataOlderThan<double>(It.IsAny<Signal>(), It.Is<DateTime>(s => s == to), 1))
-                    .Returns(new[] { datums.Last() });
-
-
 
                 double correctStep = 1.0;
 
@@ -974,30 +945,6 @@ namespace WebService.Tests
 
                 var from = new DateTime(1999, 11, 1);
                 var to = new DateTime(2000, 11, 1);
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns<Signal, DateTime, DateTime>((s, fromE, toE) => 
-                    {
-                        return datums.Where(q => q.Timestamp >= fromE && q.Timestamp <= toE); //new List<Datum<double>>();                            
-                    });
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
-                    .Returns<Signal, DateTime, int>((s, d, m) => {
-                        if (datums.FirstOrDefault(q => q.Timestamp >= d) == null) return new[] { datums.Last() };
-                        return new[] { datums.FirstOrDefault(q => q.Timestamp >= d) };
-                    });
-
-                signalsDataRepoMock
-                    .Setup(q => q.GetDataOlderThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
-                    .Returns<Signal, DateTime, int>((s, d, m) => {
-                        if (datums.FirstOrDefault(q => q.Timestamp <= d) == null) return new[] { datums.First() };
-                        return new[] { datums.FirstOrDefault(q => q.Timestamp <= d) };
-                    });
-
-
-
 
                 var result = signalsWebService.GetData(signalId, from, to);
 
@@ -1149,11 +1096,32 @@ namespace WebService.Tests
                     });
             }
 
-            private void GivenData<T>(int signalId, IEnumerable<Datum<T>> data)
+            private void GivenData<T>(int signalId, IEnumerable<Datum<T>> datums)
             {
                 signalsDataRepoMock
                     .Setup(sd => sd.GetData<T>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(data);
+                    .Returns(datums);
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns<Signal, DateTime, DateTime>((s, fromE, toE) =>
+                    {
+                        return datums.Where(q => q.Timestamp >= fromE && q.Timestamp <= toE); //new List<Datum<double>>();                            
+                    });
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetDataNewerThan<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
+                    .Returns<Signal, DateTime, int>((s, d, m) => {
+                        if (datums.FirstOrDefault(q => q.Timestamp >= d) == null) return new[] { datums.Last() };
+                        return new[] { datums.FirstOrDefault(q => q.Timestamp >= d) };
+                    });
+
+                signalsDataRepoMock
+                    .Setup(q => q.GetDataOlderThan<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
+                    .Returns<Signal, DateTime, int>((s, d, m) => {
+                        if (datums.FirstOrDefault(q => q.Timestamp <= d) == null) return new[] { datums.First() };
+                        return new[] { datums.FirstOrDefault(q => q.Timestamp <= d) };
+                    });
             }
 
             private void GivenData<T>(int signalId, int numberOfDatums, DateTime baseDate)
