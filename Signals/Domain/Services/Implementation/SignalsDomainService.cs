@@ -513,6 +513,7 @@ namespace Domain.Services.Implementation
                                                 Value = default(T),
                                             });
                                         }
+
                                         else
                                         {
                                             var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Days;
