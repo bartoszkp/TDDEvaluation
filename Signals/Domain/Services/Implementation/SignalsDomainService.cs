@@ -212,12 +212,46 @@ namespace Domain.Services.Implementation
                     }
                 }
 
+                else if (policy is FirstOrderMissingValuePolicy<T>)
+                {
+                    var newerData = getNewerDatum<T>(signal, fromIncluded);
+                    var olderData = getOlderDatum<T>(signal, toExcluded);
+
+                    dynamic step = 0;
+                    while (date < toExcluded)
+                    {
+                        Datum<T> datum = null;
+
+                        if (date < newerData.Timestamp || date > olderData.Timestamp)
+                        {
+                            datum = new Datum<T>() { Quality = Quality.None, Timestamp = new DateTime(), Value = default(T) };
+                            newData.Add(datum);
+                        }
+
+                        date = timeNextMethod(date);
+                    }
+                }
+
                 else
                     throw new NotImplementedException();
 
                 return newData;
             }
             return result;
+        }
+
+        
+        private Datum<T> getNewerDatum<T>(Signal signal, DateTime from)
+        {
+            var datum = signalsDataRepository.GetData<T>(signal, from, from);
+            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataNewerThan<T>(signal, from, 1); }
+            return datum.FirstOrDefault();
+        }
+        private Datum<T> getOlderDatum<T>(Signal signal, DateTime to)
+        {
+            var datum = signalsDataRepository.GetData<T>(signal, to, to);
+            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataOlderThan<T>(signal, to, 1); }
+            return datum.FirstOrDefault();
         }
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
