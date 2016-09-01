@@ -152,7 +152,7 @@ namespace WebService.Tests
         }
 
         private void SetupFirstOrderPolicy(Granularity granularity,
-            DateTime fromIncluded, DateTime toExluded, List<Datum<int>> actualToBeReturnedByMockDatums)
+            DateTime fromIncluded, DateTime toExcluded, List<Datum<int>> actualToBeReturnedByMockDatums)
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
             signalsWebService = new SignalsWebService(domainService);
@@ -165,7 +165,7 @@ namespace WebService.Tests
                 { Id = 1, Signal = returnedSignal });
 
 
-            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, fromIncluded, toExluded))
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, fromIncluded, toExcluded))
                 .Returns(actualToBeReturnedByMockDatums);
 
             SetupGetDataOlderAndNewerThanForSignal(returnedSignal);
@@ -916,45 +916,8 @@ namespace WebService.Tests
             AssertEqual(expectedDatum, result);
         }
 
-        [TestMethod]
-        public void GivenAnIntegerSecondSignal_WhenGettingDataWithTimeStampMiddleOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
-        {
-            var returnedSignal = new Signal() { Id = 1, Granularity = Granularity.Second, DataType = DataType.Integer };
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
-
-            mvpRepoMock.Setup(m => m.Get(returnedSignal))
-                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
-                { Id = 1, Signal = returnedSignal });
-
-            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5)))
-                .Returns(new List<Datum<int>>());
-
-            dataRepoMock
-                .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
-                .Returns(new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = 3 }
-                });
-            dataRepoMock
-                .Setup(d => d.GetDataNewerThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
-                .Returns(new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = 5 }
-                });
-
-            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
-            signalsWebService = new SignalsWebService(domainService);
-
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5));
-
-            var expectedDatum = new List<Dto.Datum>() {
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = 4 }, };
-
-            AssertEqual(expectedDatum, result);
-        }
-
         private void SetupFirstOrderPolicy(Granularity granularity,
-            DateTime fromIncluded, DateTime toExluded, List<Datum<int>> actualToBeReturnedByMockDatums)
+            DateTime fromIncluded, DateTime toExcluded, List<Datum<int>> actualToBeReturnedByMockDatums)
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
             signalsWebService = new SignalsWebService(domainService);
@@ -966,7 +929,7 @@ namespace WebService.Tests
                 .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
                 { Id = 1, Signal = returnedSignal });
 
-            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, fromIncluded, toExluded))
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, fromIncluded, toExcluded))
                 .Returns(actualToBeReturnedByMockDatums);
 
             SetupGetDataOlderAndNewerThanForSignal(returnedSignal);
@@ -1543,6 +1506,62 @@ namespace WebService.Tests
 
                     break;
             }
+        }
+
+        [TestMethod]
+        public void GivenAnIntegerSecondSignal_WhenGettingDataWithTimeStampMiddleOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
+        {
+            SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(Granularity.Second, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5));
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5));
+
+            var expectedDatum = GetExpectedSingleDatum(Granularity.Second);
+
+            AssertEqual(expectedDatum, result);
+        }
+
+        private void SetupFirstOrderPolicyForTimeStampMiddleOutOfRange(Granularity granularity, DateTime fromIncluded, DateTime toExcluded)
+        {
+            var returnedSignal = new Signal() { Id = 1, Granularity = Granularity.Second, DataType = DataType.Integer };
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+
+            mvpRepoMock.Setup(m => m.Get(returnedSignal))
+                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
+                { Id = 1, Signal = returnedSignal });
+
+            SetupDataRepoForSignleDatum(returnedSignal);
+
+            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
+            signalsWebService = new SignalsWebService(domainService);
+        }
+
+        private List<Dto.Datum> GetExpectedSingleDatum(Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return new List<Dto.Datum>() { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 4), Value = 4 }, };
+            }
+            return null;
+        }
+
+        private void SetupDataRepoForSignleDatum(Signal returnedSignal)
+        {
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), new DateTime(2000, 1, 1, 0, 0, 5)))
+                .Returns(new List<Datum<int>>());
+
+            dataRepoMock
+                .Setup(d => d.GetDataOlderThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Good, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 3), Value = 3 }
+                });
+            dataRepoMock
+                .Setup(d => d.GetDataNewerThan<int>(returnedSignal, new DateTime(2000, 1, 1, 0, 0, 4), 1))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Signal = returnedSignal, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = 5 }
+                });
         }
     }
 }
