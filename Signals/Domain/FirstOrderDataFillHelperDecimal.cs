@@ -92,7 +92,7 @@ namespace Domain
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var quality = DetermineQuality(previousDatum.Quality, nextDatum.Quality);
                     var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var weeksDifference = (int)timeDifference.TotalDays / 7;
 
@@ -185,7 +185,7 @@ namespace Domain
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var quality = DetermineQuality(previousDatum.Quality, nextDatum.Quality);
                     var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var daysDifference = (int)timeDifference.TotalDays;
 
@@ -278,7 +278,7 @@ namespace Domain
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var quality = DetermineQuality(previousDatum.Quality, nextDatum.Quality);
                     var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var yearsDifference = (int)timeDifference.TotalDays/30/12;
 
@@ -371,7 +371,7 @@ namespace Domain
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var quality = DetermineQuality(previousDatum.Quality, nextDatum.Quality);
                     var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var hoursDifference = (int)timeDifference.TotalHours;
 
@@ -464,7 +464,7 @@ namespace Domain
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var quality = DetermineQuality(previousDatum.Quality, nextDatum.Quality);
                     var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var minutesDifference = (int)timeDifference.TotalMinutes;
 
@@ -557,7 +557,7 @@ namespace Domain
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 
-                    var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var quality = DetermineQuality(previousDatum.Quality, nextDatum.Quality);
                     var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var secondsDifference = (int)timeDifference.TotalSeconds;
 
@@ -651,7 +651,7 @@ namespace Domain
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
                     
-                    var quality = determineQuality(previousDatum.Quality, nextDatum.Quality);
+                    var quality = DetermineQuality(previousDatum.Quality, nextDatum.Quality);
                     var timeDifference = nextDatum.Timestamp - previousDatum.Timestamp;
                     var monthsDifference = (int)timeDifference.TotalDays / 30;
 
@@ -702,7 +702,7 @@ namespace Domain
 
         }
 
-        private static Quality determineQuality(Quality q1, Quality q2)
+        private static Quality DetermineQuality(Quality q1, Quality q2)
         {
 
             switch (q1)
