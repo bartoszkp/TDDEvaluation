@@ -105,10 +105,21 @@ namespace Domain.Services.Implementation
                 if (result == null)
                     return null;
 
-                if (fromIncludedUtc == toExcludedUtc)
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                if (result.Count() == 0)
                 {
-                    return result;
+                    var resultList = result.ToList();
+                    resultList.Add(new Datum<T>()
+                    {
+                        Timestamp = fromIncludedUtc,
+                        Quality = Quality.None,
+                        Value = default(T)
+                    });
+                    return resultList;
                 }
+            }
+                
 
                 for (int j = result.Length - 1; j > 0; --j)
                     for (int i = 0; i < j; ++i)
