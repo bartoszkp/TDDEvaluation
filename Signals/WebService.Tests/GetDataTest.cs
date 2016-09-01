@@ -56,6 +56,7 @@ namespace WebService.Tests
             Assert.AreEqual(Dto.Quality.None, fetchedDatumObject.Quality);
             Assert.AreEqual(0, fetchedDatumObject.Value);
             Assert.AreEqual(timestamp, fetchedDatumObject.Timestamp);
+        }
 
 
 
