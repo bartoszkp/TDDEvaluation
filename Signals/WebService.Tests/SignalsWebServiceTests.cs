@@ -926,34 +926,34 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndFirsOrderMvp_WhenGettingDataDecinmal_CheckIfReturnedDataIsCorrect()
+            public void GivenASignalAndFirsOrderMvp_WhenGettingDataInteger_CheckIfReturnedDataIsCorrect()
             {
                 int signalId = 5;
                 var signal = SignalWith(
                      id: signalId,
-                    dataType: Domain.DataType.Decimal,
+                    dataType: Domain.DataType.Integer,
                     granularity: Domain.Granularity.Month,
                     path: Domain.Path.FromString("root/signal"));
 
-                Datum<decimal> olderDatum = new Datum<decimal>()
-                { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0m, Signal = signal };
-                Datum<decimal> newerDatum = new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0m };
+                Datum<int> olderDatum = new Datum<int>()
+                { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2, Signal = signal };
+                Datum<int> newerDatum = new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5 };
 
-                List<Datum<decimal>> datums = new List<Datum<decimal>>(){
-                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0m },
+                List<Datum<int>> datums = new List<Datum<int>>(){
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
                     olderDatum,
                     newerDatum
                 };
 
                 GivenASignal(signal);
-                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDecimal());
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
                 SetupSignalsDataRepository_ReturnsOlderAndNewerDatums(signalId, olderDatum, newerDatum);
 
                 GivenData(signalId, datums);
 
                 List<Dto.Datum> result = signalsWebService.GetData(signalId, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1)).ToList();
 
-                Assert.AreEqual(3.0m, result[0].Value);
+                Assert.AreEqual(3, result[0].Value);
                 Assert.AreEqual(Dto.Quality.Fair, result[0].Quality);
             }
 
