@@ -289,28 +289,20 @@ namespace WebService.Tests
                     new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 }
             };
 
-            var expectedDatums = new Datum<double>[]
+            var expectedDatums = new Dto.Datum[]
             {
-                   new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
-                   new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.5 },
-                   new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 }
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
             };
 
             SetupWebService(signal);
             SetupMocksForZero<double>(datums, signal);
 
             var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
-            Assert.AreEqual(datums.Count(), result.Count());
+            Assert.AreEqual(expectedDatums.Count(), result.Count());
 
-            int i = 0;
-            foreach (var datum in result)
-            {
-                Assert.AreEqual(expectedDatums[i].Quality, datum.Quality);
-                Assert.AreEqual(expectedDatums[i].Timestamp, datum.Timestamp);
-                Assert.AreEqual(expectedDatums[i].Value, datum.Value);
-
-                i++;
-            }
+            Assert.AreEqual(result.ElementAt(1).Value, expectedDatums[1].Value);
         }
 
         private void SetupWebService(Signal signal=null)

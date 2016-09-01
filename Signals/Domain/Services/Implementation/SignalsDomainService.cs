@@ -140,28 +140,41 @@ namespace Domain.Services.Implementation
                     while (date < fromIncludedUtc)
                         increaseDate(ref date, signal.Granularity);
 
-                    if (typeof(SpecificValueMissingValuePolicy<T>) == mvp.GetType() || typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
+                    if (typeof(SpecificValueMissingValuePolicy<T>) == mvp.GetType() || typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType() || typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
                     {
+                    T value = default(T);
+
                         var mvpSpec = mvp.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                         as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
 
                         for (int i = 0; date < toExcludedUtc && i < result.Length; increaseDate(ref date, signal.Granularity))
                         {
-                            if (result[i].Timestamp == date)
-                                datums.Add(result[i++]);
-                            else
+                        if (result[i].Timestamp == date)
+                        {
+                            value = result[i].Value;
+                            datums.Add(result[i++]);
+                        }
+                        else
+                        {
+                            if (typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
+                                datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+                            else if (typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
                             {
-                                if (typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
-                                    datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
-                                else
-                                    datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
+                                datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = value });
                             }
+                            else
+                                datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
+                        }
                         }
                         for (; date < toExcludedUtc; increaseDate(ref date, signal.Granularity))
                         {
                             if (typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
                                 datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
-                            else
+                        else if (typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
+                        {
+                            datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = value });
+                        }
+                        else
                                 datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
                         }
                     }
