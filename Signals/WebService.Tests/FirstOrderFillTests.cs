@@ -801,13 +801,13 @@ namespace WebService.Tests
         public void GivenAnIntegerSecondSignal_WhenGettingDataWithTimeStampLeftAndRightOutOfRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
             SetupFirstOrderPolicy(Granularity.Second,
-                new DateTime(2000, 1, 1, 0, 0, 3), new DateTime(2000, 1, 1, 0, 0, 10), new List<Datum<int>>()
+                new DateTime(2000, 1, 1, 0, 0, 3), new DateTime(2000, 1, 1, 0, 0, 9), new List<Datum<int>>()
                 {
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (int)5 },
                     new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 6), Value = (int)6 },
                 });
 
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 3), new DateTime(2000, 1, 1, 0, 0, 10));
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 3), new DateTime(2000, 1, 1, 0, 0, 9));
 
             var expectedDatum = GetExpectedDatums(Granularity.Second);
 

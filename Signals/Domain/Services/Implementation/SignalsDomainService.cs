@@ -200,6 +200,17 @@ namespace Domain.Services.Implementation
                                             });
                                         }
 
+                                        else if (x1.ElementAt(0).Quality == Quality.None)
+                                        {
+                                            returnList.Add(new Datum<T>()
+                                            {
+                                                Quality = Quality.None,
+                                                Signal = signal,
+                                                Timestamp = checkedDateTime,
+                                                Value = default(T),
+                                            });
+                                        }
+
                                         else
                                         {
                                             var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Seconds;
