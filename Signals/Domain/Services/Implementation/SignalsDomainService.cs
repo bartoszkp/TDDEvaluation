@@ -189,18 +189,7 @@ namespace Domain.Services.Implementation
                                         var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
                                         var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
 
-                                        if (x0.ElementAt(0).Quality == Quality.None)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
-                                                Signal = signal,
-                                                Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
-
-                                        else if (x1.ElementAt(0).Quality == Quality.None)
+                                        if (x0.ElementAt(0).Quality == Quality.None || x1.ElementAt(0).Quality == Quality.None)
                                         {
                                             returnList.Add(new Datum<T>()
                                             {
@@ -305,18 +294,7 @@ namespace Domain.Services.Implementation
                                         var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
 
 
-                                        if (x0.ElementAt(0).Quality == Quality.None)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
-                                                Signal = signal,
-                                                Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
-
-                                        else if (x1.ElementAt(0).Quality == Quality.None)
+                                        if (x0.ElementAt(0).Quality == Quality.None || x1.ElementAt(0).Quality == Quality.None)
                                         {
                                             returnList.Add(new Datum<T>()
                                             {
