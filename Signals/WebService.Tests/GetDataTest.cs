@@ -114,18 +114,18 @@ namespace WebService.Tests
                 Granularity = Domain.Granularity.Month
             };
 
+            var timestamp = new DateTime(2000, 1, 1);
+
+
             List<Datum<int>> dbDatum = new List<Datum<int>>()
             {
-                new Datum<int>() { Id = 1, Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 10), Value = 1 }
+                new Datum<int>() { Id = 1, Quality = Quality.Fair, Timestamp = timestamp, Value = 1 }
             };
-
-
-            var timestamp = new DateTime(2000, 1, 1);
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns(signal);
             Mock<NoneQualityMissingValuePolicy<int>> mvp = new Mock<NoneQualityMissingValuePolicy<int>>();
             mvpRepoMock.Setup(m => m.Get(signal)).Returns(mvp.Object);
 
-            signalsDataRepoMock.Setup(s => s.GetData<int>(signal, timestamp, timestamp))
+            signalsDataRepoMock.Setup(s => s.GetData<int>(It.IsAny<Signal>() , timestamp, timestamp))
                 .Returns(dbDatum);
 
             var result = signalsWebService.GetData(1, timestamp, timestamp);
@@ -133,9 +133,9 @@ namespace WebService.Tests
             var fetchedDatumObject = result.ElementAt(0);
 
             Assert.AreEqual(1, result.Count());
-            Assert.AreEqual(Dto.Quality.None, fetchedDatumObject.Quality);
-            Assert.AreEqual(0, fetchedDatumObject.Value);
-            Assert.AreEqual(timestamp, fetchedDatumObject.Timestamp);
+            Assert.AreEqual(Dto.Quality.Fair, fetchedDatumObject.Quality);
+            Assert.AreEqual(1, fetchedDatumObject.Value);
+            Assert.AreEqual(dbDatum.First().Timestamp, fetchedDatumObject.Timestamp);
         }
 
 
