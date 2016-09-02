@@ -226,7 +226,7 @@ namespace Domain.Services.Implementation
 
                         if (date > newerData.Timestamp || date < olderData.Timestamp)
                         {
-                            datum = new Datum<T>() { Quality = Quality.None, Timestamp = new DateTime(), Value = default(T) };
+                            datum = new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) };
                             newData.Add(datum);
                             date = timeNextMethod(date);
                             continue;
@@ -244,12 +244,22 @@ namespace Domain.Services.Implementation
 
                         if (date > olderData.Timestamp)
                         {
-                            var previousDatum = newData.Last();
+                            var previousDatum = newData.LastOrDefault();
+                            if ( previousDatum != null )
+                            { 
                             Quality quality;
+
                             if (previousDatum.Quality > nextExsistingDatum.Quality) quality = previousDatum.Quality; else quality = nextExsistingDatum.Quality;
 
-                            datum = new Datum<T>() { Timestamp = previousDatum.Timestamp, Value = previousDatum.Value + step, Quality = quality };
-
+                            datum = new Datum<T>() { Timestamp = timeNextMethod(previousDatum.Timestamp), Value = previousDatum.Value + step, Quality = quality };
+                            
+                            }
+                            else
+                            {
+                                var prevExsistingDatum = getOlderDatum<T>(signal, date);
+                                step = GetStep<T>(signal, prevExsistingDatum, nextExsistingDatum);
+                                datum = this.GetData<T>(signal, prevExsistingDatum.Timestamp, nextExsistingDatum.Timestamp).First(q=>q.Timestamp == date);
+                            }
                             newData.Add(datum);
                         }
                         date = timeNextMethod(date);
