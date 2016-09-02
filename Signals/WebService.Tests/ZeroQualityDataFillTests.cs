@@ -28,7 +28,7 @@ namespace WebService.Tests
 
             var collection = GenerateFillCollection<double>(startvalue, middlevalue, endvalue, Granularity.Month);
 
-            signalsDataRepoMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            signalsDataRepoMock.Setup(x => x.GetDataOlderThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(collection);
 
             mvpRepoMock.Setup(x => x.Get(It.IsAny<Signal>()))
@@ -43,7 +43,7 @@ namespace WebService.Tests
             });
 
 
-            var items = signalsWebService.GetData(1, collection.First().Timestamp, collection.Last().Timestamp);
+            var items = signalsWebService.GetData(1, collection.First().Timestamp, collection.Last().Timestamp).ToList();
 
 
             var returnCollection = items.ToList();
@@ -66,7 +66,7 @@ namespace WebService.Tests
 
             var collection = GenerateFillCollection<double>(startvalue, middlevalue, endvalue, Granularity.Day);
 
-            signalsDataRepoMock.Setup(x => x.GetData<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            signalsDataRepoMock.Setup(x => x.GetDataOlderThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(collection);
 
             mvpRepoMock.Setup(x => x.Get(It.IsAny<Signal>()))
@@ -102,7 +102,7 @@ namespace WebService.Tests
 
             var collection = GenerateFillCollection<int>(startvalue, middlevalue, endvalue, Granularity.Second);
 
-            signalsDataRepoMock.Setup(x => x.GetData<int>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            signalsDataRepoMock.Setup(x => x.GetDataOlderThan<int>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(collection);
 
             mvpRepoMock.Setup(x => x.Get(It.IsAny<Signal>()))
@@ -140,7 +140,7 @@ namespace WebService.Tests
 
             var collection = GenerateFillCollection<int>(startvalue, middlevalue, endvalue, Granularity.Minute);
 
-            signalsDataRepoMock.Setup(x => x.GetData<int>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            signalsDataRepoMock.Setup(x => x.GetDataOlderThan<int>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(collection);
 
             mvpRepoMock.Setup(x => x.Get(It.IsAny<Signal>()))
@@ -175,7 +175,7 @@ namespace WebService.Tests
 
             var collection = GenerateFillCollection<decimal>(startvalue, middlevalue, endvalue, Granularity.Year);
 
-            signalsDataRepoMock.Setup(x => x.GetData<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            signalsDataRepoMock.Setup(x => x.GetDataOlderThan<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(collection);
 
             mvpRepoMock.Setup(x => x.Get(It.IsAny<Signal>()))
@@ -213,7 +213,7 @@ namespace WebService.Tests
 
             var collection = GenerateFillCollection<decimal>(startvalue, middlevalue, endvalue, Granularity.Week);
 
-            signalsDataRepoMock.Setup(x => x.GetData<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            signalsDataRepoMock.Setup(x => x.GetDataOlderThan<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(collection);
 
             mvpRepoMock.Setup(x => x.Get(It.IsAny<Signal>()))

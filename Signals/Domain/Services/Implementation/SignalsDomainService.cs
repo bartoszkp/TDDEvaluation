@@ -91,9 +91,8 @@ namespace Domain.Services.Implementation
             if (!VeryfiTimeStamp(signal.Granularity, fromIncludedUtc))
                 throw new InvalidOperationException("Timestamp error :" + fromIncludedUtc + " dosen't match for " + signal.Granularity);
 
+            var data = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
 
-
-            var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
             var sortedDatums = data?.OrderBy(datum => datum.Timestamp).ToList();
 
             var mvp = GetMissingValuePolicyBase(signalId);

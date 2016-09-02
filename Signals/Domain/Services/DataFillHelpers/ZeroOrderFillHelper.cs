@@ -14,6 +14,8 @@ namespace Domain.Services.DataFillHelpers
             T actuallValue = default(T);
             var time = toExcluded - fromIncluded;
             var quality = Domain.Quality.None;
+            int dateTimeCompare = 0;
+            int dateTimeCompareWithToExclude = 0;
             
             switch(granularity)
             {
@@ -21,7 +23,19 @@ namespace Domain.Services.DataFillHelpers
                     {
                         for(int i=0; i < time.TotalDays; i++)
                         {
-                            if (data[i].Timestamp != fromIncluded.AddDays(i))
+                            dateTimeCompare = DateTime.Compare(data[i].Timestamp, fromIncluded);      
+
+                            if (data[i].Timestamp != fromIncluded.AddDays(i) && dateTimeCompare < 0)
+                            {
+                                Datum<T> newItem = new Datum<T>()
+                                {
+                                    Quality = data[i].Quality,
+                                    Value = data[i].Value,
+                                    Timestamp = fromIncluded.AddDays(i),
+                                };
+                                data.Insert(i, newItem);
+                            }
+                            if (data[i].Timestamp != fromIncluded.AddDays(i) && dateTimeCompare > 0)
                             {
                                 Datum<T> newItem = new Datum<T>()
                                 {
@@ -32,7 +46,7 @@ namespace Domain.Services.DataFillHelpers
                                 data.Insert(i, newItem);
 
                             }
-                            else
+                            else 
                             {
                                 actuallValue = data[i].Value;
                                 quality = data[i].Quality;
@@ -45,7 +59,20 @@ namespace Domain.Services.DataFillHelpers
                     {
                         for (int i = 0; i < time.TotalHours; i++)
                         {
-                            if (data[i].Timestamp != fromIncluded.AddHours(i))
+                            dateTimeCompare = DateTime.Compare(data[i].Timestamp, fromIncluded);
+
+                            if (data[i].Timestamp != fromIncluded.AddHours(i) && dateTimeCompare < 0)
+                            {
+                                Datum<T> newItem = new Datum<T>()
+                                {
+                                    Quality = data[i].Quality,
+                                    Value = data[i].Value,
+                                    Timestamp = fromIncluded.AddHours(i),
+                                };
+                                data.Insert(i, newItem);
+
+                            }
+                            if (data[i].Timestamp != fromIncluded.AddHours(i) && dateTimeCompare > 0)
                             {
                                 Datum<T> newItem = new Datum<T>()
                                 {
@@ -68,7 +95,20 @@ namespace Domain.Services.DataFillHelpers
                     {
                         for (int i = 0; i < time.TotalMinutes; i++)
                         {
-                            if (data[i].Timestamp != fromIncluded.AddMinutes(i))
+                            dateTimeCompare = DateTime.Compare(data[i].Timestamp, fromIncluded);
+
+                            if (data[i].Timestamp != fromIncluded.AddMinutes(i) && dateTimeCompare < 0)
+                            {
+                                Datum<T> newItem = new Datum<T>()
+                                {
+                                    Quality = data[i].Quality,
+                                    Value = data[i].Value,
+                                    Timestamp = fromIncluded.AddMinutes(i),
+                                };
+                                data.Insert(i, newItem);
+
+                            }
+                            if (data[i].Timestamp != fromIncluded.AddMinutes(i) && dateTimeCompare > 0)
                             {
                                 Datum<T> newItem = new Datum<T>()
                                 {
@@ -92,7 +132,20 @@ namespace Domain.Services.DataFillHelpers
                         int months = toExcluded.Month - fromIncluded.Month + (12 * (toExcluded.Year - fromIncluded.Year));
                         for (int i = 0; i < months ; i++)
                         {
-                            if (data[i].Timestamp != fromIncluded.AddMonths(i))
+                            dateTimeCompare = DateTime.Compare(data[i].Timestamp, fromIncluded);
+
+                            if (data[i].Timestamp != fromIncluded.AddMonths(i) && dateTimeCompare < 0)
+                            {
+                                Datum<T> newItem = new Datum<T>()
+                                {
+                                    Quality = data[i].Quality,
+                                    Value = data[i].Value,
+                                    Timestamp = fromIncluded.AddMonths(i),
+                                };
+                                data.Insert(i, newItem);
+
+                            }
+                            else if (data[i].Timestamp != fromIncluded.AddMonths(i) && dateTimeCompare > 0)
                             {
                                 Datum<T> newItem = new Datum<T>()
                                 {
@@ -115,7 +168,20 @@ namespace Domain.Services.DataFillHelpers
                     {
                         for (int i = 0; i < time.TotalSeconds; i++)
                         {
-                            if (data[i].Timestamp != fromIncluded.AddSeconds(i))
+                            dateTimeCompare = DateTime.Compare(data[i].Timestamp, fromIncluded);
+
+                            if (data[i].Timestamp != fromIncluded.AddSeconds(i) && dateTimeCompare < 0)
+                            {
+                                Datum<T> newItem = new Datum<T>()
+                                {
+                                    Quality = data[i].Quality,
+                                    Value = data[i].Value,
+                                    Timestamp = fromIncluded.AddSeconds(i),
+                                };
+                                data.Insert(i, newItem);
+
+                            }
+                            else if (data[i].Timestamp != fromIncluded.AddSeconds(i) && dateTimeCompare > 0)
                             {
                                 Datum<T> newItem = new Datum<T>()
                                 {
@@ -138,7 +204,20 @@ namespace Domain.Services.DataFillHelpers
                     {
                         for (int i = 0; i < (time.TotalDays / 7); i++)
                         {
-                            if (data[i].Timestamp != fromIncluded.AddDays(7 * i))
+                            dateTimeCompare = DateTime.Compare(data[i].Timestamp, fromIncluded);
+
+                            if (data[i].Timestamp != fromIncluded.AddDays(7 * i) && dateTimeCompare < 0)
+                            {
+                                Datum<T> newItem = new Datum<T>()
+                                {
+                                    Quality = data[i].Quality,
+                                    Value = data[i].Value,
+                                    Timestamp = fromIncluded.AddDays(7 * i),
+                                };
+                                data.Insert(i, newItem);
+
+                            }
+                            else if (data[i].Timestamp != fromIncluded.AddDays(7 * i) && dateTimeCompare > 0)
                             {
                                 Datum<T> newItem = new Datum<T>()
                                 {
@@ -162,7 +241,20 @@ namespace Domain.Services.DataFillHelpers
                         var year = toExcluded.Year - fromIncluded.Year;
                         for (int i = 0; i < year; i++)
                         {
-                            if (data[i].Timestamp != fromIncluded.AddYears(i))
+                            dateTimeCompare = DateTime.Compare(data[i].Timestamp, fromIncluded);
+
+                            if (data[i].Timestamp != fromIncluded.AddYears(i) && dateTimeCompare < 0)
+                            {
+                                Datum<T> newItem = new Datum<T>()
+                                {
+                                    Quality = data[i].Quality,
+                                    Value = data[i].Value,
+                                    Timestamp = fromIncluded.AddYears(i),
+                                };
+                                data.Insert(i, newItem);
+
+                            }
+                            else if (data[i].Timestamp != fromIncluded.AddYears(i) && dateTimeCompare > 0)
                             {
                                 Datum<T> newItem = new Datum<T>()
                                 {
