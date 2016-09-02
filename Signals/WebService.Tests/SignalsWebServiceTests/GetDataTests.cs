@@ -5,6 +5,7 @@ using DataAccess.GenericInstantiations;
 using System.Collections.Generic;
 using WebService.Tests.SignalsWebServiceTests.Infrastructure;
 using Moq;
+using Domain;
 
 namespace WebService.Tests.SignalsWebServiceTests
 {
@@ -245,9 +246,129 @@ namespace WebService.Tests.SignalsWebServiceTests
             };
 
             Assert.IsTrue(Utils.CompareDatum(expected, result));
+        }
+
+        [TestMethod]
+        public void GetData_SignalWithDataTypeDouble_FirstOrderMissingValuePolicyShouldFillMissingData()
+        {
+            var signalId = 1;
+            var signal = Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Month);
+            SetupGet(signal);
+            SetupMVPGet(new FirstOrderMissingValuePolicyDouble());
+
+            var datum = new[] {
+               new Domain.Datum<double> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2000,1,1), Value = 1.0 },
+               new Domain.Datum<double> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2000,5,1), Value = 2.0},
+               new Domain.Datum<double> {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000,8,1), Value = 5.0}
+            };
+
+            SetupGetData(datum);
+
+            signalsDataRepositoryMock.Setup(sdr => sdr.GetDataOlderThan<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                .Returns(new[] { (Domain.Datum<double>)null});
+
+
+            signalsDataRepositoryMock
+                    .Setup(q => q.GetDataNewerThan<double>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns<Signal, DateTime, int>((sig, dateTime, count) => {
+                        return new[] { datum.FirstOrDefault(x=>x.Timestamp >= dateTime) };
+                    });
+            
+            var result = signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1)).ToArray();
+
+            var expected = new[] {
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999,11, 1), Value = 0.0},
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 12, 1), Value = 0.0 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = 1.25 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 1.50},
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = 1.75 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 6, 1), Value = 3.0 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 7, 1), Value = 4.0 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 9, 1), Value = 0.0 },
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 10, 1), Value = 0.0 },
+            };
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+        }
+
+        [TestMethod]
+        public void GetData_NoDataInRequestedSectorDecimal_FirstOrderMissingValuePolicyShouldReturnOneElement()
+        {
+            var signalId = 1;
+            var signal = Utils.SignalWith(signalId, Domain.DataType.Decimal, Domain.Granularity.Month);
+            SetupGet(signal);
+            SetupMVPGet(new FirstOrderMissingValuePolicyDecimal());
+
+            var datum = new[] {
+               new Domain.Datum<decimal> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2000,1,1), Value = 1m },
+               new Domain.Datum<decimal> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2000,5,1), Value = 2m},
+               new Domain.Datum<decimal> {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000,8,1), Value = 5m}
+            };
+
+            SetupGetData(datum);
+
+            signalsDataRepositoryMock.Setup(sdr => sdr.GetDataOlderThan<decimal>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                .Returns(new[] {datum[1]});
+
+
+            signalsDataRepositoryMock
+                    .Setup(q => q.GetDataNewerThan<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns<Signal, DateTime, int>((sig, dateTime, count) => {
+                        return new[] { datum.FirstOrDefault(x => x.Timestamp >= dateTime) };
+                    });
+
+            var result = signalsWebService.GetData(signalId, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1)).ToArray();
+            var expected = new[] { new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000,6,1), Value = 3} };
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+        }
+
+        [TestMethod]
+        public void GetData_NoDataInRequestedSectorInteger_FirstOrderMissingValuePolicyShouldFillMissingData()
+        {
+
+            var signalId = 1;
+            var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Year);
+            SetupGet(signal);
+            SetupMVPGet(new FirstOrderMissingValuePolicyInteger());
+
+            var datum = new[] {
+               new Domain.Datum<int> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2001,1,1), Value = (int)1 },
+               new Domain.Datum<int> {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2010,1,1), Value = (int)10}
+            };
+
+            SetupGetData(datum);
+
+            signalsDataRepositoryMock.Setup(sdr => sdr.GetDataOlderThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                .Returns(new[] { datum[0] });
+
+
+            signalsDataRepositoryMock
+                    .Setup(q => q.GetDataNewerThan<int>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns<Signal, DateTime, int>((sig, dateTime, count) => {
+                        return new[] { datum.FirstOrDefault(x => x.Timestamp >= dateTime) };
+                    });
+
+            var result = signalsWebService.GetData(signalId, new DateTime(2003, 1, 1), new DateTime(2006, 1, 1)).ToArray();
+
+            var expected = new[] {
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2003, 1, 1), Value = 3 },
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2004, 1, 1), Value = 4 },
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = 5 }
+            };
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+        }
+
+        [TestMethod]
+        public void MyTestMethod()
+        {
 
         }
-        
+
         [TestMethod]
         public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
         {

@@ -237,7 +237,7 @@ namespace Domain.Services.Implementation
             if (granuality == Granularity.Day) return (int)(datum1.Timestamp - datum2.Timestamp).TotalDays;
             if (granuality == Granularity.Week) return (int)(datum1.Timestamp - datum2.Timestamp).TotalDays;
             if (granuality == Granularity.Month) return ((datum1.Timestamp.Year - datum2.Timestamp.Year) * 12) + datum1.Timestamp.Month - datum2.Timestamp.Month;
-            if (granuality == Granularity.Year) return (new DateTime(1, 1, 1) + (datum2.Timestamp - datum1.Timestamp)).Year - 1;
+            if (granuality == Granularity.Year) return (new DateTime(1, 1, 1) + (datum1.Timestamp - datum2.Timestamp)).Year - 1;
 
             return 0;
         }

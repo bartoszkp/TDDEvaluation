@@ -54,8 +54,8 @@ namespace WebService
                   .GetMethod("DeleteGeneric", BindingFlags.NonPublic | BindingFlags.Instance)
                   .MakeGenericMethod(new Type[] { GetSignalType(signalId) });
 
-            object[] WTF = new object[] { (object)signalId };
-            method.Invoke(this,WTF);
+            object[] pararm = new object[] { (object)signalId };
+            method.Invoke(this,pararm);
         }
 
         private void DeleteGeneric<T>(int signalId)

@@ -26,5 +26,6 @@ namespace Domain.MissingValuePolicy
                 Value = value
             };
         }
+
     }
 }
