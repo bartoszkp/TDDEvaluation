@@ -283,7 +283,7 @@ namespace Domain.Services.Implementation
                 case Granularity.Minute: timeDifference = nextDatum.Timestamp.Minute - currentDatum.Timestamp.Minute; break;
                 case Granularity.Hour: timeDifference = nextDatum.Timestamp.Hour - currentDatum.Timestamp.Hour; break;
                 case Granularity.Day: timeDifference = nextDatum.Timestamp.Day - currentDatum.Timestamp.Day; break;
-                //case Granularity.Week: timeDifference = nextDatum.Timestamp.Week - currentDatum.Timestamp.Week; break;  --------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                case Granularity.Week: timeDifference = (int)(nextDatum.Timestamp -currentDatum.Timestamp).TotalDays / 7; break;
                 case Granularity.Month: timeDifference = nextDatum.Timestamp.Month - currentDatum.Timestamp.Month; break;
                 case Granularity.Year: timeDifference = nextDatum.Timestamp.Year - currentDatum.Timestamp.Year; break;
             }
