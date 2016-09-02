@@ -15,7 +15,6 @@ namespace Domain.Services.DataFillHelpers
             var time = toExcluded - fromIncluded;
             var quality = Domain.Quality.None;
             int dateTimeCompare = 0;
-            int dateTimeCompareWithToExclude = 0;
             
             switch(granularity)
             {
