@@ -829,12 +829,26 @@ namespace WebService.Tests
             {
                 SetupAllSerivce();
 
+                signalsWebService.Delete(1);
 
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_MVPIsCleared()
+            {
+                SetupAllSerivce();
+
+                var signal = SignalWith(1, DataType.Double, Granularity.Minute, Path.FromString("z/a"));
+
+                signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
 
                 signalsWebService.Delete(1);
 
+                missingValueRepoMock.Verify(x => x.Set(signal, null));
+
 
             }
+
 
             private void SetupAllSerivce()
             {
