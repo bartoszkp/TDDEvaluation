@@ -364,6 +364,42 @@ namespace WebService.Tests.SignalsWebServiceTests
         }
 
         [TestMethod]
+        public void GetData_SignalGranualityWeek_FirstOrderMissingValuePolicyShouldFillMissingData()
+        {
+            var signalId = 1;
+            var signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Week);
+            SetupGet(signal);
+            SetupMVPGet(new FirstOrderMissingValuePolicyInteger());
+
+            var datum = new[] {
+               new Domain.Datum<int> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2016,8,15), Value = (int)1 },
+               new Domain.Datum<int> {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,8,29), Value = (int)10}
+            };
+
+            SetupGetData(datum);
+
+            signalsDataRepositoryMock.Setup(sdr => sdr.GetDataOlderThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                .Returns(new[] { datum[0] });
+
+
+            signalsDataRepositoryMock
+                    .Setup(q => q.GetDataNewerThan<int>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    .Returns<Signal, DateTime, int>((sig, dateTime, count) =>
+                    {
+                        return new[] { datum.FirstOrDefault(x => x.Timestamp >= dateTime) };
+                    });
+
+            var result = signalsWebService.GetData(signalId, new DateTime(2016, 8, 15), new DateTime(2016,9,5)).ToArray();
+
+            var expected = new[] {
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 15), Value = 1 },
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 22), Value = 5.5 },
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 29), Value = 10 } };
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+
+        }
+
         public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
         {
             Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMilliseconds(1)));
