@@ -24,18 +24,107 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenNoData_ReturnsNoneQualityForTheWholeRange()
+        public void GivenASecondSignalWithoutData_WhenReadingData_ReturnsNoneQualityForTheWholeRange()
         {
-            ForAllGranularities((granularity)
-                =>
-            {
-                GivenNoData();
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenNoData();
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithoutData_WhenReadingData_ReturnsNoneQualityForTheWholeRange()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenNoData();
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithoutData_WhenReadingData_ReturnsNoneQualityForTheWholeRange()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenNoData();
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithoutData_WhenReadingData_ReturnsNoneQualityForTheWholeRange()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenNoData();
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithoutData_WhenReadingData_ReturnsNoneQualityForTheWholeRange()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenNoData();
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithoutData_WhenReadingData_ReturnsNoneQualityForTheWholeRange()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenNoData();
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithoutData_WhenReadingData_ReturnsNoneQualityForTheWholeRange()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenNoData();
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithNoneQualityForRange(UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
         }
 
         [TestMethod]
