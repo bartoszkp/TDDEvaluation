@@ -835,7 +835,7 @@ namespace WebService.Tests
 
                 signalsWebService.Delete(1);
 
-                signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+                signalsDataRepositoryMock.Verify(x => x.DeleteData<int>(signal));
             }
 
             [TestMethod]
@@ -849,7 +849,7 @@ namespace WebService.Tests
 
                 signalsWebService.Delete(1);
 
-                signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+                signalsDataRepositoryMock.Verify(x => x.DeleteData<decimal>(signal));
             }
             [TestMethod]
             public void GivenASignal_WhenDeleteSignal_DataIsDeleted_String()
@@ -862,7 +862,7 @@ namespace WebService.Tests
 
                 signalsWebService.Delete(1);
 
-                signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+                signalsDataRepositoryMock.Verify(x => x.DeleteData<string>(signal));
             }
 
             [ExpectedException(typeof(NoSuchSignalException))]

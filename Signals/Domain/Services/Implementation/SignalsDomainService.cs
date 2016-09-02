@@ -453,10 +453,23 @@ namespace Domain.Services.Implementation
             {
                 case DataType.Double:
                     signalsDataRepository.DeleteData<double>(signal);
-                    missingValuePolicyRepository.Set(signal, null);
-                    signalsRepository.Delete(signal);
+                    break;
+                case DataType.Boolean:
+                    signalsDataRepository.DeleteData<bool>(signal);
+                    break;
+                case DataType.Decimal:
+                    signalsDataRepository.DeleteData<decimal>(signal);
+                    break;
+                case DataType.String:
+                    signalsDataRepository.DeleteData<string>(signal);
+                    break;
+                case DataType.Integer:
+                    signalsDataRepository.DeleteData<int>(signal);
                     break;
             }
+
+            missingValuePolicyRepository.Set(signal, null);
+            signalsRepository.Delete(signal);
         }
     }
 }
