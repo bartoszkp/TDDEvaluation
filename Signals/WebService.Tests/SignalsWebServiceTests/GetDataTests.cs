@@ -392,8 +392,8 @@ namespace WebService.Tests.SignalsWebServiceTests
             var result = signalsWebService.GetData(signalId, new DateTime(2016, 8, 15), new DateTime(2016,9,5)).ToArray();
 
             var expected = new[] {
-                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 15), Value = 1 },
-                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 22), Value = 5.5 },
+                  new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 8, 15), Value = 1 },
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 22), Value = 5 },
                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 8, 29), Value = 10 } };
 
             Assert.IsTrue(Utils.CompareDatum(expected, result));
