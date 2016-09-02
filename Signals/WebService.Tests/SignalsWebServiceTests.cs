@@ -849,6 +849,23 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_DeleteFromRepository()
+            {
+                {
+                    SetupAllSerivce();
+
+                    var signal = SignalWith(1, DataType.Double, Granularity.Minute, Path.FromString("z/a"));
+
+                    signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
+
+                    signalsWebService.Delete(1);
+
+                    signalsRepositoryMock.Verify(x => x.Delete(signal));
+
+
+                }
+            }
 
             private void SetupAllSerivce()
             {
