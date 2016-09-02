@@ -823,6 +823,18 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
 
             }
+            [ExpectedException(typeof(NoSuchSignalException))]
+            [TestMethod]
+            public void NoSignal_WhenDeleteSignal_Exception()
+            {
+                SetupAllSerivce();
+
+
+
+                signalsWebService.Delete(1);
+
+
+            }
 
             private void SetupAllSerivce()
             {
