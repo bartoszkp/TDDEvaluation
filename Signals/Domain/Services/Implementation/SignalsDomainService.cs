@@ -453,6 +453,7 @@ namespace Domain.Services.Implementation
             {
                 case DataType.Double:
                     signalsDataRepository.DeleteData<double>(signal);
+                    missingValuePolicyRepository.Set(signal, null);
                     break;
             }
         }
