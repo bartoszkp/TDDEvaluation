@@ -1023,6 +1023,42 @@ namespace WebService.Tests
                 Assert.AreEqual(1.0, result.ElementAt(9).Value);
             }
 
+            [TestMethod]
+            public void GetData_FirstOrderMissingValuePolicy_WhenDatumsHaveGranularityWeek_SetValidValue()
+            {
+                int signalId = 1;
+
+                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Week, Path = Domain.Path.FromString("root/s1") };
+
+                GivenASignal(someSignal);
+
+                var datums = new Datum<double>[]
+                    {
+                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 8, 29), Value = 1.0 },
+                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 9, 19), Value = 2.0 },
+                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 10, 3), Value = 5.0 }
+                    };
+                GivenData(signalId, datums);
+
+                mvpRepositoryMock
+                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(new FirstOrderMissingValuePolicyDouble());
+                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
+
+                var from = new DateTime(2016, 8, 22);
+                var to = new DateTime(2016, 10, 10);
+
+                var result = signalsWebService.GetData(signalId, from, to);
+
+                Assert.AreEqual(1.0, result.ElementAt(1).Value);
+
+                Assert.AreEqual(2.0, result.ElementAt(4).Value);
+
+                Assert.AreEqual(5.0, result.ElementAt(6).Value);
+            }
+
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
