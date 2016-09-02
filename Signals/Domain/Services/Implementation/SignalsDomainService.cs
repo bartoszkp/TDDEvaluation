@@ -443,5 +443,16 @@ namespace Domain.Services.Implementation
 
             return false;
         }
+
+        public void Delete(int signalId)
+        {
+            var signal = GetById(signalId);
+            switch(signal.DataType)
+            {
+                case DataType.Double:
+                    signalsDataRepository.DeleteData<double>(signal);
+                    break;
+            }
+        }
     }
 }
