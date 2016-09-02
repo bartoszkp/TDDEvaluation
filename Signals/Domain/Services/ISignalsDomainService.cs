@@ -21,5 +21,6 @@ namespace Domain.Services
         void SetData<T>(IEnumerable<Datum<T>> data,Signal signal);
 
         PathEntry GetPathEntry(Path path);
+        void Delete(int signalId);
     }
 }

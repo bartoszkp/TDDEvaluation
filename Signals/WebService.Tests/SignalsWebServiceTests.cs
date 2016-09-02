@@ -809,6 +809,32 @@ namespace WebService.Tests
             }
 
 
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_DataIsDeleted()
+            {
+                SetupAllSerivce();
+
+                var signal = SignalWith(1, DataType.Double, Granularity.Minute, Path.FromString("z/a"));
+
+                signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
+
+                signalsWebService.Delete(1);
+
+                signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+
+            }
+
+            private void SetupAllSerivce()
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                var domian = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValueRepoMock.Object);
+
+                signalsWebService = new SignalsWebService(domian);
+            }
+
             private void SetupSettingData<T>(Signal existingSignal, Dto.Datum[] existingDatum)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
