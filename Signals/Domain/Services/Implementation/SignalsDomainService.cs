@@ -447,7 +447,9 @@ namespace Domain.Services.Implementation
         public void Delete(int signalId)
         {
             var signal = GetById(signalId);
-            switch(signal.DataType)
+            if (signal == null)
+                throw new NoSuchSignalException("Signal not found");
+            switch (signal.DataType)
             {
                 case DataType.Double:
                     signalsDataRepository.DeleteData<double>(signal);
