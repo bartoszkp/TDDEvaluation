@@ -364,12 +364,6 @@ namespace WebService.Tests.SignalsWebServiceTests
         }
 
         [TestMethod]
-        public void MyTestMethod()
-        {
-
-        }
-
-        [TestMethod]
         public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
         {
             Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMilliseconds(1)));
