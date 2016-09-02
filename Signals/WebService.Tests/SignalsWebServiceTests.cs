@@ -810,7 +810,7 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            public void GivenASignal_WhenDeleteSignal_DataIsDeleted()
+            public void GivenASignal_WhenDeleteSignal_DataIsDeleted_Double()
             {
                 SetupAllSerivce();
 
@@ -823,6 +823,48 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
 
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_DataIsDeleted_Int()
+            {
+                SetupAllSerivce();
+
+                var signal = SignalWith(1, DataType.Integer, Granularity.Minute, Path.FromString("z/a"));
+
+                signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
+
+                signalsWebService.Delete(1);
+
+                signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_DataIsDeleted_Dec()
+            {
+                SetupAllSerivce();
+
+                var signal = SignalWith(1, DataType.Decimal, Granularity.Minute, Path.FromString("z/a"));
+
+                signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
+
+                signalsWebService.Delete(1);
+
+                signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+            }
+            [TestMethod]
+            public void GivenASignal_WhenDeleteSignal_DataIsDeleted_String()
+            {
+                SetupAllSerivce();
+
+                var signal = SignalWith(1, DataType.String, Granularity.Minute, Path.FromString("z/a"));
+
+                signalsRepositoryMock.Setup(x => x.Get(1)).Returns(signal);
+
+                signalsWebService.Delete(1);
+
+                signalsDataRepositoryMock.Verify(x => x.DeleteData<double>(signal));
+            }
+
             [ExpectedException(typeof(NoSuchSignalException))]
             [TestMethod]
             public void NoSignal_WhenDeleteSignal_Exception()
