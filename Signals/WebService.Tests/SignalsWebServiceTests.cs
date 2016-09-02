@@ -1018,9 +1018,9 @@ namespace WebService.Tests
 
                 Assert.AreEqual(0.0, result.ElementAt(0).Value);
 
-                Assert.AreEqual(1.0, result.ElementAt(2).Value);
+                Assert.AreEqual(5.0, result.ElementAt(2).Value);
 
-                Assert.AreEqual(3.0, result.ElementAt(7).Value);
+                Assert.AreEqual(1.0, result.ElementAt(9).Value);
             }
 
 

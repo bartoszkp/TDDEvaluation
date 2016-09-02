@@ -147,7 +147,7 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
             SingleTimestampCheck(signal, fromIncluded);
-            var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
+            var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded).OrderBy(s=>s.Timestamp);
             if (fromIncluded == toExcluded)
             {
                 if (result.Count() == 0)
