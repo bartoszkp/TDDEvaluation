@@ -1264,7 +1264,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SpecificValuePolicyIntTests : SpecificValuePolicyTests<int>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -1281,7 +1280,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SpecificValuePolicyDecimalTests : SpecificValuePolicyTests<decimal>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -1298,7 +1296,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SpecificValuePolicyDoubleTests : SpecificValuePolicyTests<double>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -1315,7 +1312,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SpecificValuePolicyStringTests : SpecificValuePolicyTests<string>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
@@ -1332,7 +1328,6 @@ namespace SignalsIntegrationTests
     [TestClass]
     public class SpecificValuePolicyBooleanTests : SpecificValuePolicyTests<bool>
     {
-
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {

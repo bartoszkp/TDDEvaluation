@@ -117,31 +117,6 @@ namespace SignalsIntegrationTests.Infrastructure
             return client.Add(signal.ToDto<Dto.Signal>());
         }
 
-        protected void ForAllSignalTypesAndQualites(Action<DataType, Granularity, Quality> test)
-        {
-            foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
-            {
-                foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
-                {
-                    foreach (var quality in Enum.GetValues(typeof(Quality)).Cast<Quality>())
-                    {
-                        test(dataType, granularity, quality);
-                    }
-                }
-            }
-        }
-
-        protected void ForAllSignalTypes(Action<DataType, Granularity> test)
-        {
-            foreach (var dataType in Enum.GetValues(typeof(DataType)).Cast<DataType>())
-            {
-                foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
-                {
-                    test(dataType, granularity);
-                }
-            }
-        }
-
         protected Quality OtherThan(Quality quality)
         {
             var values = Enum.GetValues(typeof(Quality));
