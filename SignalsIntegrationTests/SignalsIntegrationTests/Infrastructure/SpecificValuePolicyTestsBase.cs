@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 
-namespace SignalsIntegrationTests
+namespace SignalsIntegrationTests.Infrastructure
 {
     [TestClass]
     public abstract class SpecificValuePolicyTestsBase<T> : MissingValuePolicyTestsBase<T>
