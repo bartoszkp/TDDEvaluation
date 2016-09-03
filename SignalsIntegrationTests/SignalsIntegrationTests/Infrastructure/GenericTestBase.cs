@@ -19,7 +19,7 @@ namespace SignalsIntegrationTests.Infrastructure
             Assertions.AreEqual(expected, whenReadingDataResult);
         }
 
-        protected T Value(object value)
+        public static T Value(object value)
         {
             if (typeof(T).Equals(typeof(bool)))
             {
