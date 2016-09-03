@@ -8260,18 +8260,6 @@ namespace SignalsIntegrationTests
                 .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
                 .EndingWith(Value(10), Quality.Poor));
         }
-
-        private void ForAllGranularities(Action<Granularity> test)
-        {
-            foreach (var granularity in Enum.GetValues(typeof(Granularity)).Cast<Granularity>())
-            {
-                GivenASignalWith(typeof(T).FromNativeType(), granularity);
-
-                WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
-
-                test(granularity);
-            }
-        }
     }
 
     [TestClass]
