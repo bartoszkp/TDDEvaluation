@@ -1647,13 +1647,13 @@ namespace SignalsIntegrationTests
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            ZeroOrderPolicyTests<double>.ClassInitialize(testContext);
+            ZeroOrderPolicyTests<bool>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            ZeroOrderPolicyTests<double>.ClassCleanup();
+            ZeroOrderPolicyTests<bool>.ClassCleanup();
         }
     }
 
@@ -1663,13 +1663,13 @@ namespace SignalsIntegrationTests
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            ZeroOrderPolicyTests<double>.ClassInitialize(testContext);
+            ZeroOrderPolicyTests<string>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            ZeroOrderPolicyTests<double>.ClassCleanup();
+            ZeroOrderPolicyTests<string>.ClassCleanup();
         }
     }
 }

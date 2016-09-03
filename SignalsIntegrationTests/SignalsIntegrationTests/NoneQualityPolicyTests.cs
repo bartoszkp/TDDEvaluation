@@ -1311,13 +1311,13 @@ namespace SignalsIntegrationTests
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            NoneQualityPolicyTests<double>.ClassInitialize(testContext);
+            NoneQualityPolicyTests<bool>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            NoneQualityPolicyTests<double>.ClassCleanup();
+            NoneQualityPolicyTests<bool>.ClassCleanup();
         }
     }
 
@@ -1327,13 +1327,13 @@ namespace SignalsIntegrationTests
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            NoneQualityPolicyTests<double>.ClassInitialize(testContext);
+            NoneQualityPolicyTests<string>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            NoneQualityPolicyTests<double>.ClassCleanup();
+            NoneQualityPolicyTests<string>.ClassCleanup();
         }
     }
 }
