@@ -6765,228 +6765,1500 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithGoodAndFairQualities_InterpolatedValuesHaveFairQuality()
+        public void GivenASecondSignalWithDatumsWithGoodAndFairQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-                =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .StartingWithGoodQualityValue(Value(10)));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithFairAndGoodQualities_InterpolatedValuesHaveFairQuality()
+        public void GivenAMinuteSignalWithDatumsWithGoodAndFairQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-               =>
-            {
-                GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                      new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .EndingWithGoodQualityValue(Value(10)));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithGoodAndPoorQualities_InterpolatedValuesHavePoorQuality()
+        public void GivenAHourSignalWithDatumsWithGoodAndFairQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-               =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .StartingWithGoodQualityValue(Value(10)));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithPoorAndGoodQualities_InterpolatedValuesHavePoorQuality()
+        public void GivenADaySignalWithDatumsWithGoodAndFairQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-               =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .EndingWithGoodQualityValue(Value(10)));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithGoodAndBadQualities_InterpolatedValuesHaveBadQuality()
+        public void GivenAWeekSignalWithDatumsWithGoodAndFairQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-               =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .StartingWithGoodQualityValue(Value(10)));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithBadAndGoodQualities_InterpolatedValuesHaveFairQuality()
+        public void GivenAMonthSignalWithDatumsWithGoodAndFairQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-             =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .EndingWithGoodQualityValue(Value(10)));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithFairAndPoorQualities_InterpolatedValuesHavePoorQuality()
+        public void GivenAYearSignalWithDatumsWithGoodAndFairQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-                =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .StartingWith(Value(10), Quality.Fair));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithPoorAndFairQualities_InterpolatedValuesHavePoorQuality()
+        public void GivenASecondSignalWithDatumsWithFairAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-                =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                  new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .EndingWith(Value(10), Quality.Fair));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithFairAndBadQualities_InterpolatedValuesHaveBadQuality()
+        public void GivenAMinuteSignalWithDatumsWithFairAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-              =>
-            {
-                GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                          new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                  new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .StartingWith(Value(10), Quality.Fair));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithBadAndFairQualities_InterpolatedValuesHaveBadQuality()
+        public void GivenAHourSignalWithDatumsWithFairAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-                =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                  new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .EndingWith(Value(10), Quality.Fair));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithPoorAndBadQualities_InterpolatedValuesHaveBadQuality()
+        public void GivenADaySignalWithDatumsWithFairAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-               =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                  new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .StartingWith(Value(10), Quality.Poor));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
         }
 
         [TestMethod]
         [TestCategory("issue11")]
-        public void GivenDatumsWithBadAndPoorQualities_InterpolatedValuesHaveBadQuality()
+        public void GivenAWeekSignalWithDatumsWithFairAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
         {
-            ForAllGranularities((granularity)
-               =>
-            {
-                GivenData(
-                    new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
-                    new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                  new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
 
-                WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
 
-                ThenResultEquals(DatumArray<T>
-                    .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                    .EndingWith(Value(10), Quality.Poor));
-            });
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithFairAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                  new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithFairAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                  new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Fair, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithGoodAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithGoodAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithGoodAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithGoodAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithGoodAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithGoodAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithGoodAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithPoorAndGoodQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithPoorAndGoodQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithPoorAndGoodQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithPoorAndGoodQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithPoorAndGoodQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithPoorAndGoodQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithPoorAndGoodQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithGoodAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithGoodAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithGoodAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithGoodAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithGoodAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithGoodAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithGoodAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithBadAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithBadAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithBadAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithBadAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithBadAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithBadAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithBadAndGoodQualities_WhenReadingData_InterpolatedValuesHaveFairQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Good, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWithGoodQualityValue(Value(10)));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithFairAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithFairAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithFairAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithFairAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithFairAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithFairAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithFairAndPoorQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithPoorAndFairQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithPoorAndFairQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithPoorAndFairQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithPoorAndFairQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithPoorAndFairQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithPoorAndFairQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithPoorAndFairQualities_WhenReadingData_InterpolatedValuesHavePoorQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Poor, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithFairAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithFairAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithFairAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithFairAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithFairAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithFairAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithFairAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                      new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithBadAndFairQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithBadAndFairQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithBadAndFairQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithBadAndFairQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithBadAndFairQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithBadAndFairQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithBadAndFairQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Fair, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Fair));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithPoorAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithPoorAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithPoorAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithPoorAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithPoorAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithPoorAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithPoorAndBadQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .StartingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenASecondSignalWithDatumsWithBadAndPoorQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Second;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMinuteSignalWithDatumsWithBadAndPoorQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Minute;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAHourSignalWithDatumsWithBadAndPoorQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Hour;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenADaySignalWithDatumsWithBadAndPoorQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Day;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAWeekSignalWithDatumsWithBadAndPoorQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Week;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAMonthSignalWithDatumsWithBadAndPoorQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Month;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Poor));
+        }
+
+        [TestMethod]
+        [TestCategory("issue11")]
+        public void GivenAYearSignalWithDatumsWithBadAndPoorQualities_WhenReadingData_InterpolatedValuesHaveBadQuality()
+        {
+            var granularity = Granularity.Year;
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            WithMissingValuePolicy(new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<T>());
+            GivenData(
+                new Datum<T>() { Quality = Quality.Bad, Value = Value(10), Timestamp = UniversalBeginTimestamp },
+                new Datum<T>() { Quality = Quality.Poor, Value = Value(10), Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1) });
+
+            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
+
+            ThenResultEquals(DatumArray<T>
+                .WithSpecificValueAndQualityForRange(Value(10), Quality.Bad, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
+                .EndingWith(Value(10), Quality.Poor));
         }
 
         private void ForAllGranularities(Action<Granularity> test)
