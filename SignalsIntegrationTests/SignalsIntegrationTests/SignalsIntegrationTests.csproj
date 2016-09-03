@@ -113,6 +113,7 @@
     <Compile Include="BasicSignalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FirstOrderPolicyTests.cs" />
+    <Compile Include="SpecificValuePolicyTestsBase.cs" />
     <Compile Include="ZeroOrderPolicyTests.cs" />
     <Compile Include="SpecificValuePolicyTests.cs" />
   </ItemGroup>

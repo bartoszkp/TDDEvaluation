@@ -1,27 +1,26 @@
 ﻿using Domain;
 using Domain.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SignalsIntegrationTests.Infrastructure;
 
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public abstract class SpecificValuePolicyTests<T> : MissingValuePolicyTestsBase<T>
+    public abstract class SpecificValuePolicyTests<T> : SpecificValuePolicyTestsBase<T>
     {
-        protected virtual T SpecificValue { get { return Value(1410); } }
+        protected override T SpecificValue { get { return Value(1410); } }
 
-        protected virtual Quality SpecificQuality { get { return Quality.Fair; } }
+        protected override Quality SpecificQuality { get { return Quality.Fair; } }
 
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolicyTestsBase<T>.ClassInitialize(testContext);
+            SpecificValuePolicyTestsBase<T>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolicyTestsBase<T>.ClassCleanup();
+            SpecificValuePolicyTestsBase<T>.ClassCleanup();
         }
 
         [TestMethod]
@@ -71,17 +70,6 @@ namespace SignalsIntegrationTests
         public void GivenAYearSignalWithNoData_WhenReadingData_ReturnsSpecificValueForTheWholeRange()
         {
             GivenASignalWithNoData_WhenReadingData_ReturnsSpecificValueForTheWholeRange(Granularity.Year);
-        }
-
-        protected void GivenASignalWithNoData_WhenReadingData_ReturnsSpecificValueForTheWholeRange(Granularity granularity)
-        {
-            GivenASignal(granularity);
-            GivenNoData();
-
-            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
-
-            ThenResultEquals(DatumArray<T>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
         }
 
         [TestMethod]
@@ -280,23 +268,6 @@ namespace SignalsIntegrationTests
             GivenASignalWithSingleDatum_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Year, Quality.Good);
         }
 
-        protected void GivenASignalWithSingleDatum_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity granularity, Quality quality)
-        {
-            GivenASignal(granularity);
-            GivenSingleDatum(new Datum<T>()
-            {
-                Quality = quality,
-                Timestamp = UniversalBeginTimestamp,
-                Value = Value(42)
-            });
-
-            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
-
-            ThenResultEquals(DatumArray<T>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                .StartingWith(Value(42), quality));
-        }
-
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenASecondSignalWithSingleBadDatumBeforeBeginning_WhenReadingData_ReturnsSpecificValueForWholeRange()
@@ -491,22 +462,6 @@ namespace SignalsIntegrationTests
         public void GivenAYearSignalWithSingleGoodDatumBeforeBeginning_WhenReadingData_ReturnsSpecificValueForWholeRange()
         {
             GivenASignalWithSingleDatumBeforeBeginning_WhenReadingData_ReturnsSpecificValueForWholeRange(Granularity.Year, Quality.Good);
-        }
-
-        protected void GivenASignalWithSingleDatumBeforeBeginning_WhenReadingData_ReturnsSpecificValueForWholeRange(Granularity granularity, Quality quality)
-        {
-            GivenASignal(granularity);
-            GivenSingleDatum(new Datum<T>()
-            {
-                Quality = quality,
-                Timestamp = UniversalBeginTimestamp.AddSteps(granularity, -1),
-                Value = Value(42)
-            });
-
-            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
-
-            ThenResultEquals(DatumArray<T>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
         }
 
         [TestMethod]
@@ -705,23 +660,6 @@ namespace SignalsIntegrationTests
             GivenASignalWithSingleDatumAtEnd_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Year, Quality.Good);
         }
 
-        protected void GivenASignalWithSingleDatumAtEnd_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity granularity, Quality quality)
-        {
-            GivenASignal(granularity);
-            GivenSingleDatum(new Datum<T>()
-            {
-                Quality = quality,
-                Timestamp = UniversalEndTimestamp(granularity).AddSteps(granularity, -1),
-                Value = Value(42)
-            });
-
-            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
-
-            ThenResultEquals(DatumArray<T>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                .EndingWith(Value(42), quality));
-        }
-
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenASecondSignalWithSingleBadDatumAfterEnd_WhenReadingData_ReturnsSpecificValueForWholeRange()
@@ -918,233 +856,200 @@ namespace SignalsIntegrationTests
             GivenASignalWithSingleDatumAfterEnd_WhenReadingData_ReturnsSpecificValueForWholeRange(Granularity.Year, Quality.Good);
         }
 
-        protected void GivenASignalWithSingleDatumAfterEnd_WhenReadingData_ReturnsSpecificValueForWholeRange(Granularity granularity, Quality quality)
-        {
-            GivenASignal(granularity);
-            GivenSingleDatum(new Datum<T>()
-            {
-                Quality = quality,
-                Timestamp = UniversalEndTimestamp(granularity),
-                Value = Value(42)
-            });
-
-            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
-
-            ThenResultEquals(DatumArray<T>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity));
-        }
-
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenASecondSignalWithSingleBadDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Second, Quality.Bad);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Second, Quality.Bad);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenASecondSignalWithSinglePoorDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Second, Quality.Poor);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Second, Quality.Poor);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenASecondSignalWithSingleFairDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Second, Quality.Fair);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Second, Quality.Fair);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenASecondSignalWithSingleGoodDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Second, Quality.Good);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Second, Quality.Good);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMinuteSignalWithSingleBadDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Minute, Quality.Bad);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Minute, Quality.Bad);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMinuteSignalWithSinglePoorDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Minute, Quality.Poor);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Minute, Quality.Poor);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMinuteSignalWithSingleFairDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Minute, Quality.Fair);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Minute, Quality.Fair);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMinuteSignalWithSingleGoodDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Minute, Quality.Good);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Minute, Quality.Good);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAHourSignalWithSingleBadDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Hour, Quality.Bad);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Hour, Quality.Bad);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAHourSignalWithSinglePoorDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Hour, Quality.Poor);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Hour, Quality.Poor);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAHourSignalWithSingleFairDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Hour, Quality.Fair);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Hour, Quality.Fair);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAHourSignalWithSingleGoodDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Hour, Quality.Good);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Hour, Quality.Good);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenADaySignalWithSingleBadDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Day, Quality.Bad);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Day, Quality.Bad);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenADaySignalWithSinglePoorDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Day, Quality.Poor);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Day, Quality.Poor);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenADaySignalWithSingleFairDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Day, Quality.Fair);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Day, Quality.Fair);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenADaySignalWithSingleGoodDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Day, Quality.Good);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Day, Quality.Good);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAWeekSignalWithSingleBadDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Week, Quality.Bad);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Week, Quality.Bad);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAWeekSignalWithSinglePoorDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Week, Quality.Poor);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Week, Quality.Poor);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAWeekSignalWithSingleFairDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Week, Quality.Fair);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Week, Quality.Fair);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAWeekSignalWithSingleGoodDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Week, Quality.Good);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Week, Quality.Good);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMonthSignalWithSingleBadDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Month, Quality.Bad);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Month, Quality.Bad);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMonthSignalWithSinglePoorDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Month, Quality.Poor);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Month, Quality.Poor);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMonthSignalWithSingleFairDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Month, Quality.Fair);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Month, Quality.Fair);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAMonthSignalWithSingleGoodDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Month, Quality.Good);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Month, Quality.Good);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAYearSignalWithSingleBadDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Year, Quality.Bad);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Year, Quality.Bad);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAYearSignalWithSinglePoorDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Year, Quality.Poor);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Year, Quality.Poor);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAYearSignalWithSingleFairDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Year, Quality.Fair);
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Year, Quality.Fair);
         }
 
         [TestMethod]
         [TestCategory("issue8")]
         public void GivenAYearSignalWithSingleGoodDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue()
         {
-            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity.Year, Quality.Good);
-        }
-
-        protected void GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangeIsFilledWithSpecificValue(Granularity granularity, Quality quality)
-        {
-            GivenASignal(granularity);
-            GivenSingleDatum(new Datum<T>()
-            {
-                Quality = quality,
-                Timestamp = UniversalMiddleTimestamp(granularity),
-                Value = Value(42)
-            });
-
-            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
-
-            ThenResultEquals(DatumArray<T>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                .WithValueAt(Value(42), quality, UniversalMiddleTimestamp(granularity)));
+            GivenASignalWithSingleDatumInMiddle_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Year, Quality.Good);
         }
 
         [TestMethod]
@@ -1343,32 +1248,7 @@ namespace SignalsIntegrationTests
             GivenASignalWithDatumInMiddleAndDifferentDatumAtBeginning_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity.Year, Quality.Good);
         }
 
-        protected void GivenASignalWithDatumInMiddleAndDifferentDatumAtBeginning_WhenReadingData_RemainingRangesAreFilledWithSpecificValue(Granularity granularity, Quality quality)
-        {
-            GivenASignal(granularity);
-            GivenData(
-                new Datum<T>()
-                {
-                    Quality = OtherThan(quality),
-                    Timestamp = UniversalBeginTimestamp,
-                    Value = Value(1410)
-                },
-                new Datum<T>()
-                {
-                    Quality = quality,
-                    Timestamp = UniversalMiddleTimestamp(granularity),
-                    Value = Value(42)
-                });
-
-            WhenReadingData(UniversalBeginTimestamp, UniversalEndTimestamp(granularity));
-
-            ThenResultEquals(DatumArray<T>
-                .WithSpecificValueAndQualityForRange(SpecificValue, SpecificQuality, UniversalBeginTimestamp, UniversalEndTimestamp(granularity), granularity)
-                .StartingWith(Value(1410), OtherThan(quality))
-                .WithValueAt(Value(42), quality, UniversalMiddleTimestamp(granularity)));
-        }
-
-        protected virtual void GivenASignal(Granularity granularity)
+        protected override void GivenASignal(Granularity granularity)
         {
             GivenASignalWith(typeof(T).FromNativeType(), granularity);
 
