@@ -3749,6 +3749,24 @@ namespace SignalsIntegrationTests
             ThenMissingValuePolicyHasType(typeof(Dto.MissingValuePolicy.FirstOrderMissingValuePolicy));
         }
 
+        [TestMethod]
+        // TODO [TestCategory("issueXX")]
+        // TODO multiply
+        public void GivenASignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        {
+            var granularity = Granularity.Year;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, granularity);
+            GivenASignalWith(dataType, granularity);
+
+            WhenSettingShadowMissingValuePolicy(dataType, shadowSignal);
+
+            ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
+        }
+
+        // TODO shadow with wrong signal granularity
+        // TODO shadow with wrong signal type
+
         private static Domain.MissingValuePolicy.MissingValuePolicyBase CreateForNativeType(
             Type genericPolicyType, Type nativeType)
         {
@@ -3756,6 +3774,18 @@ namespace SignalsIntegrationTests
                 .MakeGenericType(nativeType)
                 .GetConstructor(Type.EmptyTypes)
                 .Invoke(null) as Domain.MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        private void WhenSettingShadowMissingValuePolicy(DataType dataType, Dto.Signal shadowSignal)
+        {
+            var newPolicy = CreateForNativeType(
+               typeof(Domain.MissingValuePolicy.ShadowMissingValuePolicy<>),
+               Domain.Infrastructure.DataTypeUtils.GetNativeType(dataType));
+
+            var dtoPolicy = newPolicy.ToDto<Dto.MissingValuePolicy.ShadowMissingValuePolicy>();
+            dtoPolicy.ShadowSignal = shadowSignal;
+
+            client.SetMissingValuePolicy(signalId, dtoPolicy);
         }
 
         private void WhenSettingSpecificValueMissingValuePolicy(DataType dataType, Quality quality)
@@ -3793,6 +3823,12 @@ namespace SignalsIntegrationTests
         {
             var policy = (Dto.MissingValuePolicy.SpecificValueMissingValuePolicy)client.GetMissingValuePolicy(signalId);
             Assert.AreEqual(quality.ToDto<Dto.Quality>(), policy.Quality);
+        }
+
+        private void ThenSignalHasShadowMissingValuePolicyWith(Dto.Signal shadowSignal)
+        {
+            var policy = (Dto.MissingValuePolicy.ShadowMissingValuePolicy)client.GetMissingValuePolicy(signalId);
+            Assert.AreEqual(shadowSignal.Id, policy.ShadowSignal.Id);
         }
     }
 }
