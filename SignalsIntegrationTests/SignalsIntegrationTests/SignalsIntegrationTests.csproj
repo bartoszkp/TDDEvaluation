@@ -88,6 +88,7 @@
     <Compile Include="MissingValuePolicyBasicTests.cs" />
     <Compile Include="GetDataArgumentsTests.cs" />
     <Compile Include="Infrastructure\TimeEnumerator.cs" />
+    <Compile Include="ShadowMissingValuePolicyAssignmentTests.cs" />
     <Compile Include="SignalDataTests.cs" />
     <Compile Include="Infrastructure\DatumArray.cs" />
     <Compile Include="Infrastructure\DatumExtensions.cs" />

@@ -9,6 +9,14 @@ namespace Domain.MissingValuePolicy
     {
         public virtual Signal ShadowSignal { get; set; }
 
+        public override IEnumerable<Type> CompatibleNativeTypes
+        {
+            get
+            {
+                return new[] { ShadowSignal.DataType.GetNativeType() };
+            }
+        }
+
         public override IEnumerable<Granularity> CompatibleGranularities
         {
             get
