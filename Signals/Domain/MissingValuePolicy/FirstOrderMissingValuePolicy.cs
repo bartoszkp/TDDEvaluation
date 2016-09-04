@@ -2,17 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Infrastructure;
+using Domain.Repositories;
 
 namespace Domain.MissingValuePolicy
 {
     public class FirstOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        [NHibernateIgnore]
-        public override int OlderDataSampleCountNeeded { get { return 1; } }
-
-        [NHibernateIgnore]
-        public override int NewerDataSampleCountNeeded { get { return 1; } }
-
         [NHibernateIgnore]
         public override IEnumerable<Type> CompatibleNativeTypes
         {
@@ -22,7 +17,7 @@ namespace Domain.MissingValuePolicy
             }
         }
 
-        public override IEnumerable<Datum<T>> FillMissingData(
+        private IEnumerable<Datum<T>> FillMissingData(
             TimeEnumerator timeEnumerator,
             IEnumerable<Datum<T>> readData,
             IEnumerable<Datum<T>> additionalOlderData,
@@ -79,6 +74,14 @@ namespace Domain.MissingValuePolicy
                 typeof(T));
 
             return new Datum<T> { Value = older.Value + increase, Timestamp = currentTs, Quality = resultQuality, Signal = Signal };
+        }
+
+        public override IEnumerable<Datum<T>> GetDataAndFillMissingSamples(TimeEnumerator timeEnumerator, ISignalsDataRepository repository)
+        {
+            var originalData = repository.GetData<T>(Signal, timeEnumerator.FromIncludedUtc, timeEnumerator.ToExcludedUtcUtc);
+            var olderData = repository.GetDataOlderThan<T>(Signal, timeEnumerator.FromIncludedUtc, maxSampleCount: 1);
+            var newerData = repository.GetDataNewerThan<T>(Signal, timeEnumerator.ToExcludedUtcUtc, maxSampleCount: 1);
+            return FillMissingData(timeEnumerator, originalData, olderData, newerData);
         }
     }
 }

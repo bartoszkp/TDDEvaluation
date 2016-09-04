@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Domain.Infrastructure;
+using Domain.Repositories;
 
 namespace Domain.MissingValuePolicy
 {
@@ -23,12 +24,6 @@ namespace Domain.MissingValuePolicy
         public abstract Type NativeDataType { get; }
 
         [NHibernateIgnore]
-        public virtual int OlderDataSampleCountNeeded { get { return 0; } }
-
-        [NHibernateIgnore]
-        public virtual int NewerDataSampleCountNeeded { get { return 0; } }
-
-        [NHibernateIgnore]
         public virtual IEnumerable<Type> CompatibleNativeTypes
         {
             get
@@ -46,10 +41,8 @@ namespace Domain.MissingValuePolicy
         [NHibernateIgnore]
         public override Type NativeDataType { get { return typeof(T); } }
 
-        public abstract IEnumerable<Datum<T>> FillMissingData(
-            TimeEnumerator timeEnumerator,
-            IEnumerable<Datum<T>> readData,
-            IEnumerable<Datum<T>> additionalOlderData,
-            IEnumerable<Datum<T>> additionalNewerData);
+        public abstract IEnumerable<Datum<T>> GetDataAndFillMissingSamples(
+            TimeEnumerator timeEnumerator, 
+            ISignalsDataRepository repository);
     }
 }

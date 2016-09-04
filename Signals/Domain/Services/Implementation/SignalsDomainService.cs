@@ -16,8 +16,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -34,7 +34,7 @@ namespace Domain.Services.Implementation
         {
             return this.signalsRepository.Get(signalId);
         }
- 
+
         public Signal Add(Signal signal)
         {
             if (signal.Id.HasValue)
@@ -95,11 +95,13 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             signal.Granularity.ValidateTimestamp(fromIncludedUtc);
-            var readData = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            return this.FillMissingData(signal,
-                                        new TimeEnumerator(fromIncludedUtc, toExcludedUtc, signal.Granularity),
-                                        readData);
+            var missingValuePolicy = GetMissingValuePolicy(signal)
+                as MissingValuePolicy.MissingValuePolicy<T>;
+
+            return missingValuePolicy.GetDataAndFillMissingSamples(
+                new TimeEnumerator(fromIncludedUtc, toExcludedUtc, signal.Granularity),
+                this.signalsDataRepository);
         }
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> data)
@@ -111,24 +113,6 @@ namespace Domain.Services.Implementation
             }
 
             this.signalsDataRepository.SetData<T>(data);
-        }
-
-        private IEnumerable<Datum<T>> FillMissingData<T>(Signal signal, TimeEnumerator timeEnumerator, IEnumerable<Datum<T>> readData)
-        {
-            var missingValuePolicy = GetMissingValuePolicy(signal)
-                as MissingValuePolicy.MissingValuePolicy<T>;
-
-            var olderData = this.signalsDataRepository.GetDataOlderThan<T>(signal,
-                                                                           timeEnumerator.FromIncludedUtc,
-                                                                           missingValuePolicy.OlderDataSampleCountNeeded);
-            var newerData = this.signalsDataRepository.GetDataNewerThan<T>(signal,
-                                                                           timeEnumerator.ToExcludedUtcUtc,
-                                                                           missingValuePolicy.NewerDataSampleCountNeeded);
-
-            return missingValuePolicy.FillMissingData(timeEnumerator,
-                                                      readData,
-                                                      olderData,
-                                                      newerData);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)

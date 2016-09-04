@@ -1,15 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using Domain.Infrastructure;
+using Domain.Repositories;
+using System.Collections.Generic;
 using System.Linq;
-using Domain.Infrastructure;
 
 namespace Domain.MissingValuePolicy
 {
     public class ZeroOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        [NHibernateIgnore]
-        public override int OlderDataSampleCountNeeded { get { return 1; } }
+        public override IEnumerable<Datum<T>> GetDataAndFillMissingSamples(TimeEnumerator timeEnumerator, ISignalsDataRepository repository)
+        {
+            var originalData = repository.GetData<T>(Signal, timeEnumerator.FromIncludedUtc, timeEnumerator.ToExcludedUtcUtc);
+            var olderData = repository.GetDataOlderThan<T>(Signal, timeEnumerator.FromIncludedUtc, maxSampleCount: 1);
+            var newerData = repository.GetDataNewerThan<T>(Signal, timeEnumerator.ToExcludedUtcUtc, maxSampleCount: 1);
+            return FillMissingData(timeEnumerator, originalData, olderData, newerData);
+        }
 
-        public override IEnumerable<Datum<T>> FillMissingData(
+        private IEnumerable<Datum<T>> FillMissingData(
            TimeEnumerator timeEnumerator,
            IEnumerable<Datum<T>> readData,
            IEnumerable<Datum<T>> additionalOlderData,
