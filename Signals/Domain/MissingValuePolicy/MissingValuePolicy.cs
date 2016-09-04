@@ -34,6 +34,17 @@ namespace Domain.MissingValuePolicy
                     .Select(dt => dt.GetNativeType());
             }
         }
+
+        [NHibernateIgnore]
+        public virtual IEnumerable<Granularity> CompatibleGranularities
+        {
+            get
+            {
+                return Enum
+                    .GetValues(typeof(Granularity))
+                    .Cast<Granularity>();
+            }
+        }
     }
 
     public abstract class MissingValuePolicy<T> : MissingValuePolicyBase

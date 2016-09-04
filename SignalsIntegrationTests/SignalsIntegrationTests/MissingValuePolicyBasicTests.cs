@@ -3750,9 +3750,92 @@ namespace SignalsIntegrationTests
         }
 
         [TestMethod]
-        // TODO [TestCategory("issueXX")]
-        // TODO multiply
-        public void GivenASignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        [TestCategory("issueShadowMVP")]
+        public void GivenASecondSignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        {
+            var granularity = Granularity.Second;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, granularity);
+            GivenASignalWith(dataType, granularity);
+
+            WhenSettingShadowMissingValuePolicy(dataType, shadowSignal);
+
+            ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMinuteSignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        {
+            var granularity = Granularity.Minute;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, granularity);
+            GivenASignalWith(dataType, granularity);
+
+            WhenSettingShadowMissingValuePolicy(dataType, shadowSignal);
+
+            ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAHourSignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        {
+            var granularity = Granularity.Hour;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, granularity);
+            GivenASignalWith(dataType, granularity);
+
+            WhenSettingShadowMissingValuePolicy(dataType, shadowSignal);
+
+            ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenADaySignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        {
+            var granularity = Granularity.Day;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, granularity);
+            GivenASignalWith(dataType, granularity);
+
+            WhenSettingShadowMissingValuePolicy(dataType, shadowSignal);
+
+            ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAWeekSignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        {
+            var granularity = Granularity.Week;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, granularity);
+            GivenASignalWith(dataType, granularity);
+
+            WhenSettingShadowMissingValuePolicy(dataType, shadowSignal);
+
+            ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMonthSignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
+        {
+            var granularity = Granularity.Month;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, granularity);
+            GivenASignalWith(dataType, granularity);
+
+            WhenSettingShadowMissingValuePolicy(dataType, shadowSignal);
+
+            ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenYearASignal_WhenSettingShadowMissingValuePolicy_PolicyIsChangedForSignal()
         {
             var granularity = Granularity.Year;
             var dataType = typeof(decimal).FromNativeType();
@@ -3764,8 +3847,509 @@ namespace SignalsIntegrationTests
             ThenSignalHasShadowMissingValuePolicyWith(shadowSignal);
         }
 
-        // TODO shadow with wrong signal granularity
-        // TODO shadow with wrong signal type
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenASecondSignal_WhenSettingMinuteShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Second;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Minute);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenASecondSignal_WhenSettingHourShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Second;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Hour);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenASecondSignal_WhenSettingDayShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Second;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Day);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenASecondSignal_WhenSettingWeekShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Second;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Week);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenASecondSignal_WhenSettingMonthShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Second;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Month);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenASecondSignal_WhenSettingYearShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Second;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Year);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMinuteSignal_WhenSettingSecondShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Minute;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Second);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMinuteSignal_WhenSettingHourShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Minute;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Hour);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMinuteSignal_WhenSettingDayShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Minute;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Day);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMinuteSignal_WhenSettingWeekShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Minute;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Week);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMinuteSignal_WhenSettingMonthShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Minute;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Month);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMinuteSignal_WhenSettingYearShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Minute;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Year);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAHourSignal_WhenSettingSecondShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Hour;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Second);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAHourSignal_WhenSettingMinuteShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Hour;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Minute);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAHourSignal_WhenSettingDayShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Hour;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Day);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAHourSignal_WhenSettingWeekShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Hour;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Week);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAHourSignal_WhenSettingMonthShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Hour;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Month);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAHourSignal_WhenSettingYearShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Hour;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Year);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenADaySignal_WhenSettingSecondShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Day;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Second);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenADaySignal_WhenSettingMinuteShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Day;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Minute);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenADaySignal_WhenSettingHourShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Day;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Hour);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenADaySignal_WhenSettingWeekShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Day;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Week);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenADaySignal_WhenSettingMonthShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Day;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Month);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenADaySignal_WhenSettingYearShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Day;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Year);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAWeekSignal_WhenSettingSecondShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Week;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Second);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAWeekSignal_WhenSettingMinuteShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Week;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Minute);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAWeekSignal_WhenSettingHourShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Week;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Hour);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAWeekSignal_WhenSettingDayShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Week;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Day);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+        
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAWeekSignal_WhenSettingMonthShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Week;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Month);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAWeekSignal_WhenSettingYearShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Week;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Year);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMonthSignal_WhenSettingSecondShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Month;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Second);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMonthSignal_WhenSettingMinuteShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Month;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Minute);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMonthSignal_WhenSettingHourShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Month;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Hour);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMonthSignal_WhenSettingDayShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Month;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Day);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMonthSignal_WhenSettingWeekShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Month;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Week);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAMonthSignal_WhenSettingYearShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Month;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Year);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAYearSignal_WhenSettingSecondShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Year;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Second);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAYearSignal_WhenSettingMinuteShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Year;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Minute);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAYearSignal_WhenSettingHourShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Year;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Hour);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAYearSignal_WhenSettingDayShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Year;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Day);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAYearSignal_WhenSettingWeekShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Year;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Week);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowMVP")]
+        public void GivenAYearSignal_WhenSettingMonthShadowMissingValuePolicy_ShouldThrow()
+        {
+            var granularity = Granularity.Year;
+            var dataType = typeof(decimal).FromNativeType();
+            var shadowSignal = AddNewSignal(dataType, Granularity.Month);
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
+        }
 
         private static Domain.MissingValuePolicy.MissingValuePolicyBase CreateForNativeType(
             Type genericPolicyType, Type nativeType)

@@ -9,6 +9,14 @@ namespace Domain.MissingValuePolicy
     {
         public virtual Signal ShadowSignal { get; set; }
 
+        public override IEnumerable<Granularity> CompatibleGranularities
+        {
+            get
+            {
+                return new[] { ShadowSignal.Granularity };
+            }
+        }
+
         public override IEnumerable<Datum<T>> GetDataAndFillMissingSamples(TimeEnumerator timeEnumerator, ISignalsDataRepository repository)
         {
             throw new NotImplementedException();

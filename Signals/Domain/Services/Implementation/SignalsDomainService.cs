@@ -135,6 +135,11 @@ namespace Domain.Services.Implementation
                 throw new IncompatibleSignalDataType();
             }
 
+            if (!missingValuePolicy.CompatibleGranularities.Contains(signal.Granularity))
+            {
+                throw new IncompatibleSignalGranularity();
+            }
+
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
     }
