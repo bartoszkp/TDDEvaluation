@@ -19,6 +19,11 @@ namespace SignalsIntegrationTests.Infrastructure
             Assertions.AreEqual(expected, whenReadingDataResult);
         }
 
+        public static T NoValue()
+        {
+            return default(T);
+        }
+
         public static T Value(object value)
         {
             if (typeof(T).Equals(typeof(bool)))

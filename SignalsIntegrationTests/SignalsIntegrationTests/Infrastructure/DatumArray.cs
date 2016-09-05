@@ -24,6 +24,18 @@ namespace SignalsIntegrationTests.Infrastructure
                 .WithValue(specificValue);
         }
 
+        public static Datum<T>[] WithSpecificValuesAndQualitiesForRange(
+            T[] values,
+            Quality[] qualities,
+            DateTime fromIncludedUtc,
+            DateTime toExcludedUtc,
+            Granularity granularity)
+        {
+            return ForRange(fromIncludedUtc, toExcludedUtc, granularity)
+                .WithValues(values)
+                .WithQualities(qualities);
+        }
+
         public static Datum<T>[] ForRange(DateTime fromIncludedUtc,
                                           DateTime toExcludedUtc,
                                           Granularity granularity)

@@ -22,6 +22,36 @@ namespace SignalsIntegrationTests.Infrastructure
             return @this;
         }
 
+        public static Datum<T>[] WithValues<T>(this Datum<T>[] @this, T[] values)
+        {
+            if (@this.Length != values.Length)
+            {
+                throw new InvalidOperationException();
+            }
+
+            for (int i = 0; i < @this.Length; ++i)
+            {
+                @this[i].Value = values[i];
+            }
+
+            return @this;
+        }
+
+        public static Datum<T>[] WithQualities<T>(this Datum<T>[] @this, Quality[] qualities)
+        {
+            if (@this.Length != qualities.Length)
+            {
+                throw new InvalidOperationException();
+            }
+
+            for (int i = 0; i < @this.Length; ++i)
+            {
+                @this[i].Quality = qualities[i];
+            }
+
+            return @this;
+        }
+
         public static Datum<T>[] WithValueAt<T>(this Datum<T>[] @this, T value, DateTime timestamp)
         {
             @this.Single(datum => datum.Timestamp == timestamp).Value = value;

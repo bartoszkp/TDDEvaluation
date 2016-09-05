@@ -85,10 +85,12 @@
   <ItemGroup>
     <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\GenericTestBase.cs" />
+    <Compile Include="Infrastructure\ShadowPolicyTestsBase.cs" />
     <Compile Include="MissingValuePolicyBasicTests.cs" />
     <Compile Include="GetDataArgumentsTests.cs" />
     <Compile Include="Infrastructure\TimeEnumerator.cs" />
     <Compile Include="ShadowMissingValuePolicyAssignmentTests.cs" />
+    <Compile Include="ShadowWithMissingDataPolicyTests.cs" />
     <Compile Include="SignalDataTests.cs" />
     <Compile Include="Infrastructure\DatumArray.cs" />
     <Compile Include="Infrastructure\DatumExtensions.cs" />
@@ -115,6 +117,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FirstOrderPolicyTests.cs" />
     <Compile Include="Infrastructure\SpecificValuePolicyTestsBase.cs" />
+    <Compile Include="ShadowPolicyTests.cs" />
     <Compile Include="ZeroOrderPolicyTests.cs" />
     <Compile Include="SpecificValuePolicyTests.cs" />
   </ItemGroup>
