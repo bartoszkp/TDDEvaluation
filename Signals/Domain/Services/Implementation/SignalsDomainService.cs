@@ -68,7 +68,14 @@ namespace Domain.Services.Implementation
         {
             Signal signal = this.signalsRepository.Get(signalId);
             if (signal == null) throw new ArgumentException();
-            missingValuePolicyRepository.Set(signal, policy);
+
+            if (IsShadowMVP(signal.DataType, policy))
+            {
+                if (IsShadowMVPAppropriate(policy, signal)) missingValuePolicyRepository.Set(signal, policy);
+                else throw new ShadowMissingValuePolicyException();
+            }
+
+            else missingValuePolicyRepository.Set(signal, policy);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(int signalID)
@@ -160,6 +167,56 @@ namespace Domain.Services.Implementation
                 default:
                     return;
             }
+        }
+
+        private bool IsShadowMVP(DataType dataType, MissingValuePolicyBase policy)
+        {
+            switch(dataType)
+            {
+                case DataType.Boolean: if (policy is ShadowMissingValuePolicy<bool>) return true; else return false;
+                case DataType.Decimal: if (policy is ShadowMissingValuePolicy<decimal>) return true; else return false;
+                case DataType.Double: if (policy is ShadowMissingValuePolicy<double>) return true; else return false;
+                case DataType.Integer: if (policy is ShadowMissingValuePolicy<int>) return true; else return false;
+                case DataType.String: if (policy is ShadowMissingValuePolicy<string>) return true; else return false;
+                default: return false;
+            }
+        }
+
+        private bool IsShadowMVPAppropriate(MissingValuePolicyBase policy, Signal signal)
+        {
+            Signal shadowSignal = new Signal();
+
+            if(policy is ShadowMissingValuePolicy<bool>)
+            {
+                var shadowPolicy = (ShadowMissingValuePolicy<bool>)policy;
+                shadowSignal = shadowPolicy.ShadowSignal;
+            }
+
+            if (policy is ShadowMissingValuePolicy<decimal>)
+            {
+                var shadowPolicy = (ShadowMissingValuePolicy<decimal>)policy;
+                shadowSignal = shadowPolicy.ShadowSignal;
+            }
+
+            if (policy is ShadowMissingValuePolicy<double>)
+            {
+                var shadowPolicy = (ShadowMissingValuePolicy<double>)policy;
+                shadowSignal = shadowPolicy.ShadowSignal;
+            }
+
+            if (policy is ShadowMissingValuePolicy<int>)
+            {
+                var shadowPolicy = (ShadowMissingValuePolicy<int>)policy;
+                shadowSignal = shadowPolicy.ShadowSignal;
+            }
+
+            if (policy is ShadowMissingValuePolicy<string>)
+            {
+                var shadowPolicy = (ShadowMissingValuePolicy<string>)policy;
+                shadowSignal = shadowPolicy.ShadowSignal;
+            }
+
+            if (signal.DataType == shadowSignal.DataType && signal.Granularity == shadowSignal.Granularity) return true; else return false; 
         }
     }
 }

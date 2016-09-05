@@ -92,6 +92,7 @@ namespace WebService
             else return null;
             
         }
+
         private IEnumerable<Dto.Datum> GetDataWithType<T>(Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             CheckTimestamp(fromIncludedUtc, signal.Granularity);
@@ -123,6 +124,7 @@ namespace WebService
             if (signalType == typeof(decimal)){ SetDataWithType<decimal>(signal, dataDto);}
             if (signalType == typeof(string)) { SetDataWithType<string> (signal, dataDto);}
         }
+
         private void SetDataWithType<T>(Domain.Signal signal, IEnumerable<Datum> dataDto)
         {
             IEnumerable<Domain.Datum<T>> dataDomain = dataDto.ToDomain<IEnumerable<Domain.Datum<T>>>();
