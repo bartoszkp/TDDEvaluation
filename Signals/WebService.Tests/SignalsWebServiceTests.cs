@@ -1021,8 +1021,8 @@ namespace WebService.Tests
                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(1999, 12, 1), Value = (double)2.5},
                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3},
 
-                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)3.5},
-                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)4},
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 2, 1), Value = (double)3.5},
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 3, 1), Value = (double)4},
                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 4, 1), Value = (double)4.5},
 
                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 5, 1), Value = (double)4},
@@ -1032,6 +1032,40 @@ namespace WebService.Tests
 
                 AssertDataDtoEquals(expectedData, result.ToArray());
             }
+
+            [TestMethod]
+            public void GivenASignalWithFirstOrderMissingValuePolicy_WhenGettingData_MissingDataHasWorseQualityFromNeighbours()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3 },
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)7 },
+
+                };
+                GivenData(signal.Id.Value, data);
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3},
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 2, 1), Value = (double)5},
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)7},
+
+                };
+
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
+
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
@@ -1050,6 +1084,7 @@ namespace WebService.Tests
                     data.ElementAt(0).Timestamp == timeStamp &&
                     data.ElementAt(0).Value.Equals(value))), Times.Once);
             }
+
 
             private void GivenMissingValuePolicy(Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
             {
