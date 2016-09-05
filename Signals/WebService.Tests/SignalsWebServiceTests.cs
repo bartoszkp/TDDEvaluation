@@ -1370,10 +1370,10 @@ namespace WebService.Tests
                    .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
                    .Returns(policy);
 
-                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
 
-                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 2), Value = (int)0 });
-                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 3), Value = (int)0 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1), Value = (int)0 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = (int)0 });
 
                 DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
 
