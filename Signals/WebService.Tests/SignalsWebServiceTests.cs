@@ -1181,9 +1181,10 @@ namespace WebService.Tests
             [ExpectedException(typeof(CouldntGetASignalException))]
             public void Delete_NotExistingSignal_NoneExceptionIsThrown()
             {
+                var id = 1;
                 SetupWebService();
 
-                signalsWebService.Delete(1);
+                DeleteASignal(id);
             }
 
             [TestMethod]
@@ -1193,7 +1194,7 @@ namespace WebService.Tests
                 SetupWebService();
 
                 var signalId = 1;
-                signalsWebService.Delete(signalId);
+                DeleteASignal(signalId);
 
                 signalsRepositoryMock.Verify(f => f.Get(It.Is<int>(i => i == signalId)), Times.Once);
             }
@@ -1328,15 +1329,18 @@ namespace WebService.Tests
             [ExpectedException(typeof(CouldntGetASignalException))]
             public void Delete_NotExistingSignal_ShouldThrowsException()
             {
+                var id = 1;
                 Signal sig = null;
                 signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(sig);
                 SetupWebService();
+                DeleteASignal( id);
 
-                var signalId = 1;
-                signalsWebService.Delete(signalId);
+            }
 
+            private void DeleteASignal(int id)
+            {
 
-               
+                signalsWebService.Delete(id);
             }
 
             private Dto.Datum[] MakeNoData()
