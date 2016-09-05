@@ -151,6 +151,15 @@ namespace Domain.Services.Implementation
                 }
             }
 
+            if (missingValuePolicy is ShadowMissingValuePolicy<bool>)
+            {
+                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<bool>;
+                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
+                {
+                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
+                }
+            }
+
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
