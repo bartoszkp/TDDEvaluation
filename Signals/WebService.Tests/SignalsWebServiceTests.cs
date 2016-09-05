@@ -1415,13 +1415,10 @@ namespace WebService.Tests
                          return signal;
                      });
 
-                signalsDataRepositoryMock
-                    .Setup(x => x.GetData<int>((It.Is<Domain.Signal>(s => s.Id== signal.Id)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(datum.ToDomain<IEnumerable<Domain.Datum<int>>>());
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datum.ToArray());
 
-                signalsDataRepositoryMock
-                  .Setup(x => x.GetData<int>(It.Is<Domain.Signal>(s => s.Id == shadowSignalDomain.Id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                  .Returns(shadowDatum.ToDomain<IEnumerable<Domain.Datum<int>>>());
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(shadowSignalDomain, 2, shadowDatum.ToArray());
+
 
                 var policy = new ShadowMissingValuePolicyInteger();
                 policy.ShadowSignal = shadowSignalDomain;
