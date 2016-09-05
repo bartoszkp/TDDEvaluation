@@ -187,6 +187,17 @@ namespace WebService.Tests
 
         }
 
+        [TestMethod]
+        public void GetData_WhenFromIncludeEqualsToExclude_ReturnsNull()
+        {
+            SetupWebService();
+            var returnedSignal = new Domain.Signal() { Id = 1 };
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+
+            var result = signalsWebService.GetData(1, new DateTime(2018, 11, 11), new DateTime(2018, 11, 11));
+
+            Assert.IsNull(result);
+        }
 
         private void SetupWebService()
         {
