@@ -37,7 +37,7 @@ namespace Domain.MissingValuePolicy
             int currentTimeDiff = GetNumberOfTimeStepsBetween(signal.Granularity, olderData.Timestamp, time);
             long wholeTimeDiff = GetNumberOfTimeStepsBetween(signal.Granularity, olderData.Timestamp, newerData.Timestamp);
 
-            T addedValue = ((dynamic)newerData.Value - (dynamic)olderData.Value) * currentTimeDiff / wholeTimeDiff;
+            T addedValue = ((dynamic)newerData.Value - (dynamic)olderData.Value) * currentTimeDiff / (int)wholeTimeDiff;
             return (dynamic)olderData.Value + addedValue;
 
         }

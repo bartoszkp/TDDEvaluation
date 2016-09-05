@@ -226,8 +226,6 @@ namespace Domain.Services.Implementation
         private void AddMissingDataDependsOnMissingValuePolicy<T>(ref List<Datum<T>> datumsList, DateTime fromIncludedUtc, 
             DateTime toExcludedUtc, Signal signal, MissingValuePolicy<T> mvp)
         {
-            var time = fromIncludedUtc;
-
             if (mvp is NoneQualityMissingValuePolicy<T>)
                 mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal);
 
@@ -236,7 +234,7 @@ namespace Domain.Services.Implementation
 
             else if (mvp is ZeroOrderMissingValuePolicy<T>)
             {
-                var dataToAdd = signalsDataRepository.GetDataOlderThan<T>(signal, time, 1).SingleOrDefault();
+                var dataToAdd = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).SingleOrDefault();
                 if (dataToAdd != null)
                     mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal, null, dataToAdd);
                 else
@@ -245,11 +243,12 @@ namespace Domain.Services.Implementation
 
             else if (mvp is FirstOrderMissingValuePolicy<T>)
             {
-                var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, time, 1).SingleOrDefault();
-                var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, time, 1).SingleOrDefault();
+                var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).SingleOrDefault();
+                var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUtc, 1).SingleOrDefault();
                 Datum<T>[] additionalDatums = new Datum<T>[] { olderData, newerData };
                 mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal,null,additionalDatums);
             }
+
             else if (mvp is ShadowMissingValuePolicy<T>)
             {
                 ShadowMissingValuePolicy<T> shadowMvp = mvp as ShadowMissingValuePolicy<T>;
