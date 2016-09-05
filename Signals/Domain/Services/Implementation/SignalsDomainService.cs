@@ -142,7 +142,7 @@ namespace Domain.Services.Implementation
             if (fromIncludedUtc == toExcludedUtc)
             {
                 if (filledList.Count == 0)
-                    filledList.Add(Domain.Datum<T>.CreateNone(signal, fromIncludedUtc));
+                    filledList.Add(GetDatumFilledWithMissingValuePolicy<T>(filledList, data, policy, signal, fromIncludedUtc));
                 return filledList;
             }
 
