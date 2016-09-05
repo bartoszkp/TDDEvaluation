@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using DataAccess.Infrastructure;
+using Domain.Exceptions;
 using Domain.Infrastructure;
 using Domain.Services;
 using Dto;
@@ -97,8 +98,6 @@ namespace WebService
             }
         }
 
-        
-
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var signal = signalsDomainService.GetById(signalId);
@@ -142,10 +141,16 @@ namespace WebService
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
             var signal = signalsDomainService.GetById(signalId);
-
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
 
+            if(policy is ShadowMissingValuePolicy)
+            {
+                var mvp = policy as ShadowMissingValuePolicy;
+                var shadow = mvp.ShadowSignal.ToDomain<Domain.Signal>();
+                if(shadow.DataType != signal.DataType || shadow.Granularity != signal.Granularity)                
+                    throw new IncompatibleShadowSignalException();                
+            }
             var domainPolicy = policy?.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
             signalsDomainService.SetMissingValuePolicy(signal, domainPolicy);
