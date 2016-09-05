@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebService.Tests.WebService.Tests;
 
 namespace WebService.Tests
 {
@@ -29,6 +30,23 @@ namespace WebService.Tests
 
             signalsWebService.Delete(1);
 
+        }
+
+        [TestMethod]
+        public void DeletingSignalShouldAlsoDeleteItsData()
+        {
+            var signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+            var signalsDomainService = new SignalsDomainService(
+                signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+            signalsRepositoryMock
+                .Setup(sr => sr.Get(It.IsAny<int>()))
+                .Returns(new Signal() { DataType = DataType.Integer });
+
+            signalsWebService.Delete(465);
+
+            signalsDataRepositoryMock.Verify(sdr => sdr.DeleteData<int>(It.Is<Signal>(s => s.DataType == DataType.Integer)));
         }
 
 
