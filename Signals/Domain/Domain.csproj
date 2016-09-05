@@ -64,6 +64,7 @@
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\IncompatibleShadowSignalException.cs" />
     <Compile Include="Exceptions\InvalidPolicyDataTypeException.cs" />
+    <Compile Include="Exceptions\SignalNotFoundException.cs" />
     <Compile Include="Exceptions\TypeMismatchException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
