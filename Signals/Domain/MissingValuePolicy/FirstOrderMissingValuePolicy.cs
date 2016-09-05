@@ -9,6 +9,8 @@ namespace Domain.MissingValuePolicy
     {
         public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> olderDatum, Datum<T> newestDatum)
         {
+
+
             var filledData = new List<Datum<T>>();
             foreach (var d in data)
             {

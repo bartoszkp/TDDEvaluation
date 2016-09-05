@@ -107,10 +107,10 @@ namespace Domain.Services.Implementation
                 VerifyTimeStamp<T>(signal.Granularity, item);
             }
 
-            if (fromIncludedUtc==toExcludedUtc)
+            if (fromIncludedUtc == toExcludedUtc)
             {
                 List<Datum<T>> returnElement = new List<Datum<T>>();
-                int indeks = 0;
+                int index = 0;
                 foreach(var x in data)
                 {
                     if (fromIncludedUtc == x.Timestamp)
@@ -118,7 +118,7 @@ namespace Domain.Services.Implementation
                         returnElement.Add(x);
                         return returnElement;
                     }
-                    indeks++;    
+                    index++;    
                 }
             }
             if(missingValuePolicyRepository == null)
