@@ -1435,7 +1435,57 @@ namespace WebService.Tests
                 DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
 
             }
+            [TestMethod]
+            [ExpectedException(typeof(WrongTypesException))]
+            public void GivenASignalDouble_WhenSetsShadowMissingValuePolicyIntegerWithNoData_ThrowsException()
+            {
 
+                Dto.Signal shadowSignal = new Dto.Signal() { Id = 2, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "x", "z" } } };
+                Signal shadowSignalDomain = new Domain.Signal() { Id = 2, DataType = DataType.Integer, Granularity = Granularity.Month, Path = Path.FromString("x/z") };
+
+
+                SetupWebService();
+
+                var signal = new Signal()
+                {
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("a")
+                };
+                var signalId = 1;
+
+                var datum = new List<Dto.Datum>
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 3 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 2, 1), Value = 6 }
+                };
+
+                var shadowDatum = new List<Dto.Datum>
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 71 }
+                };
+
+                signalsRepositoryMock
+                     .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
+                     .Returns<int>(z => {
+                         var signal2 = signal;
+                         signal.Id = signalId;
+                         return signal;
+                     });
+
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datum.ToArray());
+
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(shadowSignalDomain, 2, shadowDatum.ToArray());
+
+
+                var policy = new ShadowMissingValuePolicyInteger();
+                policy.ShadowSignal = shadowSignalDomain;
+
+                missingValuePolicyRepositoryMock
+                   .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == signal.Id)))
+                   .Returns(policy);
+
+            }
             private void DeleteASignal(int id)
             {
 
