@@ -140,7 +140,11 @@ namespace Domain.Services.Implementation
             int index = 0;
 
             if (fromIncludedUtc == toExcludedUtc)
+            {
+                if (filledList.Count == 0)
+                    filledList.Add(new Domain.Datum<T>());
                 return filledList;
+            }
 
             for (DateTime iterativeTime = fromIncludedUtc; iterativeTime < toExcludedUtc; index++, AddTimeBasedOnGranulatity(signal.Granularity, ref iterativeTime))
             {
