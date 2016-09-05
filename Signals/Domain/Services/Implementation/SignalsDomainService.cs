@@ -144,7 +144,8 @@ namespace Domain.Services.Implementation
         {
             if (missingValuePolicy is ShadowMissingValuePolicy<double>)
             {
-                if (signal.DataType != (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.DataType)
+                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<double>;
+                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
                 {
                     throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
                 }
