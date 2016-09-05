@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.MissingValuePolicy
 {
@@ -9,7 +10,23 @@ namespace Domain.MissingValuePolicy
 
         public override IEnumerable<Datum<T>> GetDatum(DateTime timeStamp, Granularity granularity, IEnumerable<Datum<T>> otherData = null, IEnumerable<Datum<T>> previousSamples = null, IEnumerable<Datum<T>> nextSamples = null)
         {
-            return new Domain.Datum<T>[] { };
+            var shadowSignalData = nextSamples.ToList();
+            var datumToInsert = shadowSignalData.Where(d => d.Timestamp == timeStamp).FirstOrDefault();
+
+            if (datumToInsert != null)
+            {
+                return new Datum<T>[]
+                {
+                    new Datum<T>()
+                    {
+                        Quality = datumToInsert.Quality,
+                        Timestamp = timeStamp,
+                        Value = datumToInsert.Value
+                    }
+                };
+            }
+
+            return new Datum<T>[] { };
         }
 
         public virtual void CheckSignalDataTypeAndGranularity(Signal signal)
