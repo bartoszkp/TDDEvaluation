@@ -127,6 +127,11 @@ namespace Domain.Services.Implementation
             if (!ValidateTimestamp(fromIncludedUtc, signal.Granularity) || !ValidateTimestamp(toExcludedUtc, signal.Granularity))
                 throw new InvalidTimestampException();
 
+            if(fromIncludedUtc == toExcludedUtc)
+            {
+                throw new InvalidTimestampException();
+            }
+
             var policy = GetMissingValuePolicy(signal);
             if(policy != null)
             {
