@@ -914,12 +914,87 @@ namespace WebService.Tests
                     SignalWith(1, DataType.Boolean, Granularity.Day, Path.FromString("A")),
                     SignalWith(2, DataType.Double, Granularity.Month, Path.FromString("B"))
                 };
-
                 GivenMultipleSignals(signals);
 
                 var policy = new ShadowMissingValuePolicy() { ShadowSignal = signals[1].ToDto<Dto.Signal>() };
 
                 signalsWebService.SetMissingValuePolicy(1, policy);
+            }
+
+            [TestMethod]
+            public void GivenTwoCompatibleSignalsWithDataAndShadowMVP_WhenGettingData_ReturnsDataAccordingToShadowMVP()
+            {
+                int signalId = 1;
+                int shadowSignalId = 2;
+                var signals = new Signal[] {
+                    SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("A")),
+                    SignalWith(shadowSignalId, DataType.Double, Granularity.Month, Path.FromString("B"))
+                };
+                GivenMultipleSignals(signals);              
+
+                var data = new Datum<double>[] {
+                    new Datum<double>
+                    {
+                        Quality = Quality.Bad,
+                        Timestamp = new DateTime(2000,2,1),
+                        Value = 2.0
+                    },
+                    new Datum<double>
+                    {
+                        Quality = Quality.Poor,
+                        Timestamp = new DateTime(2000,4,1),
+                        Value = 4.0
+                    }
+                };
+                var shadowData = new Datum<double>[] {
+                    new Datum<double>
+                    {
+                        Quality = Quality.Good,
+                        Timestamp = new DateTime(2000,3,1),
+                        Value = 3.0
+                    },
+                    new Datum<double>
+                    {
+                        Quality = Quality.Fair,
+                        Timestamp = new DateTime(2000,5,1),
+                        Value = 5.0
+                    }
+                };
+
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
+                signalsDataRepositoryMock
+                    .Setup(sd => sd.GetData<double>(It.Is<Signal>(s => s.Id == shadowSignalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(shadowData);
+
+                var policy = new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble() { ShadowSignal = signals[1] };
+                missingValuePolicyRepositoryMock.
+                    Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Returns(policy);
+
+                var fromDate = new DateTime(2000, 1, 1);
+                const int expectedNumberOfResults = 6;
+                var results = signalsWebService.GetData(signalId, fromDate, fromDate.AddMonths(expectedNumberOfResults)).ToArray();
+                
+                var expectedResults = new Dto.Datum[expectedNumberOfResults]
+                {
+                    Datum<double>.CreateNone(signals[0], new DateTime(2000,1,1)).ToDto<Dto.Datum>(),
+                    data[0].ToDto<Dto.Datum>(),
+                    shadowData[0].ToDto<Dto.Datum>(),
+                    data[1].ToDto<Dto.Datum>(),
+                    shadowData[1].ToDto<Dto.Datum>(),
+                    Datum<double>.CreateNone(signals[0], new DateTime(2000,6,1)).ToDto<Dto.Datum>()
+                };
+
+                Assert.AreEqual(expectedNumberOfResults, results.Length);
+                for (int i = 0; i < expectedNumberOfResults; ++i)
+                {
+                    Assert.AreEqual(expectedResults[i].Quality, results[i].Quality);
+                    Assert.AreEqual(expectedResults[i].Value, results[i].Value);
+                    Assert.AreEqual(expectedResults[i].Timestamp, results[i].Timestamp);
+                }
+
             }
 
             private void setupGetByPathEntry(IEnumerable<string> paths)
