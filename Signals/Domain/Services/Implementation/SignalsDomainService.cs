@@ -160,6 +160,33 @@ namespace Domain.Services.Implementation
                 }
             }
 
+            if (missingValuePolicy is ShadowMissingValuePolicy<decimal>)
+            {
+                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<decimal>;
+                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
+                {
+                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
+                }
+            }
+
+            if (missingValuePolicy is ShadowMissingValuePolicy<int>)
+            {
+                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<int>;
+                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
+                {
+                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
+                }
+            }
+
+            if (missingValuePolicy is ShadowMissingValuePolicy<string>)
+            {
+                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<string>;
+                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
+                {
+                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
+                }
+            }
+
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
