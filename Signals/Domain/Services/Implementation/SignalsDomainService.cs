@@ -78,7 +78,48 @@ namespace Domain.Services.Implementation
         {
             var signal = MissingValuePolicySignal(signalId);
 
+            CheckIfShadowMissingValuePolicy(signal, policy);
+                    
             missingValuePolicyRepository.Set(signal, policy);
+        }
+
+        private void CheckIfShadowMissingValuePolicy(Signal signal, MissingValuePolicyBase policy)
+        {
+            dynamic shadow;
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    shadow = GetShadowMissingValuePolicyWithCorrectType<bool>(policy);
+                    break;
+                case DataType.Integer:
+                    shadow = GetShadowMissingValuePolicyWithCorrectType<int>(policy);
+                    break;
+                case DataType.Double:
+                    shadow = GetShadowMissingValuePolicyWithCorrectType<double>(policy);
+                    break;
+                case DataType.Decimal:
+                    shadow = GetShadowMissingValuePolicyWithCorrectType<decimal>(policy);
+                    break;
+                case DataType.String:
+                    shadow = GetShadowMissingValuePolicyWithCorrectType<string>(policy);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            if (shadow == null)
+                return;
+
+            if (shadow.ShadowSignal.DataType != signal.DataType ||
+                shadow.ShadowSignal.Granularity != signal.Granularity)
+                throw new ShadowSignalDoesntMatchASignalException();
+        }
+
+        private ShadowMissingValuePolicy<T> GetShadowMissingValuePolicyWithCorrectType<T>(MissingValuePolicyBase policy)
+        {
+            if (!(policy is ShadowMissingValuePolicy<T>))
+                return null;
+            return policy as ShadowMissingValuePolicy<T>;
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)
