@@ -120,8 +120,6 @@ namespace Domain.Services.Implementation
             this.signalsDataRepository.SetData<T>(ListOfDatum);
         }
 
-        
-
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             if (!ValidateTimestamp(fromIncludedUtc, signal.Granularity) || !ValidateTimestamp(toExcludedUtc, signal.Granularity))
@@ -175,6 +173,10 @@ namespace Domain.Services.Implementation
                         Timestamp = fromIncludedUtc,
                         Value = ((FirstOrderMissingValuePolicy<T>)policy).Value
                     };
+
+                    datumReturnList.Add(dataToAdd);
+
+                    return datumReturnList;
                 }
             }
 

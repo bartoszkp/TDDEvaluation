@@ -21,8 +21,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerSignal_WhenGettingDataWithOneElement_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
-            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
-            signalsWebService = new SignalsWebService(domainService);
+            SetupWebService();
 
             int id = 1;
 
@@ -216,6 +215,12 @@ namespace WebService.Tests
 
                 i++;
             }
+        }
+
+        private void SetupWebService()
+        {
+            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
+            signalsWebService = new SignalsWebService(domainService);
         }
 
         private List<Dto.Datum> GetExpectedDatums(Granularity granularity)
@@ -1615,6 +1620,12 @@ namespace WebService.Tests
             return null;
         }
 
+        private void SetupWebService()
+        {
+            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
+            signalsWebService = new SignalsWebService(domainService);
+        }
+
         private void SetupDataRepoForSignleDatum(Signal returnedSignal)
         {
             switch (returnedSignal.Granularity)
@@ -1724,7 +1735,6 @@ namespace WebService.Tests
                         });
                     break;
             }
-            
         }
     }
 }
