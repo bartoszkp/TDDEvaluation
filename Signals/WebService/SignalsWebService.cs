@@ -138,6 +138,13 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
+            if (policy is ShadowMissingValuePolicy)
+            {
+                var shadowMvp = policy as ShadowMissingValuePolicy;
+                if (shadowMvp.ShadowSignal == null)
+                    throw new NullReferenceException("Shadow signal is null");
+            }
+
             var signal = GetById(signalId);
 
             if (signal == null)
