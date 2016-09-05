@@ -276,6 +276,7 @@ namespace ExampleSignalClient.Signals {
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.SpecificValueMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.ZeroOrderMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.FirstOrderMissingValuePolicy))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.ShadowMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(string[]))]
     public partial class Datum : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -378,6 +379,7 @@ namespace ExampleSignalClient.Signals {
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.SpecificValueMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.ZeroOrderMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.FirstOrderMissingValuePolicy))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.ShadowMissingValuePolicy))]
     public partial class MissingValuePolicy : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -476,6 +478,7 @@ namespace ExampleSignalClient.Signals {
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.NoneQualityMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.ZeroOrderMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.FirstOrderMissingValuePolicy))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(ExampleSignalClient.Signals.ShadowMissingValuePolicy))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(string[]))]
     public partial class SpecificValueMissingValuePolicy : ExampleSignalClient.Signals.MissingValuePolicy {
         
@@ -524,6 +527,29 @@ namespace ExampleSignalClient.Signals {
     [System.Runtime.Serialization.DataContractAttribute(Name="FirstOrderMissingValuePolicy", Namespace="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy")]
     [System.SerializableAttribute()]
     public partial class FirstOrderMissingValuePolicy : ExampleSignalClient.Signals.MissingValuePolicy {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ShadowMissingValuePolicy", Namespace="http://schemas.datacontract.org/2004/07/Dto.MissingValuePolicy")]
+    [System.SerializableAttribute()]
+    public partial class ShadowMissingValuePolicy : ExampleSignalClient.Signals.MissingValuePolicy {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private ExampleSignalClient.Signals.Signal ShadowSignalField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public ExampleSignalClient.Signals.Signal ShadowSignal {
+            get {
+                return this.ShadowSignalField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ShadowSignalField, value) != true)) {
+                    this.ShadowSignalField = value;
+                    this.RaisePropertyChanged("ShadowSignal");
+                }
+            }
+        }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
