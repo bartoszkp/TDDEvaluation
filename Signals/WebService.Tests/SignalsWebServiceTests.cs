@@ -1233,12 +1233,9 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoData_WhenGettingADataInPointInTime_ItReturnsOneDatum()
             {
-                SetupWebService();
+                var signal = MakeDefaultIntegerSignal();
 
-                var signal = GetDefaultSignal_IntegerMonth();
-
-                Dto.Datum[] datumArray = new Dto.Datum[]{
-              };
+                var datumArray = MakeNoData();
 
                 var policy = new ZeroOrderMissingValuePolicy()
                 {
@@ -1261,13 +1258,12 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenNoData_WhenGettingADataInPointInTime_ItReturnsDatumFilledWithNoneQualityMissingValuePolicy()
             {
-                SetupWebService();
 
-                var signal = GetDefaultSignal_IntegerMonth();
+                var signal = MakeDefaultIntegerSignal();
 
-                Dto.Datum[] datumArray = new Dto.Datum[]{};
+                var datumArray = MakeNoData();
 
-                var policy = new ZeroOrderMissingValuePolicy()
+               var policy = new NoneQualityMissingValuePolicy()
                 {
                     DataType = Dto.DataType.Integer
                 };
@@ -1290,6 +1286,23 @@ namespace WebService.Tests
                 DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
 
             }
+
+            private Dto.Datum[] MakeNoData()
+            {
+                return  new Dto.Datum[] { };
+            }
+
+            private Signal MakeDefaultIntegerSignal()
+            {
+                SetupWebService();
+
+                var signal = GetDefaultSignal_IntegerMonth();
+
+                
+
+                return signal;
+            }
+
             private Signal PrepareDefaultSignalToGet()
             {
                 SetupWebService();
