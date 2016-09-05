@@ -308,17 +308,54 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
         {
-
             if (missingValuePolicy is ShadowMissingValuePolicy<bool> |
                 missingValuePolicy is ShadowMissingValuePolicy<int> |
                 missingValuePolicy is ShadowMissingValuePolicy<double> |
                 missingValuePolicy is ShadowMissingValuePolicy<decimal> |
                 missingValuePolicy is ShadowMissingValuePolicy<string> )
             {
-                throw new ArgumentException();
+                switch (signal.DataType)
+                {
+                    case DataType.Boolean:
+                        if (missingValuePolicy.NativeDataType == typeof(bool) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<bool>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<bool>).ShadowSignal.Granularity == signal.Granularity)
+                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
+                        else throw new ArgumentException();
+                       break;
+                    case DataType.Integer:
+                        if (missingValuePolicy.NativeDataType == typeof(int) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<int>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<int>).ShadowSignal.Granularity == signal.Granularity)
+                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
+                        else throw new ArgumentException();
+                        break;
+                    case DataType.Double:
+                        if (missingValuePolicy.NativeDataType == typeof(double) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.Granularity == signal.Granularity)
+                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
+                        else throw new ArgumentException();
+                        break;
+                    case DataType.Decimal:
+                        if (missingValuePolicy.NativeDataType == typeof(decimal) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<decimal>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<decimal>).ShadowSignal.Granularity == signal.Granularity)
+                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
+                        else throw new ArgumentException();
+                        break;
+                    case DataType.String:
+                        if (missingValuePolicy.NativeDataType == typeof(string) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<string>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<string>).ShadowSignal.Granularity == signal.Granularity)
+                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
+                        else throw new ArgumentException();
+                        break;
+                    default:
+                        break;
+                }
             }
-
-            this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
+            else this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
