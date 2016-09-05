@@ -1444,6 +1444,43 @@ namespace WebService.Tests
                 signalsWebService.GetData(7, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithShadowMVP_GetDataIsCalledWithShadowSignal()
+            {
+                SetupWebService();
+
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = 7,
+                    Granularity = Domain.Granularity.Month,
+                    DataType = Domain.DataType.Double,
+                    Path = Domain.Path.FromString("x/y")
+                });
+
+                var shadowSignal = new Domain.Signal()
+                {
+                    Id = 5,
+                    Granularity = Domain.Granularity.Month,
+                    DataType = Domain.DataType.Double,
+                    Path = Domain.Path.FromString("a/b")
+                };
+
+                missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble()
+                {
+                    ShadowSignal = shadowSignal
+                }).Returns(null);
+
+                signalsWebService.GetData(7, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                dataRepositoryMock.Verify(drm => drm.GetData<double>(It.Is<Domain.Signal>(s =>
+                    s.Id == shadowSignal.Id &&
+                    s.Granularity == shadowSignal.Granularity &&
+                    s.DataType == shadowSignal.DataType &&
+                    s.Path.ToString().Equals(shadowSignal.Path.ToString())),
+                    new DateTime(2000, 1, 1),
+                    new DateTime(2000, 5, 1)));
+            }
+
             private static void VerifyExceptionThrown<TException>(Action action) where TException : Exception
             {
                 if (action == null)
