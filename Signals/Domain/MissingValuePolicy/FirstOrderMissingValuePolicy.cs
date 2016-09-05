@@ -25,21 +25,11 @@ namespace Domain.MissingValuePolicy
             else
                 datumsList.Add(new Datum<T>()
                 {
-                    Quality = GetWorseQuality(olderData.Quality, newerData.Quality),
+                    Quality = olderData.Quality > newerData.Quality ? olderData.Quality : newerData.Quality,
                     Timestamp = time,
                     Value = CalculateInterpolatedValue(olderData, newerData, time, signal),
                     Signal = signal
                 });
-        }
-
-        private Quality GetWorseQuality(Quality a, Quality b)
-        {
-            var qualityOrder = new Quality[] { Quality.None, Quality.Bad, Quality.Poor, Quality.Fair, Quality.Good };
-
-            int aIndex = Array.FindIndex(qualityOrder, q => q == a);
-            int bIndex = Array.FindIndex(qualityOrder, q => q == b);
-
-            return aIndex < bIndex ? a : b;
         }
 
         private T CalculateInterpolatedValue<T>(Datum<T> olderData, Datum<T> newerData, DateTime time, Signal signal)
