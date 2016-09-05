@@ -204,6 +204,16 @@ namespace Domain.Services.Implementation
             }
         }
 
+        private Quality GetWorseQuality(Quality a, Quality b)
+        {
+            var qualityOrder = new Quality[] { Quality.None, Quality.Bad, Quality.Poor, Quality.Fair, Quality.Good };
+
+            int aIndex = Array.FindIndex(qualityOrder, q => q == a);
+            int bIndex = Array.FindIndex(qualityOrder, q => q == b);
+
+            return aIndex < bIndex ? a : b;
+        }
+
         private Datum<T> createDatumBaseOnMissingValuePolicy<T>(Signal signal, DateTime date, MissingValuePolicyBase missingValuePolicy,Datum<T> lastDatum, Datum<T> nextDatum)
         {
             if (missingValuePolicy is NoneQualityMissingValuePolicy<T>)
@@ -252,13 +262,9 @@ namespace Domain.Services.Implementation
                
               dynamic  result = val1 + ((val2 - val1) * val3) / val4;
        
-                      
-               
-
-               
                 return new Datum<T>
                 {
-                    Quality = nextDatum.Quality,
+                    Quality = GetWorseQuality(lastDatum.Quality, nextDatum.Quality),
                     Signal = signal,
                     Timestamp = date,
                     Value = result
