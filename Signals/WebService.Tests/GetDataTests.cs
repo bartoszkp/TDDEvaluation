@@ -22,7 +22,7 @@ namespace WebService.Tests
         public void GivenNoSignals_GetData_WithSameTimeStamps_NoneQualityMvpFillsSingleDatum()
         {
             SetupWebService();
-            var ts = new DateTime(2018, 12, 12);
+            var ts = new DateTime(2018, 12, 1);
             var returnedSignal = new Signal()
             {
                 Id = 1,
