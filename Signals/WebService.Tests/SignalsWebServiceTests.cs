@@ -1467,6 +1467,65 @@ namespace WebService.Tests
                     new DateTime(2000, 5, 1)));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithShadowMVP_SignalDataIsFilledWithShadowSignalData()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 7,
+                    Granularity = Domain.Granularity.Day,
+                    DataType = Domain.DataType.Integer,
+                    Path = Domain.Path.FromString("x/y")
+                };
+                var shadowSignal = new Domain.Signal()
+                {
+                    Id = 5,
+                    Granularity = Domain.Granularity.Day,
+                    DataType = Domain.DataType.Integer,
+                    Path = Domain.Path.FromString("a/b")
+                };
+
+                SetupShadowMVPTest(signal, shadowSignal);
+
+                dataRepositoryMock.Setup(drm => drm.GetData<int>(It.Is<Domain.Signal>(s =>
+                    s.Id == signal.Id &&
+                    s.DataType == signal.DataType &&
+                    s.Granularity == signal.Granularity &&
+                    s.Path.ToString().Equals(signal.Path.ToString())), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(new Domain.Datum<int>[]
+                    {
+                        new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                        new Domain.Datum<int>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 5), Value = 2 },
+                        new Domain.Datum<int>() { Quality = Domain.Quality.Bad, Timestamp = new DateTime(2000, 1, 8), Value = 5 }
+                    });
+                dataRepositoryMock.Setup(drm => drm.GetData<int>(It.Is<Domain.Signal>(s =>
+                    s.Id == shadowSignal.Id &&
+                    s.DataType == shadowSignal.DataType &&
+                    s.Granularity == shadowSignal.Granularity &&
+                    s.Path.ToString().Equals(shadowSignal.Path.ToString())), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(new Domain.Datum<int>[]
+                    {
+                        new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 3), Value = 2 },
+                        new Domain.Datum<int>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 5), Value = 0 },
+                        new Domain.Datum<int>() { Quality = Domain.Quality.Bad, Timestamp = new DateTime(2000, 1, 9), Value = 7 }
+                    });
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 2), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 3), Value = 2 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 4), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 5), Value = 2 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 6), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 7), Value = default(int) },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 8), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 9), Value = 7 }
+                };
+
+                var data = signalsWebService.GetData(7, new DateTime(2000, 1, 1), new DateTime(2000, 1, 10));
+
+                Assert_Datums(expectedData, data);
+            }
+
             private void SetupShadowMVPTest(Domain.Signal signal, Domain.Signal shadowSignal)
             {
                 SetupWebService();
