@@ -142,49 +142,30 @@ namespace Domain.Services.Implementation
 
         public void Set(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
-            if (missingValuePolicy is ShadowMissingValuePolicy<double>)
+            switch (signal.DataType)
             {
-                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<double>;
-                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
-                {
-                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
-                }
-            }
-
-            if (missingValuePolicy is ShadowMissingValuePolicy<bool>)
-            {
-                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<bool>;
-                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
-                {
-                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
-                }
-            }
-
-            if (missingValuePolicy is ShadowMissingValuePolicy<decimal>)
-            {
-                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<decimal>;
-                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
-                {
-                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
-                }
-            }
-
-            if (missingValuePolicy is ShadowMissingValuePolicy<int>)
-            {
-                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<int>;
-                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
-                {
-                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
-                }
-            }
-
-            if (missingValuePolicy is ShadowMissingValuePolicy<string>)
-            {
-                var shadowPolicy = missingValuePolicy as ShadowMissingValuePolicy<string>;
-                if (signal.DataType != shadowPolicy.ShadowSignal.DataType || signal.Granularity != shadowPolicy.ShadowSignal.Granularity)
-                {
-                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
-                }
+                case DataType.Boolean:
+                    if (missingValuePolicy is ShadowMissingValuePolicy<bool>)
+                        (missingValuePolicy as ShadowMissingValuePolicy<bool>).CheckSignalDataTypeAndGranularity(signal);
+                    break;
+                case DataType.Integer:
+                    if (missingValuePolicy is ShadowMissingValuePolicy<int>)
+                        (missingValuePolicy as ShadowMissingValuePolicy<int>).CheckSignalDataTypeAndGranularity(signal);
+                    break;
+                case DataType.Double:
+                    if (missingValuePolicy is ShadowMissingValuePolicy<double>)
+                        (missingValuePolicy as ShadowMissingValuePolicy<double>).CheckSignalDataTypeAndGranularity(signal);
+                    break;
+                case DataType.Decimal:
+                    if (missingValuePolicy is ShadowMissingValuePolicy<decimal>)
+                        (missingValuePolicy as ShadowMissingValuePolicy<decimal>).CheckSignalDataTypeAndGranularity(signal);
+                    break;
+                case DataType.String:
+                    if (missingValuePolicy is ShadowMissingValuePolicy<string>)
+                        (missingValuePolicy as ShadowMissingValuePolicy<string>).CheckSignalDataTypeAndGranularity(signal);
+                    break;
+                default:
+                    break;
             }
 
             missingValuePolicyRepository.Set(signal, missingValuePolicy);

@@ -11,5 +11,11 @@ namespace Domain.MissingValuePolicy
         {
             throw new NotImplementedException();
         }
+
+        public virtual void CheckSignalDataTypeAndGranularity(Signal signal)
+        {
+            if (signal.DataType != this.ShadowSignal.DataType || signal.Granularity != this.ShadowSignal.Granularity)
+                throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
+        }
     }
 }
