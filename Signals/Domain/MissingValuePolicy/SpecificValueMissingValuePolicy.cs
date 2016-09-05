@@ -11,7 +11,8 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public override Datum<T> GetMissingValue(Signal signal, DateTime timestamp, Datum<T> previous = null, Datum<T> next = null)
+        public override Datum<T> GetMissingValue(Signal signal, DateTime timestamp, Datum<T> previous = null, Datum<T> next = null, 
+            Datum<T> shadowDatum = null)
         {
             return new Datum<T>
             {

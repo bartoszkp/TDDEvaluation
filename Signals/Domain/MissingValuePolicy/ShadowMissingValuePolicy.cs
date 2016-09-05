@@ -6,9 +6,13 @@ namespace Domain.MissingValuePolicy
     {
         public virtual Signal ShadowSignal { get; set; }
 
-        public override Datum<T> GetMissingValue(Signal signal, DateTime timestamp, Datum<T> previous = null, Datum<T> next = null)
+        public override Datum<T> GetMissingValue(Signal signal, DateTime timestamp, Datum<T> previous = null, Datum<T> next = null, 
+            Datum<T> shadowDatum = null)
         {
-            throw new NotImplementedException();
+            if (shadowDatum != null)
+                return shadowDatum;
+            else
+                return Datum<T>.CreateNone(signal, timestamp);            
         }
     }
 }

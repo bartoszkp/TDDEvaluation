@@ -21,6 +21,6 @@ namespace Domain.MissingValuePolicy
         public override Type NativeDataType { get { return typeof(T); } }
 
         public abstract Domain.Datum<T> GetMissingValue(Signal signal, DateTime timestamp, 
-            Datum<T> previous = null, Datum<T> next = null);
+            Datum<T> previous = null, Datum<T> next = null, Datum<T> shadowDatum = null);
     }
 }

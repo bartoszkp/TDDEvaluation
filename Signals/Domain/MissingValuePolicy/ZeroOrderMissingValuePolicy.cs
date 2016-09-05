@@ -7,7 +7,8 @@ namespace Domain.MissingValuePolicy
 {
     public class ZeroOrderMissingValuePolicy<T> : MissingValuePolicy<T>
     {
-        public override Datum<T> GetMissingValue(Signal signal, DateTime timestamp, Datum<T> previous = null, Datum<T> next = null)
+        public override Datum<T> GetMissingValue(Signal signal, DateTime timestamp, Datum<T> previous = null, Datum<T> next = null, 
+            Datum<T> shadowDatum = null)
         {
             if (previous == null)
                 return Datum<T>.CreateNone(signal, timestamp);

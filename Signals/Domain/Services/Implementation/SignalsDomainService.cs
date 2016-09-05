@@ -113,38 +113,45 @@ namespace Domain.Services.Implementation
             if (!isFromIncludedUtcCorrect) throw new ArgumentException();
 
             var data = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).OrderBy(datum => datum.Timestamp);
-
             var mvp = GetMissingValuePolicy(signal);
 
             IEnumerable<Datum<T>> filledData = data;
 
             if (mvp != null)
-                filledData = FillMissingRecords(signal, data, fromIncludedUtc, toExcludedUtc);
+                filledData = FillMissingRecords(signal, data, fromIncludedUtc, toExcludedUtc, mvp as MissingValuePolicy<T>);
 
             return filledData;
         }        
 
-        public IEnumerable<Datum<T>> FillMissingRecords<T>(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> FillMissingRecords<T>(Signal signal, IEnumerable<Datum<T>> data, 
+            DateTime fromIncludedUtc, DateTime toExcludedUtc, MissingValuePolicy<T> mvp)
         {
-            var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy<T>;
             var dateTimeStep = GetTimeStepFunction(signal.Granularity);
+
+            Datum<T>[] shadowDatums = null;
+            if(mvp is ShadowMissingValuePolicy<T>)
+            {
+                var shadowMVP = mvp as ShadowMissingValuePolicy<T>;
+                shadowDatums = signalsDataRepository.GetData<T>(shadowMVP.ShadowSignal, fromIncludedUtc, toExcludedUtc).ToArray();
+            }
 
             if (fromIncludedUtc == toExcludedUtc)
                 return new[] { data.FirstOrDefault(datum => datum.Timestamp == fromIncludedUtc)
-                                ?? FillMissingRecord(data, signal, fromIncludedUtc, mvp, dateTimeStep) };
+                                ?? FillMissingRecord(data, signal, fromIncludedUtc, mvp, shadowDatums) };
 
             List<Datum<T>> list = new List<Datum<T>>();            
 
             for (DateTime d = fromIncludedUtc; d < toExcludedUtc; d = dateTimeStep(d))
                 list.Add(
                     data.FirstOrDefault(datum => datum.Timestamp == d)
-                    ?? FillMissingRecord(data, signal, d, mvp, dateTimeStep));
+                    ?? FillMissingRecord(data, signal, d, mvp, shadowDatums));
 
             return list;
         }
-        private Datum<T> FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, MissingValuePolicy<T> mvp, Func<DateTime, DateTime> dateTimeStep)
+        private Datum<T> FillMissingRecord<T>(IEnumerable<Datum<T>> data, Signal signal, DateTime dateTime, 
+            MissingValuePolicy<T> mvp, Datum<T>[] shadowDatums = null)
         {
-            if (mvp is NoneQualityMissingValuePolicy<T> || mvp is SpecificValueMissingValuePolicy<T>)            
+            if (mvp is NoneQualityMissingValuePolicy<T> || mvp is SpecificValueMissingValuePolicy<T>)
                 return mvp.GetMissingValue(signal, dateTime);            
             else if (mvp is ZeroOrderMissingValuePolicy<T>)
             {
@@ -164,6 +171,11 @@ namespace Domain.Services.Implementation
                     ?? signalsDataRepository.GetDataNewerThan<T>(signal, dateTime, 1).SingleOrDefault();
 
                 return mvp.GetMissingValue(signal, dateTime, previous, next);
+            }
+            else if (mvp is ShadowMissingValuePolicy<T>)
+            {
+                var shadowDatum = shadowDatums.FirstOrDefault(datum => datum.Timestamp == dateTime);
+                return mvp.GetMissingValue(signal, dateTime, null, null, shadowDatum);
             }
             else return Datum<T>.CreateNone(signal, dateTime);
         }
