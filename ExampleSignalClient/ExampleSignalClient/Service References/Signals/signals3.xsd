@@ -44,4 +44,14 @@
     </xs:complexContent>
   </xs:complexType>
   <xs:element name="FirstOrderMissingValuePolicy" nillable="true" type="tns:FirstOrderMissingValuePolicy" />
+  <xs:complexType name="ShadowMissingValuePolicy">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:MissingValuePolicy">
+        <xs:sequence>
+          <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/Dto" minOccurs="0" name="ShadowSignal" nillable="true" type="q4:Signal" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ShadowMissingValuePolicy" nillable="true" type="tns:ShadowMissingValuePolicy" />
 </xs:schema>
