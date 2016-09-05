@@ -975,6 +975,26 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void NoneQualityMissingValuePolicy_WhenGettingData_FillDatumWithNoneQuality_WhenSignalDataIsEmpty()
+            {
+                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer };
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
+
+                Mock<NoneQualityMissingValuePolicy<int>> noneMvpMock = new Mock<NoneQualityMissingValuePolicy<int>>();
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
+                    .Returns(noneMvpMock.Object);
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(DefaultElementOfCollection<int>(new DateTime(2018, 11, 11)));
+
+                var item = signalsWebService.GetData(1, new DateTime(2018, 11, 11), new DateTime(2018, 11, 11));
+
+                Assert.AreEqual(item.Count(), 1);
+                Assert.AreEqual(item.First(f => f.Timestamp == new DateTime(2018, 11, 11)).Quality, noneMvpMock.Object.Quality);
+            }
+
+            [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.SignalDoesNotExists))]
             public void GivenNoSignal_WhenDeletingNotExistingSignal_ThrowsException()
             {
@@ -1035,6 +1055,19 @@ namespace WebService.Tests
                     Value = default(T)
                 });
                 return ListOfitems;
+            }
+
+            private List<Datum<T>> DefaultElementOfCollection<T>(DateTime startDate)
+            {
+                List<Datum<T>> SingleItem = new List<Datum<T>>();
+                SingleItem.Add(new Datum<T>()
+                {
+                    Id = 1,
+                    Quality = Domain.Quality.None,
+                    Timestamp = startDate,
+                    Value = default(T)
+                });
+                return SingleItem;
             }
 
             private void SetupGivenASignalAndatumWithGranularity(Domain.Granularity granulity, DateTime[] existingListDatum, DateTime[] expectedListDatum)

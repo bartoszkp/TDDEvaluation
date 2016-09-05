@@ -189,7 +189,7 @@ namespace WebService.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
-        public void GetData_WhenFromIncludeEqualsToExclude_ThrowInvalidTimestampException()
+        public void GetData_WhenFromIncludeEqualsToExclude_AndFromIncludedNotEqualNull_ThrowInvalidTimestampException()
         {
             SetupWebService();
             var returnedSignal = new Domain.Signal() { Id = 1 };
