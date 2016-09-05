@@ -142,7 +142,7 @@ namespace Domain.Services.Implementation
             if (fromIncludedUtc == toExcludedUtc)
             {
                 if (filledList.Count == 0)
-                    filledList.Add(new Domain.Datum<T>());
+                    filledList.Add(Domain.Datum<T>.CreateNone(signal, fromIncludedUtc));
                 return filledList;
             }
 
