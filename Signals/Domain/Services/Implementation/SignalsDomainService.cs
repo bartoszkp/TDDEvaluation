@@ -100,7 +100,25 @@ namespace Domain.Services.Implementation
             if (mvp == null) mvp = new NoneQualityMissingValuePolicy<T>();
 
             int index = 0;
-            while(fromIncludedUtc < toExcludedUtc)
+
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                var datum = (from x in res
+                             where x.Timestamp == fromIncludedUtc
+                             select x).FirstOrDefault();
+
+                if (datum == null)
+                {
+                    var tempDatums = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc, signal.Granularity, res, olderData, newerData);
+                    foreach (var tempDatum in tempDatums.Where(x => x.Timestamp == fromIncludedUtc))
+                    {
+                        tempDatum.Signal = signal;
+                        res.Insert(index, tempDatum);
+                    }
+                }
+            }
+
+            while (fromIncludedUtc < toExcludedUtc)
             {
                 var datum = (from x in res
                              where x.Timestamp == fromIncludedUtc
