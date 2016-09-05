@@ -46,19 +46,6 @@ namespace WebService.Tests
             Assert.AreEqual(specificMvpMock.Object.Value, result.Single(f => f.Timestamp == new DateTime(2000, 1, 1)).Value);
         }
 
-        private List<Datum<T>> DefaultElementOfCollection<T>(DateTime startDate)
-        {
-            List<Datum<T>> SingleItem = new List<Datum<T>>();
-            SingleItem.Add(new Datum<T>()
-            {
-                Id = 1,
-                Quality = Domain.Quality.Fair,
-                Timestamp = startDate,
-                Value = default(T),
-            });
-            return SingleItem;
-        }
-
         [TestMethod]
         public void GivenASignal_GetData_FillsMissingData()
         {
@@ -392,6 +379,19 @@ namespace WebService.Tests
 
                 i++;
             }
+        }
+
+        private List<Datum<T>> DefaultElementOfCollection<T>(DateTime startDate)
+        {
+            List<Datum<T>> SingleItem = new List<Datum<T>>();
+            SingleItem.Add(new Datum<T>()
+            {
+                Id = 1,
+                Quality = Domain.Quality.Fair,
+                Timestamp = startDate,
+                Value = default(T),
+            });
+            return SingleItem;
         }
 
 
