@@ -369,6 +369,31 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GetData_TimestampsAreTheSameAndDataDoesntExist_ReturnOneDatum()
+            {
+                int signalId = 1;
+
+                var signal = SignalWith(
+                  id: signalId,
+                  dataType: Domain.DataType.Boolean,
+                  granularity: Domain.Granularity.Day,
+                  path: Domain.Path.FromString("root/signal"));
+
+                GivenASignal(signal);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyString());
+
+                signalsDataRepositoryMock
+                 .Setup(sdr => sdr.GetData<bool>(It.Is<Domain.Signal>(s => s.Id == signalId),
+                  It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(Enumerable.Empty<Datum<bool>>);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2018, 12, 12), new DateTime(2018, 12, 12));
+
+                Assert.AreEqual(1, result.Count());
+            }
+
+
+
+            [TestMethod]
             public void GivenASignal_WhenGettingData_ReturnsCorrectAmount()
             {
                 int signalId = 7;
