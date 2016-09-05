@@ -23,12 +23,7 @@ namespace WebService.Tests
         {
             SetupWebService();
             var ts = new DateTime(2018, 12, 1);
-            var returnedSignal = new Signal()
-            {
-                Id = 1,
-                DataType = DataType.Integer,
-                Granularity = Granularity.Month
-            };
+            var returnedSignal = CreateSignal(Granularity.Month, 1);
 
 
             signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
@@ -37,10 +32,9 @@ namespace WebService.Tests
 
             var result = signalsWebService.GetData(1, ts, ts);
             var filledDatum = result.ElementAt(0);
-            Assert.AreEqual(1, result.Count());
-            Assert.AreEqual(Dto.Quality.None, filledDatum.Quality);
-            Assert.AreEqual(0, filledDatum.Value);
 
+            Assert.AreEqual(1, result.Count());
+            AssertFilledDatum(filledDatum, Dto.Quality.None, 0);
 
         }
 
@@ -49,12 +43,7 @@ namespace WebService.Tests
         {
             SetupWebService();
             var ts = new DateTime(2018, 12, 12);
-            var returnedSignal = new Signal()
-            {
-                Id = 1,
-                DataType = DataType.Integer,
-                Granularity = Granularity.Day
-            };
+            var returnedSignal = CreateSignal(Granularity.Day, 1);
 
 
             signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
@@ -68,13 +57,28 @@ namespace WebService.Tests
 
             var result = signalsWebService.GetData(1, ts, ts);
             var filledDatum = result.ElementAt(0);
+
             Assert.AreEqual(1, result.Count());
-            Assert.AreEqual(Dto.Quality.Fair, filledDatum.Quality);
-            Assert.AreEqual(42, filledDatum.Value);
+            AssertFilledDatum(filledDatum, Dto.Quality.Fair, 42);
+
         }
 
+        private void AssertFilledDatum<T>(Dto.Datum datum,Dto.Quality quality,T value)
+        {
+            Assert.AreEqual(quality, datum.Quality);
+            Assert.AreEqual(value, datum.Value);
+        }
 
-
+        
+        private Signal CreateSignal(Granularity granularity,int id)
+        {
+            return new Signal()
+            {
+                Id = id,
+                DataType = DataType.Integer,
+                Granularity = granularity
+            };
+        }
 
         private void SetupWebService()
         {
