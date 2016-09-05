@@ -100,7 +100,73 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            IEnumerable<Datum<T>> result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+            var earlierDatum = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).FirstOrDefault();
+            var laterDatum = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1).FirstOrDefault();
+
+            var policy = GetMissingValuePolicy(signal.Id.Value) as MissingValuePolicy<T>;
+
+            if (policy != null)
+            {
+                if(policy is ShadowMissingValuePolicy<T>)
+                {
+                    var shadowPolicy = (ShadowMissingValuePolicy<T>)policy;
+                    var shadowSignal = shadowPolicy.ShadowSignal;
+
+                    if (fromIncludedUtc > toExcludedUtc) return new List<Datum<T>>();
+                    else if (fromIncludedUtc == toExcludedUtc)
+                    {
+                        var datum = result.FirstOrDefault(d => d.Timestamp == fromIncludedUtc);
+                        if (datum == null) return ShadowDatum<T>(shadowSignal, fromIncludedUtc);
+                        else return new[] { datum };
+                    }
+
+                    else
+                    {
+                        List<Datum<T>> newDatumList = new List<Datum<T>>();
+                        DateTime tmpTime = fromIncludedUtc;
+                        
+                        while(tmpTime < toExcludedUtc)
+                        {
+                            var datum = result.FirstOrDefault(d => d.Timestamp == tmpTime);
+                            if (datum == null) newDatumList.Add(ShadowDatum<T>(shadowSignal, tmpTime).First());
+                            else newDatumList.Add(datum);
+
+                            tmpTime = IncreaseDateTime(signal, tmpTime);
+                        }
+
+                        return newDatumList;
+                    }
+                }
+                else result = policy.SetMissingValue(signal, result, fromIncludedUtc, toExcludedUtc, earlierDatum, laterDatum);
+            }
+                
+
+            return result;
+        }
+
+        private DateTime IncreaseDateTime(Signal signal, DateTime datetime)
+        {
+            DateTime newDate = new DateTime();
+
+            switch(signal.Granularity)
+            {
+                case Granularity.Day: return newDate = datetime.AddDays(1);
+                case Granularity.Hour: return newDate = datetime.AddHours(1);
+                case Granularity.Minute: return newDate = datetime.AddMinutes(1);
+                case Granularity.Month: return newDate = datetime.AddMonths(1);
+                case Granularity.Second: return newDate = datetime.AddSeconds(1);
+                case Granularity.Week: return newDate = datetime.AddDays(7);
+                case Granularity.Year: return newDate = datetime.AddYears(1);
+                default: return newDate;
+            }
+        }
+
+        private IEnumerable<Datum<T>> ShadowDatum<T>(Signal signal, DateTime date)
+        {
+            List<Datum<T>> shadowDatum = signalsDataRepository.GetData<T>(signal, date, date).ToList();
+            if (shadowDatum != null && shadowDatum.Count != 0) return shadowDatum;
+            else return new[] { Datum<T>.CreateNone(signal, date) };
         }
 
         public PathEntry GetPathEntry(Path path)

@@ -136,6 +136,7 @@ namespace WebService.Tests
 
                 signalsWebService.SetMissingValuePolicy(invalidId, new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy());
             }
+
             [TestMethod]
             public void GivenASignal_WhenGetMissingValuePolicy_ColledmissingValuePolicyRepository()
             {
@@ -200,6 +201,7 @@ namespace WebService.Tests
                 GivenASignal(SignalWith(DataType.String));
                 SetDataCalledVerify<string>();
             }
+
             [TestMethod]
             [ExpectedException(typeof(InvalidCastException))]
             public void GivenASignal_WhenSetDataTypesSignalAndDatumAreDiferent_ReturnException()
