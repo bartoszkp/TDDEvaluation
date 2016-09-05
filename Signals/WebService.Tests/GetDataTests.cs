@@ -63,6 +63,53 @@ namespace WebService.Tests
 
         }
 
+
+        [TestMethod]
+        public void GivenNoSignals_GetData_WithSameTimeStamps_ZeroOrderMvpFillsSingleDatum()
+        {
+            SetupWebService();
+            var ts = new DateTime(2018, 12, 1);
+            var returnedSignal = CreateSignal(Granularity.Month, 1);
+
+
+            signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            missingValuePolicyRepositoryMock.Setup(m => m.Get(returnedSignal)).Returns(new ZeroOrderMissingValuePolicyInteger());
+            signalsDataRepositoryMock.Setup(s => s.GetData<int>(returnedSignal, ts, ts)).Returns(new List<Datum<int>>());
+
+            var result = signalsWebService.GetData(1, ts, ts);
+            var filledDatum = result.ElementAt(0);
+
+            Assert.AreEqual(1, result.Count());
+            AssertFilledDatum(filledDatum, Dto.Quality.None, 0);
+        }
+
+        //signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).FirstOrDefault();
+        [TestMethod]
+        public void OlderDataExists_GetData_WithSameTimeStamps_ZeroOrderMvpFillsSingleDatum()
+        {
+            SetupWebService();
+            var ts = new DateTime(2018, 12, 1);
+            var returnedSignal = CreateSignal(Granularity.Month, 1);
+
+
+            signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            missingValuePolicyRepositoryMock.Setup(m => m.Get(returnedSignal)).Returns(new ZeroOrderMissingValuePolicyInteger());
+            signalsDataRepositoryMock.Setup(s => s.GetData<int>(returnedSignal, ts, ts)).Returns(new List<Datum<int>>());
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<int>(returnedSignal, new DateTime(2018, 12, 1), 1))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() {Quality = Quality.Good,Value = 1}
+                });
+
+
+            var result = signalsWebService.GetData(1, ts, ts);
+            var filledDatum = result.ElementAt(0);
+
+            Assert.AreEqual(1, result.Count());
+            AssertFilledDatum(filledDatum, Dto.Quality.Good, 1);
+        }
+
+
         private void AssertFilledDatum<T>(Dto.Datum datum,Dto.Quality quality,T value)
         {
             Assert.AreEqual(quality, datum.Quality);

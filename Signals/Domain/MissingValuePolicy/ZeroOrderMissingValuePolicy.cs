@@ -13,13 +13,40 @@ namespace Domain.MissingValuePolicy
 
         public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, Datum<T> olderDatum, Datum<T> newestDatum)
         {
+            returnListDatum = new List<Datum<T>>();
+
             if (olderDatum != null)
             {
                 Quality = olderDatum.Quality;
                 Value = olderDatum.Value;
             }
 
-            returnListDatum = new List<Datum<T>>();
+            if (fromIncludedUtc == toExcludedUtc && data.Count() == 0)
+            {
+                if (olderDatum != null)
+                {
+                    returnListDatum.Add(new Datum<T>()
+                    {
+                        Quality = olderDatum.Quality,
+                        Value = olderDatum.Value,
+                        Timestamp = new DateTime(fromIncludedUtc.Ticks)
+                    });
+                }
+                else
+                {
+                    returnListDatum.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = new DateTime(fromIncludedUtc.Ticks)
+                    });
+                }
+                return returnListDatum;
+
+            }
+
+
+            
             while (fromIncludedUtc < toExcludedUtc)
             {
                 var elementOfList = data.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
