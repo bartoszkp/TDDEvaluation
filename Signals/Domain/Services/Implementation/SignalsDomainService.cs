@@ -101,6 +101,11 @@ namespace Domain.Services.Implementation
 
             int index = 0;
 
+            if (mvp is ShadowMissingValuePolicy<T>)
+            {
+                newerData = GetData<T>((mvp as ShadowMissingValuePolicy<T>).ShadowSignal, fromIncludedUtc, toExcludedUtc);
+            }
+
             if (fromIncludedUtc == toExcludedUtc)
             {
                 var datum = (from x in res
