@@ -9,7 +9,7 @@ namespace Domain.MissingValuePolicy
 
         public override IEnumerable<Datum<T>> GetDatum(DateTime timeStamp, Granularity granularity, IEnumerable<Datum<T>> otherData = null, IEnumerable<Datum<T>> previousSamples = null, IEnumerable<Datum<T>> nextSamples = null)
         {
-            throw new NotImplementedException();
+            return new Domain.Datum<T>[] { };
         }
 
         public virtual void CheckSignalDataTypeAndGranularity(Signal signal)
