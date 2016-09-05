@@ -1420,26 +1420,19 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGettingDataWithShadowMVP_DoesNotThrow()
             {
-                SetupWebService();
-
-                GivenASignal(new Domain.Signal()
+                SetupShadowMVPTest(new Domain.Signal()
                 {
                     Id = 7,
                     Granularity = Domain.Granularity.Month,
                     DataType = Domain.DataType.Double,
                     Path = Domain.Path.FromString("x/y")
-                });
-
-                missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble()
+                }, new Domain.Signal()
                 {
-                    ShadowSignal = new Domain.Signal()
-                    {
-                        Id = 5,
-                        Granularity = Domain.Granularity.Month,
-                        DataType = Domain.DataType.Double,
-                        Path = Domain.Path.FromString("a/b")
-                    }
-                }).Returns(null);
+                    Id = 5,
+                    Granularity = Domain.Granularity.Month,
+                    DataType = Domain.DataType.Double,
+                    Path = Domain.Path.FromString("a/b")
+                });
 
                 signalsWebService.GetData(7, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
             }
@@ -1447,16 +1440,6 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_WhenGettingDataWithShadowMVP_GetDataIsCalledWithShadowSignal()
             {
-                SetupWebService();
-
-                GivenASignal(new Domain.Signal()
-                {
-                    Id = 7,
-                    Granularity = Domain.Granularity.Month,
-                    DataType = Domain.DataType.Double,
-                    Path = Domain.Path.FromString("x/y")
-                });
-
                 var shadowSignal = new Domain.Signal()
                 {
                     Id = 5,
@@ -1465,10 +1448,13 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("a/b")
                 };
 
-                missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble()
+                SetupShadowMVPTest(new Domain.Signal()
                 {
-                    ShadowSignal = shadowSignal
-                }).Returns(null);
+                    Id = 7,
+                    Granularity = Domain.Granularity.Month,
+                    DataType = Domain.DataType.Double,
+                    Path = Domain.Path.FromString("x/y")
+                }, shadowSignal);
 
                 signalsWebService.GetData(7, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
 
@@ -1479,6 +1465,48 @@ namespace WebService.Tests
                     s.Path.ToString().Equals(shadowSignal.Path.ToString())),
                     new DateTime(2000, 1, 1),
                     new DateTime(2000, 5, 1)));
+            }
+
+            private void SetupShadowMVPTest(Domain.Signal signal, Domain.Signal shadowSignal)
+            {
+                SetupWebService();
+                GivenASignal(signal);
+
+                switch (signal.DataType)
+                {
+                    case Domain.DataType.Boolean:
+                        missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean()
+                        {
+                            ShadowSignal = shadowSignal
+                        }).Returns(null);
+                        break;
+                    case Domain.DataType.Integer:
+                        missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyInteger()
+                        {
+                            ShadowSignal = shadowSignal
+                        }).Returns(null);
+                        break;
+                    case Domain.DataType.Double:
+                        missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble()
+                        {
+                            ShadowSignal = shadowSignal
+                        }).Returns(null);
+                        break;
+                    case Domain.DataType.Decimal:
+                        missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDecimal()
+                        {
+                            ShadowSignal = shadowSignal
+                        }).Returns(null);
+                        break;
+                    case Domain.DataType.String:
+                        missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyString()
+                        {
+                            ShadowSignal = shadowSignal
+                        }).Returns(null);
+                        break;
+                    default:
+                        break;
+                }
             }
 
             private static void VerifyExceptionThrown<TException>(Action action) where TException : Exception
