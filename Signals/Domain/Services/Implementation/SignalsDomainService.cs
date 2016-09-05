@@ -134,7 +134,7 @@ namespace Domain.Services.Implementation
             {
                 Datum<T> dataToAdd;
 
-                if (policy.GetType() == typeof(NoneQualityMissingValuePolicy<T>) || policy.GetType() == null)
+                if (policy.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
                 {
                     dataToAdd = new Datum<T>() { Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) };
                     datumReturnList.Add(dataToAdd);

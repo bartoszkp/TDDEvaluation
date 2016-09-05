@@ -19,6 +19,39 @@ namespace WebService.Tests
         private SignalsWebService signalsWebService;
 
         [TestMethod]
+        public void GivenASignal_WhenGettingDataInteger_AndFromIncludeAndToIncludeAreEquals_ThenReturnFilledDataWithSpecificMissingValuePolicy()
+        {
+            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
+            signalsWebService = new SignalsWebService(domainService);
+
+            int id = 1;
+
+            var returnedSignal = new Signal() { Id = id };
+
+            Mock<SpecificValueMissingValuePolicy<int>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<int>>();
+            specificMvpMock.Object.Value = 42;
+            specificMvpMock.Object.Quality = Quality.Fair;
+
+            signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
+            mvpRepoMock.Setup(m => m.Get(returnedSignal))
+                .Returns(specificMvpMock.Object);
+
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1,0,0,0), Value = (int)42 },
+                });
+
+
+            var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+            var filledDatum = result.ElementAt(0);
+
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(specificMvpMock.Object.Value, filledDatum.Value);
+        }
+
+        [TestMethod]
         public void GivenASignal_GetData_FillsMissingData()
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
