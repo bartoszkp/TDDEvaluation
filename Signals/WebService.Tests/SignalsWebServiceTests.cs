@@ -750,6 +750,35 @@ namespace WebService.Tests
                     Times.Once);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(System.Reflection.TargetInvocationException))]
+            public void GivenASignal_WhenSettingShadowMVPWithInvalidShadowSignal_ExpectedException()
+            {
+                GivenASignal(SignalWith(1, DataType.Boolean, Granularity.Month, Path.FromString("a/b")));
+                var invalidSignal = SignalWith(null, Dto.DataType.Boolean, Dto.Granularity.Minute, new Dto.Path() { Components = new[] { "a", "b" } });
+                
+                signalsWebService
+                .SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = invalidSignal
+                });
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenSettingShadowMVPWithValidShadowSignal_NoExceptionIsThrown()
+            {
+                GivenASignal(SignalWith(1, DataType.Boolean, Granularity.Month, Path.FromString("a/b")));
+                var invalidSignal = SignalWith(null, Dto.DataType.Boolean, Dto.Granularity.Month, new Dto.Path() { Components = new[] { "a", "b" } });
+
+                signalsWebService
+                .SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = invalidSignal
+                });
+            }
+
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
                 signalsDataRepositryMock
