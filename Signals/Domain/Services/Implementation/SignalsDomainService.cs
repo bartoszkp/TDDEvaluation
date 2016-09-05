@@ -146,11 +146,22 @@ namespace Domain.Services.Implementation
 
             if (mvp is SpecificValueMissingValuePolicy<T> || mvp is NoneQualityMissingValuePolicy<T>)
             {
-                Datum<T> returnedDatum = new Datum<T>() {Signal = signal, Timestamp = timestamp};
-                result = mvp.FillMissingValue(returnedDatum);
+                result = mvp.FillMissingValue(new Datum<T>() { Signal = signal, Timestamp = timestamp });
             }
+            else if (mvp is ShadowMissingValuePolicy<T>)
+            {
+                result = signalsDataRepository.GetData<T>((mvp as ShadowMissingValuePolicy<T>).ShadowSignal, timestamp, timestamp).SingleOrDefault();
 
-            if(mvp is ZeroOrderMissingValuePolicy<T>)
+                if (result == null)
+                    result = new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Signal = signal,
+                        Timestamp = timestamp,
+                        Value = default(T)
+                    };
+            }
+            else if(mvp is ZeroOrderMissingValuePolicy<T>)
             {
                 var datum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).FirstOrDefault();
                 if (datum == null)
@@ -158,8 +169,7 @@ namespace Domain.Services.Implementation
                 else
                     result = new Datum<T>() { Quality = datum.Quality, Value = datum.Value, Timestamp = timestamp };
             }
-
-            if (mvp is FirstOrderMissingValuePolicy<int> || mvp is FirstOrderMissingValuePolicy<double> || mvp is FirstOrderMissingValuePolicy<decimal>)
+            else  if (mvp is FirstOrderMissingValuePolicy<int> || mvp is FirstOrderMissingValuePolicy<double> || mvp is FirstOrderMissingValuePolicy<decimal>)
             {
                 var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).FirstOrDefault();
                 var newerDatum = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1).FirstOrDefault();
