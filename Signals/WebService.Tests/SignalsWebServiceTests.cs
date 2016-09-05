@@ -1287,6 +1287,40 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GivenNoData_WhenGettingADataInPointInTime_ItReturnsDatumFilledWithMissingValuePolicyExpectedValues()
+            {
+
+                var signal = MakeDefaultIntegerSignal();
+
+                var datumArray = MakeNoData();
+
+                var defaultValue = 5;
+                var policy = new SpecificValueMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Integer,
+                    Value=defaultValue,
+                    Quality=Dto.Quality.Bad
+                };
+
+                int signalId = 1;
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datumArray);
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Signal>()))
+                   .Returns(policy.ToDomain<SpecificValueMissingValuePolicyInteger>());
+
+                IEnumerable<Dto.Datum> returnedData = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                int expectedArrayLength = 1;
+                Assert.AreEqual(expectedArrayLength, returnedData.ToArray().Length);
+
+                Dto.Datum[] expectedResult = new Dto.Datum[]{
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (int)defaultValue }
+                };
+
+                DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
+
+            }
             private Dto.Datum[] MakeNoData()
             {
                 return  new Dto.Datum[] { };
