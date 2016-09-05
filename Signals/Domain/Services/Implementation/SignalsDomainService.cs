@@ -107,22 +107,43 @@ namespace Domain.Services.Implementation
             
             var dataBeforeRequest = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();
 
-            if (policy is FirstOrderMissingValuePolicy<T>) sortedData = FirstOrderMissingValuePolicyFunction<T>(fromIncludedUtc, toExcludedUtc, sortedData, signal, policy);
+            if (policy is FirstOrderMissingValuePolicy<T>)
+                sortedData = FirstOrderMissingValuePolicyFunction<T>(fromIncludedUtc, toExcludedUtc, sortedData, signal, policy);
             else
             {
                 for (DateTime dt = fromIncludedUtc; dt < toExcludedUtc; AddToDateTime(ref dt, signal.Granularity), index++)
                     if (sortedData.FirstOrDefault(d => d.Timestamp == dt) == null)
                     {
+                        DateTime timestamp = new DateTime(dt.Ticks);
+
                         if (dataBeforeRequest == null)
                         {
-                            sortedData.Insert(index, policy.GetMissingDatum(sortedData, dt));
+                            sortedData.Insert(index, policy.GetMissingDatum(sortedData, new DateTime(dt.Ticks)));
+                        }
+                        else if (policy is SpecificValueMissingValuePolicy<T>)
+                        {                         
+                            var specificPolicy = policy as SpecificValueMissingValuePolicy<T>;
+                            sortedData.Insert(
+                                index,
+                                Datum<T>.CreateSpecific(signal, timestamp, specificPolicy.Value, specificPolicy.Quality)
+                                );
+                        }
+                        else if (policy is ZeroOrderMissingValuePolicy<T>)
+                        {
+                            sortedData.Insert(
+                                index,
+                                Datum<T>.CreateSpecific(signal, timestamp, dataBeforeRequest.Value, dataBeforeRequest.Quality));
+                        }
+                        else if(dataBeforeRequest.Timestamp < fromIncludedUtc)
+                        {
+                            sortedData.Insert(index, Datum<T>.CreateNone(signal, timestamp));
                         }
                         else
                         {
-                            dataBeforeRequest.Timestamp = dt;
-                            sortedData.Insert(index, dataBeforeRequest);
-                            dataBeforeRequest = null;
+                            if(policy is NoneQualityMissingValuePolicy<T>)
+                                sortedData.Insert(index, Datum<T>.CreateNone(signal, timestamp));                                        
                         }
+                        dataBeforeRequest = null;
                     }
             }
 

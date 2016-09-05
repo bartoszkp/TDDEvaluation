@@ -16,6 +16,18 @@ namespace Domain
             };
         }
 
+        public static Datum<T> CreateSpecific(Signal signal, DateTime timestamp, T value, Quality quality)
+        {
+            return new Datum<T>()
+            {
+                Id = 0,
+                Signal = signal,
+                Timestamp = timestamp,
+                Quality = quality,
+                Value = value
+            };
+        }
+
         public virtual int Id { get; set; }
 
         public virtual Signal Signal { get; set; }
