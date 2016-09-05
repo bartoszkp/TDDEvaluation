@@ -1404,27 +1404,36 @@ namespace WebService.Tests
 
                 var shadowDatum = new List<Dto.Datum>
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 71 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 4, 1), Value = 62 }
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 71 }
                 };
 
-                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datum.ToArray());
+                signalsRepositoryMock
+                     .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
+                     .Returns<int>(z => {
+                         var signal2 = signal;
+                         signal.Id = signalId;
+                         return signal;
+                     });
 
                 signalsDataRepositoryMock
-                  .Setup(x => x.GetData<int>(It.Is<Domain.Signal>(s => CompareSignal(s, shadowSignalDomain)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Setup(x => x.GetData<int>((It.Is<Domain.Signal>(s => s.Id== signal.Id)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datum.ToDomain<IEnumerable<Domain.Datum<int>>>());
+
+                signalsDataRepositoryMock
+                  .Setup(x => x.GetData<int>(It.Is<Domain.Signal>(s => s.Id == shadowSignalDomain.Id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                   .Returns(shadowDatum.ToDomain<IEnumerable<Domain.Datum<int>>>());
 
                 var policy = new ShadowMissingValuePolicyInteger();
                 policy.ShadowSignal = shadowSignalDomain;
 
                 missingValuePolicyRepositoryMock
-                   .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                   .Setup(f => f.Get(It.Is<Domain.Signal>(s=>s.Id==signal.Id)))
                    .Returns(policy);
 
-                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 
                 datum.Add(new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (int)71 });
-                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = (int)62 });
+              
 
                 DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
 

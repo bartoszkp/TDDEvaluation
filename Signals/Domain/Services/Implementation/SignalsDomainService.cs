@@ -219,13 +219,11 @@ namespace Domain.Services.Implementation
             }
             else if (policy is ShadowMissingValuePolicy<T>)
             {
-                var result = filledList.Where(d => d.Timestamp < timestamp).LastOrDefault();
-
-
+              
                 return new Datum<T>()
                 {
                     Quality = Quality.None,
-                    Signal = result.Signal,
+                    Signal = signal,
                     Value = default(T),
                     Timestamp = timestamp
                 };
