@@ -135,13 +135,13 @@ namespace Domain.Services.Implementation
         {
             var data = signalsDataRepository.GetDataNewerThan<T>(signal, date, 1);
             if (data.Count() == 0) return null;
-            return data.ToArray()[0];
+            return data.OrderBy(d => d.Timestamp).ToArray()[0];
         }
         private Datum<T> getOlderData<T>(Signal signal, DateTime date)
         {
             var data = signalsDataRepository.GetDataOlderThan<T>(signal, date, int.MaxValue);
             if (data.Count() == 0) return null;
-            return data.ToArray()[data.Count()-1];
+            return data.OrderBy(d => d.Timestamp).ToArray()[data.Count()-1];
         }
         private void CheckTimestamp(DateTime date, Granularity granularity)
         {
