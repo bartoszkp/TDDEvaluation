@@ -1,5 +1,6 @@
 ﻿using DataAccess.GenericInstantiations;
 using Domain;
+using Domain.Exceptions;
 using Domain.Repositories;
 using Domain.Services.Implementation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,6 +17,7 @@ namespace WebService.Tests
     public class ShadowMvpTests
     {
         private SignalsWebService signalsWebService;
+
         [TestMethod]
         [ExpectedException(typeof(NullReferenceException))]
         public void SetMvp_WithNullSignalField_ExceptionIsThrown()
@@ -32,9 +34,35 @@ namespace WebService.Tests
 
             signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
             signalsWebService.SetMissingValuePolicy(1, mvp);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(ShadowSignalNotMatchingException))]
+        public void SetMvp_NotMatchingDataTypesOrGranularities_ExceptionIsThrown()
+        {
+            SetupWebService();
+            var mvp = new Dto.MissingValuePolicy.ShadowMissingValuePolicy();
+            mvp.ShadowSignal = new Dto.Signal()
+            {
+                DataType = Dto.DataType.Decimal,
+                Granularity = Dto.Granularity.Day
+            };
+
+            var returnedSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Month
+            };
+
+
+            signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            signalsWebService.SetMissingValuePolicy(1, mvp);
 
         }
+
+
+
 
 
 
