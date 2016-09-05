@@ -1125,6 +1125,90 @@ namespace WebService.Tests
                 Assert.AreEqual(0, result.Count());
             }
 
+            [TestMethod]
+            public void GivenASignalWithShadowMissingValuePolicy_WhenGettingData_OnlyMissingValuesAreCopiedFromShadowSignal()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+                var shadowSignal = GetDefaultSignal_IntegerMonth();
+                shadowSignal.DataType = DataType.Double;
+                shadowSignal.Id = 6;
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.ShadowMissingValuePolicy<double>();
+                policy.Signal = signal;
+                (policy as Domain.MissingValuePolicy.ShadowMissingValuePolicy<double>).ShadowSignal = shadowSignal;
+                GivenMissingValuePolicy(policy);
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3 },
+                    new Domain.Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)5 },
+                };
+                Domain.Datum<double>[] shadowData = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)30 },
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 3, 1), Value = (double)10 },
+                    new Domain.Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 4, 1), Value = (double)1 },
+                };
+                GivenData(signal.Id.Value, data);
+                GivenData(shadowSignal.Id.Value, shadowData);
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3},
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)30},
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)5},
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 4, 1), Value = (double)1},
+
+                };
+
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
+            [TestMethod]
+            public void GivenASignalWithShadowMissingValuePolicy_WhenGettingDataThatIsMissingFromBothSignals_MissingValuesHaveNoneQualityAndDefaultValue()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+                var shadowSignal = GetDefaultSignal_IntegerMonth();
+                shadowSignal.DataType = DataType.Double;
+                shadowSignal.Id = 6;
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.ShadowMissingValuePolicy<double>();
+                policy.Signal = signal;
+                (policy as Domain.MissingValuePolicy.ShadowMissingValuePolicy<double>).ShadowSignal = shadowSignal;
+                GivenMissingValuePolicy(policy);
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3 },
+                    new Domain.Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)5 },
+                };
+                Domain.Datum<double>[] shadowData = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 3, 1), Value = (double)10 },
+                };
+                GivenData(signal.Id.Value, data);
+                GivenData(shadowSignal.Id.Value, shadowData);
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)3},
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = default(double)},
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)5},
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = default(double)},
+
+                };
+
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                AssertDataDtoEquals(expectedData, result.ToArray());
+            }
+
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
@@ -1194,7 +1278,8 @@ namespace WebService.Tests
             {
                 signalsDataRepositoryMock
                     .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns<Domain.Signal, DateTime, DateTime>((s, from, to) => data.Where(d => d.Timestamp >= from && d.Timestamp < to));
+                    .Returns<Domain.Signal, DateTime, DateTime>((s, from, to) => 
+                        data.Where(d => (d.Timestamp >= from && d.Timestamp < to) || (from == to && d.Timestamp == from)));
 
                 signalsDataRepositoryMock
                   .Setup(sdr => sdr.GetDataNewerThan<T>(It.Is<Domain.Signal>(s => s.Id == 5), It.Is<DateTime>(t => true), It.IsAny<int>()))

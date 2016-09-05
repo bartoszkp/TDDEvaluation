@@ -278,15 +278,17 @@ namespace Domain.Services.Implementation
             else if(missingValuePolicy is ShadowMissingValuePolicy<T>)
             {
                 var mvp = missingValuePolicy as ShadowMissingValuePolicy<T>;
-                var shadowData = signalsDataRepository.GetData<T>(mvp.ShadowSignal, date, date).Single();
+                var shadowData = signalsDataRepository.GetData<T>(mvp.ShadowSignal, date, date);
 
-                if (shadowData == null)
+                if (shadowData.Count() == 0)
                     return Datum<T>.CreateNone(signal, date);
+
+                var singleShadowData = shadowData.Single();
 
                 return new Datum<T>
                 {
-                    Quality = shadowData.Quality,
-                    Value = shadowData.Value,
+                    Quality = singleShadowData.Quality,
+                    Value = singleShadowData.Value,
                     Timestamp = date,
                     Signal = signal
                 };
