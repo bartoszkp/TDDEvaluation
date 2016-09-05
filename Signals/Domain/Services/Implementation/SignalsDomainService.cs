@@ -80,6 +80,9 @@ namespace Domain.Services.Implementation
         {
             CheckTimestamp(fromIncludedUtc, signal.Granularity);
 
+            if (toExcludedUtc < fromIncludedUtc)
+                return Enumerable.Empty<Datum<T>>();
+
 
             Datum<T> lastDatum = null;
             Datum<T> nextDatum = null;
