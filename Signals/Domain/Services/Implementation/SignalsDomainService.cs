@@ -84,8 +84,11 @@ namespace Domain.Services.Implementation
             DateTime current = fromIncludedUtc;
 
             int i = 0;
-            Datum<T> before = new Datum<T>() {}; 
-            while(current < toExcludedUtc)
+            Datum<T> before = new Datum<T>() {};
+
+            if (current == toExcludedUtc) toExcludedUtc = toExcludedUtc.AddTicks(1);
+
+            while (current < toExcludedUtc)
             {
 
                 if (i >= data.Count || data[i].Timestamp != current)
