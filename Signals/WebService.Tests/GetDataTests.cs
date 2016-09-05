@@ -44,6 +44,36 @@ namespace WebService.Tests
 
         }
 
+        [TestMethod]
+        public void GivenNoSignals_GetData_WithSameTimeStamps_SpecificQualityMvpFillsSingleDatum()
+        {
+            SetupWebService();
+            var ts = new DateTime(2018, 12, 12);
+            var returnedSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Day
+            };
+
+
+            signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            missingValuePolicyRepositoryMock.Setup(m => m.Get(returnedSignal)).Returns(new SpecificValueMissingValuePolicyInteger()
+            {
+                Value = 42,
+                Quality = Quality.Fair
+
+            });
+            signalsDataRepositoryMock.Setup(s => s.GetData<int>(returnedSignal, ts, ts)).Returns(new List<Datum<int>>());
+
+            var result = signalsWebService.GetData(1, ts, ts);
+            var filledDatum = result.ElementAt(0);
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(Dto.Quality.Fair, filledDatum.Quality);
+            Assert.AreEqual(42, filledDatum.Value);
+        }
+
+
 
 
         private void SetupWebService()
