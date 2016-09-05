@@ -330,7 +330,7 @@ namespace WebService.Tests
                     path: Domain.Path.FromString("root/signal")));
 
                 this.signalsWebService.SetMissingValuePolicy(signalId, new ShadowMissingValuePolicy() {
-                  DataType = Dto.DataType.Integer,
+                  DataType = Dto.DataType.Double,
                   ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Double, Granularity = Dto.Granularity.Year}
                 });
 
@@ -349,9 +349,35 @@ namespace WebService.Tests
 
                 this.signalsWebService.SetMissingValuePolicy(signalId, new ShadowMissingValuePolicy()
                 {
-                    DataType = Dto.DataType.Integer,
+                    DataType = Dto.DataType.Decimal,
                     ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Month }
                 });
+
+            }
+
+            [TestMethod]
+            public void SetShadowMissingValuePolicy_GranualityAndDataTypeMatching_SetCalled()
+            {
+
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(),
+                    It.IsAny<Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<Double>>()));
+
+                this.signalsWebService.SetMissingValuePolicy(signalId, new ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Double,
+                    ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Double, Granularity = Dto.Granularity.Month }
+                });
+
+                
+                missingValuePolicyRepositoryMock.Verify(x => x.Set(It.IsAny<Domain.Signal>(),
+                    It.IsAny<Domain.MissingValuePolicy.ShadowMissingValuePolicy<Double>>()));
 
             }
 
