@@ -59,7 +59,6 @@ namespace WebService
             if (signalsDomainService != null)
             {
                 var sig = signalsDomainService.GetById(signalId);
-                var policy = GetMissingValuePolicy(signalId);
 
                 if (sig == null) throw new ArgumentException();
 
