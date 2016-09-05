@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -138,14 +139,21 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
+            var signal = GetById(signalId);
+
             if (policy is ShadowMissingValuePolicy)
             {
                 var shadowMvp = policy as ShadowMissingValuePolicy;
                 if (shadowMvp.ShadowSignal == null)
                     throw new NullReferenceException("Shadow signal is null");
+
+                if (signal.Granularity != shadowMvp.ShadowSignal.Granularity
+                    || signal.DataType != shadowMvp.DataType)
+                    throw new ShadowSignalNotMatchingException();
+
             }
 
-            var signal = GetById(signalId);
+
 
             if (signal == null)
                 throw new Domain.Exceptions.SettingPolicyNotExistingSignalException();
