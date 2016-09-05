@@ -343,6 +343,11 @@ namespace Domain.Services.Implementation
 
         public void CheckShadowMissingValuePolicy<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
+            if(signal.DataType.GetNativeType() != missingValuePolicy.NativeDataType)
+                throw new ArgumentException(String.Format("The policy DataType ({0}) does not match the DataType of the signal ({1})",
+                    missingValuePolicy.NativeDataType,
+                    signal.DataType.GetNativeType()));
+
             if (!(missingValuePolicy is ShadowMissingValuePolicy<T>))
                 return;
 
@@ -364,8 +369,14 @@ namespace Domain.Services.Implementation
         {
             var method = typeof(SignalsDomainService).GetMethod("CheckShadowMissingValuePolicy");
             method = method.MakeGenericMethod(signal.DataType.GetNativeType());
-
-            method.Invoke(this, new object[] { signal, missingValuePolicy });
+            try
+            {
+                method.Invoke(this, new object[] { signal, missingValuePolicy });
+            }
+            catch(TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
 
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }

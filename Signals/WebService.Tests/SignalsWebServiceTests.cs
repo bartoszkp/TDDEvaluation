@@ -1209,6 +1209,57 @@ namespace WebService.Tests
                 AssertDataDtoEquals(expectedData, result.ToArray());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingShadowPolicyWithDifferentGranularity_ArgumentExceptionIsThrown()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+                var shadowSignal = SignalWith(6, Dto.DataType.Double, Dto.Granularity.Day);
+
+                Dto.MissingValuePolicy.ShadowMissingValuePolicy policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy();
+                policy.ShadowSignal = shadowSignal;
+                policy.DataType = Dto.DataType.Double;
+
+                signalsWebService.SetMissingValuePolicy(signal.Id.Value, policy);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingShadowPolicyWithShadowWithDifferentDataType_ArgumentExceptionIsThrown()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+                var shadowSignal = SignalWith(6, Dto.DataType.Decimal, Dto.Granularity.Month);
+
+                Dto.MissingValuePolicy.ShadowMissingValuePolicy policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy();
+                policy.ShadowSignal = shadowSignal;
+                policy.DataType = Dto.DataType.Double;
+
+                signalsWebService.SetMissingValuePolicy(signal.Id.Value, policy);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingShadowPolicyWithDifferentDataType_ArgumentExceptionIsThrown()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+                var shadowSignal = SignalWith(6, Dto.DataType.Double, Dto.Granularity.Month);
+
+                Dto.MissingValuePolicy.ShadowMissingValuePolicy policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy();
+                policy.ShadowSignal = shadowSignal;
+                policy.DataType = Dto.DataType.Decimal;
+
+                signalsWebService.SetMissingValuePolicy(signal.Id.Value, policy);
+            }
+
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
