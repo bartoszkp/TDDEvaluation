@@ -11,29 +11,19 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.Decimal,
+                DataType = DataType.Double,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "FirstOrderTests" } }
+                Path = new Path() { Components = new[] { "signal" } }
             }).Id.Value;
 
-            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
+            client.SetData(id, new Datum[] {
+              new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+              new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 },
+              new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 1), Value = (double)2 } });
 
-            var beginTimestamp = new DateTime(2018, 1, 1);
-            var endTimestamp = beginTimestamp.AddMonths(5);
+            var result = client.GetData(id, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
 
-            client.SetData(id, new Datum[]
-            {
-                new Datum() { Quality = Quality.Good, Value = 10m, Timestamp = beginTimestamp.AddMonths(-1) },
-                new Datum() { Quality = Quality.Fair, Value = 20m, Timestamp = beginTimestamp.AddMonths(-2) },
-                new Datum() { Quality = Quality.Poor, Value = 80m, Timestamp = endTimestamp.AddMonths(1) },
-            });
-
-            var result = client.GetData(id, beginTimestamp, endTimestamp);
-
-            foreach (var d in result)
-            {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
-            }
+            Console.WriteLine(result.Length);
 
             Console.ReadKey();
         }

@@ -1100,6 +1100,31 @@ namespace WebService.Tests
                 AssertDataDtoEquals(expectedData, result.ToArray());
             }
 
+            [TestMethod]
+            public void GivenASignalWithFirstOrderMissingValuePolicy_WhenGettingDataWithToEarlierThanFrom_ReturnsEmptyResult()
+            {
+                var signal = GetDefaultSignal_IntegerMonth();
+                signal.DataType = DataType.Double;
+                signal.Id = 5;
+                GivenASignal(signal);
+
+                Domain.MissingValuePolicy.MissingValuePolicyBase policy = new Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<double>();
+                policy.Signal = signal;
+                GivenMissingValuePolicy(policy);
+                Domain.Datum<double>[] data = new Domain.Datum<double>[]
+                {
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(1999, 11, 1), Value = (double)3 },
+                    new Domain.Datum<double>() { Quality = Quality.Bad, Timestamp = new DateTime(1999, 10, 1), Value = (double)5 },
+                    new Domain.Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)7 },
+
+                };
+                GivenData(signal.Id.Value, data);
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 4, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(0, result.Count());
+            }
+
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
