@@ -1417,6 +1417,33 @@ namespace WebService.Tests
                 }));
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithShadowMVP_DoesNotThrow()
+            {
+                SetupWebService();
+
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = 7,
+                    Granularity = Domain.Granularity.Month,
+                    DataType = Domain.DataType.Double,
+                    Path = Domain.Path.FromString("x/y")
+                });
+
+                missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.IsAny<Domain.Signal>())).Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble()
+                {
+                    ShadowSignal = new Domain.Signal()
+                    {
+                        Id = 5,
+                        Granularity = Domain.Granularity.Month,
+                        DataType = Domain.DataType.Double,
+                        Path = Domain.Path.FromString("a/b")
+                    }
+                }).Returns(null);
+
+                signalsWebService.GetData(7, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+            }
+
             private static void VerifyExceptionThrown<TException>(Action action) where TException : Exception
             {
                 if (action == null)
