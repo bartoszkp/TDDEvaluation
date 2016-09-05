@@ -1291,8 +1291,7 @@ namespace WebService.Tests
             [ExpectedException(typeof(ArgumentException))]
             public void GivenASignalWithDataTypeDouble_WhenSettingShadowMVPWithShadowSignalWithNonMatchingDataType_ArgumentExceptionIsThrown()
             {
-                SetupWebService();
-                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal()
+                GivenASignal(new Domain.Signal()
                 {
                     Id = 1,
                     DataType = Domain.DataType.Double,
@@ -1310,15 +1309,13 @@ namespace WebService.Tests
                         Path = new Dto.Path() { Components = new[] {"x", "y"} }
                     }
                 });
-
             }
 
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GivenASignalWithDataTypeDouble_WhenSettingShadowMVPWithShadowSignalWithNonMatchingGranularity_ArgumentExceptionIsThrown()
             {
-                SetupWebService();
-                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal()
+                GivenASignal(new Domain.Signal()
                 {
                     Id = 1,
                     DataType = Domain.DataType.Double,
