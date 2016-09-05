@@ -84,10 +84,22 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainPolicyBase)
         {
-            var gettingSignalFromRepository = signalsRepository.Get(signalId);
-            if (gettingSignalFromRepository == null)
+            var gettingSignal = signalsRepository.Get(signalId);
+            if (gettingSignal == null)
                 throw new SignalIsNotException();
-            missingValuePolicyRepository.Set(gettingSignalFromRepository, domainPolicyBase);
+
+            if (domainPolicyBase.GetType() == new ShadowMissingValuePolicy<bool>().GetType())
+                ShadowSignalCorrectly<bool>(domainPolicyBase, gettingSignal);
+            if (domainPolicyBase.GetType() == new ShadowMissingValuePolicy<decimal>().GetType())
+                ShadowSignalCorrectly<decimal>(domainPolicyBase, gettingSignal);
+            if (domainPolicyBase.GetType() == new ShadowMissingValuePolicy<double>().GetType())
+                ShadowSignalCorrectly<double>(domainPolicyBase, gettingSignal);
+            if (domainPolicyBase.GetType() == new ShadowMissingValuePolicy<int>().GetType())
+                ShadowSignalCorrectly<int>(domainPolicyBase, gettingSignal);
+            if (domainPolicyBase.GetType() == new ShadowMissingValuePolicy<string>().GetType())
+                ShadowSignalCorrectly<string>(domainPolicyBase, gettingSignal);
+
+            missingValuePolicyRepository.Set(gettingSignal, domainPolicyBase);
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signalDomain)
@@ -392,6 +404,12 @@ namespace Domain.Services.Implementation
             this.signalsRepository.Delete(signal);
         }
 
-
+        private void ShadowSignalCorrectly<T>(MissingValuePolicyBase mvpb, Signal signal)
+        {
+            var smvp = (ShadowMissingValuePolicy<T>)mvpb;
+            if (smvp.ShadowSignal.Granularity != signal.Granularity
+                || smvp.ShadowSignal.DataType != signal.DataType)
+                throw new ShadowSignalNotCorrectlyException();
+        }
     }
 }
