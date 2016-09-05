@@ -199,7 +199,7 @@ namespace WebService
             if(policy is Dto.MissingValuePolicy.ShadowMissingValuePolicy)
             {
                 var shadowPolicy = policy as Dto.MissingValuePolicy.ShadowMissingValuePolicy;
-                if((int)shadowPolicy.ShadowSignal.Granularity != (int)signal.Granularity)
+                if((int)shadowPolicy.ShadowSignal.Granularity != (int)signal.Granularity || (int)shadowPolicy.ShadowSignal.DataType != (int)signal.DataType )
                 {
                     throw new ArgumentException("Granuality and DataType of ShadowMissingValuePolicy and signal MUST match");
                 }
