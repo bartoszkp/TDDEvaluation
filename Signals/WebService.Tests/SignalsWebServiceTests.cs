@@ -336,6 +336,25 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void SetShadowMissingValuePolicy_DateTypeArentEqual_ThrowException()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: Domain.DataType.Double,
+                    granularity: Domain.Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
+
+                this.signalsWebService.SetMissingValuePolicy(signalId, new ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Integer,
+                    ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Month }
+                });
+
+            }
+
 
             [TestMethod]
             [ExpectedException(typeof(CouldntGetASignalException))]
