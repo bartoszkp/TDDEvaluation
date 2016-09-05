@@ -1337,6 +1337,48 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSetsShadowMissingValuePolicyWithNoData_FilledDefaultValues()
+            {
+
+                Dto.Signal shadowSignal = new Dto.Signal() { Id = 2, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "x", "z" } } };
+                Signal shadowSignalDomain = new Domain.Signal() { Id = 2, DataType = DataType.Integer, Granularity = Granularity.Month, Path = Path.FromString("x/z") };
+
+               
+                SetupWebService();
+
+                var signal = new Signal()
+                {
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("a")
+                };
+                var signalId = 1;
+
+                var datum = new List<Dto.Datum>
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 3 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 2, 1), Value = 6 }
+                };
+
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datum.ToArray());
+
+                var policy = new ShadowMissingValuePolicyInteger();
+                policy.ShadowSignal = shadowSignalDomain;
+
+                missingValuePolicyRepositoryMock
+                   .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                   .Returns(policy);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
+
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 2), Value = (int)0 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 3), Value = (int)0 });
+
+                DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
+
+            }
+
             private void DeleteASignal(int id)
             {
 
