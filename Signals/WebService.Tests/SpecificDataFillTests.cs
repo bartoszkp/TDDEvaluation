@@ -26,7 +26,7 @@ namespace WebService.Tests
 
             int id = 1;
 
-            var returnedSignal = new Signal() { Id = id };
+            var returnedSignal = new Signal() { Id = id, DataType = DataType.Integer };
 
             Mock<SpecificValueMissingValuePolicy<int>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<int>>();
             specificMvpMock.Object.Value = 42;

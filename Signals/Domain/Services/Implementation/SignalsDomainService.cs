@@ -141,6 +141,13 @@ namespace Domain.Services.Implementation
 
                     return datumReturnList;
                 }
+                else if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                {
+                    dataToAdd = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = fromIncludedUtc, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                    datumReturnList.Add(dataToAdd);
+
+                    return datumReturnList;
+                }
             }
 
             if(policy != null)
