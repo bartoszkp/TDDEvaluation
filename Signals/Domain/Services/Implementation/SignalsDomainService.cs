@@ -142,6 +142,14 @@ namespace Domain.Services.Implementation
 
         public void Set(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
+            if (missingValuePolicy is ShadowMissingValuePolicy<double>)
+            {
+                if (signal.DataType != (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.DataType)
+                {
+                    throw new ArgumentException("Failed to assign ShadowMissingValuePolicy to the signal.");
+                }
+            }
+
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
