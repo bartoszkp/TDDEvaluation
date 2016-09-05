@@ -36,19 +36,27 @@ namespace WebService.Tests
             mvpRepoMock.Setup(m => m.Get(returnedSignal))
                 .Returns(specificMvpMock.Object);
 
-            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)))
-                .Returns(new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1,0,0,0), Value = (int)42 },
-                });
-
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1)))
+                .Returns(DefaultElementOfCollection<int>(new DateTime(2000, 1, 1)));
+               
 
             var result = signalsWebService.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
 
-            var filledDatum = result.ElementAt(0);
-
             Assert.AreEqual(1, result.Count());
-            Assert.AreEqual(specificMvpMock.Object.Value, filledDatum.Value);
+            Assert.AreEqual(specificMvpMock.Object.Value, result.Single(f => f.Timestamp == new DateTime(2000, 1, 1)).Value);
+        }
+
+        private List<Datum<T>> DefaultElementOfCollection<T>(DateTime startDate)
+        {
+            List<Datum<T>> SingleItem = new List<Datum<T>>();
+            SingleItem.Add(new Datum<T>()
+            {
+                Id = 1,
+                Quality = Domain.Quality.Fair,
+                Timestamp = startDate,
+                Value = default(T),
+            });
+            return SingleItem;
         }
 
         [TestMethod]
