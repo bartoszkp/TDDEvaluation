@@ -275,6 +275,23 @@ namespace Domain.Services.Implementation
 
 
             }
+            else if(missingValuePolicy is ShadowMissingValuePolicy<T>)
+            {
+                var mvp = missingValuePolicy as ShadowMissingValuePolicy<T>;
+                var shadowData = signalsDataRepository.GetData<T>(mvp.ShadowSignal, date, date).Single();
+
+                if (shadowData == null)
+                    return Datum<T>.CreateNone(signal, date);
+
+                return new Datum<T>
+                {
+                    Quality = shadowData.Quality,
+                    Value = shadowData.Value,
+                    Timestamp = date,
+                    Signal = signal
+                };
+            }
+
             return new Datum<T>()
             {
                 Signal = signal,
