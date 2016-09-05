@@ -12,6 +12,50 @@ namespace Domain.MissingValuePolicy
 
 
             var filledData = new List<Datum<T>>();
+
+            if (fromIncludedUtc == toExcludedUtc && data.Count() == 0)
+            {
+                foreach (var d in data)
+                {
+                    for (; fromIncludedUtc <= toExcludedUtc; fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity))
+                    {
+                        if (d.Timestamp == fromIncludedUtc)
+                        {
+                            filledData.Add(d);
+                            olderDatum = d;
+                            fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity);
+                            break;
+                        }
+                        if (olderDatum == null)
+                        {
+                            filledData.Add(new Datum<T>()
+                            {
+                                Signal = signal,
+                                Timestamp = fromIncludedUtc,
+                                Quality = Quality.None,
+                                Value = default(T)
+                            });
+                            continue;
+                        }
+                        filledData.Add(fillDatum(signal, fromIncludedUtc, olderDatum, d));
+                    }
+                }
+                if (newestDatum != null)
+                    for (; fromIncludedUtc <= toExcludedUtc; fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity))
+                        filledData.Add(fillDatum(signal, fromIncludedUtc, olderDatum, newestDatum));
+                else
+                    for (; fromIncludedUtc <= toExcludedUtc; fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity))
+                        filledData.Add(new Datum<T>()
+                        {
+                            Signal = signal,
+                            Timestamp = fromIncludedUtc,
+                            Quality = Quality.None,
+                            Value = default(T)
+                        });
+                return filledData;
+
+            }
+
             foreach (var d in data)
             {
                 for (; fromIncludedUtc < toExcludedUtc; fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal.Granularity))
@@ -53,7 +97,7 @@ namespace Domain.MissingValuePolicy
             return filledData;
         }
 
-        private Datum<T> fillDatum (Signal signal, DateTime fromIncludedUtc, Datum<T> olderDatum, Datum<T> newestDatum)
+        private Datum<T> fillDatum(Signal signal, DateTime fromIncludedUtc, Datum<T> olderDatum, Datum<T> newestDatum)
         {
             var diff = difference(olderDatum.Timestamp, newestDatum.Timestamp, signal.Granularity);
             var pos = difference(olderDatum.Timestamp, fromIncludedUtc, signal.Granularity);
@@ -113,7 +157,7 @@ namespace Domain.MissingValuePolicy
                     return (int)(d2 - d1).TotalSeconds;
 
                 case Granularity.Week:
-                    return (int)(d2 - d1).TotalDays/7;
+                    return (int)(d2 - d1).TotalDays / 7;
 
                 case Granularity.Year:
                     return d2.Year - d1.Year;

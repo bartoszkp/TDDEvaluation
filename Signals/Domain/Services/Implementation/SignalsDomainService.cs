@@ -128,7 +128,7 @@ namespace Domain.Services.Implementation
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
 
             var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).FirstOrDefault();
-            var newestDatum = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc.AddMilliseconds(-1), 1).FirstOrDefault();
+            var newestDatum = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1).FirstOrDefault(); //.AddMilliseconds(-1)
             return mvp.FillData(signal, data, fromIncludedUtc, toExcludedUtc, olderDatum, newestDatum).ToArray();
         }
 

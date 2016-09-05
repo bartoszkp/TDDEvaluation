@@ -110,7 +110,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GetData_WithSameTimeStamps_FirstOrderMvpFillsSingleDatum()
+        public void NoData_GetData_WithSameTimeStamps_FirstOrderMvpFillsSingleDatum()
         {
             SetupWebService();
             var ts = new DateTime(2018, 12, 1);
@@ -120,17 +120,39 @@ namespace WebService.Tests
             signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
             missingValuePolicyRepositoryMock.Setup(m => m.Get(returnedSignal)).Returns(new ZeroOrderMissingValuePolicyInteger());
             signalsDataRepositoryMock.Setup(s => s.GetData<int>(returnedSignal, ts, ts)).Returns(new List<Datum<int>>());
+            
+
+
+
+            var result = signalsWebService.GetData(1, ts, ts);
+            var filledDatum = result.ElementAt(0);
+
+            Assert.AreEqual(1, result.Count());
+            AssertFilledDatum(filledDatum, Dto.Quality.None, 0);
+        }
+
+        [TestMethod]
+        public void GetData_WithSameTimeStamps_FirstOrderMvpFillsSingleDatum()
+        {
+            SetupWebService();
+            var ts = new DateTime(2018, 12, 1);
+            var returnedSignal = CreateSignal(Granularity.Month, 1);
+
+
+            signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            missingValuePolicyRepositoryMock.Setup(m => m.Get(returnedSignal)).Returns(new FirstOrderMissingValuePolicyInteger());
+            signalsDataRepositoryMock.Setup(s => s.GetData<int>(returnedSignal, ts, ts)).Returns(new List<Datum<int>>());
             signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<int>(returnedSignal, new DateTime(2018, 12, 1), 1))
                 .Returns(new List<Datum<int>>()
                 {
                     new Datum<int>() {Quality = Quality.Good,Value = 1,Timestamp = new DateTime(2018, 11, 1)}
                 });
-
-            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<int>(returnedSignal, new DateTime(2018, 12, 1), 1))
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<int>(returnedSignal, new DateTime(2018, 12, 1), 1))
                 .Returns(new List<Datum<int>>()
                 {
                     new Datum<int>() {Quality = Quality.Good,Value = 3,Timestamp = new DateTime(2019, 1, 1)}
                 });
+
 
 
 
