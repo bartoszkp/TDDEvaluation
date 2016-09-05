@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -73,8 +73,9 @@
     <Compile Include="MissingValuePolicy\FirstOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\ZeroOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\SpecificValueMissingValuePolicy.cs" />
-    <Compile Include="PathEntry.cs" />
+    <Compile Include="MissingValuePolicy\ShadowMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\NoneQualityMissingValuePolicy.cs" />
+    <Compile Include="PathEntry.cs" />
     <Compile Include="Quality.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Datum.cs" />
