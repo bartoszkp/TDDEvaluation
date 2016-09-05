@@ -21,28 +21,33 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerSignal_WhenGettingDataWithOneElement_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
+            SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
+            signalsWebService = new SignalsWebService(domainService);
+
             int id = 1;
 
             var returnedSignal = new Signal() { Id = id, DataType = DataType.Integer };
 
+            Mock<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<int>> firstOrderPolicyMock = new Mock<Domain.MissingValuePolicy.FirstOrderMissingValuePolicy<int>>();
+
             signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
             mvpRepoMock.Setup(m => m.Get(returnedSignal))
-                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
-                { Id = 1, Signal = returnedSignal });
+                .Returns(firstOrderPolicyMock.Object);
+               
 
             dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 11, 11), new DateTime(2000, 11, 11)))
                 .Returns(new List<Datum<int>>()
                 {
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 11, 11), Value = (int)1 },
+                    new Datum<int>() { Quality = Quality.None, Timestamp = new DateTime(2000, 11, 11), Value = (int)1 },
                 });
 
-            var result = signalsWebService.GetData(id, new DateTime(2000, 11, 11), new DateTime(2000, 11, 11));
+            var result = signalsWebService.GetData(1, new DateTime(2000, 11, 11), new DateTime(2000, 11, 11));
 
             var filledDatum = result.ElementAt(0);
 
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual(Dto.Quality.None, filledDatum.Quality);
-            Assert.AreEqual(0, filledDatum.Value);
+            Assert.AreEqual(1, filledDatum.Value);
         }
 
         [TestMethod]

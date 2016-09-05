@@ -167,6 +167,15 @@ namespace Domain.Services.Implementation
 
                     return datumReturnList;
                 }
+                else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                {
+                    dataToAdd = new Datum<T>()
+                    {
+                        Quality = ((FirstOrderMissingValuePolicy<T>)policy).Quality,
+                        Timestamp = fromIncludedUtc,
+                        Value = ((FirstOrderMissingValuePolicy<T>)policy).Value
+                    };
+                }
             }
 
             if(policy != null)
