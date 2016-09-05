@@ -6,6 +6,7 @@ using Domain.Infrastructure;
 using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
+using System.Reflection;
 
 namespace Domain.Services.Implementation
 {
@@ -340,8 +341,32 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
+        public void CheckShadowMissingValuePolicy<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
+        {
+            if (!(missingValuePolicy is ShadowMissingValuePolicy<T>))
+                return;
+
+            var mvp = missingValuePolicy as ShadowMissingValuePolicy<T>;
+
+            if (signal.Granularity != mvp.ShadowSignal.Granularity)
+                throw new ArgumentException(String.Format("The signals Granularity ({0}) does not match the Granularity of its shadow ({1})", 
+                    signal.Granularity, 
+                    mvp.ShadowSignal.Granularity));
+            if (signal.DataType != mvp.ShadowSignal.DataType)
+                throw new ArgumentException(String.Format("The signals DataType ({0}) does not match the DataType of its shadow ({1})",
+                    signal.DataType,
+                    mvp.ShadowSignal.DataType));
+
+
+        }
+
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
+            var method = typeof(SignalsDomainService).GetMethod("CheckShadowMissingValuePolicy");
+            method = method.MakeGenericMethod(signal.DataType.GetNativeType());
+
+            method.Invoke(this, new object[] { signal, missingValuePolicy });
+
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
