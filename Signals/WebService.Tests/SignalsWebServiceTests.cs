@@ -874,6 +874,70 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock.Verify(s => s.Set(newSignal, It.IsAny<ShadowMissingValuePolicy<double>>()));
             }
 
+            [TestMethod]
+            public void GivenASignal_HavingSignalWithShadowMVP_WithDateFromEqualsDateTo_WhenGettingData_RetursIt()
+            {
+                int dummyId = 1;
+                var newSignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("some/signal")
+                };
+
+                var shadowSignal = new Signal()
+                {
+                    Id = 2,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("shadow/signal")
+                };
+
+                var signalDatum = new Datum<bool>[]
+                {
+                    new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = true },
+                    new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = false },
+                    new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = true }
+                };
+
+                var shadowSignalDatum = new Datum<bool>[]
+                {
+                    new Datum<bool>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = true }
+                };
+
+                GivenASignal(newSignal);
+
+                missingValuePolicyRepositoryMock
+                    .Setup(s => s.Get(It.IsAny<Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean() {ShadowSignal = shadowSignal });
+
+                signalsDataRepositoryMock
+                    .Setup(s => s.GetData<bool>(It.Is<Domain.Signal>((i => i.Id == 1)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(signalDatum);
+
+                signalsDataRepositoryMock
+                    .Setup(s => s.GetData<bool>(It.Is<Domain.Signal>((i => i.Id == 2)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(shadowSignalDatum);
+
+                var result = signalsWebService.GetData(dummyId, new DateTime(2000, 3, 1), new DateTime(2000, 3, 1));
+
+                Assert.AreEqual(true, result.First().Value);
+                Assert.AreEqual(new DateTime(2000, 3, 1), result.First().Timestamp);
+                Assert.AreEqual(Dto.Quality.Fair, result.First().Quality);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
             private void SetupDataRepository<T>(int signalId = 1, IEnumerable<Datum<T>> data = null)
             {
                 if (data == null)
