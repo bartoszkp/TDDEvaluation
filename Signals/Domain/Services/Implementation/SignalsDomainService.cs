@@ -52,12 +52,27 @@ namespace Domain.Services.Implementation
             return signalsRepository.Get(path);
         }
 
+        public void CheckShadowMVP<T>(Signal signal, MissingValuePolicyBase domainMissingValuePolicy)
+        {
+            if (domainMissingValuePolicy is ShadowMissingValuePolicy<T> == false) return;
+
+            var mvp = domainMissingValuePolicy as ShadowMissingValuePolicy<T>;
+
+            if (signal.DataType != mvp.ShadowSignal.DataType ||
+                signal.Granularity != mvp.ShadowSignal.Granularity)
+                throw new Exception("ShadowSignal doesnt meet signal criteria.");
+        }
+
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase domainMissingValuePolicy)
         {
             if (signal == null)
-            {
                 throw new ArgumentException("no signal with this id");
-            }
+
+            var method = typeof(SignalsDomainService)
+                .GetMethod("CheckShadowMVP")
+                .MakeGenericMethod(signal.DataType.GetNativeType())
+                .Invoke(this, new object[] { signal, domainMissingValuePolicy });
+
             missingValuePolicyRepository.Set(signal, domainMissingValuePolicy);
         }
 
