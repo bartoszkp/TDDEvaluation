@@ -308,6 +308,16 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
         {
+
+            if (missingValuePolicy is ShadowMissingValuePolicy<bool> |
+                missingValuePolicy is ShadowMissingValuePolicy<int> |
+                missingValuePolicy is ShadowMissingValuePolicy<double> |
+                missingValuePolicy is ShadowMissingValuePolicy<decimal> |
+                missingValuePolicy is ShadowMissingValuePolicy<string> )
+            {
+                throw new ArgumentException();
+            }
+
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
