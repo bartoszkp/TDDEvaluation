@@ -209,6 +209,12 @@ namespace Domain.Services.Implementation
                 Datum<T>[] additionalDatums = new Datum<T>[] { olderData, newerData };
                 mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal,null,additionalDatums);
             }
+            else if (mvp is ShadowMissingValuePolicy<T>)
+            {
+                ShadowMissingValuePolicy<T> shadowMvp = mvp as ShadowMissingValuePolicy<T>;
+                IEnumerable<Datum<T>> additionalDatums = GetData<T>(shadowMvp.ShadowSignal.Id.Value,fromIncludedUtc,toExcludedUtc);
+                mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal, null, additionalDatums);
+            }
         }
 
         private DateTime ShiftTime(Granularity granularity, DateTime time, int shift = 1)
