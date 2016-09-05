@@ -143,7 +143,26 @@ namespace Domain.Services.Implementation
                 }
                 else if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                 {
-                    dataToAdd = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = fromIncludedUtc, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                    dataToAdd = new Datum<T>()
+                    {
+                        Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality,
+                        Timestamp = fromIncludedUtc,
+                        Value = ((SpecificValueMissingValuePolicy<T>)policy).Value
+                    };
+
+                    datumReturnList.Add(dataToAdd);
+
+                    return datumReturnList;
+                }
+                else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                {
+                    dataToAdd = new Datum<T>()
+                    {
+                        Quality = ((ZeroOrderMissingValuePolicy<T>)policy).Quality,
+                        Timestamp = fromIncludedUtc,
+                        Value = ((ZeroOrderMissingValuePolicy<T>)policy).Value
+                    };
+
                     datumReturnList.Add(dataToAdd);
 
                     return datumReturnList;
