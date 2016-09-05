@@ -1321,6 +1321,22 @@ namespace WebService.Tests
                 DatumArraysAreEqual(expectedResult.ToArray(), returnedData.ToArray());
 
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void Delete_NotExistingSignal_ShouldThrowsException()
+            {
+                Signal sig = null;
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(sig);
+                SetupWebService();
+
+                var signalId = 1;
+                signalsWebService.Delete(signalId);
+
+
+               
+            }
+
             private Dto.Datum[] MakeNoData()
             {
                 return  new Dto.Datum[] { };
