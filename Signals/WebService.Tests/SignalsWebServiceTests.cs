@@ -40,6 +40,25 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignal_WhenAssigningToTheSignalSOMVPWithSignalWithGranularityAndDatatypeSameAsInGivenSignal_CalledIsSetMVPRepositorySetMethod()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Second, Path = Path.FromString("root/signal/") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+
+                signalsWebService.SetMissingValuePolicy(givenSignal.Id.Value,
+                    new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Second } });
+
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
                 GivenNoSignals();
