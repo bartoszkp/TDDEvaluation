@@ -130,7 +130,6 @@ namespace WebService.Tests
             [ExpectedException(typeof(ArgumentException))]
             public void GivenASignal_WhenSetMissingValuePolicyWithInvalidId_ReturnException()
             {
-                int correctId = 1;
                 int invalidId = 123;
 
                 GivenASignal(SignalWith());
@@ -811,6 +810,36 @@ namespace WebService.Tests
                 Assert.AreEqual(fromDate, result[0].Timestamp);
                 Assert.AreEqual(expectedResults[0].Quality, result[0].Quality);
                 Assert.AreEqual(expectedResults[0].Value, result[0].Value);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.ShadowMissingValuePolicyException))]
+            public void GivenASignal_WhenSettingShadowMVPWithIncorrectSignal_ThrowException()
+            {
+                int dummyId = 1;
+                var newSignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("shadow/signal")
+                };
+
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() {
+                    Id = dummyId,
+                    DataType = Dto.DataType.Double,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        Id = dummyId,
+                        DataType = Dto.DataType.Decimal,
+                        Granularity = Dto.Granularity.Day,
+                        Path = new Dto.Path() { Components = new[] {"shadow","siangl"}}
+                    }
+                };
+
+
+                GivenASignal(newSignal);
+                signalsWebService.SetMissingValuePolicy(dummyId, policy);
             }
 
             private void SetupDataRepository<T>(int signalId = 1, IEnumerable<Datum<T>> data = null)
