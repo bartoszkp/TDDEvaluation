@@ -217,6 +217,19 @@ namespace Domain.Services.Implementation
                     Timestamp = timestamp
                 };
             }
+            else if (policy is ShadowMissingValuePolicy<T>)
+            {
+                var result = filledList.Where(d => d.Timestamp < timestamp).LastOrDefault();
+
+
+                return new Datum<T>()
+                {
+                    Quality = Quality.None,
+                    Signal = result.Signal,
+                    Value = default(T),
+                    Timestamp = timestamp
+                };
+            }
             else
             {
                 throw new NotImplementedException();
