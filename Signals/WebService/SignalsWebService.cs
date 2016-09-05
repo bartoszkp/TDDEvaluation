@@ -148,7 +148,7 @@ namespace WebService
                     throw new NullReferenceException("Shadow signal is null");
 
                 if (signal.Granularity != shadowMvp.ShadowSignal.Granularity
-                    || signal.DataType != shadowMvp.DataType)
+                    || signal.DataType != shadowMvp.ShadowSignal.DataType)
                     throw new ShadowSignalNotMatchingException();
 
             }
