@@ -331,11 +331,10 @@ namespace WebService.Tests
 
                 this.signalsWebService.SetMissingValuePolicy(signalId, new ShadowMissingValuePolicy() {
                   DataType = Dto.DataType.Integer,
-                  ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Double, Granularity = Dto.Granularity.Minute}
+                  ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Double, Granularity = Dto.Granularity.Year}
                 });
 
             }
-
 
 
             [TestMethod]

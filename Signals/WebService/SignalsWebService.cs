@@ -196,6 +196,15 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
+            if(policy is Dto.MissingValuePolicy.ShadowMissingValuePolicy)
+            {
+                var shadowPolicy = policy as Dto.MissingValuePolicy.ShadowMissingValuePolicy;
+                if((int)shadowPolicy.ShadowSignal.Granularity != (int)signal.Granularity)
+                {
+                    throw new ArgumentException("Granuality and DataType of ShadowMissingValuePolicy and signal MUST match");
+                }
+            }
+
             this.signalsDomainService.SetMissingValuePolicy(
                 signal.ToDomain<Domain.Signal>(),
                 policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
