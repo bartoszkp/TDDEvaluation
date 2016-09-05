@@ -842,6 +842,36 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(dummyId, policy);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenSettingShadowMVPWithCorrectSignal_SetMissingValuePolicyIsCalled()
+            {
+                int dummyId = 1;
+                var newSignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("shadow/signal")
+                };
+
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    Id = dummyId,
+                    DataType = Dto.DataType.Double,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        Id = dummyId,
+                        DataType = Dto.DataType.Double,
+                        Granularity = Dto.Granularity.Day,
+                        Path = new Dto.Path() { Components = new[] { "shadow", "signal" } }
+                    }
+                };
+
+                GivenASignal(newSignal);
+                signalsWebService.SetMissingValuePolicy(dummyId, policy);
+                missingValuePolicyRepositoryMock.Verify(s => s.Set(newSignal, It.IsAny<ShadowMissingValuePolicy<double>>()));
+            }
+
             private void SetupDataRepository<T>(int signalId = 1, IEnumerable<Datum<T>> data = null)
             {
                 if (data == null)
