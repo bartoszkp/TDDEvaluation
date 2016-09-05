@@ -1041,6 +1041,25 @@ namespace WebService.Tests
                 Assert.AreEqual("Fair", resultData.First().Quality.ToString());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Exception))]
+            public void WhenSetingShadowMissingValuePolicy_DataTypeMostBeToSame()
+            {
+                var signalId = 1;
+
+                var testSignal = SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("x/y"));
+
+                var shadowSignal = SignalWith(Dto.DataType.Boolean, Dto.Granularity.Month, new Dto.Path() { Components = new[] { "x","y"} });
+
+                GivenASignal(testSignal);
+                
+                signalsWebService.SetMissingValuePolicy(signalId, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = shadowSignal,
+                });
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
