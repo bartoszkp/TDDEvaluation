@@ -1178,6 +1178,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
             public void Delete_NotExistingSignal_NoneExceptionIsThrown()
             {
                 SetupWebService();
@@ -1186,6 +1187,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
             public void Delete_NotExistingSignal_ExpectedRepositoryGetCall()
             {
                 SetupWebService();

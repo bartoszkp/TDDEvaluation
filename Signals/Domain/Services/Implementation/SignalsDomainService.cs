@@ -45,7 +45,7 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
-            if (signal == null) return;
+            if (signal == null) throw new CouldntGetASignalException();
 
             DeleteSignalData(signal);
             missingValuePolicyRepository.Set(signal, null);
