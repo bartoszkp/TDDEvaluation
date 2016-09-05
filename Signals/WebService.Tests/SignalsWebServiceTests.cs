@@ -1359,6 +1359,84 @@ namespace WebService.Tests
                 });
             }
 
+            [TestMethod]
+            public void GivenSignalsOfDifferentDataTypes_WhenSettingShadowMVPWithNonMatchingShadowSignal_ArgumentExceptionIsThrown()
+            {
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Decimal,
+                    Granularity = Domain.Granularity.Second,
+                    Path = Domain.Path.FromString("x/y")
+                });
+                VerifyExceptionThrown<ArgumentException>(() => signalsWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Decimal,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        DataType = Dto.DataType.Integer,
+                        Granularity = Dto.Granularity.Week,
+                        Path = new Dto.Path() { Components = new[] { "x", "y" } }
+                    }
+                }));
+
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.String,
+                    Granularity = Domain.Granularity.Second,
+                    Path = Domain.Path.FromString("x/y")
+                });
+                VerifyExceptionThrown<ArgumentException>(() => signalsWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.String,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        DataType = Dto.DataType.Double,
+                        Granularity = Dto.Granularity.Second,
+                        Path = new Dto.Path() { Components = new[] { "x", "y" } }
+                    }
+                }));
+
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Minute,
+                    Path = Domain.Path.FromString("x/y")
+                });
+                VerifyExceptionThrown<ArgumentException>(() => signalsWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Integer,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        DataType = Dto.DataType.Integer,
+                        Granularity = Dto.Granularity.Year,
+                        Path = new Dto.Path() { Components = new[] { "x", "y" } }
+                    }
+                }));
+            }
+
+            private static void VerifyExceptionThrown<TException>(Action action) where TException : Exception
+            {
+                if (action == null)
+                    throw new ArgumentException("Action to test cannot be null!");
+
+                if (typeof(TException).Equals(typeof(Exception)))
+                    throw new ArgumentException("TException type cannot be of type Exception");
+
+                try
+                {
+                    action();
+                }
+                catch (TException)
+                {
+                    return;
+                }
+
+                Assert.Fail("Action does not throw the exception expected");
+            }
+
             private void DeleteAndVerifyDeletedSignal<T>(Domain.Signal signal)
             {
                 signalsWebService.Delete(signal.Id.Value);
