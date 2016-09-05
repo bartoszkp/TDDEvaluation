@@ -219,7 +219,14 @@ namespace Domain.Services.Implementation
             }
             else if (policy is ShadowMissingValuePolicy<T>)
             {
-              
+                var pol = policy as ShadowMissingValuePolicy<T>;
+                var result = signalsDataRepository.GetData<T>(pol.ShadowSignal, timestamp, timestamp);
+
+                if (result.Count() == 1)
+                {
+                    return result.ToArray()[0];
+                }
+
                 return new Datum<T>()
                 {
                     Quality = Quality.None,
