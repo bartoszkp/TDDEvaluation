@@ -1260,6 +1260,33 @@ namespace WebService.Tests
 
             #endregion
 
+            [TestMethod]
+            public void GivenASignal_GivenNoData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
+            {
+                SetupDataRepositoryMock<int>(new Domain.Signal() {
+                    Id = 1,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("x/y") },
+                    new Dto.Datum[] { });
+
+                var timestamp = new DateTime(2016, 12, 12);
+
+                var data = signalsWebService.GetData(1, timestamp, timestamp);
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum()
+                    {
+                        Quality = Dto.Quality.None,
+                        Timestamp = timestamp,
+                        Value = default(int)
+                    }
+                };
+
+                Assert_Datums(expectedData, data);
+            }
+
             private void DeleteAndVerifyDeletedSignal<T>(Domain.Signal signal)
             {
                 signalsWebService.Delete(signal.Id.Value);
