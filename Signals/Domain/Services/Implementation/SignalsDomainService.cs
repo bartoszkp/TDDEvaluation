@@ -128,10 +128,19 @@ namespace Domain.Services.Implementation
                 throw new InvalidTimestampException();
 
             var policy = GetMissingValuePolicy(signal);
+            var datumReturnList = new List<Datum<T>>();
 
             if (fromIncludedUtc == toExcludedUtc)
             {
-                throw new InvalidTimestampException();
+                Datum<T> dataToAdd;
+
+                if (policy.GetType() == typeof(NoneQualityMissingValuePolicy<T>) || policy.GetType() == null)
+                {
+                    dataToAdd = new Datum<T>() { Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) };
+                    datumReturnList.Add(dataToAdd);
+
+                    return datumReturnList;
+                }
             }
 
             if(policy != null)

@@ -978,6 +978,7 @@ namespace WebService.Tests
             public void NoneQualityMissingValuePolicy_WhenGettingData_FillDatumWithNoneQuality_WhenSignalDataIsEmpty()
             {
                 var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer };
+
                 SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
 
                 Mock<NoneQualityMissingValuePolicy<int>> noneMvpMock = new Mock<NoneQualityMissingValuePolicy<int>>();
@@ -991,7 +992,7 @@ namespace WebService.Tests
                 var item = signalsWebService.GetData(1, new DateTime(2018, 11, 11), new DateTime(2018, 11, 11));
 
                 Assert.AreEqual(item.Count(), 1);
-                Assert.AreEqual(item.First(f => f.Timestamp == new DateTime(2018, 11, 11)).Quality, noneMvpMock.Object.Quality);
+                Assert.AreEqual(item.Single(f => f.Timestamp == new DateTime(2018, 11, 11)).Value, noneMvpMock.Object.Value);
             }
 
             [TestMethod]

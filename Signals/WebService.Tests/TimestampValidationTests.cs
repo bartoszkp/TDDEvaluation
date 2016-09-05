@@ -187,17 +187,6 @@ namespace WebService.Tests
 
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidTimestampException))]
-        public void GetData_WhenFromIncludeEqualsToExclude_AndFromIncludedNotEqualNull_ThrowInvalidTimestampException()
-        {
-            SetupWebService();
-            var returnedSignal = new Domain.Signal() { Id = 1 };
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
-
-            var result = signalsWebService.GetData(1, new DateTime(2018, 11, 11), new DateTime(2018, 11, 11));
-        }
-
         private void SetupWebService()
         {
             SignalsDomainService domainService = new SignalsDomainService(signalsRepoMock.Object, dataRepoMock.Object, mvpRepoMock.Object);
