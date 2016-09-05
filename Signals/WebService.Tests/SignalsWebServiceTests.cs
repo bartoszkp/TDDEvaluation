@@ -1287,6 +1287,32 @@ namespace WebService.Tests
                 Assert_Datums(expectedData, data);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignalWithDataTypeDouble_WhenSettingShadowMVPWithShadowSignalWithNonMatchingDataType_ArgumentExceptionIsThrown()
+            {
+                SetupWebService();
+                signalsRepositoryMock.Setup(srm => srm.Get(It.IsAny<int>())).Returns(new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("x/y")
+                });
+
+                signalsWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Double,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        DataType = Dto.DataType.Boolean,
+                        Granularity = Dto.Granularity.Day,
+                        Path = new Dto.Path() { Components = new[] {"x", "y"} }
+                    }
+                });
+
+            }
+
             private void DeleteAndVerifyDeletedSignal<T>(Domain.Signal signal)
             {
                 signalsWebService.Delete(signal.Id.Value);
