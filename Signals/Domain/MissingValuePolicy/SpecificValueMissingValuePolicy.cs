@@ -43,30 +43,51 @@ namespace Domain.MissingValuePolicy
             {
                 case Granularity.Second:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
+                    if (count == 0)
+                        count = 1;
+
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+
                 case Granularity.Minute:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalMinutes;
+                    if (count == 0)
+                        count = 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+
                 case Granularity.Hour:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalHours;
+                    if (count == 0)
+                        count = 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+
                 case Granularity.Day:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays;
+                    if (count == 0)
+                        count = 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+
                 case Granularity.Week:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 7;
+                    if (count == 0)
+                        count = 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+
                 case Granularity.Month:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
+                    if (count == 0)
+                        count = 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
+
                 case Granularity.Year:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 365;
+                    if (count == 0)
+                        count = 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
             }
