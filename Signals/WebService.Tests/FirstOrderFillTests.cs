@@ -19,6 +19,33 @@ namespace WebService.Tests
         private SignalsWebService signalsWebService;
 
         [TestMethod]
+        public void GivenAnIntegerSignal_WhenGettingDataWithOneElement_FirstOrderPolicy_CorrectlyFillsMissingData()
+        {
+            int id = 1;
+
+            var returnedSignal = new Signal() { Id = id, DataType = DataType.Integer };
+
+            signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
+            mvpRepoMock.Setup(m => m.Get(returnedSignal))
+                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger()
+                { Id = 1, Signal = returnedSignal });
+
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 11, 11), new DateTime(2000, 11, 11)))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 11, 11), Value = (int)1 },
+                });
+
+            var result = signalsWebService.GetData(id, new DateTime(2000, 11, 11), new DateTime(2000, 11, 11));
+
+            var filledDatum = result.ElementAt(0);
+
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(Dto.Quality.None, filledDatum.Quality);
+            Assert.AreEqual(0, filledDatum.Value);
+        }
+
+        [TestMethod]
         public void GivenAnIntegerSecondSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
             SetupFirstOrderPolicy(Granularity.Second,
