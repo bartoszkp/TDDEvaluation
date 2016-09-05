@@ -1229,6 +1229,35 @@ namespace WebService.Tests
                     .Verify(f => f.Set(It.Is<Signal>(sig => CompareSignal(sig, signal)), null), Times.Once);
             }
 
+
+            [TestMethod]
+            public void GivenNoData_WhenGettingADataInPointInTime_ItReturnsOneDatum()
+            {
+                SetupWebService();
+
+                var signal = GetDefaultSignal_IntegerMonth();
+
+                Dto.Datum[] datumArray = new Dto.Datum[]{
+              };
+
+                var policy = new ZeroOrderMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Integer
+                };
+
+                int signalId = 1;
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datumArray);
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(policy.ToDomain<ZeroOrderMissingValuePolicyInteger>());
+
+                IEnumerable<Dto.Datum> returnedData = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                int expectedArrayLength = 1;
+                Assert.AreEqual(expectedArrayLength, returnedData.ToArray().Length);
+
+            }
+
             private Signal PrepareDefaultSignalToGet()
             {
                 SetupWebService();
@@ -1290,6 +1319,7 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("x/y/z"),
                     Granularity = Granularity.Month,
                     DataType = DataType.Integer
+
                 };
             }
 
