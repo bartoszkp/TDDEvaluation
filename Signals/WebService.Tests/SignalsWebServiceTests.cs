@@ -7,6 +7,9 @@ using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using Domain.Exceptions;
+using Domain.MissingValuePolicy;
+using Dto.MissingValuePolicy;
 
 namespace WebService.Tests
 {
@@ -902,6 +905,22 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdr => sdr.DeleteData<int>(dummySignal));
                 signalsRepositoryMock.Verify(sr => sr.Delete(dummySignal));
             }
+            
+            [TestMethod]
+            [ExpectedException(typeof(IncompatibleShadowSignalException))]
+            public void GivenTwoDifferentlyGranulatedSignalsOfDifferentTypes_WhenSettingShadowMVPWithOneSignalForTheOther_IncompatibleShadowSignalExceptionIsThrown()
+            {
+                var signals = new Signal[] {
+                    SignalWith(1, DataType.Boolean, Granularity.Day, Path.FromString("A")),
+                    SignalWith(2, DataType.Double, Granularity.Month, Path.FromString("B"))
+                };
+
+                GivenMultipleSignals(signals);
+
+                var policy = new ShadowMissingValuePolicy() { ShadowSignal = signals[1].ToDto<Dto.Signal>() };
+
+                signalsWebService.SetMissingValuePolicy(1, policy);
+            }
 
             private void setupGetByPathEntry(IEnumerable<string> paths)
             {
@@ -997,6 +1016,22 @@ namespace WebService.Tests
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(signal.Path))
                     .Returns(signal);
+            }
+
+            private void GivenMultipleSignals(Signal[] signals)
+            {
+                GivenNoSignals();
+
+                foreach(var signal in signals)
+                {
+                    signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
+
+                    signalsRepositoryMock
+                        .Setup(sr => sr.Get(signal.Path))
+                        .Returns(signal);
+                }                
             }
 
             private void GivenData<T>(Signal signal, Datum<T>[] datum)
