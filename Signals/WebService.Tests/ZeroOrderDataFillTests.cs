@@ -43,8 +43,8 @@ namespace WebService.Tests
             var filledDatum = result.ElementAt(0);
 
             Assert.AreEqual(1, result.Count());
-            Assert.AreEqual(Dto.Quality.Good, filledDatum.Quality);
-            Assert.AreEqual(1, filledDatum.Value);
+            Assert.AreEqual(Dto.Quality.None, filledDatum.Quality);
+            Assert.AreEqual(0, filledDatum.Value);
         }
 
         [TestMethod]
