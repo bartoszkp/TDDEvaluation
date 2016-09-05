@@ -1378,7 +1378,57 @@ namespace WebService.Tests
                 DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
 
             }
+            [TestMethod]
+            public void GivenASignal_WhenSetsShadowMissingValuePolicyWithData_FilledEmptySpacesWithShadowData()
+            {
 
+                Dto.Signal shadowSignal = new Dto.Signal() { Id = 2, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Month, Path = new Dto.Path() { Components = new[] { "x", "z" } } };
+                Signal shadowSignalDomain = new Domain.Signal() { Id = 2, DataType = DataType.Integer, Granularity = Granularity.Month, Path = Path.FromString("x/z") };
+
+
+                SetupWebService();
+
+                var signal = new Signal()
+                {
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("a")
+                };
+                var signalId = 1;
+
+                var datum = new List<Dto.Datum>
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 3 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 2, 1), Value = 6 }
+                };
+
+                var shadowDatum = new List<Dto.Datum>
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 71 },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 4, 1), Value = 62 }
+                };
+
+                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datum.ToArray());
+
+                signalsDataRepositoryMock
+                  .Setup(x => x.GetData<int>(It.Is<Domain.Signal>(s => CompareSignal(s, shadowSignalDomain)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                  .Returns(shadowDatum.ToDomain<IEnumerable<Domain.Datum<int>>>());
+
+                var policy = new ShadowMissingValuePolicyInteger();
+                policy.ShadowSignal = shadowSignalDomain;
+
+                missingValuePolicyRepositoryMock
+                   .Setup(f => f.Get(It.IsAny<Domain.Signal>()))
+                   .Returns(policy);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
+
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (int)71 });
+                datum.Add(new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = (int)62 });
+
+                DatumArraysAreEqual(datum.OrderBy(d => d.Timestamp).ToArray(), result.ToArray());
+
+            }
             private void DeleteASignal(int id)
             {
 
@@ -1432,7 +1482,7 @@ namespace WebService.Tests
                     });
 
                 signalsDataRepositoryMock
-                    .Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Setup(x => x.GetData<int>(It.Is<Domain.Signal>(s=>CompareSignal(s,signal)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(datumArray.ToDomain<IEnumerable<Domain.Datum<int>>>());
             }
 
