@@ -18,6 +18,36 @@ namespace WebService.Tests
         private SignalsWebService signalsWebService;
 
         [TestMethod]
+        public void GivenASignal_WhenGettingDataInteger_AndFromIncludeAndToIncludeAreEquals_ThenReturnFilledDataWithZeroOrderMissingValuePolicy()
+        {
+            SetupWebService();
+
+            int id = 1;
+
+            var returnedSignal = new Signal() { Id = id, DataType = DataType.Integer };
+
+            Mock<ZeroOrderMissingValuePolicy<int>> zeroOrderMvpMock = new Mock<ZeroOrderMissingValuePolicy<int>>();
+
+            signalsRepoMock.Setup(sr => sr.Get(id)).Returns(returnedSignal);
+            mvpRepoMock.Setup(m => m.Get(returnedSignal))
+                .Returns(zeroOrderMvpMock.Object);
+
+            dataRepoMock.Setup(d => d.GetData<int>(returnedSignal, new DateTime(2000, 11, 11), new DateTime(2000, 11, 11)))
+                .Returns(new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 11, 11), Value = (int)1 },
+                });
+
+            var result = signalsWebService.GetData(id, new DateTime(2000, 11, 11), new DateTime(2000, 11, 11));
+
+            var filledDatum = result.ElementAt(0);
+
+            Assert.AreEqual(3, result.Count());
+            Assert.AreEqual(Dto.Quality.Good, filledDatum.Quality);
+            Assert.AreEqual(1, filledDatum.Value);
+        }
+
+        [TestMethod]
         public void GivenASignal_GetData_FillsMissingData()
         {
             SetupWebService();
