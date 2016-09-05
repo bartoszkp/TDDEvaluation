@@ -1335,6 +1335,30 @@ namespace WebService.Tests
                 });
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignalWithDataTypeBoolean_WhenSettingShadowMVPWithNonMatchingShadowSignal_ArgumentExceptionIsThrown()
+            {
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = 1,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Second,
+                    Path = Domain.Path.FromString("x/y")
+                });
+
+                signalsWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        DataType = Dto.DataType.Decimal,
+                        Granularity = Dto.Granularity.Week,
+                        Path = new Dto.Path() { Components = new[] { "x", "y" } }
+                    }
+                });
+            }
+
             private void DeleteAndVerifyDeletedSignal<T>(Domain.Signal signal)
             {
                 signalsWebService.Delete(signal.Id.Value);
