@@ -1042,7 +1042,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Exception))]
+            [ExpectedException(typeof(DataTypeException))]
             public void WhenSetingShadowMissingValuePolicy_DataTypeMostBeToSame()
             {
                 var signalId = 1;

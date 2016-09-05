@@ -119,7 +119,14 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
+            if (missingValuePolicyBase is ShadowMissingValuePolicy<bool>) checkShadowDataType<bool>(signal, missingValuePolicyBase);
+            
             missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
+        }
+        private void checkShadowDataType<T>(Signal signal, MissingValuePolicyBase mvp)
+        {
+            var shadowMVP = mvp as ShadowMissingValuePolicy<T>;
+            if (shadowMVP.NativeDataType != signal.DataType.GetType()) { throw new DataTypeException(); } 
         }
 
         public PathEntry GetPathEntry(Path path)
