@@ -219,6 +219,50 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalWithDataAndAShadowWithData_WhenGettingDataByFromDatetimeEarlierThanTo_ReturnedIsDataWhereEveryDatumIsDefaultOrComesFromsSignalsDataOrComesFromShadowsData()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Month, Path = Path.FromString("root/signal") };
+                var givenShadow = new Signal() { Id = 2, DataType = DataType.Decimal, Granularity = Granularity.Month, Path = Path.FromString("root/shadow") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenShadow.Path)))).Returns(givenShadow);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenShadow.Id.Value))).Returns(givenShadow);
+
+                mvpRepositoryMock.Setup(mvpr => mvpr.Get
+                    (It.Is<Signal>(s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
+                .Returns(new ShadowMissingValuePolicyDecimal() { Signal = givenSignal, ShadowSignal = givenShadow });
+
+                signalsDataRepoMock.Setup(sdr => sdr.GetData<decimal>((It.Is<Signal>
+                    (s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))),
+                    new DateTime(2000, 1, 1), new DateTime(2000, 4, 1))).Returns(new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2000, 1, 1), Value = 10m, Quality = Quality.Good } });
+
+                signalsDataRepoMock.Setup(sdr => sdr.GetData<decimal>((It.Is<Signal>
+                    (s => s.Id.Value == givenShadow.Id.Value && s.DataType == givenShadow.DataType && s.Granularity == givenShadow.Granularity && s.Path.Equals(givenShadow.Path))),
+                    new DateTime(2000, 1, 1), new DateTime(2000, 4, 1))).Returns(new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2000, 1, 1), Value = 10m, Quality = Quality.Bad },
+                                                                                                        new Datum<decimal>() { Timestamp = new DateTime(2000, 2, 1), Value = 20m, Quality = Quality.Good }});
+
+                var expectedResult = new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2000,1,1), Value = 10m, Quality = Quality.Good},
+                                                            new Datum<decimal>() { Timestamp = new DateTime(2000,2,1), Value = 20m, Quality = Quality.Good},
+                                                            new Datum<decimal>() { Timestamp = new DateTime(2000,3,1), Value = 0m, Quality = Quality.None} };
+
+                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)).ToArray();
+
+                for (int i = 0; i < result.Length; i++)
+                {
+                    Assert.AreEqual(expectedResult[i].Timestamp, result[i].Timestamp);
+                    Assert.AreEqual(expectedResult[i].Value, result[i].Value);
+                    Assert.AreEqual(expectedResult[i].Quality, result[i].Quality.ToDomain<Domain.Quality>());
+                }
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
                 GivenNoSignals();
