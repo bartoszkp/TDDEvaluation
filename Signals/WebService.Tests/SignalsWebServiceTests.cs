@@ -91,6 +91,22 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignal_WhenAddSignalInTheSameId_ReturnException()
+            {
+
+                GivenASignal(SignalWith(
+                    id: 1,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal")));
+                GivenASignal(SignalWith(
+                    id: 1,
+                    dataType: DataType.Integer,
+                    granularity: Granularity.Second,
+                    path: Domain.Path.FromString("root/signal2")));
+            }
+
+            [TestMethod]
             public void WhenGettingByPath_ReturnsIt()
             {
                 GivenNoSignals();
