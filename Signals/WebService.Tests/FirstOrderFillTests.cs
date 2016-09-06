@@ -46,7 +46,7 @@ namespace WebService.Tests
 
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual(Dto.Quality.None, filledDatum.Quality);
-            Assert.AreEqual(1, filledDatum.Value);
+            Assert.AreEqual(0, filledDatum.Value);
         }
 
         [TestMethod]
@@ -123,6 +123,38 @@ namespace WebService.Tests
             var expectedDatum = GetExpectedDatums(Granularity.Day);
 
             AssertEqual(expectedDatum, result);
+        }
+
+        [TestMethod]
+        public void GivenAnIntegerDailySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData_ForIssue31()
+        {
+            SetupFirstOrderPolicy(Granularity.Day,
+                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 6, 0, 0, 0), new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2, 0, 0, 0), Value = (int)10 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 5, 0, 0, 0), Value = (int)30 },
+                });
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 4));
+
+            var expectedDatum = new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)0 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 2, 0, 0, 0), Value = (int)10 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 3, 0, 0, 0), Value = (int)17 },
+            };
+
+            int i = 0;
+
+            Assert.AreEqual(3, result.Count());
+            foreach (var actualData in result)
+            {
+                Assert.AreEqual(expectedDatum[i].Quality, actualData.Quality);
+                Assert.AreEqual(expectedDatum[i].Timestamp, actualData.Timestamp);
+                Assert.AreEqual(expectedDatum[i].Value, actualData.Value);
+
+                i++;
+            }
         }
 
         [TestMethod]
