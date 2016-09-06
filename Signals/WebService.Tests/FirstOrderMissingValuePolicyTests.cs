@@ -788,6 +788,149 @@ namespace WebService.Tests
                 .Returns(signal);
         }
 
+
+        [TestMethod]
+        public void GivenADecimalSignalAndMonthDatumWithMissingDataAndFirstOrderMissingValuePolicy_WhenGettingData_FillsDataWhenThereIsNoOlderData()
+        {
+            var existingSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Month,
+                Path = Domain.Path.FromString("root/signal1")
+            };
+
+            var existingDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
+            };
+
+            var filledDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 5, 1),  Value = 0m},
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1),  Value = 0m },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1),  Value = 0m },
+                        new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 8, 1),  Value = 5m }
+            };
+
+            var newerDatum = new Datum<decimal>[]
+            {
+                    new Datum<decimal>() {Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
+            };
+
+            var firstTimestamp = new DateTime(2000, 5, 1);
+            var lastTimestamp = new DateTime(2000, 9, 1);
+
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+            GivenASignal(existingSignal);
+
+            signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+            signalDataRepositoryMock
+                .Setup(sdrm => sdrm.GetData<decimal>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<decimal>>>);
+
+            signalDataRepositoryMock
+                .Setup(sdrm => sdrm.GetDataNewerThan<decimal>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), 1))
+                .Returns(newerDatum);
+
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+            missingValuePolicyRepositoryMock
+                .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDecimal());
+
+            var signalsDomainService = new SignalsDomainService(
+                signalsRepositoryMock.Object,
+                signalDataRepositoryMock.Object,
+                missingValuePolicyRepositoryMock.Object);
+
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+            var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+
+            int index = 0;
+            foreach (var fd in filledDatum)
+            {
+                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
+                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
+                Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
+                index++;
+            }
+        }
+
+        [TestMethod]
+        public void GivenADecimalSignalAndMonthDatumWithMissingDataAndFirstOrderMissingValuePolicy_WhenGettingData_FillsDataWhenThereIsNoNewerData()
+        {
+            var existingSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Month,
+                Path = Domain.Path.FromString("root/signal1")
+            };
+
+            var existingDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m }
+            };
+
+            var filledDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1),  Value = 2m},
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1),  Value = 0m },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1),  Value = 0m },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 8, 1),  Value = 0m }
+            };
+
+            var olderDatum = new Datum<decimal>[]
+            {
+                    new Datum<decimal>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m }
+            };
+
+            var firstTimestamp = new DateTime(2000, 5, 1);
+            var lastTimestamp = new DateTime(2000, 9, 1);
+
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+            GivenASignal(existingSignal);
+
+            signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+            signalDataRepositoryMock
+                .Setup(sdrm => sdrm.GetData<decimal>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<decimal>>>);
+
+            signalDataRepositoryMock
+                .Setup(sdrm => sdrm.GetDataOlderThan<decimal>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), 1))
+                .Returns(olderDatum);
+
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+            missingValuePolicyRepositoryMock
+                .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDecimal());
+
+            var signalsDomainService = new SignalsDomainService(
+                signalsRepositoryMock.Object,
+                signalDataRepositoryMock.Object,
+                missingValuePolicyRepositoryMock.Object);
+
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+            var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+
+            int index = 0;
+            foreach (var fd in filledDatum)
+            {
+                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
+                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
+                Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
+                index++;
+            }
+        }
+
         private Mock<ISignalsRepository> signalsRepositoryMock = new Mock<ISignalsRepository>();
         private Mock<ISignalsDataRepository> signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
         private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock= new Mock<IMissingValuePolicyRepository>();
