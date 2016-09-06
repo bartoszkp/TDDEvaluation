@@ -258,7 +258,10 @@ namespace Domain.Services.Implementation
             T temp = default(T);
             try
             {
-                var result = Math.Abs(older - newer) * diffOlder_Acrual / diffOlder_Newer + older;
+                dynamic result = default(T);
+                if (older < newer) result = Math.Abs(older - newer) * diffOlder_Acrual / diffOlder_Newer + older;
+                else
+                if (older > newer) result = older - ((older - newer) * diffOlder_Acrual / diffOlder_Newer);
                 if (typeof(int) == temp.GetType()) { return result; } else { return Math.Round(result, 5); }
             }
             catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException) { throw new ArgumentException(); }

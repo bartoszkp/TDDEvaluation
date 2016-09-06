@@ -1076,35 +1076,14 @@ namespace WebService.Tests
                 };
                 GivenASignalWithDataOfType(dummyId, data, DataType.Decimal, Granularity.Day);
                 GivenMissingValuePolicy(dummyId, new FirstOrderMissingValuePolicyDecimal());
-
                 
-
                 var resultData = signalsWebService.GetData(dummyId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
 
                 Assert.AreEqual(5, resultData.Count());
                 Assert.AreEqual("Good", resultData.First().Quality.ToString());
                 Assert.AreEqual(2m, resultData.ElementAt(3).Value);
             }
-
-            /*
-            var id = client.Add(new Signal()
-            {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "FirstOrderTests" } }
-            }).Id.Value;
-
-            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
-
-            client.SetData(id, new Datum[]
-            {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 3m },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 5), Value = 1m }
-        });
-        */
-
-
+            
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
