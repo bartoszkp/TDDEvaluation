@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain.Infrastructure;
 
@@ -9,5 +10,10 @@ namespace Domain.MissingValuePolicy
         public virtual T Value { get; set; }
 
         public virtual Quality Quality { get; set; }
+
+        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
