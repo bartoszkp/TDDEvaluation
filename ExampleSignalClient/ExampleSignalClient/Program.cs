@@ -11,19 +11,21 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Year,
-                Path = new Path() { Components = new[] { "SpecificValue12345" } }
+                DataType = DataType.String,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "FirstOrderT3" } }
             }).Id.Value;
 
-            client.SetMissingValuePolicy(id, new NoneQualityMissingValuePolicy() {DataType = DataType.Decimal });
+            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.String });
 
             client.SetData(id, new Datum[]
             {
-    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2011, 1, 1), Value = 1m }
+            new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "a" },
+            new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = "b" },
+            new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = "c" }
             });
 
-            var result = client.GetData(id, new DateTime(2013, 1, 1), new DateTime(2015, 1, 1));
+            var result = client.GetData(id, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1));
 
             foreach (var d in result)
             {

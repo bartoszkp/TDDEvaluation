@@ -214,6 +214,10 @@ namespace Domain.Services.Implementation
             Datum<T> leftNeighbor = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();
             Datum<T> rightNeighbor;
 
+            if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
+                throw new ArgumentException("Datatype is not supported");
+
+
             if (leftNeighbor != null) tempFromIncludeUtc = leftNeighbor.Timestamp;
             for (DateTime dt = tempFromIncludeUtc; dt < toExcludedUtc; AddToDateTime(ref dt, signal.Granularity), index++)
             {
