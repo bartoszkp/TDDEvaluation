@@ -266,8 +266,12 @@ namespace Domain.Services.Implementation
                     }
                 }
 
-                else
-                    throw new NotImplementedException();
+                else if (policy is ShadowMissingValuePolicy<T>)
+                {
+                    return new Datum<T>[] { };
+                }
+
+                else throw new NotImplementedException();
 
                 return newData;
             }
