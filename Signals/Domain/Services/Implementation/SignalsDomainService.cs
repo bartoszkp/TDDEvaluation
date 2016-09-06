@@ -28,13 +28,24 @@ namespace Domain.Services.Implementation
             this.missingValuePolicyRepository = missingValuePolicyRepository;
         }
 
-        public Signal Add<T>(Signal newSignal, NoneQualityMissingValuePolicy<T> nonePolicy)
+        public Signal Add(Signal newSignal)
         {
-            var toReturn = this.signalsRepository.Add(newSignal);
+            if (newSignal.Id.HasValue)
+                throw new IdNotNullException();
+            var signal = this.signalsRepository.Add(newSignal);
+            if (missingValuePolicyRepository == null)
+                return signal;
+            var switchDataType = new Dictionary<DataType, Action>()
+            {
+                {DataType.Boolean, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>()) },
+                {DataType.Decimal, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>()) },
+                {DataType.Double, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>()) },
+                {DataType.Integer, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>()) },
+                {DataType.String, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>()) }
+            };
+            switchDataType[signal.DataType].Invoke();
 
-            missingValuePolicyRepository.Set(newSignal, nonePolicy);
-
-            return toReturn;
+            return signal;
         }
 
         public Signal GetById(int signalId)

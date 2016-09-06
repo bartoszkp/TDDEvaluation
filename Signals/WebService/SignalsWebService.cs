@@ -41,34 +41,8 @@ namespace WebService
 
         public Signal Add(Signal signalDto)
         {
-            var signal = signalDto.ToDomain<Domain.Signal>();
-
-            NoneQualityMissingValuePolicy dtoNonePolicy = new NoneQualityMissingValuePolicy();
-
-            switch(signal.DataType)
-            {
-                case (Domain.DataType.Boolean):
-                    var domainsNonePolicyBool = dtoNonePolicy.ToDomain<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>();
-                    var resultBool = signalsDomainService.Add<bool>(signal, domainsNonePolicyBool);
-                    return resultBool.ToDto<Dto.Signal>();
-                case (Domain.DataType.Decimal):
-                    var domainsNonePolicyDecimal = dtoNonePolicy.ToDomain<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<decimal>>();
-                    var resultDecimal = signalsDomainService.Add<decimal>(signal, domainsNonePolicyDecimal);
-                    return resultDecimal.ToDto<Dto.Signal>();
-                case (Domain.DataType.Double):
-                    var domainsNonePolicyDouble = dtoNonePolicy.ToDomain<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>();
-                    var resultDouble = signalsDomainService.Add<double>(signal, domainsNonePolicyDouble);
-                    return resultDouble.ToDto<Dto.Signal>();
-                case (Domain.DataType.Integer):
-                    var domainsNonePolicyInteger = dtoNonePolicy.ToDomain<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>();
-                    var resultInteger = signalsDomainService.Add<int>(signal, domainsNonePolicyInteger);
-                    return resultInteger.ToDto<Dto.Signal>();
-                case (Domain.DataType.String):
-                    var domainsNonePolicyString = dtoNonePolicy.ToDomain<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<string>>();
-                    var resultString = signalsDomainService.Add<string>(signal, domainsNonePolicyString);
-                    return resultString.ToDto<Dto.Signal>();
-            }
-            return null;
+            var result = signalsDomainService.Add(signalDto.ToDomain<Domain.Signal>());
+            return result.ToDto<Dto.Signal>();
         }
 
         public void Delete(int signalId)
