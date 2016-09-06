@@ -1042,23 +1042,43 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(DataTypeException))]
-            public void WhenSetingShadowMissingValuePolicy_DataTypeMostBeToSame()
+            [ExpectedException(typeof(ShadowMissingValuePolicyDataTypeException))]
+            public void WhenSetingShadowMissingValuePolicy_DataTypeMustBeTheSame()
             {
                 var signalId = 1;
 
                 var testSignal = SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("x/y"));
 
-                var shadowSignal = SignalWith(Dto.DataType.Boolean, Dto.Granularity.Month, new Dto.Path() { Components = new[] { "x","y"} });
+                var shadowSignal = SignalWith(Dto.DataType.Boolean, Dto.Granularity.Month, new Dto.Path() { Components = new[] { "x", "y" } });
 
                 GivenASignal(testSignal);
-                
+
                 signalsWebService.SetMissingValuePolicy(signalId, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
                 {
                     DataType = Dto.DataType.Boolean,
                     ShadowSignal = shadowSignal,
                 });
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(ShadowMissingValuePolicyGranularityException))]
+            public void WhenSetingShadowMissingValuePolicy_GranularityMustBeTheSame()
+            {
+                var signalId = 1;
+
+                var testSignal = SignalWith(signalId, DataType.Boolean, Granularity.Day, Path.FromString("x/y"));
+
+                var shadowSignal = SignalWith(Dto.DataType.Boolean, Dto.Granularity.Month, new Dto.Path() { Components = new[] { "x", "y" } });
+
+                GivenASignal(testSignal);
+
+                signalsWebService.SetMissingValuePolicy(signalId, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = shadowSignal,
+                });
+            }
+
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
