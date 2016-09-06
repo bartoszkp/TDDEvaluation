@@ -1554,6 +1554,18 @@ namespace WebService.Tests
                         new Domain.Datum<bool>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 15), Value = true }
                     });
 
+                dataRepositoryMock.SetupSequence(drm => drm.GetDataOlderThan<bool>(It.Is<Domain.Signal>(s =>
+                    s.Id == signal.Id &&
+                    s.Granularity == signal.Granularity &&
+                    s.DataType == signal.DataType &&
+                    s.Path.ToString().Equals(signal.Path.ToString())), It.IsAny<DateTime>(), 1))
+                        .Returns(new Datum<bool>[] { })
+                        .Returns(new Datum<bool>[] { })
+                        .Returns(new Datum<bool>[] 
+                        {
+                            new Datum<bool>() {Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 15), Value = true }
+                        });
+
                 var expectedData = new Dto.Datum[]
                 {
                     new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 14), Value = default(bool) },
