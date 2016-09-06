@@ -13,7 +13,7 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.String,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "FirstOrderT3" } }
+                Path = new Path() { Components = new[] { "FirstOrderT4" } }
             }).Id.Value;
 
             client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.String });

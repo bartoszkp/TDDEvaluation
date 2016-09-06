@@ -134,15 +134,12 @@ namespace Domain.Services.Implementation
                                 index,
                                 Datum<T>.CreateSpecific(signal, timestamp, dataBeforeRequest.Value, dataBeforeRequest.Quality));
                         }
-                        else if(dataBeforeRequest.Timestamp < fromIncludedUtc)
+                        else if(dataBeforeRequest.Timestamp < fromIncludedUtc) // when timestamp is lower than fromIncludedUtc setup default(T) and none
                         {
                             sortedData.Insert(index, Datum<T>.CreateNone(signal, timestamp));
                         }
-                        else
-                        {
-                            if(policy is NoneQualityMissingValuePolicy<T>)
+                        else if(policy is NoneQualityMissingValuePolicy<T>)
                                 sortedData.Insert(index, Datum<T>.CreateNone(signal, timestamp));                                        
-                        }
                         dataBeforeRequest = null;
                     }
             }
@@ -151,12 +148,18 @@ namespace Domain.Services.Implementation
             return sortedData.Where(x => x.Timestamp >= fromIncludedUtc && x.Timestamp < toExcludedUtc).ToList();
         }
 
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase domainMvp)
+        public void SetMissingValuePolicy<T>(int signalId, MissingValuePolicyBase domainMvp)
         {
             Signal foundSignal = GetById(signalId);
             if (foundSignal == null)
                 throw new SignalNotExistException();
-                   
+
+            if (domainMvp is ShadowMissingValuePolicy<T>)
+            {
+                var specificMvp = domainMvp as ShadowMissingValuePolicy<T>;
+                CheckIfSignalsDataTypesAndGranularitesAreTheSame(foundSignal, specificMvp.ShadowSignal); // throws Exception
+            }
+                
             missingValuePolicyRepository.Set(foundSignal, domainMvp);
         }
 
@@ -310,9 +313,16 @@ namespace Domain.Services.Implementation
             var signal = signalsRepository.Get(signalId);
             if (signal == null) throw new ArgumentException("there is no signals with given id");
 
-            SetMissingValuePolicy(signalId, null);
+            SetMissingValuePolicy<T>(signalId, null);
             signalsDataRepository.DeleteData<T>(signal);
             signalsRepository.Delete(signal);
         }
+        
+        private void CheckIfSignalsDataTypesAndGranularitesAreTheSame(Signal signal, Signal shadowSignal)
+        {
+            if (signal.DataType != shadowSignal.DataType || signal.Granularity != shadowSignal.Granularity)
+                throw new ArgumentException("Signals Datatypes or Granularities are not the same");
+        }
+
     }
 }

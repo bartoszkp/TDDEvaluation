@@ -82,18 +82,16 @@ namespace WebService
             RunGenericMethod(GetSignalType(signalId), "SetDataGeneric", signalId, data);
         }
 
+        public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
+        {
+            RunGenericMethod(GetSignalType(signalId), "SetMissingValuePolicyGeneric", signalId, policy);
+        }
+
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
             return signalsDomainService
                 .GetMissingValuePolicy(signalId)
                 ?.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
-        }
-
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
-        {
-            var domainMvp = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
-
-            signalsDomainService.SetMissingValuePolicy(signalId, domainMvp);
         }
 
         public IEnumerable<Datum> GetDataGeneric<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -108,6 +106,13 @@ namespace WebService
             var cos = data.ToDomain<IEnumerable<Domain.Datum<T>>>();
             signalsDomainService
                 .SetData(signalId, data.ToDomain<IEnumerable<Domain.Datum<T>>>());
+        }
+
+        public void SetMissingValuePolicyGeneric<T>(int signalId, MissingValuePolicy policy)
+        {
+            var domainMvp = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+
+            signalsDomainService.SetMissingValuePolicy<T>(signalId, domainMvp);
         }
 
         private object RunGenericMethod(Type type, string methodName, params object[] param)
