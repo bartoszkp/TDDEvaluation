@@ -23,8 +23,8 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
@@ -103,29 +103,15 @@ namespace WebService
             Signal signal = GetById(signalId);
             if (signal == null)
                 throw new Domain.Exceptions.NoSuchSignalException();
-            switch (signal.DataType)
+            var switchDataType = new Dictionary<DataType, Action>()
             {
-                case (DataType.Boolean):
-                    SetData<bool>(signalId, data);
-                    return;
-
-                case (DataType.Decimal):
-                    SetData<decimal>(signalId, data);
-                    return;
-
-                case (DataType.Double):
-                    SetData<double>(signalId, data);
-                    return;
-
-                case (DataType.Integer):
-                    SetData<int>(signalId, data);
-                    return;
-
-                case (DataType.String):
-                    SetData<string>(signalId, data);
-                    return;
-            }
-            throw new NotSupportedException("Type is not supported");
+                {DataType.Boolean,()=> SetData<bool>(signalId, data) },
+                {DataType.Decimal,()=> SetData<decimal>(signalId, data) },
+                {DataType.Double,()=> SetData<double>(signalId, data) },
+                {DataType.Integer,()=> SetData<int>(signalId, data) },
+                {DataType.String,()=> SetData<string>(signalId, data) }
+            };
+            switchDataType[signal.DataType].Invoke();
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum> data)
@@ -146,8 +132,8 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            var result = signalsDomainService.GetMissingValuePolicyBase(signalId);
-            return result?.ToDto<MissingValuePolicy>();
+            var signal = signalsDomainService.GetById(signalId);
+            return this.signalsDomainService.GetMissingValuePolicy(signal).ToDto<MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
@@ -156,6 +142,6 @@ namespace WebService
             signalsDomainService.SetMissingValuePolicyBase(signalId, policyDomain);
         }
 
-        
+
     }
 }

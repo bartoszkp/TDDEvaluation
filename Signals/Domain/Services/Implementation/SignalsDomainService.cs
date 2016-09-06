@@ -68,98 +68,76 @@ namespace Domain.Services.Implementation
             return result;
         }
 
-        public MissingValuePolicyBase GetMissingValuePolicyBase(int signalId)
+        public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
-            var signal = signalsRepository.Get(signalId);
             if (signal == null)
             {
                 throw new NoSuchSignalException();
             }
-            var mvp = missingValuePolicyRepository.Get(signal);
-            if (mvp == null)
-                return null;
-
-            return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy.MissingValuePolicyBase;
+            var result = this.missingValuePolicyRepository.Get(signal);
+            if (result == null)
+                throw new NonExistMissingValuePolicy();
+            else
+                return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
         }
 
         public void SetMissingValuePolicyBase(int signalId, MissingValuePolicyBase policy)
         {
             var signal = signalsRepository.Get(signalId);
             if (signal == null)
-            {
                 throw new NoSuchSignalException();
-            }
             missingValuePolicyRepository.Set(signal, policy);
         }
 
         public IEnumerable<Datum<T>> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            Signal signal = GetById(signalId);
-            if (signal == null)
-                throw new NoSuchSignalException();
+            var signal = GetById(signalId);
+            Datum<T> secondaryItem = new Datum<T>() { Signal = signal, Timestamp = fromIncludedUtc };
+            VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
+            secondaryItem = new Datum<T>() { Signal = signal, Timestamp = toExcludedUtc };
+            VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
+            var data = this.signalsDataRepository
+                .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
-            if (!VeryfiTimeStamp(signal.Granularity, fromIncludedUtc))
-                throw new InvalidOperationException("Timestamp error :" + fromIncludedUtc + " dosen't match for " + signal.Granularity);
-
-            var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-
-            if (data.Count() == 0)
+            foreach (var item in data)
             {
-                data = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
+                VerifyTimeStamp<T>(signal.Granularity, item);
             }
-
-            var sortedDatums = data?.OrderBy(datum => datum.Timestamp).ToList();
-
-            var mvp = GetMissingValuePolicyBase(signalId);
-
-            if (mvp is SpecificValueMissingValuePolicy<T>)
+            if (fromIncludedUtc == toExcludedUtc)
             {
-                var specificMvp = mvp as SpecificValueMissingValuePolicy<T>;
-                SpecificDataFillHelper.FillMissingData(signal.Granularity, sortedDatums, specificMvp.Value, fromIncludedUtc, toExcludedUtc);
+                List<Datum<T>> returnElement = new List<Datum<T>>();
+                int indeks = 0;
+                foreach (var x in data)
+                {
+                    if (fromIncludedUtc == x.Timestamp)
+                    {
+                        returnElement.Add(x);
+                        return returnElement;
+                    }
+                    indeks++;
+                }
             }
-            else if(mvp is ZeroOrderMissingValuePolicy<T>)
-            {
-                ZeroOrderFillHelper.FillMissingData<T>(signal.Granularity, sortedDatums, fromIncludedUtc, toExcludedUtc);
-            }
-            else if (mvp is NoneQualityMissingValuePolicy<T>)
-            {
-                NoneQualityDataFillHelper.FillMissingData(signal.Granularity, sortedDatums, fromIncludedUtc, toExcludedUtc);
-            }
-
-            return sortedDatums.OrderBy(datum => datum.Timestamp);
+            if (missingValuePolicyRepository == null)
+                return data;
+            var missingValuePolicy = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
+            return missingValuePolicy.FillData(signal, data, fromIncludedUtc, toExcludedUtc).ToArray();
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> dataDomain)
         {
-            Signal signal = GetById(signalId);
-            if (signal == null)
-                throw new NoSuchSignalException();
+            var signal = GetById(signalId);
 
-            foreach(var item in dataDomain)
+            foreach (var item in dataDomain)
             {
-                if (!VeryfiTimeStamp(signal.Granularity, item.Timestamp))
-                    throw new InvalidOperationException("Timestamp error :" + item.Timestamp + " dosen't match for " + signal.Granularity);
+                item.Signal = signal;
             }
-
-
-            var datums = new Datum<T>[dataDomain.Count()];
-            int i = 0;
-            foreach (Datum<T> d in dataDomain)
-            {
-                datums[i++] = new Datum<T>
+            if ((dataDomain != null) && (signal != null))
+                foreach (var item in dataDomain)
                 {
-                    Quality = d.Quality,
-                    Timestamp = d.Timestamp,
-                    Value = d.Value,
-                    Signal = signal
-                };
-            }
-
-            IEnumerable<Datum<T>> sortedDatums = datums.OrderBy(datum => datum.Timestamp);
-            signalsDataRepository.SetData<T>(sortedDatums);
+                    VerifyTimeStamp<T>(signal.Granularity, item);
+                }
+            signalsDataRepository.SetData(dataDomain);
         }
-
 
         public PathEntry GetPathEntry(Path prefixPath)
         {
@@ -178,6 +156,13 @@ namespace Domain.Services.Implementation
             return new PathEntry(filteredMatchingSignals, subPaths);
 
         }
+
+        public void Delete(int signalId)
+        {
+            throw new NotImplementedException();
+        }
+
+
 
         private List<Path> CreateSubPathsList(IEnumerable<Signal> signalsInSubPaths, Path prefixPath)
         {
@@ -200,69 +185,71 @@ namespace Domain.Services.Implementation
             return subPaths;
         }
 
-        private bool VeryfiTimeStamp(Granularity granularity, DateTime timeStamp)
+
+        #region SetupGranularity
+        public void VerifyTimeStamp<T>(Granularity granularity, Datum<T> checkingElement)
         {
-            switch(granularity)
+            var checkGranularity = new Dictionary<Granularity, Action>
             {
-                case Granularity.Day:
-                    {
-                        if (timeStamp.Hour == 0 && timeStamp.Minute == 0
-                            && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
-                            return true;
-                        break;
-                    }
-                case Granularity.Hour:
-                    {
-                        if (timeStamp.Minute == 0 && timeStamp.Second == 0 
-                            && timeStamp.Millisecond == 0)
-                            return true;
-                        break;
-                    }
-                case Granularity.Minute:
-                    {
-                        if (timeStamp.Second == 0 && timeStamp.Millisecond == 0)
-                            return true;
-                        break;
-                    }
-                case Granularity.Month:
-                    {
-                        if (timeStamp.Day == 1 && timeStamp.Hour == 0 && timeStamp.Minute == 0
-                            && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
-                            return true;
-                        break;
-                    }
-                case Granularity.Second:
-                    {
-                        if (timeStamp.Millisecond == 0)
-                            return true;
-                        break;
-                    }
-                case Granularity.Week:
-                    {
-                        if (timeStamp.DayOfWeek == DayOfWeek.Monday && timeStamp.Hour == 0 && timeStamp.Minute == 0
-                             && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
-                            return true;
-                            break;
-                    }
-                case Granularity.Year:
-                    {
-                        if(timeStamp.DayOfYear == 1 && timeStamp.Hour == 0 && timeStamp.Minute == 0
-                             && timeStamp.Second == 0 && timeStamp.Millisecond == 0)
-                            return true;
-                        break;
-                    }
-                default:
-                    {
-                        throw new NotImplementedException();
-                    }
-            }
-
-            return false;
+                {Granularity.Second, () => GranularitySecond<T>(checkingElement) },
+                {Granularity.Hour, () => GranularityHour<T>(checkingElement) },
+                {Granularity.Minute, () => GranularityMinute<T>(checkingElement) },
+                {Granularity.Day, () => GranularityDay<T>(checkingElement) },
+                {Granularity.Week, () => GranularityWeek<T>(checkingElement) },
+                {Granularity.Month, () => GranularityMonth<T>(checkingElement) },
+                {Granularity.Year, () => GranularityYear<T>(checkingElement) }
+            };
+            checkGranularity[granularity].Invoke();
         }
-
-        public void Delete(int signalId)
+        private void GranularitySecond<T>(Datum<T> checkingElement)
         {
-            throw new NotImplementedException();
+            if (checkingElement.Timestamp.Millisecond != 0)
+                throw new TimestampHaveWrongFormatException();
         }
+        private void GranularityMinute<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityHour<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityDay<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityWeek<T>(Datum<T> checkingElement)
+        {
+            DateTime dd = new DateTime(2000, 1, 1, 0, 0, 0);
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.DayOfWeek != DayOfWeek.Monday))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityMonth<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.Day != 1))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+        private void GranularityYear<T>(Datum<T> checkingElement)
+        {
+            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.Day != 1) || (checkingElement.Timestamp.Month != 1))
+            {
+                throw new TimestampHaveWrongFormatException();
+            }
+        }
+
+        #endregion
     }
 }

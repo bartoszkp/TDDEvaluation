@@ -14,4 +14,19 @@ namespace Domain.Exceptions
 
         }
     }
+
+    public class NonExistMissingValuePolicy : Exception
+    {
+        public NonExistMissingValuePolicy() : base("MissingValuePolicy non exist")
+        {
+        }
+    }
+
+    public class TimestampHaveWrongFormatException:Exception
+    {
+        public TimestampHaveWrongFormatException():base("Wrong format for Timestamp")
+        {
+
+        }
+    }
 }
