@@ -262,11 +262,7 @@ namespace Domain.Services.Implementation
 
         public void Delete(int signalId)
         {
-            var signal = GetById(signalId);
-
-            missingValuePolicyRepository.Set(signal, null);
-
-            this.signalsRepository.Delete(signal);
+            throw new NotImplementedException();
         }
     }
 }
