@@ -9,75 +9,28 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = 1;
-            var bool_month_id = client.Add(new Signal()
-            {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "bool", "month", id.ToString() } }
-            }).Id.Value;
-            var bool_second_id = client.Add(new Signal()
-            {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "bool", "second", id.ToString() } }
-            }).Id.Value;
-            var decimal_month_id = client.Add(new Signal()
+            var id = client.Add(new Signal()
             {
                 DataType = DataType.Decimal,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "decimal", "month", id.ToString() } }
+                Granularity = Granularity.Day,
+                Path = new Path() { Components = new[] { "FirstOrderTests" } }
             }).Id.Value;
 
-            var bool_month_shadow = client.Add(new Signal()
+            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
+
+            client.SetData(id, new Datum[]
             {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "shadows", "bool", "month", id.ToString() } }
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 3), Value = 3m },
+                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 5), Value = 1m }
             });
 
-            try
-            {
-                client.SetMissingValuePolicy(
-                    bool_second_id,
-                    new ShadowMissingValuePolicy()
-                    {
-                        DataType = DataType.Boolean,
-                        ShadowSignal = bool_month_shadow
-                    });
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Failed to assign");
-            }
+            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
 
-            try
+            foreach (var d in result)
             {
-                client.SetMissingValuePolicy(
-                    decimal_month_id,
-                    new ShadowMissingValuePolicy()
-                    {
-                        DataType = DataType.Decimal,
-                        ShadowSignal = bool_month_shadow
-                    });
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
             }
-            catch (Exception)
-            {
-                Console.WriteLine("Failed to assign");
-            }
-
-            client.SetMissingValuePolicy(
-                bool_month_id,
-                new ShadowMissingValuePolicy()
-                {
-                    DataType = DataType.Boolean,
-                    ShadowSignal = bool_month_shadow
-                });
-
-            var mvp = client.GetMissingValuePolicy(bool_month_id);
-
-            Console.WriteLine(mvp.GetType().ToString());
-            Console.WriteLine(string.Join(",", ((ShadowMissingValuePolicy)mvp).ShadowSignal.Path.Components));
 
             Console.ReadKey();
         }

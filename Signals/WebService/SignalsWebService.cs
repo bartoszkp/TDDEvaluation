@@ -62,12 +62,11 @@ namespace WebService
 
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
+            var signal = signalsDomainService.GetById(signalId);
+            if (signal == null) throw new ArgumentException();
 
             else
             {
-                var signal = signalsDomainService.GetById(signalId);
-
                 var type = signal.DataType.ToString();
 
                 if (type == "Boolean") return signalsDomainService.GetData<bool>(signalId, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Dto.Datum>>();
