@@ -91,22 +91,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignal_WhenAddSignalInTheSameId_ReturnException()
-            {
-
-                GivenASignal(SignalWith(
-                    id: 1,
-                    dataType: DataType.Integer,
-                    granularity: Granularity.Second,
-                    path: Domain.Path.FromString("root/signal")));
-                GivenASignal(SignalWith(
-                    id: 1,
-                    dataType: DataType.Integer,
-                    granularity: Granularity.Second,
-                    path: Domain.Path.FromString("root/signal2")));
-            }
-
-            [TestMethod]
             public void WhenGettingByPath_ReturnsIt()
             {
                 GivenNoSignals();
@@ -131,6 +115,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.NonExistMissingValuePolicy))]
             public void WhenGettingMissingValuePolicyForNewSignal_ReturnsNull()
             {
                 var signal = new Domain.Signal()
@@ -240,7 +225,7 @@ namespace WebService.Tests
                 signalsWebService.GetData(signalId, System.DateTime.MinValue, System.DateTime.Today);
             }
 
-            
+
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.NoSuchSignalException))]
             public void WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException()
@@ -253,28 +238,23 @@ namespace WebService.Tests
             [TestMethod]
             public void WhenSettingDataForExistSignal_CallsRepositorySetData()
             {
-                var signal = new Domain.Signal()
-                {
-                    Id = 567,
-                    DataType = DataType.Integer,
-                    Granularity = Granularity.Day,
-                    Path = Path.FromString("sfda/xvbc/jhkl")
-                };
-                prepareDataRepository(signal.Id.Value, signal);
-                signalsDataRepositoryMock
-                    .Setup(sdr => sdr.SetData<int>(It.IsAny<IEnumerable<Domain.Datum<int>>>()));
+                var signalId = 1;
+                GivenASignal(SignalWith(
+                    id: signalId,
+                    dataType: DataType.Double,
+                    granularity: Granularity.Month,
+                    path: Domain.Path.FromString("root/signal")));
 
-                var enumerable = new Dto.Datum[] {
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new System.DateTime(2016, 1, 16), Value = 7 },
-                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new System.DateTime(2020, 2, 21), Value = 2 },
-                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new System.DateTime(2003, 3, 18), Value = 78 } };
-                signalsWebService.SetData(signal.Id.Value, enumerable);
-
-                var enumerableSorted = enumerable.OrderBy(dtoDatum => dtoDatum.Timestamp);
-
-                signalsDataRepositoryMock.Verify(sdr => sdr.SetData<int>(
-                    It.Is<IEnumerable<Domain.Datum<int>>>(
-                        d => IEnumerableDatumAreEqual(enumerableSorted, d, signal))));
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, null);
+                Datum<double>[] dataToSet = new Datum<double>[] {
+                        new Datum<double>() { Id = 1, Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (double)1 },
+                        new Datum<double>() { Id = 2, Quality = Quality.Fair, Timestamp = new DateTime(2000, 2, 1), Value = (double)2 },
+                        new Datum<double>() { Id = 3, Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)3 },
+                        };
+                signalsDomainService.SetData(1, dataToSet);
+                signalsDataRepositoryMock.Verify(sr => sr.SetData(dataToSet));
             }
 
             [TestMethod]
