@@ -96,14 +96,13 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-
             if (!VeryfiTimeStamp(signal.Granularity, fromIncludedUtc))
                 throw new QuerryAboutDateWithIncorrectFormatException();
 
             var result = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
 
-                if (result == null)
-                    return null;
+            if (result == null)
+                return null;
 
             if (fromIncludedUtc == toExcludedUtc)
             {
@@ -121,35 +120,34 @@ namespace Domain.Services.Implementation
                 else
                     return result;
             }
-                
 
-                for (int j = result.Length - 1; j > 0; --j)
-                    for (int i = 0; i < j; ++i)
-                        if (result[i].Timestamp > result[i + 1].Timestamp)
-                        {
-                            var r = result[i];
-                            result[i] = result[i + 1];
-                            result[i + 1] = r;
-                        }
-
-                var mvp = GetMissingValuePolicy(signal.Id.Value);
-                if (mvp != null)
-                {
-                    List<Datum<T>> datums = new List<Datum<T>>();
-                var date = fromIncludedUtc;
-                    while (date < fromIncludedUtc)
-                        increaseDate(ref date, signal.Granularity);
-
-                    if (typeof(SpecificValueMissingValuePolicy<T>) == mvp.GetType() || typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType() || typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
+            for (int j = result.Length - 1; j > 0; --j)
+                for (int i = 0; i < j; ++i)
+                    if (result[i].Timestamp > result[i + 1].Timestamp)
                     {
+                        var r = result[i];
+                        result[i] = result[i + 1];
+                        result[i + 1] = r;
+                    }
+
+            var mvp = GetMissingValuePolicy(signal.Id.Value);
+            if (mvp != null)
+            {
+                List<Datum<T>> datums = new List<Datum<T>>();
+                var date = fromIncludedUtc;
+                while (date < fromIncludedUtc)
+                    increaseDate(ref date, signal.Granularity);
+
+                if (typeof(SpecificValueMissingValuePolicy<T>) == mvp.GetType() || typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType() || typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
+                {
                     T value = default(T);
                     Quality quality = default(Quality);
 
-                        var mvpSpec = mvp.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                        as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
+                    var mvpSpec = mvp.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
+                            as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
 
-                        for (int i = 0; date < toExcludedUtc && i < result.Length; increaseDate(ref date, signal.Granularity))
-                        {
+                    for (int i = 0; date < toExcludedUtc && i < result.Length; increaseDate(ref date, signal.Granularity))
+                    {
                         if (result[i].Timestamp == date)
                         {
                             value = result[i].Value;
@@ -167,23 +165,135 @@ namespace Domain.Services.Implementation
                             else
                                 datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
                         }
-                        }
-                        for (; date < toExcludedUtc; increaseDate(ref date, signal.Granularity))
-                        {
-                            if (typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
-                                datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+                    }
+
+                    for (; date < toExcludedUtc; increaseDate(ref date, signal.Granularity))
+                    {
+                        if (typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
+                             datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
                         else if (typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
                         {
-                            datums.Add(new Datum<T>() { Quality = quality, Timestamp = date, Value = value });
+                         datums.Add(new Datum<T>() { Quality = quality, Timestamp = date, Value = value });
                         }
                         else
-                                datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
+                            datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
+                     }
+                }
+                else if(mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                {
+                    var datum = new Datum<T>();
+
+                    T step = default(T);
+                    Quality quality = default(Quality);
+                    
+                    while (date < toExcludedUtc)
+                    {
+                        var actualData = result.FirstOrDefault(x => x.Timestamp == date);
+                        if (actualData != null)
+                        {
+                            datums.Add(actualData);
+                            step = default(T);
                         }
+                        else
+                        {
+                            var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, date, 1);
+                            var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, date, 1);
+
+                            if (olderData.Count() == 0)
+                            {
+                                datum = new Datum<T>()
+                                {
+                                    Quality = Quality.None,
+                                    Value = default(T)
+                                };
+                            }
+                            else if (newerData.Count() == 0)
+                            {
+                                datum = new Datum<T>()
+                                {
+                                    Quality = Quality.None,
+                                    Value = default(T)
+                                };
+                            }
+                            else
+                            {
+                                T value = olderData.First().Value;
+                                var valueDifference = Convert.ChangeType((dynamic)newerData.First().Value - (dynamic)olderData.First().Value, typeof(T));
+                                var granularity = signal.Granularity;
+
+                                quality = SetOutQuality(olderData.First(), newerData.First());
+
+                                int totalSteps = SetTotalSteps(granularity, olderData.First(), newerData.First());
+
+                                value = SetOutValue(valueDifference, ref step, totalSteps, value);
+
+                                datum = new Datum<T>()
+                                {
+                                    Quality = quality,
+                                    Value = value
+                                };
+                            }
+                            datums.Add(new Datum<T>() { Quality = datum.Quality, Value = datum.Value, Timestamp = date });
+                        }
+                        increaseDate(ref date, signal.Granularity);
                     }
-                    return datums?.ToArray();
                 }
 
-                return result;
+                return datums?.ToArray();
+            }
+
+            return result;
+        }
+
+        private int SetTotalSteps<T>(Granularity granularity, Datum<T> olderData, Datum<T> newerData)
+        {
+            var timespan = newerData.Timestamp.Subtract(olderData.Timestamp);
+
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return (int)timespan.TotalSeconds;
+                case Granularity.Minute:
+                    return (int)timespan.TotalMinutes;
+                case Granularity.Hour:
+                    return (int)timespan.TotalHours;
+                case Granularity.Day:
+                    return (int)timespan.TotalDays;
+                case Granularity.Week:
+                    return (int)timespan.TotalDays / 7;
+                case Granularity.Month:
+                    return (int)timespan.TotalDays / 30;
+                case Granularity.Year:
+                    return (int)timespan.TotalDays / 365;
+                default:
+                    return 0;
+            }
+        }
+
+        private Quality SetOutQuality<T>(Datum<T> olderData, Datum<T> newerData)
+        {
+            if (olderData.Quality == newerData.Quality)
+                return olderData.Quality;
+            else if (olderData.Quality > newerData.Quality)
+                return olderData.Quality;
+            else
+                return newerData.Quality;
+        }
+
+        private T SetOutValue<T>(dynamic valueDifference, ref T step, int totalSteps, T value)
+        {
+            if (valueDifference > 0)
+            {
+                step += valueDifference / totalSteps;
+
+                return (dynamic)value + step;
+            }
+            else if (valueDifference < 0)
+            {
+                step += -(valueDifference / totalSteps);
+                return (dynamic)value + step;
+            }
+            return default(T);
         }
 
         public void SetData<T>(IEnumerable<Datum<T>> data, Signal signal)

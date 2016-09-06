@@ -63,15 +63,15 @@ namespace WebService.Tests
             signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
 
             signalDataRepositoryMock
-                .Setup(sdrm => sdrm.GetData<int>(existingSignal, firstTimestamp, lastTimestamp))
+                .Setup(sdrm => sdrm.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<int>>>);
 
             signalDataRepositoryMock
-                .Setup(sdrm => sdrm.GetDataNewerThan<int>(existingSignal, It.IsAny<DateTime>(), 1))
+                .Setup(sdrm => sdrm.GetDataNewerThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(newerDatum);
 
             signalDataRepositoryMock
-                .Setup(sdrm => sdrm.GetDataOlderThan<int>(existingSignal, It.IsAny<DateTime>(), 1))
+                .Setup(sdrm => sdrm.GetDataOlderThan<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), 1))
                 .Returns(olderDatum);
 
             missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
