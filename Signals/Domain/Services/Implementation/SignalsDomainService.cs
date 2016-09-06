@@ -224,7 +224,7 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
-            if (signal == null) return;
+            if (signal == null) throw new InvalidSignalId();
 
             missingValuePolicyRepository.Set(signal, null);
 
