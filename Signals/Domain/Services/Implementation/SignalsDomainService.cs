@@ -131,6 +131,7 @@ namespace Domain.Services.Implementation
 
                 if (datum == null)
                 {
+                    olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
                     var tempDatums = (mvp as MissingValuePolicy<T>).GetDatum(fromIncludedUtc,signal.Granularity, res, olderData, newerData);
                     foreach (var tempDatum in tempDatums.Where(x => x.Timestamp < toExcludedUtc && x.Timestamp >= fromIncludedUtc))
                     {
