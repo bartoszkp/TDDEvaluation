@@ -403,16 +403,21 @@ namespace WebService.Tests
                     Path = Path.FromString("shadows/shadow1")
                 };
 
+                signalsRepositoryMock.Setup(x => x.Get(shadowId)).Returns(shadow);
+
 
                 missingValuePolicyRepositoryMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(),
                     It.IsAny<Domain.MissingValuePolicy.ShadowMissingValuePolicy<decimal>>()));
 
-                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(s=>s.Id == signalId))).Returns(
                     new ShadowMissingValuePolicyDecimal()
                     {
                         Signal = signal,
                         ShadowSignal = shadow,
                     });
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(s => s.Id == shadowId))).Returns(
+                    new NoneQualityMissingValuePolicyDecimal());
 
                 signalsDataRepositoryMock.Setup(x => x.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(
                     new Domain.Datum<decimal>[] {
@@ -421,30 +426,35 @@ namespace WebService.Tests
                       new Datum<decimal>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = 5m },
                     });
 
-                var shadowData = new Domain.Datum<decimal>[] {
+                var shadowData = new [] {
                     new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 1.4m},
                     new Datum<decimal>() {Quality = Quality.Poor, Timestamp = new DateTime(2000, 5, 1), Value = 0.0m },
                     new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m},
                 };
 
+                
                 signalsDataRepositoryMock.Setup(x => x.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == shadowId), It.IsAny<DateTime>(), It.IsAny<DateTime>())).
-                    Returns<DateTime>((dateTime) => {
-                    return new[] { shadowData.FirstOrDefault(x => x.Timestamp == dateTime) };
-                });
+                    Returns<Signal, DateTime, DateTime>((sig, from, to) => {
+                        if (shadowData.FirstOrDefault(x=>x.Timestamp == from) == null)
+                        {
+                            return new List<Datum<decimal>>();
+                        }
+                        return new[] { shadowData.FirstOrDefault(x => x.Timestamp == from) };
+                    }); 
 
                 var expected = new[] {
-                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999,11, 1), Value = 0.0m},
-                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 12, 1), Value = 0.0m },
-                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0m },
-                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = 0.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999,11, 1), Value = 0m},
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 12, 1), Value = 0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = 0m },
                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 1.4m},
-                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = 0.0m },
-                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0m },
-                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0.0m },
-                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = 0.0m },
-                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = 5.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = 0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = 0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = 5m },
                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m },
-                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 10, 1), Value = 0.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 10, 1), Value = 0 },
             };
 
                 var result = this.signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));

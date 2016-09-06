@@ -176,6 +176,10 @@ namespace Domain.Services.Implementation
             {
                 return ReturnDatumFirstOrderMissingValuePolicy<T>(signal, timeStamp);
             }
+            else if (mvp is MissingValuePolicy.ShadowMissingValuePolicy<T>)
+            {
+                return this.GetData<T>((mvp as MissingValuePolicy.ShadowMissingValuePolicy<T>).ShadowSignal.Id.Value, timeStamp, timeStamp).First();
+            }
             return new Datum<T>();
         }
 
