@@ -140,8 +140,6 @@ namespace Domain.Services.Implementation
                 }
                 else result = policy.SetMissingValue(signal, result, fromIncludedUtc, toExcludedUtc, earlierDatum, laterDatum);
             }
-                
-
             return result;
         }
 
