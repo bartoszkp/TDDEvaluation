@@ -268,7 +268,7 @@ namespace Domain.Services.Implementation
 
                 else if (policy is ShadowMissingValuePolicy<T>)
                 {
-                    return new Datum<T>[] { };
+                    if (fromIncluded > toExcluded) return new Datum<T>[] { };
                 }
 
                 else throw new NotImplementedException();
