@@ -194,47 +194,14 @@ namespace Domain.Services.Implementation
 
             }
 
-
-
-            if (data.Count() == 0 || data.First().Timestamp != fromIncludedUTC)
+            if (mvp is NoneQualityMissingValuePolicy<T>)
             {
-                List<Datum<T>> dataToFill = data.ToList();
-                dataToFill.Add(new Datum<T>()
-                {
-                    Id = 0,
-                    Quality = Quality.None,
-                    Signal = signal,
-                    Timestamp = fromIncludedUTC,
-                    Value = default(T),
-                });
-
-                data = dataToFill.OrderBy(s => s.Timestamp).ToArray();
+                var noneQualityMvp = mvp as NoneQualityMissingValuePolicy<T>;
+                NoneQualityDataFillHelper.FillMissingData(signal, dataList, fromIncludedUTC, toExcludedUTC);
+                return dataList.OrderBy(s => s.Timestamp).ToList();
             }
 
-            if (fromIncludedUTC == toExcludedUTC)
-                return data;
-
-            var timestampBegin = fromIncludedUTC;
-            var timestampEnd = toExcludedUTC;
-            var dateTimeComparator = DateTime.Compare(timestampBegin, timestampEnd);
-
-            if (dateTimeComparator > 0)
-            {
-                for (int i = 0; i < data.Count(); i++)
-                {
-                    data.ToList().RemoveAt(i);
-                }
-
-                missingValuePolicy = GetMissingValuePolicy(signal)
-                as MissingValuePolicy.MissingValuePolicy<T>;
-
-                return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
-            }
-            else
-                missingValuePolicy = GetMissingValuePolicy(signal)
-                as MissingValuePolicy.MissingValuePolicy<T>;
-
-            return missingValuePolicy.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToArray();
+            return data.OrderBy(d => d.Timestamp).ToArray();
         }
 
         public PathEntry GetPathEntry(Path path)
