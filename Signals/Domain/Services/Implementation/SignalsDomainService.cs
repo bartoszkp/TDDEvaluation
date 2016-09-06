@@ -66,6 +66,10 @@ namespace Domain.Services.Implementation
             {
                 return (MVP as FirstOrderMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
             }
+            else if (MVP is ShadowMissingValuePolicy<T>)
+            {
+                return (MVP as ShadowMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
+            }
             else    //NoneQuality || SpecificValue
             {
 
