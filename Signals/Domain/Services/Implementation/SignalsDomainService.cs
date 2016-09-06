@@ -173,75 +173,24 @@ namespace Domain.Services.Implementation
 
             if (mvp is FirstOrderMissingValuePolicy<T>)
             {
-                if (typeof(T) == typeof(int))
+                var dataIntList = this.signalsDataRepository
+                    .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
+
+                FirstOrderDataFillHelper.FillMissingData(signal, this, dataIntList, fromIncludedUTC, toExcludedUTC);
+                dataList.Clear();
+                foreach (var item in dataIntList)
                 {
-                    var dataIntList = this.signalsDataRepository
-                        .GetData<int>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
+                    if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
+                        dataList.Add(new Datum<T>()
+                        {
+                            Value = (T)Convert.ChangeType(item.Value, typeof(T)),
+                            Timestamp = item.Timestamp,
+                            Quality = item.Quality
 
-                    FirstOrderDataFillHelperInt.FillMissingData(signal, this, dataIntList, fromIncludedUTC, toExcludedUTC);
-                    dataList.Clear();
-                    foreach (var item in dataIntList)
-                    {
-                        if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
-                            dataList.Add(new Datum<T>()
-                            {
-                                Value = (T)Convert.ChangeType(item.Value, typeof(T)),
-                                Timestamp = item.Timestamp,
-                                Quality = item.Quality
-
-                            });
-                    }
-
-                    return dataList.OrderBy(s => s.Timestamp).ToList();
-
+                        });
                 }
 
-                else if (typeof(T) == typeof(decimal))
-                {
-                    var dataDecimalList = this.signalsDataRepository
-                        .GetData<decimal>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
-
-                    FirstOrderDataFillHelperDecimal.FillMissingData(signal, this, dataDecimalList, fromIncludedUTC, toExcludedUTC);
-                    dataList.Clear();
-                    foreach (var item in dataDecimalList)
-                    {
-
-                        if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
-                            dataList.Add(new Datum<T>()
-                            {
-                                Value = (T)Convert.ChangeType(item.Value, typeof(T)),
-                                Timestamp = item.Timestamp,
-                                Quality = item.Quality
-
-                            });
-                    }
-
-                    return dataList.OrderBy(s => s.Timestamp).ToList();
-
-                }
-
-                else if (typeof(T) == typeof(double))
-                {
-                    var dataDoubleList = this.signalsDataRepository
-                        .GetData<double>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
-
-                    FirstOrderDataFillHelperDouble.FillMissingData(signal, this, dataDoubleList, fromIncludedUTC, toExcludedUTC);
-                    dataList.Clear();
-                    foreach (var item in dataDoubleList)
-                    {
-                        if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
-                            dataList.Add(new Datum<T>()
-                            {
-                                Value = (T)Convert.ChangeType(item.Value, typeof(T)),
-                                Timestamp = item.Timestamp,
-                                Quality = item.Quality
-
-                            });
-                    }
-
-                    return dataList.OrderBy(s => s.Timestamp).ToList();
-
-                }
+                return dataList.OrderBy(s => s.Timestamp).ToList();
 
             }
 

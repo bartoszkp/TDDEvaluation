@@ -65,13 +65,12 @@
     <Compile Include="Exceptions\InvalidTimeStampException.cs" />
     <Compile Include="Exceptions\NoSuchSignalException.cs" />
     <Compile Include="Exceptions\ShadowSignalNotCorrectlyException.cs" />
-    <Compile Include="FirstOrderDataFillHelperDecimal.cs" />
-    <Compile Include="FirstOrderDataFillHelperDouble.cs" />
-    <Compile Include="FirstOrderDataFillHelperInt.cs" />
+    <Compile Include="MissingValuePolicyFillHelpers\FirstOrderDataFillHelper.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />
     <Compile Include="Infrastructure\UnityRegisterAttribute.cs" />
+    <Compile Include="MissingValuePolicyFillHelpers\MissingValuePolicyFillHelper.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\FirstOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\ZeroOrderMissingValuePolicy.cs" />
@@ -94,8 +93,8 @@
     <Compile Include="Services\Implementation\SignalsDomainService.cs" />
     <Compile Include="Services\ISignalsDomainService.cs" />
     <Compile Include="Signal.cs" />
-    <Compile Include="SpecificDataFillHelper.cs" />
-    <Compile Include="ZeroOrderDataFillHelper.cs" />
+    <Compile Include="MissingValuePolicyFillHelpers\SpecificDataFillHelper.cs" />
+    <Compile Include="MissingValuePolicyFillHelpers\ZeroOrderDataFillHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
