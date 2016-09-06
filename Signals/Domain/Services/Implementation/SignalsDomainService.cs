@@ -275,29 +275,15 @@ namespace Domain.Services.Implementation
                 {
                     if (fromIncluded > toExcluded) return new Datum<T>[] { };
 
-                    else
+                    else if(fromIncluded == toExcluded)
                     {
                         var filledData = new List<Datum<T>>();
                         var signalData = signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
                         var shadowData = signalsDataRepository.GetData<T>((policy as ShadowMissingValuePolicy<T>).ShadowSignal, fromIncluded, toExcluded);
 
-                        foreach (var datum in signalData)
-                        {
-                            if (fromIncluded == datum.Timestamp)
-                            {
-                                filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
-                                return filledData;
-                            }
-                        }
-                        foreach (var datum in shadowData)
-                        {
-                            if (fromIncluded == datum.Timestamp)
-                            {
-                                filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
-                                return filledData;
-                            }
-                        }
-                        filledData.Add(new Datum<T>() { Signal = signal, Quality = Quality.None, Value = default(T), Timestamp = fromIncluded });
+                        AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, fromIncluded);
+                        if (filledData.Count() == 0) AddToListSuitableDatumWhenGivenIsSMVP(filledData, shadowData, fromIncluded);
+                        if (filledData.Count() == 0) filledData.Add(new Datum<T>() { Signal = signal, Quality = Quality.None, Value = default(T), Timestamp = fromIncluded });
                         return filledData;
                     }
                 }
@@ -305,6 +291,17 @@ namespace Domain.Services.Implementation
                 else throw new NotImplementedException();
 
                 return newData;
+            }
+        }
+
+        private void AddToListSuitableDatumWhenGivenIsSMVP<T>(List<Datum<T>> filledData, IEnumerable<Datum<T>> data, DateTime fromIncluded)
+        {
+            foreach (var datum in data)
+            {
+                if (fromIncluded == datum.Timestamp)
+                {
+                    filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
+                }
             }
         }
 
