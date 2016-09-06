@@ -148,6 +148,36 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalWithNoDataAndAShadowWithNoData_WhenGettingDataByFromDatetimeEarlierThanTo_ReturnedIsEnumerableWhereAllDatumsAreWithNoneQualityAndDefaultValue()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Month, Path = Path.FromString("root/signal") };
+                var givenShadow = new Signal() { Id = 2, DataType = DataType.Decimal, Granularity = Granularity.Month, Path = Path.FromString("root/shadow") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenShadow.Path)))).Returns(givenShadow);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenShadow.Id.Value))).Returns(givenShadow);
+
+                mvpRepositoryMock.Setup(mvpr => mvpr.Get
+                    (It.Is<Signal>(s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
+                .Returns(new ShadowMissingValuePolicyDecimal() { Signal = givenSignal, ShadowSignal = givenShadow });
+
+                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                foreach (var datum in result)
+                {
+                    Assert.AreEqual(Dto.Quality.None, datum.Quality);
+                    Assert.AreEqual(0m, datum.Value);
+                }
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
                 GivenNoSignals();
