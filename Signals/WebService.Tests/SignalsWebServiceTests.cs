@@ -326,6 +326,45 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalWithSpecificDataAndFOMVP_WhenGettingData_ReturnedIsExpectedResult()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Day, Path = Path.FromString("root/signal") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
+
+                mvpRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
+                    (s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
+                .Returns(new FirstOrderMissingValuePolicyDecimal());
+
+                signalsDataRepoMock.Setup(sdr => sdr.GetData<decimal>(It.Is<Signal>
+                    (s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path)),
+                    new DateTime(2018, 1, 1), new DateTime(2018, 1, 6))).Returns(new Datum<decimal>[] { new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2017, 12, 31), Value = 10m },
+                                                                                                        new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2018, 1, 2), Value = 30m } });
+
+                var expectedResult = new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2018,1,1), Value = 20m, Quality = Quality.Bad},
+                                                            new Datum<decimal>() { Timestamp = new DateTime(2018,1,2), Value = 30m, Quality = Quality.Bad },
+                                                            new Datum<decimal>() { Timestamp = new DateTime(2018,1,3), Value = 0m, Quality = Quality.None },
+                                                            new Datum<decimal>() { Timestamp = new DateTime(2018,1,4), Value = 0m, Quality = Quality.None },
+                                                            new Datum<decimal>() { Timestamp = new DateTime(2018,1,5), Value = 0m, Quality = Quality.None } };
+
+                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2018, 1, 1), new DateTime(2018, 1, 6)).ToArray();
+
+                for (int i = 0; i < result.Length; i++)
+                {
+                    Assert.AreEqual(expectedResult[i].Timestamp, result[i].Timestamp);
+                    Assert.AreEqual(expectedResult[i].Value, result[i].Value);
+                    Assert.AreEqual(expectedResult[i].Quality, result[i].Quality);
+                }
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
                 GivenNoSignals();
