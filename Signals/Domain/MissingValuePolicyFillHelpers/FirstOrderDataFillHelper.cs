@@ -49,8 +49,6 @@ namespace Domain
                             Value = default(T),
                             Quality = Quality.None
                         };
-                        if (nextDatum.Timestamp < toExcluded)
-                            data.Add(nextDatum);
                     }
                     else nextDatum = nextDatumCollection.ElementAt(0);
 

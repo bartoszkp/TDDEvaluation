@@ -120,6 +120,45 @@ namespace WebService.Tests
             Assert.AreEqual(Dto.Quality.Fair, resultDatum.Quality);
         }
 
+        [TestMethod]
+        public void GetData_NotFillsToMuchData()
+        {
+            SetupWebService();
+            var datums = new Datum<int>[] { new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 } };
+            var signal = new Signal()
+            {
+                Id = 21,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Day
+            };
+
+            signalsRepositoryMock
+                .Setup(sr => sr.Get(It.IsAny<int>()))
+                .Returns(signal);
+            missingValuePolicyRepositoryMock
+                .Setup(mvpr => mvpr.Get(It.IsAny<Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
+            signalsDataRepositoryMock
+                .Setup(sdr => sdr.GetData<int>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(datums);
+
+            signalsDataRepositoryMock
+                .Setup(sdr => sdr.GetDataOlderThan<int>(It.IsAny<Signal>(), It.Is<DateTime>(dt => dt > new DateTime(2000, 1, 1)), 1))
+                .Returns(datums);
+            signalsDataRepositoryMock
+                .Setup(sdr => sdr.GetDataOlderThan<int>(It.IsAny<Signal>(), It.Is<DateTime>(dt => dt >= new DateTime(2000, 1, 1)), 1))
+                .Returns(new List<Datum<int>>());
+
+            signalsDataRepositoryMock
+                .Setup(sdr => sdr.GetDataNewerThan<int>(It.IsAny<Signal>(), It.Is<DateTime>(dt => dt < new DateTime(2000, 1, 1)), 1))
+                .Returns(datums);
+            signalsDataRepositoryMock
+                .Setup(sdr => sdr.GetDataNewerThan<int>(It.IsAny<Signal>(), It.Is<DateTime>(dt => dt >= new DateTime(2000, 1, 1)), 1))
+                .Returns(new List<Datum<int>>());
+
+            var result = signalsWebService.GetData(signal.Id.Value, new DateTime(1999, 12, 31), new DateTime(2000, 1, 3));
+            Assert.AreEqual(3, result.Count());
+        }
 
         private void SetupWebService()
         {
