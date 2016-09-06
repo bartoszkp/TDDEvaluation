@@ -104,7 +104,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1)).ToArray()[0];
 
-                Assert.AreEqual(Quality.Fair, result.Quality);
+                Assert.AreEqual(Dto.Quality.Fair, result.Quality);
                 Assert.AreEqual(new DateTime(2000, 1, 1), result.Timestamp);                
             }
 

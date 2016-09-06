@@ -275,7 +275,31 @@ namespace Domain.Services.Implementation
                 {
                     if (fromIncluded > toExcluded) return new Datum<T>[] { };
 
-                    return new Datum<T>[] { new Datum<T>() { Quality = Quality.None, Value = default(T) } };
+                    else
+                    {
+                        var filledData = new List<Datum<T>>();
+                        var signalData = signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
+                        var shadowData = signalsDataRepository.GetData<T>((policy as ShadowMissingValuePolicy<T>).ShadowSignal, fromIncluded, toExcluded);
+
+                        foreach (var datum in signalData)
+                        {
+                            if (fromIncluded == datum.Timestamp)
+                            {
+                                filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
+                                return filledData;
+                            }
+                        }
+                        foreach (var datum in shadowData)
+                        {
+                            if (fromIncluded == datum.Timestamp)
+                            {
+                                filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
+                                return filledData;
+                            }
+                        }
+                        filledData.Add(new Datum<T>() { Signal = signal, Quality = Quality.None, Value = default(T), Timestamp = fromIncluded });
+                        return filledData;
+                    }
                 }
 
                 else throw new NotImplementedException();
