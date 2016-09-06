@@ -980,7 +980,42 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.None, result.First().Quality);
             }
 
+            [TestMethod]
+            public void GivenASignal_GetDataWithFirstOrderMVP_ReturnsCorrectlyFillsData()
+            {
+                int dummyId = 1;
+                var newSignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("some/signal/firstOrderTest")
+                };
 
+                var signalDatum = new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = 10 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 6), Value = 30 }
+                };
+
+                GivenASignal(newSignal);
+
+                missingValuePolicyRepositoryMock
+                    .Setup(s => s.Get(It.Is<Domain.Signal>((i => i.Id == dummyId))))
+                    .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
+
+                signalsDataRepositoryMock
+                    .Setup(s => s.GetData<int>(It.Is<Domain.Signal>((i => i.Id == dummyId)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(signalDatum);
+
+                var result = signalsWebService.GetData(dummyId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
+
+                Assert.AreEqual(4, result.Count());
+                Assert.IsTrue(new DateTime(2000, 1, 1) == result.ElementAt(0).Timestamp && 0 == (int)result.ElementAt(0).Value && Dto.Quality.None == result.ElementAt(0).Quality);
+                Assert.IsTrue(new DateTime(2000, 1, 2) == result.ElementAt(1).Timestamp && 10 == (int)result.ElementAt(1).Value && Dto.Quality.Good == result.ElementAt(1).Quality);
+                Assert.IsTrue(new DateTime(2000, 1, 3) == result.ElementAt(2).Timestamp && 15 == (int)result.ElementAt(2).Value && Dto.Quality.Good == result.ElementAt(2).Quality);
+                Assert.IsTrue(new DateTime(2000, 1, 4) == result.ElementAt(3).Timestamp && 20 == (int)result.ElementAt(3).Value && Dto.Quality.Good == result.ElementAt(3).Quality);
+            }
 
 
 
