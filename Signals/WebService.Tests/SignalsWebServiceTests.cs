@@ -1526,6 +1526,46 @@ namespace WebService.Tests
                 Assert_Datums(expectedData, data);
             }
 
+            [TestMethod]
+            public void GivenASignal_GivenDataContaining1Sample_WhenGettingDataWithZeroOrderMVP_ZeroOrderMVPCorrectlyFillsMissingData()
+            {
+                SetupWebService();
+                var signal = new Domain.Signal()
+                {
+                    Id = 6,
+                    Granularity = Domain.Granularity.Day,
+                    DataType = Domain.DataType.Boolean,
+                    Path = Domain.Path.FromString("x/y")
+                };
+                GivenASignal(signal);
+
+                missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.Is<Domain.Signal>(s =>
+                    s.Id == signal.Id &&
+                    s.Granularity == signal.Granularity &&
+                    s.DataType == signal.DataType &&
+                    s.Path.ToString().Equals(signal.Path.ToString())))).Returns(new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyBoolean());
+
+                dataRepositoryMock.Setup(drm => drm.GetData<bool>(It.Is<Domain.Signal>(s =>
+                    s.Id == signal.Id &&
+                    s.Granularity == signal.Granularity &&
+                    s.DataType == signal.DataType &&
+                    s.Path.ToString().Equals(signal.Path.ToString())), new DateTime(2000, 1, 14), new DateTime(2000, 1, 17))).Returns(new Domain.Datum<bool>[]
+                    {
+                        new Domain.Datum<bool>() { Quality = Domain.Quality.Poor, Timestamp = new DateTime(2000, 1, 15), Value = true }
+                    });
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 14), Value = default(bool) },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 15), Value = true },
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 16), Value = true }
+                };
+
+                var data = signalsWebService.GetData(6, new DateTime(2000, 1, 14), new DateTime(2000, 1, 17));
+
+                Assert_Datums(expectedData, data);
+            }
+
             private void SetupShadowMVPTest(Domain.Signal signal, Domain.Signal shadowSignal)
             {
                 SetupWebService();
