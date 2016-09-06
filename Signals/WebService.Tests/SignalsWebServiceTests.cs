@@ -769,14 +769,42 @@ namespace WebService.Tests
             public void GivenASignal_WhenSettingShadowMVPWithValidShadowSignal_NoExceptionIsThrown()
             {
                 GivenASignal(SignalWith(1, DataType.Boolean, Granularity.Month, Path.FromString("a/b")));
-                var invalidSignal = SignalWith(null, Dto.DataType.Boolean, Dto.Granularity.Month, new Dto.Path() { Components = new[] { "a", "b" } });
+                var validSignal = SignalWith(null, Dto.DataType.Boolean, Dto.Granularity.Month, new Dto.Path() { Components = new[] { "a", "b" } });
 
                 signalsWebService
                 .SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
                 {
                     DataType = Dto.DataType.Boolean,
-                    ShadowSignal = invalidSignal
+                    ShadowSignal = validSignal
                 });
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingDataWithShadowMVP_ReturnsIt()
+            {
+                var signal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("a/b"));
+                var shadowSignal = SignalWith(2, DataType.Double, Granularity.Month, Path.FromString("a/b/c"));
+                GivenASignal(signal);
+
+                var dt = new DateTime(2000, 1, 1);
+                missingValuePolicyMock
+                    .Setup(f => f.Get(It.Is<Signal>(s => s.Id.Value == signal.Id.Value)))
+                    .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble() { ShadowSignal = shadowSignal, Signal = signal});
+                signalsDataRepositryMock
+                    .Setup(f => f.GetData<Double>(It.Is<Domain.Signal>(s => s.Id.Value == signal.Id.Value), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new[] { new Datum<Double>() { Quality = Quality.Fair, Timestamp = dt, Value = 5.5 } });
+                signalsDataRepositryMock
+                    .Setup(f => f.GetData<Double>(It.Is<Domain.Signal>(s => s.Id.Value == shadowSignal.Id.Value), dt.AddMonths(2), dt.AddMonths(2)))
+                    .Returns(new[] { new Datum<Double>() { Quality = Quality.Fair, Timestamp = dt.AddMonths(2), Value = 2.5 } });
+                    
+                var result = signalsWebService.GetData(1, dt, dt.AddMonths(3));
+
+                Assert.IsTrue(CompareDatum(result, new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 5.5 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = default(double) },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 },
+                }));
             }
 
             private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
