@@ -21,6 +21,9 @@ namespace SignalsIntegrationTests.Infrastructure
         }
 
         /// <summary>
+        /// When using HTTP building (without "tcp" service process argument, and with BasicHttpBinding_ISignalsWebService endpoint
+        /// configuration - in TestsBase.InitializeClient):
+        /// 
         /// Either run VS as administrator or execute this command in a console with administrative priviledges:
         /// 
         /// netsh http add urlacl url=http://+:8080/signals user=[DOMAIN]\[USER]
@@ -43,7 +46,8 @@ namespace SignalsIntegrationTests.Infrastructure
                 RedirectStandardInput = true,
                 FileName = serviceExecutable.FullName,
                 WorkingDirectory = serviceExecutable.DirectoryName,
-                UseShellExecute = false
+                UseShellExecute = false,
+                Arguments = "tcp"
             };
 
             serviceProcess = Process.Start(psi);

@@ -25,7 +25,7 @@ namespace SignalsIntegrationTests.Infrastructure
         public void InitializeClient()
         {
             ServiceManagerGuard.EnsureRunning();
-            client = new WS.SignalsWebServiceClient();
+            client = new WS.SignalsWebServiceClient("NetTcpBinding_ISignalsWebService");
             client.Endpoint.Binding.SendTimeout = new TimeSpan(0, 0, 45);
             client.Endpoint.Binding.OpenTimeout = new TimeSpan(0, 0, 45);
         }
