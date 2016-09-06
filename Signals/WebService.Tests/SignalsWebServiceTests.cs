@@ -998,6 +998,16 @@ namespace WebService.Tests
                     new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 6), Value = 30 }
                 };
 
+                var older = new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 2), Value = 10 }
+                };
+
+                var newer = new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 6), Value = 30 }
+                };
+
                 GivenASignal(newSignal);
 
                 missingValuePolicyRepositoryMock
@@ -1007,6 +1017,9 @@ namespace WebService.Tests
                 signalsDataRepositoryMock
                     .Setup(s => s.GetData<int>(It.Is<Domain.Signal>((i => i.Id == dummyId)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(signalDatum);
+
+                signalsDataRepositoryMock.Setup(a => a.GetDataOlderThan<int>(It.Is<Domain.Signal>((i => i.Id == dummyId)), new DateTime(2000, 1, 1), 1)).Returns(new List<Datum<int>>());
+                signalsDataRepositoryMock.Setup(a => a.GetDataNewerThan<int>(It.Is<Domain.Signal>((i => i.Id == dummyId)), new DateTime(2000, 1, 5), 1)).Returns(newer);
 
                 var result = signalsWebService.GetData(dummyId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 5));
 
