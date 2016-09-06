@@ -181,6 +181,9 @@ namespace Domain.Services.Implementation
                 }
                 else if(mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
                 {
+                    if (signal.DataType.GetNativeType().Name == "Boolean" || signal.DataType.GetNativeType().Name == "String")
+                        throw new ArgumentException("Boolean and String types are not supported.");
+
                     var datum = new Datum<T>();
 
                     T step = default(T);

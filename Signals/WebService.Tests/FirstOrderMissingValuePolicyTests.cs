@@ -747,6 +747,40 @@ namespace WebService.Tests
             }
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void GivenAStringSignalAndMonthDatumWithMissingDataAndFirstOrderMissingValuePolicy_WhenGettingData_ThrowsException()
+        {
+            var existingSignal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.String,
+                Granularity = Granularity.Month,
+                Path = Domain.Path.FromString("root/signal1")
+            };
+
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+            GivenASignal(existingSignal);
+
+            signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+            missingValuePolicyRepositoryMock
+                .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyString());
+
+            var signalsDomainService = new SignalsDomainService(
+                signalsRepositoryMock.Object,
+                signalDataRepositoryMock.Object,
+                missingValuePolicyRepositoryMock.Object);
+
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+            signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
+        }
+
         private void GivenASignal(Signal signal)
         {
             signalsRepositoryMock
