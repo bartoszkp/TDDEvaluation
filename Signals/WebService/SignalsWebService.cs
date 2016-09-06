@@ -62,7 +62,7 @@ namespace WebService
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var getSignal = this.signalsDomainService.GetById(signalId);
-            if (getSignal == null) throw new NullReferenceException();
+            if (getSignal == null) throw new InvalidSignalId();
 
             switch (getSignal.DataType)
             {
@@ -71,7 +71,7 @@ namespace WebService
                 case Domain.DataType.Decimal:
                     return this.signalsDomainService.GetData<decimal>(getSignal, fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToArray().OrderBy(t => t.Timestamp);
                 case Domain.DataType.Integer:
-                    return this.signalsDomainService.GetData<Int32>(getSignal, fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToArray().OrderBy(t => t.Timestamp);
+                    return this.signalsDomainService.GetData<int>(getSignal, fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToArray().OrderBy(t => t.Timestamp);
                 case Domain.DataType.Boolean:
                     return this.signalsDomainService.GetData<bool>(getSignal, fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToArray().OrderBy(t => t.Timestamp);
                 case Domain.DataType.String:

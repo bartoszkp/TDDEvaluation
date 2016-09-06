@@ -60,69 +60,50 @@ namespace Domain.Services.Implementation
 
             if (MVP is ZeroOrderMissingValuePolicy<T>)
             {
-                var fillledData = (MVP as ZeroOrderMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
-
-                return fillledData;
+                return (MVP as ZeroOrderMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
             }
-
-            if (MVP is FirstOrderMissingValuePolicy<T>)
+            else if (MVP is FirstOrderMissingValuePolicy<T>)
             {
-                var fillledData = (MVP as FirstOrderMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
-
-                return fillledData;
+                return (MVP as FirstOrderMissingValuePolicy<T>).SetMissingValues(signalsDataRepository, signal, fromIncludedUtc, toExcludedUtc);
             }
-
-            List<Datum<T>> datumList = new List<Datum<T>>();
-
-            if (fromIncludedUtc > toExcludedUtc) return datumList;
-
-            var tempDatum = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-
-            do
+            else    //NoneQuality || SpecificValue
             {
-                Datum<T> datum;
-                try
+
+                List<Datum<T>> datumList = new List<Datum<T>>();
+
+                if (fromIncludedUtc > toExcludedUtc) return datumList;
+
+                var tempDatum = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+                do
                 {
-                    datum = tempDatum
-                        .Any(d => d.Timestamp == fromIncludedUtc) ?
-                        tempDatum.First(d => d.Timestamp == fromIncludedUtc) :
-                        null;
+                    Datum<T> datum = tempDatum.FirstOrDefault(d => d.Timestamp == fromIncludedUtc);
+
+                    if (datum == null)
+                    {
+                        var MVPasSpecificValueMVP = GetMVPData<T>(MVP, datumList);
+                        datumList.Add(new Datum<T>()
+                        {
+                            Signal = signal,
+                            Quality = MVPasSpecificValueMVP.Quality,
+                            Timestamp = fromIncludedUtc,
+                            Value = MVPasSpecificValueMVP.Value
+                        });
+                    }
+                    else datumList.Add(datum);
+                    fromIncludedUtc = AddTimpestamp(signal, fromIncludedUtc);
                 }
-                catch { datum = null; }
+                while (fromIncludedUtc < toExcludedUtc);
 
-                if (datum == null) datumList.Add(new Datum<T>()
-                {
-                    Signal = signal,
-                    Quality = GetMVPData<T>(MVP, datumList).Quality,
-                    Timestamp = fromIncludedUtc,
-                    Value = GetMVPData<T>(MVP, datumList).Value
-                });
-                else datumList.Add(datum);
-                fromIncludedUtc = AddTimpestamp(signal, fromIncludedUtc);
+                return datumList;
             }
-            while (fromIncludedUtc < toExcludedUtc);
-
-            return datumList;
         }  
 
-    private SpecificValueMissingValuePolicy<T> GetMVPData<T>(MissingValuePolicyBase MVP, List<Datum<T>> datums)
+        private SpecificValueMissingValuePolicy<T> GetMVPData<T>(MissingValuePolicyBase MVP, List<Datum<T>> datums)
         {
-            if (MVP is Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<T>)
-            { return new SpecificValueMissingValuePolicy<T>() { Quality = Quality.None, Value = default(T) }; }
-
             if (MVP is Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<T>)
-            {
                 return MVP as SpecificValueMissingValuePolicy<T>;
-            }
-            if (MVP is Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
-            {
-                int length = datums.Count();
-                var result = new SpecificValueMissingValuePolicy<T>();
 
-                if (length > 0) { result.Quality = datums[length - 1].Quality; result.Value = datums[length - 1].Value; }
-                else { result.Quality = Quality.None; result.Value = default(T); }
-                return result;
-            }
             return new SpecificValueMissingValuePolicy<T>() { Quality = Quality.None, Value = default(T) };
         }
 
@@ -130,13 +111,13 @@ namespace Domain.Services.Implementation
         {
             switch (signal.Granularity)
             {
-                case Granularity.Day: return datetime = datetime.AddDays(1);
-                case Granularity.Hour: return datetime = datetime.AddHours(1);
-                case Granularity.Minute: return datetime = datetime.AddMinutes(1);
-                case Granularity.Month: return datetime = datetime.AddMonths(1);
-                case Granularity.Second: return datetime = datetime.AddSeconds(1);
-                case Granularity.Week: return datetime = datetime.AddDays(7);
-                case Granularity.Year: return datetime = datetime.AddYears(1);
+                case Granularity.Day: return datetime.AddDays(1);
+                case Granularity.Hour: return datetime.AddHours(1);
+                case Granularity.Minute: return datetime.AddMinutes(1);
+                case Granularity.Month: return datetime.AddMonths(1);
+                case Granularity.Second: return datetime.AddSeconds(1);
+                case Granularity.Week: return datetime.AddDays(7);
+                case Granularity.Year: return datetime.AddYears(1);
                 default: return datetime;
             }
         }
