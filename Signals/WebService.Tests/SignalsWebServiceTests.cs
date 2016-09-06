@@ -831,7 +831,7 @@ namespace WebService.Tests
 
                 Assert.AreEqual(1, resultData.Count());
                 Assert.AreEqual("Good", resultData.First().Quality.ToString());
-                Assert.AreEqual(2.95833, resultData.First().Value);
+                Assert.AreEqual(1.04167, resultData.First().Value);
                 Assert.AreEqual(new DateTime(1999, 12, 1), resultData.First().Timestamp);
             }
 
@@ -948,7 +948,7 @@ namespace WebService.Tests
 
                 Assert.AreEqual(1, resultData.Count());
                 Assert.AreEqual("Good", resultData.First().Quality.ToString());
-                Assert.AreEqual(Convert.ToDecimal(2.95833), resultData.First().Value);
+                Assert.AreEqual(Convert.ToDecimal(1.04167), resultData.First().Value);
                 Assert.AreEqual(new DateTime(1999, 12, 1), resultData.First().Timestamp);
             }
 
