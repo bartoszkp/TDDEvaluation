@@ -119,14 +119,22 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
-            if (missingValuePolicyBase is ShadowMissingValuePolicy<bool>) checkShadowDataType<bool>(signal, missingValuePolicyBase);
-            
+            if (missingValuePolicyBase is ShadowMissingValuePolicy<bool>)
+            {
+                checkShadowDataType<bool>(signal, missingValuePolicyBase);
+                checkShadowGranularity<bool>(signal, missingValuePolicyBase);
+            }
             missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
         }
         private void checkShadowDataType<T>(Signal signal, MissingValuePolicyBase mvp)
         {
             var shadowMVP = mvp as ShadowMissingValuePolicy<T>;
-            if (shadowMVP.NativeDataType != signal.DataType.GetType()) { throw new DataTypeException(); } 
+            if (shadowMVP.ShadowSignal.DataType != signal.DataType) { throw new ShadowMissingValuePolicyDataTypeException(); } 
+        }
+        private void checkShadowGranularity<T>(Signal signal, MissingValuePolicyBase mvp)
+        {
+            var shadowMVP = mvp as ShadowMissingValuePolicy<T>;
+            if (shadowMVP.ShadowSignal.Granularity != signal.Granularity) throw new ShadowMissingValuePolicyGranularityException();
         }
 
         public PathEntry GetPathEntry(Path path)
