@@ -115,25 +115,18 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase missingValuePolicyBase)
+        public void SetMissingValuePolicy<T>(int signalId, MissingValuePolicyBase missingValuePolicyBase)
         {
             var signal = signalsRepository.Get(signalId);
 
-            if (missingValuePolicyBase is ShadowMissingValuePolicy<bool>)
-            {
-                checkShadowDataType<bool>(signal, missingValuePolicyBase);
-                checkShadowGranularity<bool>(signal, missingValuePolicyBase);
-            }
+            if (missingValuePolicyBase is ShadowMissingValuePolicy<T>) checkShadowDataTypeAndGranularityonToEquality<T>(signal, missingValuePolicyBase);
+
             missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
         }
-        private void checkShadowDataType<T>(Signal signal, MissingValuePolicyBase mvp)
+        private void checkShadowDataTypeAndGranularityonToEquality<T>(Signal signal, MissingValuePolicyBase mvp)
         {
             var shadowMVP = mvp as ShadowMissingValuePolicy<T>;
-            if (shadowMVP.ShadowSignal.DataType != signal.DataType) { throw new ShadowMissingValuePolicyDataTypeException(); } 
-        }
-        private void checkShadowGranularity<T>(Signal signal, MissingValuePolicyBase mvp)
-        {
-            var shadowMVP = mvp as ShadowMissingValuePolicy<T>;
+            if (shadowMVP.ShadowSignal.DataType != signal.DataType) throw new ShadowMissingValuePolicyDataTypeException();
             if (shadowMVP.ShadowSignal.Granularity != signal.Granularity) throw new ShadowMissingValuePolicyGranularityException();
         }
 

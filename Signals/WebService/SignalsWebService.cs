@@ -22,8 +22,8 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
@@ -119,9 +119,23 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
-
-            else signalsDomainService.SetMissingValuePolicy(signalId, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+            var signal = signalsDomainService.GetById(signalId);
+            
+            if ( signal == null) throw new ArgumentException();
+            else
+            {
+                var mvp = policy as ShadowMissingValuePolicy;
+                var DomainMVP = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+                if (mvp != null) switch(mvp.DataType)
+                    {
+                    case DataType.Boolean: { signalsDomainService.SetMissingValuePolicy<bool>(signalId, DomainMVP);    break; }
+                    case DataType.Decimal: { signalsDomainService.SetMissingValuePolicy<decimal>(signalId, DomainMVP); break; }
+                    case DataType.Double:  { signalsDomainService.SetMissingValuePolicy<double>(signalId, DomainMVP);  break; }
+                    case DataType.Integer: { signalsDomainService.SetMissingValuePolicy<int>(signalId, DomainMVP);     break; }
+                    case DataType.String:  { signalsDomainService.SetMissingValuePolicy<string>(signalId, DomainMVP);  break; }
+                    }
+                else signalsDomainService.SetMissingValuePolicy<Type>(signalId, DomainMVP);
+            }
         }
     }
 }
