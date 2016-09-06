@@ -101,7 +101,7 @@ namespace Domain.Services.Implementation
                     break;
 
                 case Granularity.Week:
-                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, 0, 0, 0) && d.Timestamp.DayOfWeek != DayOfWeek.Monday)) throw new DatumTimestampException();
+                    if (data.Any(d => d.Timestamp != new DateTime(d.Timestamp.Year, d.Timestamp.Month, d.Timestamp.Day, 0, 0, 0) | d.Timestamp.DayOfWeek == DayOfWeek.Monday)) throw new DatumTimestampException();
                     break;
 
                 case Granularity.Year:

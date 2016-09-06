@@ -306,7 +306,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(Exception))]
+            [ExpectedException(typeof(DatumTimestampException))]
             public void GivenASignal_WhenSettingDataWhenDataGranularityIsWeekAndTimestampOfOneDatumIsNotMonday_ThrowedIsException()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
