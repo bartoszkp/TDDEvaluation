@@ -80,7 +80,7 @@ namespace WebService.Tests.SignalsWebServiceTests
             }
 
         }
-        
+
         private bool IsSetDataTimestampValid(DateTime dt, Domain.Granularity granularity = Domain.Granularity.Year)
         {
             var signalId = 1;

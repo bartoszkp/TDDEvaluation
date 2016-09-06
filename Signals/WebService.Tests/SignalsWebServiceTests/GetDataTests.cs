@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using WebService.Tests.SignalsWebServiceTests.Infrastructure;
 using Moq;
 using Domain;
+using System.Reflection;
 
 namespace WebService.Tests.SignalsWebServiceTests
 {
@@ -442,6 +443,22 @@ namespace WebService.Tests.SignalsWebServiceTests
 
             Assert.IsTrue(Utils.CompareDatum(expected, result));
 
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(TargetInvocationException))]
+        public void GivenASignalDataTypeString_GetDataWithFirstOrderMVP_ExpectedException()
+        {
+            int signalId = 3;
+            Signal signal = Utils.SignalWith(signalId, Domain.DataType.String, Domain.Granularity.Year);
+            SetupGet(signal);
+            SetupMVPGet(new FirstOrderMissingValuePolicyString() { });
+
+            var datum = new[] {
+               new Domain.Datum<string> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2016,1,1), Value = "a" }
+            };
+
+            signalsWebService.GetData(signalId, new DateTime(2014, 1, 1), new DateTime(2018, 1, 1));
         }
 
         public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
