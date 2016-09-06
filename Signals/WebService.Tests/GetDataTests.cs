@@ -346,7 +346,31 @@ namespace WebService.Tests
                 new DateTime(2000, 1, 1), new DateTime(2003, 1, 1),
                 new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble(), filledDatum);
         }
+        [TestMethod]
+        public void GivenASignal_WhenFormatTimeStampIsWrong_ReturnZeroElements()
+        {
+            var existingSignal = SignalWith(1, DataType.Boolean, Granularity.Day, Path.FromString("Bool"));
+            var existingDatum = new Dto.Datum[]
+            {
+                    new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (bool)false }
+            };
 
+
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+            GivenASignal(existingSignal);
+            signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+            choiseDataType(existingSignal, existingDatum, new DateTime(2000, 1, 3), new DateTime(2000, 1, 1));
+            mvpRepoMock = new Mock<IMissingValuePolicyRepository>();
+            mvpRepoMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyBoolean());
+            var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    mvpRepoMock.Object);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+            var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
+            Assert.AreEqual(result.Count(), 0);
+        }
         #endregion
 
         private void SetupWebService()
