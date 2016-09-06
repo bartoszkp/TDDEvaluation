@@ -225,7 +225,7 @@ namespace Domain.Services.Implementation
                 {
                     var diffNumberOlder_Newer = NumberOfPeriods(olderData.First().Timestamp, newerData.First().Timestamp, signal.Granularity);
                     var diffNumberOlder_Actual = NumberOfPeriods(olderData.First().Timestamp, timestamp, signal.Granularity);
-                    var stepValue = ValueStep<T>(signal, olderData.First().Value, newerData.First().Value, diffNumberOlder_Newer, diffNumberOlder_Actual, olderData.First().Value);
+                    var stepValue = ValueStep<T>(signal, olderData.First().Value, newerData.First().Value, diffNumberOlder_Newer, diffNumberOlder_Actual);
 
                     Quality quality;
                     if (olderData.First().Quality != newerData.First().Quality)
@@ -253,16 +253,15 @@ namespace Domain.Services.Implementation
 
         }
 
-        private T ValueStep<T>(Signal signal, T v1, T v2, int numberOfPeriods1, int numberOfPeriods2, T v3)
+        private T ValueStep<T>(Signal signal, dynamic older, dynamic newer, int diffOlder_Newer, int diffOlder_Acrual)
         {
-            switch (signal.DataType)
+            T temp = default(T);
+            try
             {
-                case DataType.Double: return (T)(Math.Round((Math.Abs(Convert.ToDouble(v1) - Convert.ToDouble(v2))* numberOfPeriods2 / numberOfPeriods1)+ Convert.ToDouble(v3), 5).Adapt(v1.GetType(), typeof(double)));
-                case DataType.Decimal: return (T)(Math.Round((Math.Abs(Convert.ToDecimal(v1) - Convert.ToDecimal(v2)) * numberOfPeriods2 / numberOfPeriods1) + Convert.ToDecimal(v3), 5).Adapt(v1.GetType(), typeof(decimal)));
-                case DataType.Integer: return (T)((Math.Abs(Convert.ToInt32(v1) - Convert.ToInt32(v2)) * numberOfPeriods2 / numberOfPeriods1) + Convert.ToInt32(v3)).Adapt(v1.GetType(), typeof(Int32));
-
-                default: throw new ArgumentException();
+                var result = Math.Abs(older - newer) * diffOlder_Acrual / diffOlder_Newer + older;
+                if (typeof(int) == temp.GetType()) { return result; } else { return Math.Round(result, 5); }
             }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException) { throw new ArgumentException(); }
         }
 
         private Func<DateTime, DateTime> DateModifier(Granularity granularity)
