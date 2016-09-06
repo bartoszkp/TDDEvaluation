@@ -70,6 +70,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
 
+
                 Assert.AreEqual(Dto.Quality.None, result.ToArray()[0].Quality);
                 Assert.AreEqual(0m, result.ToArray()[0].Value);
             }
