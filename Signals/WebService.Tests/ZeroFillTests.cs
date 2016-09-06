@@ -53,6 +53,8 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
             Assert.AreEqual(returnCollection.Last().Value, middlevalue);
+            foreach (var item in returnCollection)
+                Assert.AreEqual(Quality.Good, item.Quality);
         }
 
         [TestMethod]
@@ -88,6 +90,8 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
             Assert.AreEqual(returnCollection.Last().Value, middlevalue);
+            foreach (var item in returnCollection)
+                Assert.AreEqual(Quality.Good, item.Quality);
 
         }
 
@@ -127,6 +131,8 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
             Assert.AreEqual(returnCollection.Last().Value, middlevalue);
+            foreach (var item in returnCollection)
+                Assert.AreEqual(Quality.Good, item.Quality);
         }
 
         [TestMethod]
@@ -162,6 +168,8 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
             Assert.AreEqual(returnCollection.Last().Value, middlevalue);
+            foreach (var item in returnCollection)
+                Assert.AreEqual(Quality.Good, item.Quality);
         }
 
         [TestMethod]
@@ -200,6 +208,8 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[3].Value, returnCollection[4].Value);
             Assert.AreEqual(returnCollection.Last().Value, (decimal)5);
+            foreach (var item in returnCollection)
+                Assert.AreEqual(Quality.Good, item.Quality);
         }
 
         [TestMethod]
@@ -238,6 +248,8 @@ namespace WebService.Tests
             Assert.AreEqual(returnCollection.First().Value, returnCollection[1].Value);
             Assert.AreEqual(returnCollection[2].Value, returnCollection[3].Value);
             Assert.AreEqual(returnCollection.Last().Value, middlevalue);
+            foreach (var item in returnCollection)
+                Assert.AreEqual(Quality.Good, item.Quality);
         }
 
         private List<Datum<T>> GenerateFillCollection<T>(T startvalue, T middlevalue, T endvalue, Domain.Granularity granulatiry)
