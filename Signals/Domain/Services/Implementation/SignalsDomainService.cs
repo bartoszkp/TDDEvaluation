@@ -280,13 +280,9 @@ namespace Domain.Services.Implementation
                         var filledData = new List<Datum<T>>();
                         var signalData = signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
                         var shadowData = signalsDataRepository.GetData<T>((policy as ShadowMissingValuePolicy<T>).ShadowSignal, fromIncluded, toExcluded);
-
-                        AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, fromIncluded);
-                        if (filledData.Count() == 0) AddToListSuitableDatumWhenGivenIsSMVP(filledData, shadowData, fromIncluded);
-                        if (filledData.Count() == 0) filledData.Add(new Datum<T>() { Signal = signal, Quality = Quality.None, Value = default(T), Timestamp = fromIncluded });
+                        AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, fromIncluded);
                         return filledData;
                     }
-
                     else
                     {
                         var filledData = new List<Datum<T>>();
@@ -299,49 +295,49 @@ namespace Domain.Services.Implementation
                             case Granularity.Second:
                                 while (tmp < toExcluded)
                                 {
-                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, tmp);
                                     tmp = tmp.AddSeconds(1);
                                 }
                                 break;
                             case Granularity.Minute:
                                 while (tmp < toExcluded)
                                 {
-                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, tmp);
                                     tmp = tmp.AddMinutes(1);
                                 }
                                 break;
                             case Granularity.Hour:
                                 while (tmp < toExcluded)
                                 {
-                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, tmp);
                                     tmp = tmp.AddHours(1);
                                 }
                                 break;
                             case Granularity.Day:
                                 while (tmp < toExcluded)
                                 {
-                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, tmp);
                                     tmp = tmp.AddDays(1);
                                 }
                                 break;
                             case Granularity.Week:
                                 while (tmp < toExcluded)
                                 {
-                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, tmp);
                                     tmp = tmp.AddDays(7);
                                 }
                                 break;
                             case Granularity.Month:
                                 while (tmp < toExcluded)
                                 {
-                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, tmp);
                                     tmp = tmp.AddMonths(1);
                                 }
                                 break;
                             case Granularity.Year:
                                 while (tmp < toExcluded)
                                 {
-                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    AddToListSuitableDatumWhenGivenIsSMVP(filledData, signalData, shadowData, tmp);
                                     tmp = tmp.AddYears(1);
                                 }
                                 break;
@@ -357,15 +353,25 @@ namespace Domain.Services.Implementation
             }
         }
 
-        private void AddToListSuitableDatumWhenGivenIsSMVP<T>(List<Datum<T>> filledData, IEnumerable<Datum<T>> data, DateTime fromIncluded)
+        private void AddToListSuitableDatumWhenGivenIsSMVP<T>(List<Datum<T>> filledData, IEnumerable<Datum<T>> signalData, IEnumerable<Datum<T>> shadowData, DateTime tmp)
         {
-            foreach (var datum in data)
+            foreach (var datum in signalData)
             {
-                if (fromIncluded == datum.Timestamp)
+                if (tmp == datum.Timestamp)
                 {
                     filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
+                    return;
                 }
             }
+            foreach (var datum in shadowData)
+            {
+                if (tmp == datum.Timestamp)
+                {
+                    filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
+                    return;
+                }
+            }
+            filledData.Add(new Datum<T>() { Timestamp = tmp, Quality = Quality.None, Value = default(T) });
         }
 
         private dynamic GetStep<T>(Signal signal, Datum<T> currentDatum, Datum<T> nextDatum)
