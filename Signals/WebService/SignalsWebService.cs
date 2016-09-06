@@ -143,7 +143,7 @@ namespace WebService
         {
             if (policy == null)
                 throw new ArgumentNullException();
-
+            
             var domainPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             signalsDomainService.SetMissingValuePolicy(signalId, domainPolicy);
         }

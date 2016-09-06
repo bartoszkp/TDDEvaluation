@@ -92,9 +92,11 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new NoSuchSignalException("Attempted to set missing value policy to a non exsisting signal");
 
+            policy.CheckGranularityAndDataType(signal);
+
             this.missingValuePolicyRepository.Set(signal, policy);
         }
-
+        
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             if (!VeryfiTimeStamp(signal.Granularity, fromIncludedUtc))
