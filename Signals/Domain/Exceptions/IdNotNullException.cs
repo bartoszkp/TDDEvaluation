@@ -37,9 +37,17 @@ namespace Domain.Exceptions
     public class UnsupportedTypeForMVP : Exception
     {
         public UnsupportedTypeForMVP()
-            :base("Trying to set a default MVPolicy for an unsupported type. Supported types are: int32, decimal, double, string.")
+            : base("Trying to set a default MVPolicy for an unsupported type. Supported types are: int32, decimal, double, string.")
         {
 
+        }
+    }
+
+    public class InvalidSignalForShadowing : Exception
+    {
+        public InvalidSignalForShadowing()
+            : base("You can only shadow signals of the same DataType and Granularity.")
+        {
         }
     }
 

@@ -128,6 +128,12 @@ namespace Domain.Services.Implementation
 
         public void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase)
         {
+            if(domainPolicyBase.GetType().GetGenericTypeDefinition() == typeof(ShadowMissingValuePolicy<>))
+            {
+                dynamic shadowPolicy = domainPolicyBase;
+                if (shadowPolicy.ShadowSignal.Granularity != domainSetMVPSignal.Granularity || shadowPolicy.ShadowSignal.DataType != domainSetMVPSignal.DataType)
+                    throw new InvalidSignalForShadowing();
+            }
             this.missingValuePolicyRepository.Set(domainSetMVPSignal, domainPolicyBase);
         }
 
