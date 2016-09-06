@@ -41,7 +41,7 @@ namespace WebService.Tests
                     (It.Is<Signal>(s => s.Id == givenSignal.Id && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
                 .Returns(new ShadowMissingValuePolicyDecimal() { Signal = givenSignal, ShadowSignal = givenShadow });
 
-                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
+                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 2), new DateTime(2000, 1, 1));
 
                 Assert.AreEqual(0, result.ToArray().Length);
             }
@@ -64,13 +64,14 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenShadow.Id.Value))).Returns(givenShadow);
 
                 mvpRepositoryMock.Setup(mvpr => mvpr.Get
-                    (It.Is<Signal>(s => s.Id == givenSignal.Id && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
-                .Returns(new ShadowMissingValuePolicyDecimal() { Signal = givenSignal, ShadowSignal = givenShadow });
+                    (It.Is<Signal>(s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
+                .Returns(new ShadowMissingValuePolicyDecimal () {  Signal = givenSignal, ShadowSignal = givenShadow});
 
-                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1)).ToArray()[0];
 
-                Assert.AreEqual(Dto.Quality.None, result.Quality);
-                Assert.AreEqual(0m, result.Value);
+                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(Dto.Quality.None, result.ToArray()[0].Quality);
+                Assert.AreEqual(0m, result.ToArray()[0].Value);
             }
 
             [TestMethod]
@@ -605,7 +606,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndData_CallingGetDataWithTheSameDateInBothArguments_ReturnsOneDatumWithThatDate()
+            public void GivenASignalAndData_WhenCallingGetDataWithTheSameDateInBothArguments_ReturnsOneDatumWithThatDate()
             {
                 int signalId = 1;
                 GivenASignal(SignalWith(
@@ -623,6 +624,7 @@ namespace WebService.Tests
                     {
                         new Datum<bool>() {Timestamp = thatDate }
                     });
+                var resulttmp = signalsDataRepoMock.Object.GetData<bool>(SignalWith(signalId, DataType.Boolean, Granularity.Month, Path.FromString("")),thatDate,thatDate);
 
                 var result = signalsWebService.GetData(signalId, thatDate, thatDate);
 
@@ -631,7 +633,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void GivenASignalAndNoData_CallingGetDataWithTheSameDateInBothArguments_ReturnsEmptyResult()
+            public void GivenASignalAndNoData_WhenCallingGetDataWithTheSameDateInBothArguments_ReturnsNotEmptyResult()
             {
                 int signalId = 1;
                 GivenASignal(SignalWith(
@@ -648,7 +650,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(signalId, thatDate, thatDate);
 
-                Assert.AreEqual(0, result.Count());
+                Assert.AreEqual(1, result.Count());
             }
 
             [TestMethod]

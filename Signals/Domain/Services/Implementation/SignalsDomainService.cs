@@ -147,18 +147,13 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded)
         {
             SingleTimestampCheck(signal, fromIncluded);
-            var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded).OrderBy(s=>s.Timestamp);
-            if (fromIncluded == toExcluded)
-            {
-                if (result.Count() == 0)
-                    return result;
 
-                return new Datum<T>[1] { result.First() };
-            }                
+            var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
+            if (result != null) result.OrderBy(s=>s.Timestamp);
 
             var policy = GetMissingValuePolicy(signal);
-
-            if (policy != null)
+            if (policy == null) return result;
+            else
             {
                 var timeNextMethod = GetTimeNextMethod(signal.Granularity);
                 var timePreviousMethod = GetTimePreviousMethod(signal.Granularity);
@@ -166,12 +161,22 @@ namespace Domain.Services.Implementation
                 var newData = new List<Datum<T>>();
 
                 if (policy is NoneQualityMissingValuePolicy<T>)
-                    while (date < toExcluded)
+                {
+                    if (fromIncluded == toExcluded)
                     {
-                        var datum = result.FirstOrDefault(d => d.Timestamp == date);                    
+                        var datum = result.FirstOrDefault(d => d.Timestamp == date);
                         newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
-                        date = timeNextMethod(date);
-                    }                
+                    }
+                    else
+                    {
+                        while (date < toExcluded)
+                        {
+                            var datum = result.FirstOrDefault(d => d.Timestamp == date);
+                            newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
+                            date = timeNextMethod(date);
+                        }
+                    }
+                }
                 else if (policy is SpecificValueMissingValuePolicy<T>)
                 {
                     var mvp = policy as SpecificValueMissingValuePolicy<T>;
@@ -180,7 +185,7 @@ namespace Domain.Services.Implementation
                         var datum = result.FirstOrDefault(d => d.Timestamp == date);
                         newData.Add(datum ?? Datum<T>.CreateSpecific(policy.Signal, date, mvp.Quality, mvp.Value));
                         date = timeNextMethod(date);
-                    }                    
+                    }
                 }
                 else if (policy is ZeroOrderMissingValuePolicy<T>)
                 {
@@ -189,10 +194,10 @@ namespace Domain.Services.Implementation
                         Datum<T> datum;
                         Datum<T> previousDatum;
 
-                        if(date == fromIncluded)
+                        if (date == fromIncluded)
                         {
                             datum = result.FirstOrDefault(d => d.Timestamp == date);
-                            if (datum == null) datum = new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = date};
+                            if (datum == null) datum = new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = date };
                             newData.Add(datum);
                         }
 
@@ -204,7 +209,7 @@ namespace Domain.Services.Implementation
 
                             else
                             {
-                                if(previousDatum != null) newData.Add(Datum<T>.CreateSpecific(policy.Signal, date, previousDatum.Quality, previousDatum.Value));
+                                if (previousDatum != null) newData.Add(Datum<T>.CreateSpecific(policy.Signal, date, previousDatum.Quality, previousDatum.Value));
                                 else throw new ZeroOrderMVPException();
                             }
                         }
@@ -239,26 +244,26 @@ namespace Domain.Services.Implementation
                         {
                             newData.Add(currentDatum);
                             olderData = currentDatum;
-                            if (nextExsistingDatum != null)step = GetStep<T>(signal, currentDatum, nextExsistingDatum);
+                            if (nextExsistingDatum != null) step = GetStep<T>(signal, currentDatum, nextExsistingDatum);
                         }
 
                         if (date > olderData.Timestamp)
                         {
                             var previousDatum = newData.LastOrDefault();
-                            if ( previousDatum != null )
-                            { 
-                            Quality quality;
+                            if (previousDatum != null)
+                            {
+                                Quality quality;
 
-                            if (previousDatum.Quality > nextExsistingDatum.Quality) quality = previousDatum.Quality; else quality = nextExsistingDatum.Quality;
+                                if (previousDatum.Quality > nextExsistingDatum.Quality) quality = previousDatum.Quality; else quality = nextExsistingDatum.Quality;
 
-                            datum = new Datum<T>() { Timestamp = timeNextMethod(previousDatum.Timestamp), Value = previousDatum.Value + step, Quality = quality };
-                            
+                                datum = new Datum<T>() { Timestamp = timeNextMethod(previousDatum.Timestamp), Value = previousDatum.Value + step, Quality = quality };
+
                             }
                             else
                             {
                                 var prevExsistingDatum = getOlderDatum<T>(signal, date);
                                 step = GetStep<T>(signal, prevExsistingDatum, nextExsistingDatum);
-                                datum = this.GetData<T>(signal, prevExsistingDatum.Timestamp, nextExsistingDatum.Timestamp).First(q=>q.Timestamp == date);
+                                datum = this.GetData<T>(signal, prevExsistingDatum.Timestamp, nextExsistingDatum.Timestamp).First(q => q.Timestamp == date);
                             }
                             newData.Add(datum);
                         }
@@ -269,13 +274,14 @@ namespace Domain.Services.Implementation
                 else if (policy is ShadowMissingValuePolicy<T>)
                 {
                     if (fromIncluded > toExcluded) return new Datum<T>[] { };
+
+                    return new Datum<T>[] { new Datum<T>() { Quality = Quality.None, Value = default(T) } };
                 }
 
                 else throw new NotImplementedException();
 
                 return newData;
             }
-            return result;
         }
 
         private dynamic GetStep<T>(Signal signal, Datum<T> currentDatum, Datum<T> nextDatum)
