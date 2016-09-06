@@ -11,7 +11,7 @@ namespace DataAccess.AutoMappingOverrides.CustomTypes
     {
         public bool IsMutable {  get { return true; } }
 
-        public Type ReturnedType {  get { return typeof(IEnumerable<string>); } }
+        public Type ReturnedType {  get { return typeof(string[]); } }
 
         public SqlType[] SqlTypes { get { return new[] { new StringSqlType() }; } }
 
@@ -54,7 +54,7 @@ namespace DataAccess.AutoMappingOverrides.CustomTypes
             object paramVal = DBNull.Value;
             if (value != null)
             {
-                paramVal = Domain.Path.JoinComponents(((IEnumerable<string>)value));
+                paramVal = Domain.Path.JoinComponents(((string[])value));
             }
 
             var parameter = (IDataParameter)cmd.Parameters[index];
