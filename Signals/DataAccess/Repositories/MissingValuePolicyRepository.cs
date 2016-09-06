@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
+using Domain;
 using Domain.Infrastructure;
 using Domain.MissingValuePolicy;
 using Mapster;
+using NHibernate.Criterion;
 
 namespace DataAccess.Repositories
 {
@@ -64,9 +66,27 @@ namespace DataAccess.Repositories
 
         public MissingValuePolicyBase Get(Domain.Signal signal)
         {
-            return Session.QueryOver<MissingValuePolicyBase>()
-                .Where(mvp => mvp.Signal == signal)
-                .SingleOrDefault();
+            var signalPropertyName = ReflectionUtils.GetMemberInfo<MissingValuePolicyBase, Signal>(mvpb => mvpb.Signal)
+                .Name;
+
+            foreach (var type in genericConcretePolicyTypePairs
+                .Select(gcptp => gcptp.Item2)
+                .Where(gcpt => gcpt.BaseType.GetGenericArguments().Single().Equals(signal.DataType.GetNativeType())))
+            {
+                var tryGet = Session.CreateCriteria(type)
+                    .Add(Restrictions.Eq(signalPropertyName, signal))
+                    .SetMaxResults(1)
+                    .List()
+                    .Cast<MissingValuePolicyBase>()
+                    .SingleOrDefault();
+
+                if (tryGet != null)
+                {
+                    return tryGet;
+                }
+            }
+
+            return null;
         }
 
         private List<Tuple<Type, Type>> genericConcretePolicyTypePairs = new List<Tuple<Type, Type>>();
