@@ -143,6 +143,7 @@ namespace Domain.Services.Implementation
                     if (typeof(SpecificValueMissingValuePolicy<T>) == mvp.GetType() || typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType() || typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
                     {
                     T value = default(T);
+                    Quality quality = default(Quality);
 
                         var mvpSpec = mvp.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                         as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
@@ -152,6 +153,7 @@ namespace Domain.Services.Implementation
                         if (result[i].Timestamp == date)
                         {
                             value = result[i].Value;
+                            quality = result[i].Quality;
                             datums.Add(result[i++]);
                         }
                         else
@@ -160,7 +162,7 @@ namespace Domain.Services.Implementation
                                 datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
                             else if (typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
                             {
-                                datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = value });
+                                datums.Add(new Datum<T>() { Quality = quality, Timestamp = date, Value = value });
                             }
                             else
                                 datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
@@ -172,7 +174,7 @@ namespace Domain.Services.Implementation
                                 datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
                         else if (typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
                         {
-                            datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = value });
+                            datums.Add(new Datum<T>() { Quality = quality, Timestamp = date, Value = value });
                         }
                         else
                                 datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
