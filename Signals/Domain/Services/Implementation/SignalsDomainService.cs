@@ -286,6 +286,69 @@ namespace Domain.Services.Implementation
                         if (filledData.Count() == 0) filledData.Add(new Datum<T>() { Signal = signal, Quality = Quality.None, Value = default(T), Timestamp = fromIncluded });
                         return filledData;
                     }
+
+                    else
+                    {
+                        var filledData = new List<Datum<T>>();
+                        var signalData = signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
+                        var shadowData = signalsDataRepository.GetData<T>((policy as ShadowMissingValuePolicy<T>).ShadowSignal, fromIncluded, toExcluded);
+                        var tmp = fromIncluded;
+
+                        switch (signal.Granularity)
+                        {
+                            case Granularity.Second:
+                                while (tmp < toExcluded)
+                                {
+                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    tmp = tmp.AddSeconds(1);
+                                }
+                                break;
+                            case Granularity.Minute:
+                                while (tmp < toExcluded)
+                                {
+                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    tmp = tmp.AddMinutes(1);
+                                }
+                                break;
+                            case Granularity.Hour:
+                                while (tmp < toExcluded)
+                                {
+                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    tmp = tmp.AddHours(1);
+                                }
+                                break;
+                            case Granularity.Day:
+                                while (tmp < toExcluded)
+                                {
+                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    tmp = tmp.AddDays(1);
+                                }
+                                break;
+                            case Granularity.Week:
+                                while (tmp < toExcluded)
+                                {
+                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    tmp = tmp.AddDays(7);
+                                }
+                                break;
+                            case Granularity.Month:
+                                while (tmp < toExcluded)
+                                {
+                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    tmp = tmp.AddMonths(1);
+                                }
+                                break;
+                            case Granularity.Year:
+                                while (tmp < toExcluded)
+                                {
+                                    filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T) });
+                                    tmp = tmp.AddYears(1);
+                                }
+                                break;
+                            default: break;
+                        }
+                        return filledData;
+                    }
                 }
 
                 else throw new NotImplementedException();

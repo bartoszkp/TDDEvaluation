@@ -170,6 +170,7 @@ namespace WebService.Tests
 
                 var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
 
+                Assert.AreEqual(3, result.ToArray().Length);
                 foreach (var datum in result)
                 {
                     Assert.AreEqual(Dto.Quality.None, datum.Quality);
