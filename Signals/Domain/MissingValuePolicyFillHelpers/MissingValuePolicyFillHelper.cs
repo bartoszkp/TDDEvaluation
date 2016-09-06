@@ -9,7 +9,7 @@ namespace Domain
     [Infrastructure.NHibernateIgnore]
     public class MissingValuePolicyFillHelper
     {
-        protected static DateTime addTime(DateTime time, Granularity granularity, int interval = 1)
+        protected static DateTime AddTime(DateTime time, Granularity granularity, int interval = 1)
         {
             switch (granularity)
             {

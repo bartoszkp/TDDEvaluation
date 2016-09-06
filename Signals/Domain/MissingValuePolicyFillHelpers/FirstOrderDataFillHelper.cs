@@ -30,7 +30,7 @@ namespace Domain
                     {
                         previousDatum = new Datum<T>()
                         {
-                            Timestamp = addTime(currentDate, signal.Granularity, -1),
+                            Timestamp = AddTime(currentDate, signal.Granularity, -1),
                             Value = default(T),
                             Quality = Quality.None
                         };
@@ -41,7 +41,7 @@ namespace Domain
 
                     if (nextDatumCollection.Count() == 0 || !previousDatumExisted)
                     {
-                        var timestamp = addTime(currentDate, signal.Granularity);
+                        var timestamp = AddTime(currentDate, signal.Granularity);
 
                         nextDatum = new Datum<T>()
                         {
@@ -74,7 +74,7 @@ namespace Domain
                             data.Add(missingDatum);
 
                             value = AggregateValue(value, valueToAdd);
-                            tempDate = addTime(tempDate, signal.Granularity);
+                            tempDate = AddTime(tempDate, signal.Granularity);
                         }
                     }
                     else
@@ -97,7 +97,7 @@ namespace Domain
                     }
                 }
 
-                currentDate = addTime(currentDate, signal.Granularity);
+                currentDate = AddTime(currentDate, signal.Granularity);
             }
 
             return data;

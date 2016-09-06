@@ -7,347 +7,50 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public static class ZeroOrderDataFillHelper
+    [Infrastructure.NHibernateIgnore]
+    public class ZeroOrderDataFillHelper : MissingValuePolicyFillHelper
     {
 
-        public static List<Datum<T>> FillMissingData<T>(SignalsDomainService service, Signal signal, List<Datum<T>> data, DateTime from, DateTime to)
+        public static List<Datum<T>> FillMissingData<T>(SignalsDomainService service, Signal signal, List<Datum<T>> data, DateTime fromIncluded, DateTime toExcluded)
         {
+            var currentDate = new DateTime(fromIncluded.Ticks);
 
-
-            switch (signal.Granularity)
+            while (currentDate < toExcluded)
             {
-                case Granularity.Second:
-                    FillSecondGranularityData(signal, service, data, from, to);
-                    break;
+                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                {
+                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
 
-                case Granularity.Minute:
-                    FillMinuteGranularityData(signal, service, data, from, to);
-                    break;
+                    Datum<T> missingDatum = null;
 
-                case Granularity.Hour:
-                    FillHourGranularityData(signal, service, data, from, to);
-                    break;
+                    if (olderData.Count() != 0)
+                    {
+                        var previousDatum = olderData.ElementAt(0);
 
-                case Granularity.Day:
-                    FillDayGranularityData(signal, service, data, from, to);
-                    break;
+                        missingDatum = new Datum<T>()
+                        {
+                            Value = previousDatum.Value,
+                            Timestamp = currentDate,
+                            Quality = previousDatum.Quality
+                        };
+                    }
+                    else
+                    {
+                        missingDatum = new Datum<T>()
+                        {
+                            Value = default(T),
+                            Timestamp = currentDate,
+                            Quality = Quality.None
+                        };
+                    }
 
-                case Granularity.Week:
-                    FillWeekGranularityData(signal, service, data, from, to);
-                    break;
+                    data.Add(missingDatum);
+                }
 
-                case Granularity.Month:
-                    FillMonthGranularityData(signal, service, data, from, to);
-                    break;
-
-                case Granularity.Year:
-                    FillYearGranularityData(signal, service, data, from, to);
-                    break;
-
-                default:
-                    break;
+                currentDate = AddTime(currentDate, signal.Granularity);
             }
 
             return data;
         }
-
-
-
-
-        private static void FillSecondGranularityData<T>(Signal signal,SignalsDomainService service,List<Datum<T>> data,
-            DateTime fromIncluded, DateTime toExcluded)
-        {
-            var currentDate = new DateTime(fromIncluded.Ticks);
-
-            while (currentDate < toExcluded)
-            {
-                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
-
-                    Datum<T> missingDatum = null;
-
-                    if (olderData.Count() != 0)
-                    {
-                        var previousDatum = olderData.ElementAt(0);
-
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = previousDatum.Value,
-                            Timestamp = currentDate,
-                            Quality = previousDatum.Quality
-                        };
-                    }
-                    else
-                    {
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                    }
-
-                    data.Add(missingDatum);
-                }
-
-                currentDate = currentDate.AddSeconds(1);
-            }
-
-        }
-
-        private static void FillMonthGranularityData<T>(Signal signal, SignalsDomainService service, List<Datum<T>> data,
-            DateTime fromIncluded, DateTime toExcluded)
-        {
-            var currentDate = new DateTime(fromIncluded.Ticks);
-
-            while (currentDate < toExcluded)
-            {
-                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
-
-                    Datum<T> missingDatum = null;
-
-                    if (olderData.Count() != 0)
-                    {
-                        var previousDatum = olderData.ElementAt(0);
-
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = previousDatum.Value,
-                            Timestamp = currentDate,
-                            Quality = previousDatum.Quality
-                        };
-                    }
-                    else
-                    {
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                    }
-
-                    data.Add(missingDatum);
-                }
-
-                currentDate = currentDate.AddMonths(1);
-            }
-        }
-
-        private static void FillDayGranularityData<T>(Signal signal, SignalsDomainService service, List<Datum<T>> data,
-            DateTime fromIncluded, DateTime toExcluded)
-        {
-            var currentDate = new DateTime(fromIncluded.Ticks);
-
-            while (currentDate < toExcluded)
-            {
-                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
-
-                    Datum<T> missingDatum = null;
-
-                    if (olderData.Count() != 0)
-                    {
-                        var previousDatum = olderData.ElementAt(0);
-
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = previousDatum.Value,
-                            Timestamp = currentDate,
-                            Quality = previousDatum.Quality
-                        };
-                    }
-                    else
-                    {
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                    }
-
-                    data.Add(missingDatum);
-                }
-
-                currentDate = currentDate.AddDays(1);
-            }
-
-        }
-
-
-        private static void FillMinuteGranularityData<T>(Signal signal, SignalsDomainService service, List<Datum<T>> data,
-            DateTime fromIncluded, DateTime toExcluded)
-        {
-            var currentDate = new DateTime(fromIncluded.Ticks);
-
-            while (currentDate < toExcluded)
-            {
-                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
-
-                    Datum<T> missingDatum = null;
-
-                    if (olderData.Count() != 0)
-                    {
-                        var previousDatum = olderData.ElementAt(0);
-
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = previousDatum.Value,
-                            Timestamp = currentDate,
-                            Quality = previousDatum.Quality
-                        };
-                    }
-                    else
-                    {
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                    }
-
-                    data.Add(missingDatum);
-                }
-
-                currentDate = currentDate.AddMinutes(1);
-            }
-        }
-
-
-        private static void FillYearGranularityData<T>(Signal signal, SignalsDomainService service, List<Datum<T>> data,
-            DateTime fromIncluded, DateTime toExcluded)
-        {
-            var currentDate = new DateTime(fromIncluded.Ticks);
-
-            while (currentDate < toExcluded)
-            {
-                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
-
-                    Datum<T> missingDatum = null;
-
-                    if (olderData.Count() != 0)
-                    {
-                        var previousDatum = olderData.ElementAt(0);
-
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = previousDatum.Value,
-                            Timestamp = currentDate,
-                            Quality = previousDatum.Quality
-                        };
-                    }
-                    else
-                    {
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                    }
-
-                    data.Add(missingDatum);
-                }
-
-                currentDate = currentDate.AddYears(1);
-            }
-        }
-
-        private static void FillWeekGranularityData<T>(Signal signal, SignalsDomainService service, List<Datum<T>> data,
-            DateTime fromIncluded, DateTime toExcluded)
-        {
-            var currentDate = new DateTime(fromIncluded.Ticks);
-
-            while (currentDate < toExcluded)
-            {
-                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
-
-                    Datum<T> missingDatum = null;
-
-                    if (olderData.Count() != 0)
-                    {
-                        var previousDatum = olderData.ElementAt(0);
-
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = previousDatum.Value,
-                            Timestamp = currentDate,
-                            Quality = previousDatum.Quality
-                        };
-                    }
-                    else
-                    {
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                    }
-
-                    data.Add(missingDatum);
-                }
-
-                currentDate = currentDate.AddDays(7);
-            }
-        }
-
-        private static void FillHourGranularityData<T>(Signal signal, SignalsDomainService service, List<Datum<T>> data,
-            DateTime fromIncluded, DateTime toExcluded)
-        {
-            var currentDate = new DateTime(fromIncluded.Ticks);
-
-            while (currentDate < toExcluded)
-            {
-                if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var olderData = service.GetDataOlderThan<T>(signal, currentDate, 1);
-
-                    Datum<T> missingDatum = null;
-
-                    if (olderData.Count() != 0)
-                    {
-                        var previousDatum = olderData.ElementAt(0);
-
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = previousDatum.Value,
-                            Timestamp = currentDate,
-                            Quality = previousDatum.Quality
-                        };
-                    }
-                    else
-                    {
-                        missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                    }
-
-                    data.Add(missingDatum);
-                }
-
-                currentDate = currentDate.AddHours(1);
-            }
-        }
-
-
-
-
-
     }
 }
