@@ -400,6 +400,50 @@ namespace WebService.Tests.SignalsWebServiceTests
 
         }
 
+        [TestMethod]
+        public void GivenASignal_GetDataWithNoneQualityMvp_ReturnsNoneData()
+        {
+            int signalId = 5;
+            Signal signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Year);
+            SetupGet(signal);
+            SetupMVPGet(new NoneQualityMissingValuePolicyInteger());
+
+            var datum = new[] {
+               new Domain.Datum<int> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2016,1,1), Value = (int)1 }
+            };
+
+            var result = signalsWebService.GetData(signalId, new DateTime(2017, 1, 1), new DateTime(2019, 1, 1)).ToArray();
+
+            var expected = new[] {
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2017, 1, 1), Value = 0 },
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2018, 1, 1), Value = 0 } };
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+
+        }
+
+        [TestMethod]
+        public void GivenASignal_GetDataWithSpecificValueMvp_ReturnsIt()
+        {
+            int signalId = 5;
+            Signal signal = Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Year);
+            SetupGet(signal);
+            SetupMVPGet(new SpecificValueMissingValuePolicyDouble() { Quality = Quality.Good, Value = 5.0 } );
+
+            var datum = new[] {
+               new Domain.Datum<double> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2016,1,1), Value = (double)1 }
+            };
+
+            var result = signalsWebService.GetData(signalId, new DateTime(2017, 1, 1), new DateTime(2019, 1, 1)).ToArray();
+
+            var expected = new[] {
+                  new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2017, 1, 1), Value = 5.0 },
+                  new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 1), Value = 5.0 } };
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+
+        }
+
         public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
         {
             Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMilliseconds(1)));
