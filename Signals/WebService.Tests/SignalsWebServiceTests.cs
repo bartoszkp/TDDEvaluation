@@ -378,9 +378,79 @@ namespace WebService.Tests
                 
                 missingValuePolicyRepositoryMock.Verify(x => x.Set(It.IsAny<Domain.Signal>(),
                     It.IsAny<Domain.MissingValuePolicy.ShadowMissingValuePolicy<Double>>()));
-
             }
 
+            [TestMethod]
+            public void GetData_ShadowSignalHadData_ShadowMissingValuePolicyShouldFillMissingData()
+            {
+                var signalId = 1;
+                var signal = new Signal()
+                {
+                    Id = signalId,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("ShadowTests")
+                };
+
+                GivenASignal(signal);
+
+                var shadowId = 2;
+                var shadow = new Signal()
+                {
+                    Id = shadowId,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("shadows/shadow1")
+                };
+
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Set(It.IsAny<Domain.Signal>(),
+                    It.IsAny<Domain.MissingValuePolicy.ShadowMissingValuePolicy<decimal>>()));
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(
+                    new ShadowMissingValuePolicyDecimal()
+                    {
+                        Signal = signal,
+                        ShadowSignal = shadow,
+                    });
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(
+                    new Domain.Datum<decimal>[] {
+                      new Datum<decimal>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
+                      new Datum<decimal>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
+                      new Datum<decimal>() {Quality = Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = 5m },
+                    });
+
+                var shadowData = new Domain.Datum<decimal>[] {
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 1.4m},
+                    new Datum<decimal>() {Quality = Quality.Poor, Timestamp = new DateTime(2000, 5, 1), Value = 0.0m },
+                    new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m},
+                };
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == shadowId), It.IsAny<DateTime>(), It.IsAny<DateTime>())).
+                    Returns<DateTime>((dateTime) => {
+                    return new[] { shadowData.FirstOrDefault(x => x.Timestamp == dateTime) };
+                });
+
+                var expected = new[] {
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999,11, 1), Value = 0.0m},
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 12, 1), Value = 0.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = 0.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 1.4m},
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = 0.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = 0.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = 0.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = 5.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m },
+                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 10, 1), Value = 0.0m },
+            };
+
+                var result = this.signalsWebService.GetData(signalId, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
+
+                Assert.IsTrue(CompareDatum(expected, result));
+            }
 
             [TestMethod]
             [ExpectedException(typeof(CouldntGetASignalException))]
@@ -1067,6 +1137,7 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdr => sdr.GetDataNewerThan<double>(signal, new DateTime(1999, 11, 1), 1));
             }
 
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
@@ -1104,6 +1175,22 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Setup(sdr =>
                 sdr.GetDataNewerThan<T>(It.Is<Domain.Signal>(s => s.Id == signalId), It.IsAny<DateTime>(), 1))
                 .Returns(new List<Datum<T>>(new Datum<T>[] { newerDatum }));
+            }
+
+            private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
+            {
+                if (datum1.Count() != datum2.Count()) return false;
+
+                for (int i = 0; i < datum1.Count(); i++)
+                {
+
+                    if (datum1.ToList()[i].Quality != datum2.ToList()[i].Quality ||
+                        DateTime.Equals(datum1.ToList()[i].Timestamp, datum2.ToList()[i].Timestamp) == false ||
+                        datum1.ToList()[i].Value.ToString() != datum2.ToList()[i].Value.ToString()
+                     )
+                        return false;
+                }
+                return true;
             }
 
             private void GivenSignals(IEnumerable<Signal> signals)
