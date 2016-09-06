@@ -21,8 +21,7 @@ namespace WebService.Tests
             private ISignalsWebService signalsWebService;
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
-            public void GivenASignalWithGranularitySecondAndDatatypeBool_WhenAssigningToTheSignalSMVPWithSignalWithOtherGranularityAndOtherDatatype_ThrowedIsArgumentException()
+            public void GivenAnySignalWithSMVPAndAnyShadow_WhenGettingDataByFromDatetimeLaterThanToDatetime_ReturnedIsBlankEnumerable()
             {
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
                 signalsDataRepoMock = new Mock<ISignalsDataRepository>();
@@ -30,35 +29,21 @@ namespace WebService.Tests
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                var givenSignal = new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Second, Path = Path.FromString("root/signal/") };
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Hour, Path = Path.FromString("root/signal") };
+                var givenShadow = new Signal() { Id = 2, DataType = DataType.Decimal, Granularity = Granularity.Hour, Path = Path.FromString("root/shadow") };
 
-                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
                 signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
-
-                signalsWebService.SetMissingValuePolicy(givenSignal.Id.Value,
-                    new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { DataType=Dto.DataType.Integer, ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Day } });
-            }
-
-            [TestMethod]
-            public void GivenASignal_WhenAssigningToTheSignalSMVPWithSignalWithGranularityAndDatatypeSameAsInGivenSignal_CalledIsMVPRepositorySetMethod()
-            {
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
-                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                var givenSignal = new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Second, Path = Path.FromString("root/signal/") };
-
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenShadow.Path)))).Returns(givenShadow);
                 signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
-                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenShadow.Id.Value))).Returns(givenShadow);
 
-                signalsWebService.SetMissingValuePolicy(givenSignal.Id.Value,
-                    new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { DataType=Dto.DataType.Boolean, ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Second } });
+                mvpRepositoryMock.Setup(mvpr => mvpr.Get
+                    (It.Is<Signal>(s => s.Id == givenSignal.Id && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
+                .Returns(new ShadowMissingValuePolicyDecimal() { Signal = givenSignal, ShadowSignal = givenShadow });
 
-                mvpRepositoryMock.Verify(mvpr => mvpr.Set(It.Is<Signal>((s =>
-                    s.Id == givenSignal.Id & s.DataType == givenSignal.DataType & s.Granularity == givenSignal.Granularity & s.Path.Equals(givenSignal.Path))),
-                    It.Is<ShadowMissingValuePolicy<bool>>(smvp => smvp.NativeDataType==typeof(bool) & smvp.ShadowSignal.DataType == DataType.Boolean & smvp.ShadowSignal.Granularity==Granularity.Second)));
+                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
+
+                Assert.AreEqual(0, result.ToArray().Length);
             }
 
             [TestMethod]
@@ -1100,7 +1085,48 @@ namespace WebService.Tests
                 Assert.AreEqual(5.0, result.ElementAt(6).Value);
             }
 
-           
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignalWithGranularitySecondAndDatatypeBool_WhenAssigningToTheSignalSMVPWithSignalWithOtherGranularityAndOtherDatatype_ThrowedIsArgumentException()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Second, Path = Path.FromString("root/signal/") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+
+                signalsWebService.SetMissingValuePolicy(givenSignal.Id.Value,
+                    new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { DataType = Dto.DataType.Integer, ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Decimal, Granularity = Dto.Granularity.Day } });
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenAssigningToTheSignalSMVPWithSignalWithGranularityAndDatatypeSameAsInGivenSignal_CalledIsMVPRepositorySetMethod()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Boolean, Granularity = Granularity.Second, Path = Path.FromString("root/signal/") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+
+                signalsWebService.SetMissingValuePolicy(givenSignal.Id.Value,
+                    new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { DataType = Dto.DataType.Boolean, ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Second } });
+
+                mvpRepositoryMock.Verify(mvpr => mvpr.Set(It.Is<Signal>((s =>
+                    s.Id == givenSignal.Id & s.DataType == givenSignal.DataType & s.Granularity == givenSignal.Granularity & s.Path.Equals(givenSignal.Path))),
+                    It.Is<ShadowMissingValuePolicy<bool>>(smvp => smvp.NativeDataType == typeof(bool) & smvp.ShadowSignal.DataType == DataType.Boolean & smvp.ShadowSignal.Granularity == Granularity.Second)));
+            }
+
+            
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
