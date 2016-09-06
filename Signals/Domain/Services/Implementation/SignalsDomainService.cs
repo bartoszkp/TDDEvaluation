@@ -91,6 +91,7 @@ namespace Domain.Services.Implementation
             var signal = GetById(signalId);
             if (signal == null)
                 throw new NoSuchSignalException("Attempted to set missing value policy to a non exsisting signal");
+
             this.missingValuePolicyRepository.Set(signal, policy);
         }
 
