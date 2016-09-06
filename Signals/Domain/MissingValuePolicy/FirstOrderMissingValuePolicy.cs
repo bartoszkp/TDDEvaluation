@@ -13,22 +13,15 @@ namespace Domain.MissingValuePolicy
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum<T>>();
 
-            List<Datum<T>> filledList = new List<Datum<T>>();
-            var datumsArray = datums.ToList();
-
-            if (fromIncludedUtc == toExcludedUtc && datumsArray.Count == 1)
-            {
-                filledList.Add(datumsArray[0]);
-                return filledList;
-            }
-
             if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                 throw new Exception("First Order MVP can be set only for numeric types.");
 
-            /////////////////////////////////////////////////////////////////////////////
-            int counter = 1;
+            List<Datum<T>> filledList = new List<Datum<T>>();
+            var datumsArray = datums.ToList();
+
             var tmpDate = fromIncludedUtc;
-            while(tmpDate < toExcludedUtc)
+
+            if (fromIncludedUtc == toExcludedUtc)
             {
                 var earlier = earlierDatum;
                 var later = datumsArray.FirstOrDefault(s => s.Timestamp > tmpDate);
@@ -45,13 +38,14 @@ namespace Domain.MissingValuePolicy
 
                         else
                         {
+                            var sampleSmallQuantity = SampleCount(signal, earlier.Timestamp, tmpDate);
                             var sampleQuantity = SampleCount(signal, earlier.Timestamp, later.Timestamp);
 
                             filledList.Add(new Datum<T>()
                             {
                                 Timestamp = tmpDate,
                                 Signal = signal,
-                                Value = ValueSample(signal, earlier, later, sampleQuantity, counter),
+                                Value = ValueSample(signal, earlier, later, sampleQuantity, sampleSmallQuantity),
                                 Quality = WorestQuality(earlier.Quality, later.Quality)
                             });
                         }
@@ -59,10 +53,48 @@ namespace Domain.MissingValuePolicy
                 }
 
                 else filledList.Add(tmpDatum);
-
-                counter++;
                 tmpDate = IncreaseDate(signal, tmpDate);
-            }       
+            }
+
+            else
+            {
+                while (tmpDate < toExcludedUtc)
+                {
+                    var earlier = earlierDatum;
+                    var later = datumsArray.FirstOrDefault(s => s.Timestamp > tmpDate);
+                    var tmpDatum = datumsArray.FirstOrDefault(s => s.Timestamp == tmpDate);
+
+                    if (tmpDatum == null)
+                    {
+                        if (earlier == null || later == null)
+                        {
+                            if (earlier == null) earlier = datumsArray.LastOrDefault(s => s.Timestamp < tmpDate);
+                            if (later == null) later = laterDatum;
+
+                            if (earlier == null || later == null) filledList.Add(Datum<T>.CreateNone(signal, tmpDate));
+
+                            else
+                            {
+                                var sampleSmallQuantity = SampleCount(signal, earlier.Timestamp, tmpDate);
+                                var sampleQuantity = SampleCount(signal, earlier.Timestamp, later.Timestamp);
+
+                                filledList.Add(new Datum<T>()
+                                {
+                                    Timestamp = tmpDate,
+                                    Signal = signal,
+                                    Value = ValueSample(signal, earlier, later, sampleQuantity, sampleSmallQuantity),
+                                    Quality = WorestQuality(earlier.Quality, later.Quality)
+                                });
+                            }
+                        }
+                    }
+
+                    else filledList.Add(tmpDatum);
+                    
+                    tmpDate = IncreaseDate(signal, tmpDate);
+                }
+            }
+                  
 
             return filledList;            
         }
@@ -81,21 +113,21 @@ namespace Domain.MissingValuePolicy
                     {
                         var earlier = Convert.ToDecimal(earlierDatum.Value);
                         var later = Convert.ToDecimal(laterDatum.Value);
-                        var sample = Math.Round(((Math.Abs(later - earlier) / sampleCount)*counter), 4);
+                        var sample = Math.Round(((Math.Abs(later - earlier) / sampleCount) * counter + earlier), 4);
                         return (T)sample.Adapt(typeof(decimal),typeof(decimal));
                     }
                 case DataType.Double:
                     {
                         var earlier = Convert.ToDouble(earlierDatum.Value);
                         var later = Convert.ToDouble(laterDatum.Value);
-                        var sample = Math.Round(((Math.Abs(later - earlier) / sampleCount) * counter), 4);
+                        var sample = Math.Round(((Math.Abs(later - earlier) / sampleCount) * counter + earlier), 4);
                         return (T)sample.Adapt(typeof(double), typeof(double));
                     }
                 case DataType.Integer:
                     {
                         var earlier = Convert.ToInt32(earlierDatum.Value);
                         var later = Convert.ToInt32(laterDatum.Value);
-                        var sample = Convert.ToInt32(((Math.Abs(later - earlier) / sampleCount) * counter));
+                        var sample = Convert.ToInt32(((Math.Abs(later - earlier) / sampleCount) * counter + earlier));
                         return (T)sample.Adapt(typeof(int), typeof(int));
                     }
                 default: throw new Exception("Datum dataType unsupported");

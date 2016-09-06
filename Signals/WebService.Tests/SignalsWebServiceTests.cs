@@ -739,7 +739,7 @@ namespace WebService.Tests
                 Assert.AreEqual(expectedNumberOfResults, result.Length);
                 Assert.AreEqual(fromDate, result[0].Timestamp);
                 Assert.AreEqual(expectedResults[0].Quality, result[0].Quality);
-                Assert.AreEqual(expectedResults[0].Value, result[0].Value);
+                Assert.AreEqual(Math.Round(Convert  .ToDouble(expectedResults[0].Value),4), result[0].Value);
                 
             }
 
@@ -776,7 +776,7 @@ namespace WebService.Tests
                 Assert.AreEqual(expectedNumberOfResults, result.Length);
                 Assert.AreEqual(fromDate, result[0].Timestamp);
                 Assert.AreEqual(expectedResults[0].Quality, result[0].Quality);
-                Assert.AreEqual(expectedResults[0].Value, result[0].Value);
+                Assert.AreEqual(Math.Round(Convert.ToDouble(expectedResults[0].Value),4), result[0].Value);
             }
 
             [TestMethod]
