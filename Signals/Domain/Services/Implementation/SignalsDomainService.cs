@@ -255,7 +255,9 @@ namespace Domain.Services.Implementation
                 case Granularity.Week:
                     return (int)timespan.TotalDays / 7;
                 case Granularity.Month:
-                    return (int)timespan.TotalDays / 30;
+                    var monthTimeDifference = (newerData.Timestamp.Year - olderData.Timestamp.Year) * 12 +
+                        (newerData.Timestamp.Month - olderData.Timestamp.Month);
+                    return monthTimeDifference;
                 case Granularity.Year:
                     return (int)timespan.TotalDays / 365;
                 default:
