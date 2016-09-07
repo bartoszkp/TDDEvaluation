@@ -1010,7 +1010,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(signalId, new DateTime(2018, 1, 8), new DateTime(2018, 1, 15));
 
                 var expected = new[] {
-                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 1m}
+                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 8), Value = 1m}
                 };
 
                 Assert.IsTrue(CompareDatum(expected, result));
