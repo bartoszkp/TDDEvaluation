@@ -11,7 +11,7 @@ namespace DataAccess.AutoMappingOverrides
             mapping
                 .Id(mvp => mvp.Id)
                 .GeneratedBy
-                .Increment();
+                .Native();
 
             mapping
                 .References(mvp => mvp.Signal)

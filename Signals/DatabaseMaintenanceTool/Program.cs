@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Configuration;
 
 namespace DatabaseMaintenanceTool
@@ -13,13 +14,14 @@ namespace DatabaseMaintenanceTool
                 return;
             }
 
-            if (args[0] == "rebuild")
+            if (args.Any(a => a == "rebuild"))
             {
                 Console.WriteLine("Rebuilding database...");
 
                 CreateDatabaseIfNotExists();
 
-                DatabaseMaintenance.DatabaseMaintenance dm = new DatabaseMaintenance.DatabaseMaintenance(new DataAccess.UnitOfWorkProvider());
+                DatabaseMaintenance.DatabaseMaintenance dm = new DatabaseMaintenance.DatabaseMaintenance(
+                    new DataAccess.UnitOfWorkProvider(new DataAccess.DatabaseConfigurationProvider(false)));
 
                 dm.RebuildDatabase();
 

@@ -8,5 +8,8 @@
     <Setting Name="DatabaseMaintenanceToolExecutablePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\..\..\Signals\DatabaseMaintenanceTool\bin\Debug\DatabaseMaintenanceTool.exe</Value>
     </Setting>
+    <Setting Name="InMemoryDatabase" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

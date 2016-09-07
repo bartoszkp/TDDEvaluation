@@ -1,4 +1,5 @@
 ﻿using DataAccess;
+using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 
 namespace DatabaseMaintenance
@@ -14,8 +15,16 @@ namespace DatabaseMaintenance
 
         public void RebuildDatabase()
         {
-            new SchemaExport(this.sessionProvider.NHibernateConfiguration)
-                .Execute(true, true, false);
+            if (this.sessionProvider.Session == null)
+            {
+                new SchemaExport(this.sessionProvider.NHibernateConfiguration)
+                    .Execute(true, true, false);
+            }
+            else
+            {
+                new SchemaExport(this.sessionProvider.NHibernateConfiguration)
+                    .Execute(true, true, false, this.sessionProvider.Session.Connection, null);
+            }
         }
     }
 }

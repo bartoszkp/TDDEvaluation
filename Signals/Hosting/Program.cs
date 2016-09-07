@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ServiceModel.Description;
 using Microsoft.Practices.Unity;
 using Unity.Wcf;
@@ -10,10 +11,11 @@ namespace Hosting
     {
         static void Main(string[] args)
         {
+            var tcpHosting = args.Any(a => a == "tcp");
+            var inMemoryDatabase = args.Any(a => a == "inMemoryDatabase");
             var unityContainer = new UnityContainer();
-            new Bootstrapper.Bootstrapper().Run(unityContainer);
-
-            var tcpHosting = args.Length > 0 && args[0] == "tcp";
+            new Bootstrapper.Bootstrapper().Run(unityContainer, inMemoryDatabase);
+            
             Uri baseAddress = tcpHosting
                 ? new Uri("net.tcp://localhost:8080/signals")
                 : new Uri("http://localhost:8080/signals");

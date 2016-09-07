@@ -11,7 +11,7 @@ namespace DataAccess.AutoMappingOverrides
             mapping
                 .Id(s => s.Id)
                 .GeneratedBy
-                .Increment();
+                .Native();
         }
     }
 }

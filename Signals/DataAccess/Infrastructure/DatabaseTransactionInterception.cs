@@ -31,6 +31,8 @@ namespace DataAccess.Infrastructure
                 {
                     uow.Commit();
                 }
+
+                uow.Clear();
             }
 
             return result;

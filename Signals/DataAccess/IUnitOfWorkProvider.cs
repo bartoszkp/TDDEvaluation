@@ -2,10 +2,10 @@
 {
     public interface IUnitOfWorkProvider
     {
-        UnitOfWork CurrentUnitOfWork { get; }
+        UnitOfWorkBase CurrentUnitOfWork { get; }
 
-        UnitOfWork OpenUnitOfWork();
+        UnitOfWorkBase OpenUnitOfWork();
 
-        UnitOfWork OpenReadOnlyUnitOfWork();
+        UnitOfWorkBase OpenReadOnlyUnitOfWork();
     }
 }

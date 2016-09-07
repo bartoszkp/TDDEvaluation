@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -8,16 +9,20 @@ namespace SignalsIntegrationTests.Infrastructure
     {
         private const string ExecutableHostPathSettingName = "SignalsHostExecutablePath";
         private const string ExecutableDatabaseMaintenanceToolPathSettingName = "DatabaseMaintenanceToolExecutablePath";
+        private const string InMemoryDatabaseSettingName = "InMemoryDatabase";
 
         private Process serviceProcess = null;
 
         public static void RebuildDatabase()
         {
-            var databaseMaintenanceToolExecutable = GetExecutableFromSetting(ExecutableDatabaseMaintenanceToolPathSettingName);
+            if (!ShouldUseInMemoryDatabase())
+            {
+                var databaseMaintenanceToolExecutable = GetExecutableFromSetting(ExecutableDatabaseMaintenanceToolPathSettingName);
 
-            var process = Process.Start(databaseMaintenanceToolExecutable.FullName, "rebuild");
+                var process = Process.Start(databaseMaintenanceToolExecutable.FullName, "rebuild");
 
-            process.WaitForExit();
+                process.WaitForExit();
+            }
         }
 
         /// <summary>
@@ -40,6 +45,13 @@ namespace SignalsIntegrationTests.Infrastructure
 
             var serviceExecutable = GetExecutableFromSetting(ExecutableHostPathSettingName);
 
+            var arguments = new List<string>() { "tcp" };
+
+            if (ShouldUseInMemoryDatabase())
+            {
+                arguments.Add("inMemoryDatabase");
+            }
+
             ProcessStartInfo psi = new ProcessStartInfo()
             {
                 ErrorDialog = false,
@@ -47,7 +59,7 @@ namespace SignalsIntegrationTests.Infrastructure
                 FileName = serviceExecutable.FullName,
                 WorkingDirectory = serviceExecutable.DirectoryName,
                 UseShellExecute = false,
-                Arguments = "tcp"
+                Arguments = string.Join(" ", arguments)
             };
 
             serviceProcess = Process.Start(psi);
@@ -107,6 +119,11 @@ namespace SignalsIntegrationTests.Infrastructure
             }
 
             return executableFileInfo;
+        }
+
+        private static bool ShouldUseInMemoryDatabase()
+        {
+            return (bool)Properties.Settings.Default[InMemoryDatabaseSettingName];
         }
     }
 }

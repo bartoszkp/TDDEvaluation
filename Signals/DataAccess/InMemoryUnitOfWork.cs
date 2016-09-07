@@ -4,30 +4,24 @@ using NHibernate;
 
 namespace DataAccess
 {
-    public class UnitOfWork : UnitOfWorkBase
+    public class InMemoryUnitOfWork : UnitOfWorkBase
     {
-        private ISession session;
+        private static ISession GlobalSession;
+
+        public static void Initialize(ISession session)
+        {
+            InMemoryUnitOfWork.GlobalSession = session;
+        }
 
         public override ISession Session
         {
-            get { return session; }
+            get { return GlobalSession; }
         }
 
-        public UnitOfWork(ISession session, bool readOnly)
+        public InMemoryUnitOfWork()
         {
-            this.session = session;
-            ReadOnly = readOnly;
-
-            if (readOnly)
-            {
-                session.FlushMode = FlushMode.Never;
-            }
-            else
-            {
-                session.FlushMode = FlushMode.Commit;
-            }
-
-            Transaction = session.BeginTransaction(IsolationLevel.ReadCommitted);
+            ReadOnly = false;
+            Transaction = GlobalSession.BeginTransaction(IsolationLevel.ReadCommitted);
         }
 
         public override void Dispose()
@@ -56,7 +50,6 @@ namespace DataAccess
                 }
                 finally
                 {
-                    session.Close();
                     RaiseClosed();
                 }
             }

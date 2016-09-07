@@ -15,9 +15,11 @@ namespace DataAccess
         public Configuration NHibernateConfiguration { get; private set; }
 
         private readonly ISessionFactory sessionFactory;
-        private ThreadLocal<UnitOfWork> unitOfWorkLocal = new ThreadLocal<UnitOfWork>(() => null);
+        private ThreadLocal<UnitOfWorkBase> unitOfWorkLocal = new ThreadLocal<UnitOfWorkBase>(() => null);
 
-        public UnitOfWork CurrentUnitOfWork
+        public bool InMemory { get; private set; }
+
+        public UnitOfWorkBase CurrentUnitOfWork
         {
             get { return unitOfWorkLocal.Value; }
         }
@@ -35,20 +37,24 @@ namespace DataAccess
             }
         }
 
-        public UnitOfWorkProvider()
+        public UnitOfWorkProvider(IDatabaseConfigurationProvider databaseConfigurationProvider)
         {
-            this.sessionFactory = CreateSessionFactory();
+            InMemory = databaseConfigurationProvider.UseInMemoryDatabase;
+
+            if (InMemory)
+            {
+                this.sessionFactory = CreateSqliteSessionFactory();
+                InMemoryUnitOfWork.Initialize(this.sessionFactory.OpenSession());
+            }
+            else
+            {
+                this.sessionFactory = CreateMsSqlSessionFactory();
+            }
         }
 
-        private ISessionFactory CreateSessionFactory()
+        private ISessionFactory CreateMsSqlSessionFactory()
         {
-            var mappings = AutoMap
-                .Assemblies(new SignalsAutoMappingConfiguration(), typeof(Domain.Signal).Assembly, typeof(UnitOfWorkProvider).Assembly)
-                .IgnoreBase(typeof(Domain.Datum<>))
-                .IncludeBase(typeof(Domain.MissingValuePolicy.MissingValuePolicyBase))
-                .IgnoreBase(typeof(Domain.MissingValuePolicy.MissingValuePolicy<>))
-                .UseOverridesFromAssemblyOf<UnitOfWorkProvider>()
-                .Conventions.AddFromAssemblyOf<UnitOfWorkProvider>();
+            var mappings = CreateMappings();
                 
             this.NHibernateConfiguration = Fluently
                 .Configure()
@@ -60,15 +66,36 @@ namespace DataAccess
             return this.NHibernateConfiguration.BuildSessionFactory();
         }
 
-        private UnitOfWork OpenUnitOfWork(bool readOnly)
+        private ISessionFactory CreateSqliteSessionFactory()
+        {
+            var mappings = CreateMappings();
+
+            this.NHibernateConfiguration = Fluently
+                .Configure()
+                .Database(FluentNHibernate.Cfg.Db.SQLiteConfiguration.Standard.InMemory())
+                .Mappings(m => m.AutoMappings.Add(mappings))
+                .BuildConfiguration();
+
+            return this.NHibernateConfiguration.BuildSessionFactory();
+        }
+
+        private AutoPersistenceModel CreateMappings()
+        {
+            return AutoMap
+                .Assemblies(new SignalsAutoMappingConfiguration(), typeof(Domain.Signal).Assembly, typeof(UnitOfWorkProvider).Assembly)
+                .IgnoreBase(typeof(Domain.Datum<>))
+                .IncludeBase(typeof(Domain.MissingValuePolicy.MissingValuePolicyBase))
+                .IgnoreBase(typeof(Domain.MissingValuePolicy.MissingValuePolicy<>))
+                .UseOverridesFromAssemblyOf<UnitOfWorkProvider>()
+                .Conventions.AddFromAssemblyOf<UnitOfWorkProvider>();
+        }
+
+        private UnitOfWorkBase OpenUnitOfWork(bool readOnly)
         {
             if (unitOfWorkLocal.Value == null)
             {
-                var session = sessionFactory.OpenSession();
-                var unitOfWork = new UnitOfWork(session, readOnly);
-                unitOfWorkLocal.Value = unitOfWork;
-                unitOfWork.Closed += new EventHandler(OnUnitOfWorkClosed);
-                return unitOfWork;
+                unitOfWorkLocal.Value = BuildUpUnitOfWork(readOnly);
+                return unitOfWorkLocal.Value;
             }
             else
             {
@@ -76,19 +103,37 @@ namespace DataAccess
             }
         }
 
-        public UnitOfWork OpenReadOnlyUnitOfWork()
+        private UnitOfWorkBase BuildUpUnitOfWork(bool readOnly)
+        {
+            UnitOfWorkBase result;
+            if (InMemory)
+            {
+                result = new InMemoryUnitOfWork();
+            }
+            else
+            {
+                var session = sessionFactory.OpenSession();
+                result = new UnitOfWork(session, readOnly);
+            }
+
+            result.Closed += new EventHandler(OnUnitOfWorkClosed);
+
+            return result;
+        }
+
+        public UnitOfWorkBase OpenReadOnlyUnitOfWork()
         {
             return OpenUnitOfWork(true);
         }
 
-        public UnitOfWork OpenUnitOfWork()
+        public UnitOfWorkBase OpenUnitOfWork()
         {
             return OpenUnitOfWork(false);
         }
 
         private void OnUnitOfWorkClosed(object sender, EventArgs e)
         {
-            UnitOfWork unitOfWork = (UnitOfWork)sender;
+            UnitOfWorkBase unitOfWork = (UnitOfWorkBase)sender;
             unitOfWork.Closed -= OnUnitOfWorkClosed;
 
             unitOfWorkLocal.Value = null;
