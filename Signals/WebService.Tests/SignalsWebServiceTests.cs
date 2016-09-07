@@ -324,7 +324,8 @@ namespace WebService.Tests
                 { new Dto.Datum() { Value = (double)1, Timestamp = new DateTime(2018, 1, 2) },
                   new Dto.Datum() { Value = (double)2, Timestamp = new DateTime(2018, 1, 8) }});
             }
-            //
+            
+
             [TestMethod]
             public void GivenASignalWithSpecificDataAndFOMVP_WhenGettingData_ReturnedIsExpectedResult()
             {
@@ -348,6 +349,16 @@ namespace WebService.Tests
                     new DateTime(2018, 1, 1), new DateTime(2018, 1, 6))).Returns(new Datum<decimal>[] { new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2017, 12, 31), Value = 10m },
                                                                                                         new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2018, 1, 2), Value = 30m } });
 
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataOlderThan<decimal>
+                (It.Is<Signal>(s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path)),
+                new DateTime(2018,1,1), 1))
+                .Returns(new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2018, 1, 1), Value = 20m, Quality = Quality.Bad } });
+
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataNewerThan<decimal>
+                (It.Is<Signal>(s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path)),
+                new DateTime(2018,1,1), 1))
+                .Returns(new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2018, 1, 2), Value = 30m, Quality = Quality.Bad } });
+
                 var expectedResult = new Datum<decimal>[] { new Datum<decimal>() { Timestamp = new DateTime(2018,1,1), Value = 20m, Quality = Quality.Bad},
                                                             new Datum<decimal>() { Timestamp = new DateTime(2018,1,2), Value = 30m, Quality = Quality.Bad },
                                                             new Datum<decimal>() { Timestamp = new DateTime(2018,1,3), Value = 0m, Quality = Quality.None },
@@ -360,7 +371,7 @@ namespace WebService.Tests
                 {
                     Assert.AreEqual(expectedResult[i].Timestamp, result[i].Timestamp);
                     Assert.AreEqual(expectedResult[i].Value, result[i].Value);
-                    Assert.AreEqual(expectedResult[i].Quality, result[i].Quality);
+                    Assert.AreEqual(expectedResult[i].Quality, result[i].Quality.ToDomain<Domain.Quality>());
                 }
             }
 
