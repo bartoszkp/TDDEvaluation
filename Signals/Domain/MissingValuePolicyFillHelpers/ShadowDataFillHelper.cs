@@ -21,21 +21,7 @@ namespace Domain
             while (currentDate < toExcluded)
             {
                 if (data.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
-                {
-                    var shadowDatum = shadowData.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0);
-                    if (shadowDatum == null)
-                    {
-                        var missingDatum = new Datum<T>()
-                        {
-                            Value = default(T),
-                            Timestamp = currentDate,
-                            Quality = Quality.None
-                        };
-                        data.Add(missingDatum);
-                    }
-                    else
-                        data.Add(shadowDatum);
-                }
+                    data.Add(shadowData.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0));
 
                 currentDate = AddTime(currentDate, mvp.Signal.Granularity);
             }

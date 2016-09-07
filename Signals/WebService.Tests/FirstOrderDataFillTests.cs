@@ -52,12 +52,7 @@ namespace WebService.Tests
             var to = new DateTime(2000, 7, 1);
 
             signalsDataRepositoryMock.Setup(s => s.GetData<decimal>(returnedSignal, from, to))
-               .Returns(new List<Datum<decimal>>()
-               {
-                   new Datum<decimal> { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
-                   new Datum<decimal> { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
-                   new Datum<decimal> { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
-               });
+               .Returns(new List<Datum<decimal>>(){});
 
             var result = signalsWebService.GetData(1, from, to);
             var resultDatum = result.ElementAt(0);
@@ -104,12 +99,7 @@ namespace WebService.Tests
             var to = new DateTime(2000, 5, 7);
 
             signalsDataRepositoryMock.Setup(s => s.GetData<int>(returnedSignal, from, to))
-               .Returns(new List<Datum<int>>()
-               {
-                   new Datum<int> { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 1 },
-                   new Datum<int> { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 5), Value = 2 },
-                   new Datum<int> { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 8), Value = 5 }
-               });
+               .Returns(new List<Datum<int>>() {});
 
             var result = signalsWebService.GetData(1, from, to);
             var resultDatum = result.ElementAt(0);

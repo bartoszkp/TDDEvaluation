@@ -144,66 +144,42 @@ namespace Domain.Services.Implementation
                 throw new InvalidTimeStampException();
             }
 
-            var mvp = GetMissingValuePolicy(signal);
+            var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy<T>;
 
             var data = this.signalsDataRepository
-                .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToArray();
-
-            var dataList = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
 
             if (data == null)
                 return null;
 
-
             if (mvp is ZeroOrderMissingValuePolicy<T>)
             {
-                ZeroOrderDataFillHelper.FillMissingData(this, signal, dataList, fromIncludedUTC, toExcludedUTC);
-                return dataList.OrderBy(s => s.Timestamp).ToList();
+                Datum<T> olderDatum = null;
+                var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUTC, 1);
+                if (olderData.Count() > 0)
+                    olderDatum = olderData.First();
+
+                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC, olderDatum).ToList();
             }
 
-            if (mvp is SpecificValueMissingValuePolicy<T>)
+            else if (mvp is SpecificValueMissingValuePolicy<T>)
+                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToList();
+
+            else if (mvp is FirstOrderMissingValuePolicy<T>)
             {
-                var specificMvp = mvp as SpecificValueMissingValuePolicy<T>;
-                SpecificDataFillHelper.FillMissingData(specificMvp, dataList, fromIncludedUTC, toExcludedUTC);
-                return dataList.OrderBy(s => s.Timestamp).ToList();
+                FirstOrderDataFillHelper.FillMissingData(signal, this, data, fromIncludedUTC, toExcludedUTC);
             }
 
-            if (mvp is FirstOrderMissingValuePolicy<T>)
+            else if (mvp is NoneQualityMissingValuePolicy<T>)
             {
-                var dataIntList = this.signalsDataRepository
-                    .GetData<T>(signal, fromIncludedUTC, toExcludedUTC)?.ToList();
-
-                FirstOrderDataFillHelper.FillMissingData(signal, this, dataIntList, fromIncludedUTC, toExcludedUTC);
-                dataList.Clear();
-                foreach (var item in dataIntList)
-                {
-                    if (item.Timestamp >= fromIncludedUTC && item.Timestamp < toExcludedUTC)
-                        dataList.Add(new Datum<T>()
-                        {
-                            Value = (T)Convert.ChangeType(item.Value, typeof(T)),
-                            Timestamp = item.Timestamp,
-                            Quality = item.Quality
-
-                        });
-                }
-
-                return dataList.OrderBy(s => s.Timestamp).ToList();
-
+                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToList();
+                return data.OrderBy(s => s.Timestamp).ToList();
             }
 
-            if (mvp is NoneQualityMissingValuePolicy<T>)
-            {
-                var noneQualityMvp = mvp as NoneQualityMissingValuePolicy<T>;
-                NoneQualityDataFillHelper.FillMissingData(signal, dataList, fromIncludedUTC, toExcludedUTC);
-                return dataList.OrderBy(s => s.Timestamp).ToList();
-            }
-
-            if (mvp is ShadowMissingValuePolicy<T>)
+            else if (mvp is ShadowMissingValuePolicy<T>)
             {
                 var ShadowMvp = mvp as ShadowMissingValuePolicy<T>;
-                ShadowDataFillHelper.FillMissingData<T>(ShadowMvp, this, dataList, fromIncludedUTC, toExcludedUTC);
-                return dataList.OrderBy(s => s.Timestamp).ToList();
+                ShadowDataFillHelper.FillMissingData<T>(ShadowMvp, this, data, fromIncludedUTC, toExcludedUTC);
             }
 
             return data.OrderBy(d => d.Timestamp).ToArray();
