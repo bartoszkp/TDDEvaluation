@@ -144,7 +144,7 @@ namespace Domain.Services.Implementation
                     }
                     else if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                     {
-                        datum = SetDatumForZeroOrderMissingValuePolicy(returnList, datum);
+                        datum = SetDatumForZeroOrderMissingValuePolicy<T>(signal, fromIncludedUtc);
                     }
                     else if (mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
                     {
@@ -172,26 +172,29 @@ namespace Domain.Services.Implementation
             };
         }
 
-        private Datum<T> SetDatumForZeroOrderMissingValuePolicy<T>(List<Datum<T>> returnList, Datum<T> datum)
+        private Datum<T> SetDatumForZeroOrderMissingValuePolicy<T>(Signal signal, DateTime fromIncludedUtc)
         {
-            if (returnList.Count == 0)
+            var lastData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
+            if (lastData == null)
             {
-                datum = new Datum<T>()
+                return new Datum<T>()
                 {
                     Quality = Quality.None,
-                    Value = default(T)
+                    Signal = signal,
+                    Timestamp = SubstractDateTime(signal.Granularity, fromIncludedUtc),
+                    Value = default(T),
                 };
             }
             else
             {
-                datum = new Datum<T>()
+                return new Datum<T>()
                 {
-                    Quality = returnList.Last().Quality,
-                    Value = returnList.Last().Value
+                    Quality = lastData.ElementAt(0).Quality,
+                    Signal = signal,
+                    Timestamp = lastData.ElementAt(0).Timestamp,
+                    Value = lastData.ElementAt(0).Value,
                 };
             }
-
-            return datum;
         }
 
         private Datum<T> SetDatumForFirstOrderMissingValuePolicy<T>(Signal signal, Datum<T> datum, DateTime fromIncludedUtc, Quality quality, ref T step)
@@ -422,6 +425,34 @@ namespace Domain.Services.Implementation
         private void DeleteSignalData<T>(Signal signal)
         {
             signalsDataRepository.DeleteData<T>(signal);
+        }
+
+        private DateTime SubstractDateTime(Granularity granularity, DateTime dateTime)
+        {
+            switch(granularity)
+            {
+                case Granularity.Second:
+                    return dateTime.AddSeconds(-1);
+
+                case Granularity.Minute:
+                    return dateTime.AddMinutes(-1);
+
+                case Granularity.Hour:
+                    return dateTime.AddHours(-1);
+
+                case Granularity.Day:
+                    return dateTime.AddDays(-1);
+
+                case Granularity.Week:
+                    return dateTime.AddDays(-7);
+
+                case Granularity.Month:
+                    return dateTime.AddMonths(-1);
+
+                case Granularity.Year:
+                    return dateTime.AddYears(-1);
+            }
+            return new DateTime();
         }
     }
 }
