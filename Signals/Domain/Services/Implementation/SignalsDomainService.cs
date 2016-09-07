@@ -138,7 +138,7 @@ namespace Domain.Services.Implementation
                     xx = gettingList.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
                 if (xx == null)
                 {
-                    if (signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1) != null && mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                    if (signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1) != null && mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                     {
                         datum = SetDatumForSpecificOrderMissingValuePolicy<T>(signal, fromIncludedUtc);
                     }
