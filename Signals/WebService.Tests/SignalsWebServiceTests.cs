@@ -2010,7 +2010,83 @@ namespace WebService.Tests
                 }
             }
 
-            //Bug fixing 
+            [TestMethod]
+            public void GivenAnExampleSignal_WhenGettingData_ForSpecificTimestamp_FirstOrderCorrectlyFillsMissingData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("example/signal")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 2, 1), Value = (int)10 },
+                        new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 4, 1), Value = (int)30 }
+                };
+
+                var filledDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2018, 1, 1),  Value = (int)0 },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 2, 1),  Value = (int)10 },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 3, 1),  Value = (int)20 },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 4, 1),  Value = (int)30 },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2018, 5, 1),  Value = (int)0 },
+                };
+
+                var firstTimestamp = new DateTime(2018, 1, 1);
+                var lastTimestamp = new DateTime(2018, 6, 1);
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                GivenASignal(existingSignal);
+
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<int>(existingSignal, firstTimestamp, lastTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<int>>>);
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetDataNewerThan<int>(existingSignal, new DateTime(2018, 3, 1), 1))
+                    .Returns(new Datum<int>[]
+                        {
+                            new Datum<int>() {Quality = Quality.Bad, Timestamp = new DateTime(2018, 3, 1), Value = 30 }
+                        });
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetDataOlderThan<int>(existingSignal, new DateTime(2018, 3, 1), 1))
+                    .Returns(new Datum<int>[]
+                        {
+                            new Datum<int>() {Quality = Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 10 }
+                        });
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+
+                int index = 0;
+                foreach (var fd in filledDatum)
+                {
+                    Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
+                    Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
+                    Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
+                    index++;
+                }
+            }
 
             [TestMethod]
             public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathWithCollectionOfSignalsFromMainDirectoryAndSubpathsFromMainDirectory()
