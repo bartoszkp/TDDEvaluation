@@ -11,21 +11,20 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Month,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Day,
                 Path = new Path() { Components = new[] { "FirstOrderTests" } }
             }).Id.Value;
 
-            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
+            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Integer });
 
             client.SetData(id, new Datum[]
             {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
-                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
+                new Datum() { Timestamp = new DateTime(2000, 1, 2), Value = 10, Quality = Quality.Good },
+                new Datum() { Timestamp = new DateTime(2000, 1, 5), Value = 30, Quality = Quality.Good }
             });
 
-            var result = client.GetData(id, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1));
+            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
 
             foreach (var d in result)
             {
@@ -33,6 +32,7 @@ namespace ExampleSignalClient
             }
 
             Console.ReadKey();
+
         }
     }
 }
