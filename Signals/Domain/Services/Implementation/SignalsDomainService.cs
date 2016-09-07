@@ -162,10 +162,10 @@ namespace Domain.Services.Implementation
             else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
             {
                 Datum<T> returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
-                if (returnDatum.Value == null)
+                if (returnDatum.Value == null )
                 {
                     returnDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).FirstOrDefault();
-                    if (returnDatum == null)
+                    if (returnDatum == null )
                         returnDatum = Datum<T>.CreateNone(signal, timeStamp);
                     else
                         returnDatum.Timestamp = new DateTime(timeStamp.Ticks);

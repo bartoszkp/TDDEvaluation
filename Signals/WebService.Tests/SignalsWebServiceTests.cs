@@ -986,6 +986,37 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GetData_OlderDataExist_ZeroOrderMustUseThatData()
+            {
+                int signalId = 1;
+
+                List<Domain.Datum<decimal>> givenDatums = new List<Domain.Datum<decimal>>() {
+                 new Domain.Datum<decimal> {Quality = Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 1m }
+                };
+
+                var signal = SignalWith(
+                   id: signalId,
+                   dataType: Domain.DataType.Decimal,
+                   granularity: Domain.Granularity.Week,
+                   path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDecimal());
+
+
+                signalsDataRepositoryMock.Setup(x => x.GetDataOlderThan<decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<int>())).Returns(givenDatums);
+                signalsDataRepositoryMock.Setup(x=>x.GetData<decimal>(It.IsAny<Signal>(),It.IsAny<DateTime>(),It.IsAny<DateTime>())).Returns(Enumerable.Empty<Datum<decimal>>);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2018, 1, 8), new DateTime(2018, 1, 15));
+
+                var expected = new[] {
+                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 1m}
+                };
+
+                Assert.IsTrue(CompareDatum(expected, result));
+            }
+
+            [TestMethod]
             public void GivenASignalAndMissingValuePolicy_WhenDeletingSignal_CheckIfMVPIsSettedNull()
             {
                 int signalId = 6;
