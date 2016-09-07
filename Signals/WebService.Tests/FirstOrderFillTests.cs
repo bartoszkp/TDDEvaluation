@@ -186,7 +186,7 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerMinuteSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData_ForIssue31()
         {
-            SetupFirstOrderPolicyFroSpecificExample(Granularity.Hour, new DateTime(2000, 1, 1, 1, 1, 0), new DateTime(2000, 1, 1, 1, 4, 0), new List<Datum<int>>()
+            SetupFirstOrderPolicyFroSpecificExample(Granularity.Minute, new DateTime(2000, 1, 1, 1, 1, 0), new DateTime(2000, 1, 1, 1, 4, 0), new List<Datum<int>>()
             {
                 new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 1, 2, 0), Value = (int)10 },
                 new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 1, 5, 0), Value = (int)30 }

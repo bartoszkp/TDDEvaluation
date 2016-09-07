@@ -369,17 +369,20 @@ namespace Domain.Services.Implementation
 
                                             for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
                                             {
-                                                valueToAdd += avarage;
-                                                var itemToAdd = new Datum<T>()
+                                                if (checkedDateTime != toExcludedUtc)
                                                 {
-                                                    Quality = qualityToAdd,
-                                                    Signal = signal,
-                                                    Timestamp = checkedDateTime,
-                                                    Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                };
+                                                    valueToAdd += avarage;
+                                                    var itemToAdd = new Datum<T>()
+                                                    {
+                                                        Quality = qualityToAdd,
+                                                        Signal = signal,
+                                                        Timestamp = checkedDateTime,
+                                                        Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                                    };
 
-                                                returnList.Add(itemToAdd);
-                                                checkedDateTime = checkedDateTime.AddMinutes(1);
+                                                    returnList.Add(itemToAdd);
+                                                    checkedDateTime = checkedDateTime.AddMinutes(1);
+                                                }
                                             }
                                             i--;
 
