@@ -150,45 +150,18 @@ namespace Domain.Services.Implementation
 
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
             if (result != null) result.OrderBy(s=>s.Timestamp);
-
             var policy = GetMissingValuePolicy(signal);
+
             if (policy == null) return result;
+
             else
             {
-                var timeNextMethod = GetTimeNextMethod(signal.Granularity);
-                var timePreviousMethod = GetTimePreviousMethod(signal.Granularity);
-                var date = fromIncluded;
-                var newData = new List<Datum<T>>();
-
-                if (policy is NoneQualityMissingValuePolicy<T>)
+                if (policy is ZeroOrderMissingValuePolicy<T>)
                 {
-                    if (fromIncluded == toExcluded)
-                    {
-                        var datum = result.FirstOrDefault(d => d.Timestamp == date);
-                        newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
-                    }
-                    else
-                    {
-                        while (date < toExcluded)
-                        {
-                            var datum = result.FirstOrDefault(d => d.Timestamp == date);
-                            newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
-                            date = timeNextMethod(date);
-                        }
-                    }
-                }
-                else if (policy is SpecificValueMissingValuePolicy<T>)
-                {
-                    var mvp = policy as SpecificValueMissingValuePolicy<T>;
-                    while (date < toExcluded)
-                    {
-                        var datum = result.FirstOrDefault(d => d.Timestamp == date);
-                        newData.Add(datum ?? Datum<T>.CreateSpecific(policy.Signal, date, mvp.Quality, mvp.Value));
-                        date = timeNextMethod(date);
-                    }
-                }
-                else if (policy is ZeroOrderMissingValuePolicy<T>)
-                {
+                    var timeNextMethod = GetTimeNextMethod(signal.Granularity);
+                    var timePreviousMethod = GetTimePreviousMethod(signal.Granularity);
+                    var date = fromIncluded;
+                    var newData = new List<Datum<T>>();
                     while (date < toExcluded)
                     {
                         Datum<T> datum;
@@ -215,8 +188,9 @@ namespace Domain.Services.Implementation
                         }
                         date = timeNextMethod(date);
                     }
-                }
 
+                    return newData;
+                }
                 else if (policy is FirstOrderMissingValuePolicy<T>)
                 {
                     if (typeof(T) == typeof(string) | typeof(T) == typeof(bool)) return signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
@@ -286,15 +260,12 @@ namespace Domain.Services.Implementation
 
                     }
                     return filledData;
-
-                    
                 }
-
                 else if (policy is ShadowMissingValuePolicy<T>)
                 {
                     if (fromIncluded > toExcluded) return new Datum<T>[] { };
 
-                    else if(fromIncluded == toExcluded)
+                    else if (fromIncluded == toExcluded)
                     {
                         var filledData = new List<Datum<T>>();
                         var signalData = signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
@@ -366,27 +337,67 @@ namespace Domain.Services.Implementation
                     }
                 }
 
-                else throw new NotImplementedException();
+                else
+                {
+                    var timeNextMethod = GetTimeNextMethod(signal.Granularity);
+                    var timePreviousMethod = GetTimePreviousMethod(signal.Granularity);
+                    var date = fromIncluded;
+                    var newData = new List<Datum<T>>();
 
-                return newData;
+                    if (policy is NoneQualityMissingValuePolicy<T>)
+                    {
+                        if (fromIncluded == toExcluded)
+                        {
+                            var datum = result.FirstOrDefault(d => d.Timestamp == date);
+                            newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
+                        }
+                        else
+                        {
+                            while (date < toExcluded)
+                            {
+                                var datum = result.FirstOrDefault(d => d.Timestamp == date);
+                                newData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, date));
+                                date = timeNextMethod(date);
+                            }
+                        }
+                    }
+                    else if (policy is SpecificValueMissingValuePolicy<T>)
+                    {
+                        var mvp = policy as SpecificValueMissingValuePolicy<T>;
+                        while (date < toExcluded)
+                        {
+                            var datum = result.FirstOrDefault(d => d.Timestamp == date);
+                            newData.Add(datum ?? Datum<T>.CreateSpecific(policy.Signal, date, mvp.Quality, mvp.Value));
+                            date = timeNextMethod(date);
+                        }
+                    }
+
+                    else throw new NotImplementedException();
+
+                    return newData;
+                }
             }
         }
+       
 
         private void AddToListSuitableDatumWhenGivenIsFOMVP<T>(Signal signal, IEnumerable<Datum<T>> data, List<Datum<T>> filledData, DateTime tmp)
         {
             Datum<T> datumWithTimestampEqualToTmp = null;
 
-            foreach (var datum in data)
+            if (data != null)
             {
-                if (datum.Timestamp == tmp)
+                foreach (var datum in data)
                 {
-                    datumWithTimestampEqualToTmp = new Datum<T>()
+                    if (datum.Timestamp == tmp)
                     {
-                        Quality = datum.Quality,
-                        Value = datum.Value,
-                        Timestamp = tmp
-                    };
-                    break;
+                        datumWithTimestampEqualToTmp = new Datum<T>()
+                        {
+                            Quality = datum.Quality,
+                            Value = datum.Value,
+                            Timestamp = tmp
+                        };
+                        break;
+                    }
                 }
             }
 
@@ -460,20 +471,26 @@ namespace Domain.Services.Implementation
 
         private void AddToListSuitableDatumWhenGivenIsSMVP<T>(List<Datum<T>> filledData, IEnumerable<Datum<T>> signalData, IEnumerable<Datum<T>> shadowData, DateTime tmp)
         {
-            foreach (var datum in signalData)
+            if (signalData != null)
             {
-                if (tmp == datum.Timestamp)
+                foreach (var datum in signalData)
                 {
-                    filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
-                    return;
+                    if (tmp == datum.Timestamp)
+                    {
+                        filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
+                        return;
+                    }
                 }
             }
-            foreach (var datum in shadowData)
+            if (shadowData != null)
             {
-                if (tmp == datum.Timestamp)
+                foreach (var datum in shadowData)
                 {
-                    filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
-                    return;
+                    if (tmp == datum.Timestamp)
+                    {
+                        filledData.Add(new Datum<T> { Id = datum.Id, Quality = datum.Quality, Signal = datum.Signal, Timestamp = datum.Timestamp, Value = datum.Value });
+                        return;
+                    }
                 }
             }
             filledData.Add(new Datum<T>() { Timestamp = tmp, Quality = Quality.None, Value = default(T) });
