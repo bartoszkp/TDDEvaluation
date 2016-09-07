@@ -175,7 +175,7 @@ namespace Domain.Services.Implementation
         private Datum<T> SetDatumForZeroOrderMissingValuePolicy<T>(Signal signal, DateTime fromIncludedUtc)
         {
             var lastData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
-            if (lastData == null)
+            if (lastData.Count() == 0)
             {
                 return new Datum<T>()
                 {

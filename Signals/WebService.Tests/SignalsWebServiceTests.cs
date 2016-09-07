@@ -2309,8 +2309,6 @@ namespace WebService.Tests
                 {
                         new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 14),  Value = default(string) },
                         new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 15),  Value = "middle" },
-
-
                 };
                 var firstTimestamp = new DateTime(2000, 1, 14);
                 var lastTimestamp = new DateTime(2000, 1, 26);
