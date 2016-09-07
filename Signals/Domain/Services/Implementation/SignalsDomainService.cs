@@ -144,8 +144,6 @@ namespace Domain.Services.Implementation
                 throw new InvalidTimeStampException();
             }
 
-            MissingValuePolicy<T> missingValuePolicy;
-
             var mvp = GetMissingValuePolicy(signal);
 
             var data = this.signalsDataRepository
