@@ -12,7 +12,8 @@ namespace Domain
     public class SpecificDataFillHelper : MissingValuePolicyFillHelper
     {
 
-        public static List<Datum<T>> FillMissingData<T>(SpecificValueMissingValuePolicy<T> mvp, List<Datum<T>> data, DateTime fromIncluded, DateTime toExcluded)
+        public static List<Datum<T>> FillMissingData<T>(SpecificValueMissingValuePolicy<T> mvp, 
+            List<Datum<T>> data, DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 

@@ -72,6 +72,7 @@
     <Compile Include="Infrastructure\UnityRegisterAttribute.cs" />
     <Compile Include="MissingValuePolicyFillHelpers\MissingValuePolicyFillHelper.cs" />
     <Compile Include="MissingValuePolicyFillHelpers\NoneQualityDataFillHelper.cs" />
+    <Compile Include="MissingValuePolicyFillHelpers\ShadowDataFillHelper.cs" />
     <Compile Include="MissingValuePolicy\MissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\FirstOrderMissingValuePolicy.cs" />
     <Compile Include="MissingValuePolicy\ZeroOrderMissingValuePolicy.cs" />

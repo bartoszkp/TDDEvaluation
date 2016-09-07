@@ -10,7 +10,8 @@ namespace Domain
     [Infrastructure.NHibernateIgnore]
     public class NoneQualityDataFillHelper : MissingValuePolicyFillHelper
     {
-        public static List<Datum<T>> FillMissingData<T>(Signal signal, List<Datum<T>> data, DateTime fromIncluded, DateTime toExcluded)
+        public static List<Datum<T>> FillMissingData<T>(Signal signal, 
+            List<Datum<T>> data, DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 

@@ -201,6 +201,13 @@ namespace Domain.Services.Implementation
                 return dataList.OrderBy(s => s.Timestamp).ToList();
             }
 
+            if (mvp is ShadowMissingValuePolicy<T>)
+            {
+                var ShadowMvp = mvp as ShadowMissingValuePolicy<T>;
+                ShadowDataFillHelper.FillMissingData<T>(ShadowMvp, this, dataList, fromIncludedUTC, toExcludedUTC);
+                return dataList.OrderBy(s => s.Timestamp).ToList();
+            }
+
             return data.OrderBy(d => d.Timestamp).ToArray();
         }
 

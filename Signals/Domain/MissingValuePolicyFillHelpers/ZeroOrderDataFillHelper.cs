@@ -11,7 +11,8 @@ namespace Domain
     public class ZeroOrderDataFillHelper : MissingValuePolicyFillHelper
     {
 
-        public static List<Datum<T>> FillMissingData<T>(SignalsDomainService service, Signal signal, List<Datum<T>> data, DateTime fromIncluded, DateTime toExcluded)
+        public static List<Datum<T>> FillMissingData<T>(SignalsDomainService service, Signal signal, 
+            List<Datum<T>> data, DateTime fromIncluded, DateTime toExcluded)
         {
             var currentDate = new DateTime(fromIncluded.Ticks);
 
