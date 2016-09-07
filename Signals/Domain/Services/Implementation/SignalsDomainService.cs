@@ -140,7 +140,7 @@ namespace Domain.Services.Implementation
                 {
                     if (signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1) != null && mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                     {
-                        datum = SetDatumForSpecificOrderMissingValuePolicy<T>(signal, fromIncludedUtc);
+                        datum = SetDatumForSpecificOrderMissingValuePolicy<T>((MissingValuePolicy.SpecificValueMissingValuePolicy<T>)mvp);
                     }
                     else if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                     {
@@ -163,13 +163,12 @@ namespace Domain.Services.Implementation
             return returnList.ToArray();
         }
 
-        private Datum<T> SetDatumForSpecificOrderMissingValuePolicy<T>(Signal signal, DateTime fromIncludedUtc)
+        private Datum<T> SetDatumForSpecificOrderMissingValuePolicy<T>(MissingValuePolicy.SpecificValueMissingValuePolicy<T> mvp)
         {
-            var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
             return new Datum<T>()
             {
-                Quality = olderDatum.First().Quality,
-                Value = olderDatum.First().Value
+                Quality = mvp.Quality,
+                Value = mvp.Value
             };
         }
 
