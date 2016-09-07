@@ -271,6 +271,35 @@ namespace WebService.Tests
         }
 
         [TestMethod]
+        public void GivenAnIntegerYearSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData_ForIssue31()
+        {
+            SetupFirstOrderPolicyFroSpecificExample(Granularity.Year, new DateTime(2001, 1, 1), new DateTime(2004, 1, 1), new List<Datum<int>>()
+            {
+                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2002, 1, 1), Value = (int)10 },
+                new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2005, 1, 1), Value = (int)30 }
+            });
+
+            var result = signalsWebService.GetData(1, new DateTime(2001, 1, 1), new DateTime(2004, 1, 1));
+
+            var expectedDatum = new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2001, 1, 1), Value = (int)0 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2002, 1, 1), Value = (int)10 },
+                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2003, 1, 1), Value = (int)17 },
+            };
+
+            int i = 0;
+
+            Assert.AreEqual(3, result.Count());
+            foreach (var actualData in result)
+            {
+                Assert.AreEqual(expectedDatum[i].Timestamp, actualData.Timestamp);
+
+                i++;
+            }
+        }
+
+        [TestMethod]
         public void GivenAnIntegerWeeklySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
             SetupFirstOrderPolicy(Granularity.Week,
