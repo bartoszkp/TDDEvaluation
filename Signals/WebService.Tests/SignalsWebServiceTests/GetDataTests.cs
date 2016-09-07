@@ -461,6 +461,45 @@ namespace WebService.Tests.SignalsWebServiceTests
             signalsWebService.GetData(signalId, new DateTime(2014, 1, 1), new DateTime(2018, 1, 1));
         }
 
+        [TestMethod]
+        public void GivenTwoSignals_GetDataWihShadowMVP_ExpectedResult()
+        {
+            int signalId = 3;
+            int shadowSignalId = 5;
+            Signal signal = Utils.SignalWith(signalId, Domain.DataType.String, Domain.Granularity.Day);
+            Signal shadowSignal = Utils.SignalWith(shadowSignalId, Domain.DataType.String, Domain.Granularity.Day);
+
+            SetupGet(signal);
+            SetupGet(shadowSignal);
+
+            var signalDatums = new[] {
+               new Domain.Datum<string> {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1,2), Value = "signal1" },
+               new Domain.Datum<string> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2016,1,3), Value = "signal2"  }
+            };
+
+            var shadowSignalsDatums = new[]{
+                new Domain.Datum<string> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2016,1,2), Value = "shadowSignal1" },
+                new Domain.Datum<string> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2016,1,4), Value = "shadowSignal2" }
+            };
+
+            var expectedResult = new[]
+            {
+                new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2016,1,1), Value = null }, //default value for string
+                new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016,1,2), Value = "signal1" },
+                new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016,1,3), Value = "signal2"  },
+                new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2016,1,4), Value = "shadowSignal2" }
+            };
+
+            SetupGetData<string>(signalDatums, signal);
+            SetupGetData<string>(shadowSignalsDatums, shadowSignal);
+            
+            SetupMVPGet(new ShadowMissingValuePolicyString() { ShadowSignal = shadowSignal });
+
+            var result = signalsWebService.GetData(signalId, new DateTime(2016, 1, 1), new DateTime(2016, 1, 5));
+
+            Assert.IsTrue(Utils.CompareDatum(result.ToArray(), expectedResult));
+        }
+
         public void GivenASignal_WhenGettingSignalDataWithInvalidMilliseconds_ExpectHandledExceptions()
         {
             Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMilliseconds(1)));

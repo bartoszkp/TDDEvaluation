@@ -63,7 +63,7 @@ namespace WebService.Tests.SignalsWebServiceTests.Infrastructure
         {
             return a.Quality == b.Quality &&
                 a.Timestamp == b.Timestamp &&
-                a.Value.ToString() == b.Value.ToString();
+                a.Value?.ToString() == b.Value?.ToString();
         }
 
         public static bool ComparePath(Domain.Path a, Domain.Path b)

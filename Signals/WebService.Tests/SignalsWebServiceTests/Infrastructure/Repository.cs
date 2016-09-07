@@ -59,6 +59,13 @@ namespace WebService.Tests.SignalsWebServiceTests.Infrastructure
                 .Returns(data);
         }
 
+        protected void SetupGetData<T>(IEnumerable<Domain.Datum<T>> data, Domain.Signal signal)
+        {
+            signalsDataRepositoryMock
+                .Setup(sdr => sdr.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signal.Id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Returns(data);
+        }
+
         protected void SetupMVPGet(Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
         {
             missingValuePolicyRepoMock
