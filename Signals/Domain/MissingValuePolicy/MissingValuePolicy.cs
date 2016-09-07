@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Domain.Infrastructure;
+using Domain.Repositories;
 
 namespace Domain.MissingValuePolicy
 {
@@ -20,6 +21,6 @@ namespace Domain.MissingValuePolicy
         [NHibernateIgnore]
         public override Type NativeDataType { get { return typeof(T); } }
 
-        public abstract IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+        public abstract IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, ISignalsDataRepository signalsDataRepository);
     }
 }

@@ -164,6 +164,22 @@ namespace WebService.Tests
                 new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyBoolean(), filledDatum);
         }
 
+        [TestMethod]
+        public void TestFixedBug_ZeroOderPolicyWorkForWeekSignals()
+        {
+            var existingSignal = SignalWith(1, DataType.Decimal, Granularity.Week, Path.FromString("root/signal1"));
+            var existingDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1),  Value = (decimal)1m }
+            };
+            var filledDatum = new Dto.Datum[]
+            {
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 8),  Value = (decimal)1m }
+            };
+            SetupZeroQuality(existingSignal, existingDatum, new DateTime(2018, 1, 8), new DateTime(2018, 1, 15),
+               new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDecimal(), filledDatum);
+        }
+
         private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
         {
             return new Domain.Signal()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Infrastructure;
+using Domain.Repositories;
 
 namespace Domain.MissingValuePolicy
 {
@@ -10,10 +11,16 @@ namespace Domain.MissingValuePolicy
 
         private Quality Quality = Quality.None;
         private T Value = default(T);
-
-        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+ 
+        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, ISignalsDataRepository signalsDataRepository)
         {
             returnListDatum = new List<Datum<T>>();
+            if((data.Last(x=>x==x).Timestamp)<fromIncludedUtc)
+            {
+                var dataOlder = data.Last(x => x == x);
+                this.Quality = dataOlder.Quality;
+                this.Value = dataOlder.Value;
+            }
             while (fromIncludedUtc < toExcludedUtc)
             {
                 Datum<T> elementOfList = data.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);

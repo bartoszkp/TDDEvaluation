@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Infrastructure;
+using Domain.Repositories;
 
 namespace Domain.MissingValuePolicy
 {
@@ -11,7 +12,7 @@ namespace Domain.MissingValuePolicy
 
         public virtual Quality Quality { get; set; }
 
-        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, ISignalsDataRepository signalsDataRepository)
         {
             throw new NotImplementedException();
         }

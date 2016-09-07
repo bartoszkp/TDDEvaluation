@@ -120,7 +120,7 @@ namespace Domain.Services.Implementation
             if (missingValuePolicyRepository == null)
                 return data;
             var missingValuePolicy = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
-            return missingValuePolicy.FillData(signal, data, fromIncludedUtc, toExcludedUtc).ToArray();
+            return missingValuePolicy.FillData(signal, data, fromIncludedUtc, toExcludedUtc,signalsDataRepository).ToArray();
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> dataDomain)
