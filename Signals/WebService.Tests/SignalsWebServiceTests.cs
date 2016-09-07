@@ -1157,6 +1157,39 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GetData_DataExist_FirstOrderMustInterpolateQualitiesCorrectly()
+            {
+                int signalId = 1;
+                var signal = SignalWith(
+                     id: signalId,
+                    dataType: Domain.DataType.Integer,
+                    granularity: Domain.Granularity.Day,
+                    path: Domain.Path.FromString("root/signal"));
+
+                List<Domain.Datum<int>> givenDatums = new List<Domain.Datum<int>>() {
+                  new Domain.Datum<int> {Timestamp = new DateTime(2000, 1, 1), Value = 10, Quality = Quality.Bad, Signal = signal },
+                  new Domain.Datum<int> {Timestamp = new DateTime(2000, 1, 5), Value = 30, Quality = Quality.Fair, Signal = signal }
+                };
+
+                GivenASignal(signal);
+                GivenData(signalId, givenDatums);
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger());
+                SetupSignalsDataRepository_ReturnsOlderAndNewerDatums(signalId, givenDatums[0], givenDatums[1]);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
+
+                var expected = new[] {
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 10},
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 2), Value = 15},
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 3), Value = 20},
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 4), Value = 25},
+                  new Dto.Datum(){ Quality = Dto.Quality.Fair, Timestamp = new DateTime(2018, 1, 5), Value = 30}
+                };
+
+                Assert.IsTrue(CompareDatum(expected, result));
+            }
+
+            [TestMethod]
             public void GivenASignal_WhenGettingData_VerifyGetDataNewerThan()
             {
                 int signalId = 5;
