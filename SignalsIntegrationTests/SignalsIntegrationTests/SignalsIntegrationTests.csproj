@@ -83,6 +83,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="GetSingleDatumConventionTests.cs" />
     <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\GenericTestBase.cs" />
     <Compile Include="Infrastructure\ShadowPolicyTestsBase.cs" />

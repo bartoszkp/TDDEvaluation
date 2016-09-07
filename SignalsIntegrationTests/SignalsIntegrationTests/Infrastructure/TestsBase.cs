@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -64,6 +62,11 @@ namespace SignalsIntegrationTests.Infrastructure
         protected void GivenNoSignals()
         {
             signalId = 0;
+        }
+
+        protected void GivenMissingValuePolicy(Dto.MissingValuePolicy.MissingValuePolicy missingValuePolicy)
+        {
+            client.SetMissingValuePolicy(signalId, missingValuePolicy);
         }
 
         protected void GivenNoData()

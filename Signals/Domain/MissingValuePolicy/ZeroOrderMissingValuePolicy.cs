@@ -29,7 +29,7 @@ namespace Domain.MissingValuePolicy
 
             foreach (var ts in timeEnumerator)
             {
-                if (ts == nextValueTs)
+                if (ts == nextValueTs && readEnumerator.Current != null)
                 {
                     lastQuality = readEnumerator.Current.Quality;
                     lastValue = readEnumerator.Current.Value;
