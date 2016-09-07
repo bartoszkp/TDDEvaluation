@@ -2,6 +2,7 @@
 using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Domain.Services.Implementation;
+using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -21,42 +22,51 @@ namespace WebService.Tests
         [TestMethod]
         public void SignalHasNoData_GetData_ReturnsFilledData()
         {
-            SetupWebService();
-
             var signal = new Signal()
             {
                 Id = 1,
                 DataType = Domain.DataType.Integer,
                 Granularity = Domain.Granularity.Month
             };
-
-            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(signal);
-            Mock<SpecificValueMissingValuePolicy<int>> mvp = new Mock<SpecificValueMissingValuePolicy<int>>();
-
-            mvpRepoMock.Setup(m => m.Get(signal)).Returns(mvp.Object);
-            signalsDataRepoMock.Setup(s => s.GetData<int>(signal, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1)))
-                .Returns(new List<Datum<int>>());
-
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
-            var fetchedDatumObject = result.ElementAt(0);
+            var policy = new Dto.MissingValuePolicy.SpecificValueMissingValuePolicy()
+            {
+                DataType = Dto.DataType.Integer,
+                Quality = Dto.Quality.Bad,
+                Value = (int)1
+            };
+            SetupWebService(signal,policy);
+            var domainExistingPolicy = (Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>)policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
+            missingValuePolicyRepositoryMock
+                .Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.Is<Domain.MissingValuePolicy.SpecificValueMissingValuePolicy<int>>(mv =>
+                (
+                    mv.NativeDataType == domainExistingPolicy.NativeDataType
+                    && mv.Quality == domainExistingPolicy.Quality
+                    && mv.Value == domainExistingPolicy.Value
+                ))));
             
-            Assert.AreEqual(1, result.Count());
-            Assert.AreEqual(Dto.Quality.Fair, fetchedDatumObject.Quality);
-
         }
 
 
-
-        private void SetupWebService()
+        private void SetupWebService(Signal signal, Dto.MissingValuePolicy.SpecificValueMissingValuePolicy policy)
         {
-            var signalsDomainService = new SignalsDomainService(signalsRepoMock.Object, signalsDataRepoMock.Object, mvpRepoMock.Object);
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+            signalsRepositoryMock.Setup(srm => srm.Get(signal.Id.Value))
+                .Returns(signal);
+
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+            missingValuePolicyRepositoryMock
+                .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.MissingValuePolicyBase>()));
+
+            var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
+
+            signalsWebService.SetMissingValuePolicy(signal.Id.Value, policy);
         }
 
 
-        private Mock<ISignalsRepository> signalsRepoMock = new Mock<ISignalsRepository>();
+        private Mock<ISignalsRepository> signalsRepositoryMock = new Mock<ISignalsRepository>();
         private Mock<ISignalsDataRepository> signalsDataRepoMock = new Mock<ISignalsDataRepository>();
-        private Mock<IMissingValuePolicyRepository> mvpRepoMock = new Mock<IMissingValuePolicyRepository>();
+        private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
 
     }
