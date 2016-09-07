@@ -99,6 +99,7 @@ namespace Domain.Services.Implementation
             VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
             secondaryItem = new Datum<T>() { Signal = signal, Timestamp = toExcludedUtc };
             VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
+
             var data = this.signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);            
 
@@ -127,8 +128,18 @@ namespace Domain.Services.Implementation
             }
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
 
+            if (mvp is ShadowMissingValuePolicy<T>)
+            {
+                var shadowMvp = mvp as ShadowMissingValuePolicy<T>;
+                var shadowSignalData = GetShadowSignalData<T>(shadowMvp.ShadowSignal.Id.Value, fromIncludedUtc, toExcludedUtc).ToList();
+                return shadowMvp.FillData(signal, data.ToList(), shadowSignalData, fromIncludedUtc, toExcludedUtc)
+                    .OrderBy(d => d.Timestamp).ToArray();
+
+            }
+
+
             var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).FirstOrDefault();
-            var newestDatum = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1).FirstOrDefault(); //.AddMilliseconds(-1)
+            var newestDatum = signalsDataRepository.GetDataNewerThan<T>(signal, toExcludedUtc, 1).FirstOrDefault();
             return mvp.FillData(signal, data, fromIncludedUtc, toExcludedUtc, olderDatum, newestDatum).ToArray();
         }
 
@@ -218,6 +229,13 @@ namespace Domain.Services.Implementation
             };
             checkGranularity[granularity].Invoke();
         }
+
+        private IEnumerable<Datum<T>> GetShadowSignalData<T>(int shadowSignalId,DateTime fromIncluded,DateTime toExcluded)
+        {
+            var shadowSignal = GetById(shadowSignalId);
+            return this.signalsDataRepository.GetData<T>(shadowSignal,fromIncluded,toExcluded);
+        }
+
 
         private void GranularitySecond<T>(Datum<T> checkingElement)
         {

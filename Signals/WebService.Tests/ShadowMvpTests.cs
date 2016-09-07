@@ -84,6 +84,8 @@ namespace WebService.Tests
             var to = new DateTime(2000, 11, 1);
 
             signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+            signalsRepositoryMock.Setup(sr => sr.Get(2)).Returns(shadowSignal);
+
             signalsDataRepositoryMock.Setup(sd => sd.GetData<decimal>(returnedSignal, from, to))
                 .Returns(new List<Datum<decimal>>()
                 {
@@ -100,17 +102,17 @@ namespace WebService.Tests
                     new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m }
                 });
 
-
-
-            missingValuePolicyRepositoryMock.Setup(s => s.Get(returnedSignal))
-                .Returns(new ShadowMissingValuePolicyInteger());
+            var mvp = new ShadowMissingValuePolicyDecimal() { ShadowSignal = shadowSignal, Signal = returnedSignal, Id = 3 };
+            
+            missingValuePolicyRepositoryMock.Setup(s => s.Get(It.Is<Signal>(signal => signal == returnedSignal)))
+           .Returns(mvp);
 
 
             var result = signalsWebService.GetData(1, from, to);
             var filledDatumForMarch = result.ElementAt(4);
 
             Assert.AreEqual(12, result.Count());
-            Assert.AreEqual(Dto.Quality.Poor, filledDatumForMarch.Quality);
+            Assert.AreEqual(Dto.Quality.Fair, filledDatumForMarch.Quality);
             Assert.AreEqual(1.4m, filledDatumForMarch.Value);
         }
 
