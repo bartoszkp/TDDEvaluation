@@ -173,16 +173,16 @@ namespace Domain.Services.Implementation
                     for (; date < toExcludedUtc; increaseDate(ref date, signal.Granularity))
                     {
                         if (typeof(NoneQualityMissingValuePolicy<T>) == mvp.GetType())
-                             datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+                            datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
                         else if (typeof(ZeroOrderMissingValuePolicy<T>) == mvp.GetType())
                         {
-                         datums.Add(new Datum<T>() { Quality = quality, Timestamp = date, Value = value });
+                            datums.Add(new Datum<T>() { Quality = quality, Timestamp = date, Value = value });
                         }
                         else
                             datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
-                     }
+                    }
                 }
-                else if(mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                else if (mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
                 {
                     if (signal.DataType.GetNativeType().Name == "Boolean" || signal.DataType.GetNativeType().Name == "String")
                         throw new ArgumentException("Boolean and String types are not supported.");
@@ -191,7 +191,7 @@ namespace Domain.Services.Implementation
 
                     T step = default(T);
                     Quality quality = default(Quality);
-                    
+
                     while (date < toExcludedUtc)
                     {
                         var actualData = result.FirstOrDefault(x => x.Timestamp == date);
@@ -242,6 +242,25 @@ namespace Domain.Services.Implementation
                             datums.Add(new Datum<T>() { Quality = datum.Quality, Value = datum.Value, Timestamp = date });
                         }
                         increaseDate(ref date, signal.Granularity);
+                    }
+                }
+                else if (mvp.GetType() == typeof(ShadowMissingValuePolicy<T>))
+                {
+                    while (date < toExcludedUtc)
+                    {
+                        var actualData = result.FirstOrDefault(d => d.Timestamp == date);
+
+                        if (actualData != null)
+                        {
+                            datums.Add(actualData);
+                        }
+                        else
+                        {
+                            datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+                        }
+
+                        increaseDate(ref date, signal.Granularity);
+
                     }
                 }
 
