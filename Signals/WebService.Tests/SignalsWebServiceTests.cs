@@ -324,7 +324,7 @@ namespace WebService.Tests
                 { new Dto.Datum() { Value = (double)1, Timestamp = new DateTime(2018, 1, 2) },
                   new Dto.Datum() { Value = (double)2, Timestamp = new DateTime(2018, 1, 8) }});
             }
-
+            //
             [TestMethod]
             public void GivenASignalWithSpecificDataAndFOMVP_WhenGettingData_ReturnedIsExpectedResult()
             {
@@ -1263,7 +1263,7 @@ namespace WebService.Tests
             }
 
 
-
+            //
             [TestMethod]
             public void GetData_FirstOrderMissingValuePolicy_WhenTimeIsOutOfBounds_SetValidValue()
             {
@@ -1273,33 +1273,37 @@ namespace WebService.Tests
 
                 GivenASignal(someSignal);
 
+                var from = new DateTime(1999, 11, 1);
+                var to = new DateTime(2000, 11, 1);
+
                 var datums = new Datum<double>[]
                     {
                         new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
                         new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
                         new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 }
                     };
-                GivenData(signalId, datums);
 
-                mvpRepositoryMock
-                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
-                    .Returns(new FirstOrderMissingValuePolicyDouble());
-                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
-                signalsWebService.SetMissingValuePolicy(signalId, policy);
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataOlderThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(dt => dt > new DateTime(2000, 1, 1) && dt < new DateTime(2000, 5, 1)), 1))
+                    .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 } });
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataNewerThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(dt => dt > new DateTime(2000, 1, 1) && dt < new DateTime(2000, 5, 1)), 1))
+                    .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 } });
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataOlderThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(dt => dt > new DateTime(2000, 5, 1) && dt < new DateTime(2000, 8, 1)), 1))
+                    .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 } });
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataNewerThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(dt => dt > new DateTime(2000, 5, 1) && dt < new DateTime(2000, 8, 1)), 1))
+                    .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 } });
 
+                signalsDataRepoMock.Setup(sdr => sdr.GetData<double>(It.Is<Signal>(s => s.Id == signalId), from, to)).Returns(datums);
 
-                var from = new DateTime(1999, 11, 1);
-                var to = new DateTime(2000, 11, 1);
+                mvpRepositoryMock.Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId))).Returns(new FirstOrderMissingValuePolicyDouble());
 
                 var result = signalsWebService.GetData(signalId, from, to);
 
                 Assert.AreEqual(0.0, result.ElementAt(0).Value);
-
                 Assert.AreEqual(1.0, result.ElementAt(2).Value);
-
                 Assert.AreEqual(3.0, result.ElementAt(7).Value);
             }
 
+            //
             [TestMethod]
             public void GetData_FirstOrderMissingValuePolicy_WhenTimeIsBbetweenDatums_SetValidValue()
             {
@@ -1309,6 +1313,9 @@ namespace WebService.Tests
 
                 GivenASignal(someSignal);
 
+                var from = new DateTime(2000, 6, 1);
+                var to = new DateTime(2000, 7, 1);
+
                 var datums = new Datum<double>[]
                     {
                         new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 },
@@ -1317,15 +1324,11 @@ namespace WebService.Tests
                     };
                 GivenData(signalId, datums);
 
-                mvpRepositoryMock
-                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
-                    .Returns(new FirstOrderMissingValuePolicyDouble());
-                var policy = new Dto.MissingValuePolicy.FirstOrderMissingValuePolicy();
-                signalsWebService.SetMissingValuePolicy(signalId, policy);
+                mvpRepositoryMock.Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId))).Returns(new FirstOrderMissingValuePolicyDouble());
 
 
-                var from = new DateTime(2000, 6, 1);
-                var to = new DateTime(2000, 7, 1);
+
+                
 
                 var result = signalsWebService.GetData(signalId, from, to);
 

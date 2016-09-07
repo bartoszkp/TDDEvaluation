@@ -219,56 +219,75 @@ namespace Domain.Services.Implementation
 
                 else if (policy is FirstOrderMissingValuePolicy<T>)
                 {
-                    var newerData = getNewerDatum<T>(signal, toExcluded);
-                    if (newerData == null) newerData = result.Last();
-                    var olderData = getOlderDatum<T>(signal, fromIncluded);
-                    if (olderData == null) olderData = result.First();
+                    if (typeof(T) == typeof(string) | typeof(T) == typeof(bool)) return signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
 
-                    dynamic step = 0;
-                    while (date < toExcluded)
+                    if (fromIncluded > toExcluded) return new List<Datum<T>>();
+
+                    var filledData = new List<Datum<T>>();
+                    DateTime tmp = fromIncluded;
+                    var data = signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
+
+                    if (fromIncluded == toExcluded) AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                    else
                     {
-                        Datum<T> datum = null;
-
-                        if (date > newerData.Timestamp || date < olderData.Timestamp)
+                        switch (signal.Granularity)
                         {
-                            datum = new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) };
-                            newData.Add(datum);
-                            date = timeNextMethod(date);
-                            continue;
+                            case Granularity.Second:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddSeconds(1);
+                                }
+                                break;
+                            case Granularity.Minute:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddMinutes(1);
+                                }
+                                break;
+                            case Granularity.Hour:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddHours(1);
+                                }
+                                break;
+                            case Granularity.Day:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddDays(1);
+                                }
+                                break;
+                            case Granularity.Week:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddDays(7);
+                                }
+                                break;
+                            case Granularity.Month:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddMonths(1);
+                                }
+                                break;
+                            case Granularity.Year:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddYears(1);
+                                }
+                                break;
+                            default: break;
                         }
 
-
-                        var nextExsistingDatum = getNewerDatum<T>(signal, timeNextMethod(date));
-                        var currentDatum = result.FirstOrDefault<Datum<T>>(d => d.Timestamp == date);
-                        if (currentDatum != null)
-                        {
-                            newData.Add(currentDatum);
-                            olderData = currentDatum;
-                            if (nextExsistingDatum != null) step = GetStep<T>(signal, currentDatum, nextExsistingDatum);
-                        }
-
-                        if (date > olderData.Timestamp)
-                        {
-                            var previousDatum = newData.LastOrDefault();
-                            if (previousDatum != null)
-                            {
-                                Quality quality;
-
-                                if (previousDatum.Quality > nextExsistingDatum.Quality) quality = previousDatum.Quality; else quality = nextExsistingDatum.Quality;
-
-                                datum = new Datum<T>() { Timestamp = timeNextMethod(previousDatum.Timestamp), Value = previousDatum.Value + step, Quality = quality };
-
-                            }
-                            else
-                            {
-                                var prevExsistingDatum = getOlderDatum<T>(signal, date);
-                                step = GetStep<T>(signal, prevExsistingDatum, nextExsistingDatum);
-                                datum = this.GetData<T>(signal, prevExsistingDatum.Timestamp, nextExsistingDatum.Timestamp).First(q => q.Timestamp == date);
-                            }
-                            newData.Add(datum);
-                        }
-                        date = timeNextMethod(date);
                     }
+                    return filledData;
+
+                    
                 }
 
                 else if (policy is ShadowMissingValuePolicy<T>)
@@ -350,6 +369,92 @@ namespace Domain.Services.Implementation
                 else throw new NotImplementedException();
 
                 return newData;
+            }
+        }
+
+        private void AddToListSuitableDatumWhenGivenIsFOMVP<T>(Signal signal, IEnumerable<Datum<T>> data, List<Datum<T>> filledData, DateTime tmp)
+        {
+            Datum<T> datumWithTimestampEqualToTmp = null;
+
+            foreach (var datum in data)
+            {
+                if (datum.Timestamp == tmp)
+                {
+                    datumWithTimestampEqualToTmp = new Datum<T>()
+                    {
+                        Quality = datum.Quality,
+                        Value = datum.Value,
+                        Timestamp = tmp
+                    };
+                    break;
+                }
+            }
+
+            if (datumWithTimestampEqualToTmp != null) filledData.Add(datumWithTimestampEqualToTmp);
+            else
+            {
+                Datum<T> previousDatum = signalsDataRepository.GetDataOlderThan<T>(signal, tmp, 1).FirstOrDefault();
+                Datum<T> nextDatum = signalsDataRepository.GetDataNewerThan<T>(signal, tmp, 1).FirstOrDefault();
+
+                if (previousDatum == null | nextDatum == null) filledData.Add(new Datum<T>() { Timestamp = tmp, Quality = Quality.None, Value = default(T) });
+                else
+                {
+                    Granularity granularity = signal.Granularity;
+
+                    T newValue;
+                    int numberOfTimePeriodsBetweenPreviousAndNext = FindNumberOfPeriodsBetweenTwoDates(previousDatum.Timestamp, nextDatum.Timestamp, granularity);
+                    int numberOfTimePeriodsBetweenPreviousAndTmp = FindNumberOfPeriodsBetweenTwoDates(previousDatum.Timestamp, tmp, granularity);
+                    double valuesDifferenceBetweenPreviousAndNext = Convert.ToDouble(nextDatum.Value) - Convert.ToDouble(previousDatum.Value);
+                    double growthForOnePeriod = valuesDifferenceBetweenPreviousAndNext / numberOfTimePeriodsBetweenPreviousAndNext;
+                    newValue = (T)Convert.ChangeType(Convert.ToDouble(previousDatum.Value) + growthForOnePeriod * numberOfTimePeriodsBetweenPreviousAndTmp, typeof(T));
+
+                    Quality newQuality;
+                    int comparitionOfQualities = CompareQualities(previousDatum.Quality, nextDatum.Quality);
+                    if (comparitionOfQualities == -1) newQuality = previousDatum.Quality;
+                    else newQuality = nextDatum.Quality;
+
+                    filledData.Add(new Datum<T>()
+                    {
+                        Value = newValue,
+                        Quality = newQuality,
+                        Timestamp = tmp
+                    });
+                }
+            }
+        }
+
+        private int FindNumberOfPeriodsBetweenTwoDates(DateTime dateTime1, DateTime dateTime2, Granularity granularity)
+        {
+            int numberOfPeriods = 0;
+
+            switch (granularity)
+            {
+                case Granularity.Second: numberOfPeriods = (int)Math.Round((dateTime2 - dateTime1).TotalSeconds); break;
+                case Granularity.Minute: numberOfPeriods = (int)Math.Round((dateTime2 - dateTime1).TotalMinutes); break;
+                case Granularity.Hour: numberOfPeriods = (int)Math.Round((dateTime2 - dateTime1).TotalHours); break;
+                case Granularity.Day: numberOfPeriods = (int)Math.Round((dateTime2 - dateTime1).TotalDays); break;
+                case Granularity.Week: numberOfPeriods = (int)Math.Round((dateTime2 - dateTime1).TotalDays / 7); break;
+                case Granularity.Month: numberOfPeriods = (int)Math.Round((dateTime2 - dateTime1).TotalDays / 30); break;
+                case Granularity.Year: numberOfPeriods = (int)Math.Round((dateTime2 - dateTime1).TotalDays / 365); break;
+                default: break;
+            }
+
+            return numberOfPeriods;
+        }
+
+        private int CompareQualities(Quality q1, Quality q2)
+        {
+            if (q1 == Quality.None | q2 == Quality.None)
+            {
+                if (q2 == Quality.None & q1 != Quality.None) return -1;
+                if (q1 == Quality.None & q2 != Quality.None) return 1;
+                return 0;
+            }
+            else
+            {
+                if (q1 > q2) return -1;
+                if (q1 < q2) return 1;
+                return 0;
             }
         }
 
