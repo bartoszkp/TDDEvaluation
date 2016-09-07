@@ -2213,6 +2213,80 @@ namespace WebService.Tests
             }
             #endregion
 
+
+            #region tests for SpecificValuePolicy
+            [TestMethod]
+            public void WhenGettingData_SpecificValuePolicy_CorrectlyFillsMissingData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/signal")
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 10), Value = false },
+                        new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 15), Value = true }
+                };
+
+                var expectedDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 10),  Value = false },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 11),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 12),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 13),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 14),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 1, 15),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 16),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 17),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 18),  Value = true },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 19),  Value = true },
+
+                };
+                var firstTimestamp = new DateTime(2000, 1, 10);
+                var lastTimestamp = new DateTime(2000, 1, 20);
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<bool>(existingSignal, firstTimestamp, lastTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<bool>>>);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(1))
+                    .Returns(existingSignal);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean()
+                    { Quality = Quality.Bad, Value = true});
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+
+                int index = 0;
+                foreach (var ed in expectedDatum)
+                {
+                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
+                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
+                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
+                    index++;
+                }
+            }
+            #endregion
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
