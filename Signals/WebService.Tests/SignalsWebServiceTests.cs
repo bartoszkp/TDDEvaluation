@@ -1262,8 +1262,6 @@ namespace WebService.Tests
                 Assert.AreEqual(correctStep, result.ElementAt(5).Value - result.ElementAt(4).Value);
             }
 
-
-            //
             [TestMethod]
             public void GetData_FirstOrderMissingValuePolicy_WhenTimeIsOutOfBounds_SetValidValue()
             {
@@ -1303,7 +1301,6 @@ namespace WebService.Tests
                 Assert.AreEqual(3.0, result.ElementAt(7).Value);
             }
 
-            //
             [TestMethod]
             public void GetData_FirstOrderMissingValuePolicy_WhenTimeIsBbetweenDatums_SetValidValue()
             {
@@ -1322,13 +1319,15 @@ namespace WebService.Tests
                         new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 },
                         new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 }
                     };
-                GivenData(signalId, datums);
 
-                mvpRepositoryMock.Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId))).Returns(new FirstOrderMissingValuePolicyDouble());
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataOlderThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(dt => dt > new DateTime(2000, 5, 1) && dt < new DateTime(2000, 8, 1)), 1))
+                    .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2.0 } });
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataNewerThan<double>(It.Is<Signal>(s => s.Id == signalId), It.Is<DateTime>(dt => dt > new DateTime(2000, 5, 1) && dt < new DateTime(2000, 8, 1)), 1))
+                    .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5.0 } });
 
+                signalsDataRepoMock.Setup(sdr => sdr.GetData<double>(It.Is<Signal>(s => s.Id == signalId), from, to)).Returns(datums);
 
-
-                
+                mvpRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>(s => s.Id == signalId))).Returns(new FirstOrderMissingValuePolicyDouble());
 
                 var result = signalsWebService.GetData(signalId, from, to);
 
