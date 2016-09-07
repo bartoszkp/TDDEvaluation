@@ -376,6 +376,33 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignalWithNoDataAndFOMVP_WhenGettingData_ThereIsNotThrowedException()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Decimal, Granularity = Granularity.Minute, Path = Path.FromString("root/signal") };
+
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<int>(i => i == givenSignal.Id.Value))).Returns(givenSignal);
+
+                signalsDataRepoMock.Setup(sdr => sdr.GetData<decimal>((It.Is<Signal>
+                    (s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))),
+                    new DateTime(2018, 1, 1, 0, 0, 0), new DateTime(2018, 1, 1, 0, 2, 0)))
+                .Returns<IEnumerable<Datum<decimal>>>(null);
+
+                mvpRepositoryMock.Setup(mvpr => mvpr.Get(It.Is<Signal>
+                    (s => s.Id.Value == givenSignal.Id.Value && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path))))
+                .Returns(new FirstOrderMissingValuePolicyDecimal());
+
+                signalsWebService.GetData(1, new DateTime(2018, 1, 1, 0, 0, 0), new DateTime(2018, 1, 1, 0, 2, 0));
+
+            }
+
+            [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
                 GivenNoSignals();
