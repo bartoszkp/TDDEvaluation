@@ -841,6 +841,8 @@ namespace WebService.Tests
 
             #endregion
 
+
+            #region test for GetPathEntry()
             [TestMethod]
             public void GivenNoSignals_GetPathentry_RepoIsCalled()
             {
@@ -870,7 +872,45 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(s => s.GetAllWithPathPrefix(It.IsAny<Path>()));
             }
-            
+
+            [TestMethod]
+            public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathWithCollectionOfSignalsFromMainDirectoryAndSubpathsFromMainDirectory()
+            {
+                List<Signal> signalsList = new List<Signal>()
+                {
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/s1")},
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("s0") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s2") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s3") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/subsub/s4") },
+                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s5") }
+                };
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()))
+                    .Returns(signalsList.AsEnumerable);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
+
+                Assert.AreEqual(1, result.Signals.Count());
+                Assert.AreEqual(signalsList.First().ToDto<Dto.Signal>().DataType, result.Signals.First().DataType);
+                CollectionAssert.AreEqual(signalsList.First().ToDto<Dto.Signal>().Path.Components.ToArray(),
+                    result.Signals.First().Path.Components.ToArray());
+
+                Assert.AreEqual(2, result.SubPaths.Count());
+                CollectionAssert.AreEqual(new[] { "root", "sub" }, result.SubPaths.First().Components.ToArray());
+                CollectionAssert.AreEqual(new[] { "root", "subsub" }, result.SubPaths.Last().Components.ToArray());
+            }
+            #endregion
+
+
+            #region tests for Delete() method
             [TestMethod]
             public void GivenASignal_WhenDeletingASignal_ProperSignalRepositoryDeleteIsCalled()
             {
@@ -1104,7 +1144,10 @@ namespace WebService.Tests
                 signalDataRepositoryMock
                     .Verify(sdrm => sdrm.DeleteData<string>(existingSignal));
             }
+            #endregion
 
+
+            #region tests for FirstOrderPolicy
             [TestMethod]
             public void GivenADecimalSignalAndMonthDatumWithMissingDataAndFirstOrderMissingValuePolicy_WhenGettingData_FillsDataInsideRange()
             {
@@ -2087,42 +2130,10 @@ namespace WebService.Tests
                     index++;
                 }
             }
+            #endregion
 
-            [TestMethod]
-            public void GivenListOfSignals_WhenGettingPathEntry_ReturnsPathWithCollectionOfSignalsFromMainDirectoryAndSubpathsFromMainDirectory()
-            {
-                List<Signal> signalsList = new List<Signal>()
-                {
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/s1")},
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("s0") },
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s2") },
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s3") },
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/subsub/s4") },
-                    new Signal() {DataType = DataType.Double, Path = Domain.Path.FromString("root/sub/s5") }
-                };
 
-                signalsRepositoryMock = new Mock<ISignalsRepository>();
-
-                signalsRepositoryMock
-                    .Setup(srm => srm.GetAllWithPathPrefix(It.IsAny<Path>()))
-                    .Returns(signalsList.AsEnumerable);
-
-                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
-
-                signalsWebService = new SignalsWebService(signalsDomainService);
-
-                var result = signalsWebService.GetPathEntry(new Dto.Path() { Components = new string[] { "root" } });
-
-                Assert.AreEqual(1, result.Signals.Count());
-                Assert.AreEqual(signalsList.First().ToDto<Dto.Signal>().DataType, result.Signals.First().DataType);
-                CollectionAssert.AreEqual(signalsList.First().ToDto<Dto.Signal>().Path.Components.ToArray(),
-                    result.Signals.First().Path.Components.ToArray());
-
-                Assert.AreEqual(2, result.SubPaths.Count());
-                CollectionAssert.AreEqual(new[] { "root", "sub" }, result.SubPaths.First().Components.ToArray());
-                CollectionAssert.AreEqual(new[] { "root", "subsub" }, result.SubPaths.Last().Components.ToArray());
-            }
-
+            #region tests for GetData() method
             [TestMethod]
             public void GivenASignalAndData_WhenGettingDataFromEmptyRange_ReturnsEmptyResult()
             {
@@ -2200,6 +2211,7 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2000, 1 ,10), result.First().Timestamp);
                 Assert.AreEqual(existingDatum.First().Value, result.First().Value);
             }
+            #endregion
 
             private Dto.Signal SignalWith(
                 int? id = null,
