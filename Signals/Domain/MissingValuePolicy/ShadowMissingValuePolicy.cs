@@ -9,7 +9,12 @@ namespace Domain.MissingValuePolicy
 
         public override Datum<T> GetMissingDatum(IEnumerable<Datum<T>> data, DateTime dt)
         {
-            throw new NotImplementedException();
+            return new Datum<T>()
+            {
+                Quality = Quality.None,
+                Timestamp = dt,
+                Value = default(T)
+            };
         }
     }
 }

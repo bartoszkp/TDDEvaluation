@@ -105,8 +105,8 @@ namespace Domain.Services.Implementation
 
             if (fromIncludedUtc == toExcludedUtc) toExcludedUtc = toExcludedUtc.AddTicks(1);
             
-            var dataBeforeRequest = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();
-
+            var dataBeforeRequest = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).LastOrDefault();      
+            
             if (policy is FirstOrderMissingValuePolicy<T>)
                 sortedData = FirstOrderMissingValuePolicyFunction<T>(fromIncludedUtc, toExcludedUtc, sortedData, signal, policy);
             else
@@ -134,16 +134,20 @@ namespace Domain.Services.Implementation
                                 index,
                                 Datum<T>.CreateSpecific(signal, timestamp, dataBeforeRequest.Value, dataBeforeRequest.Quality));
                         }
-                        else if(dataBeforeRequest.Timestamp < fromIncludedUtc) // when timestamp is lower than fromIncludedUtc setup default(T) and none
+                        // when timestamp is lower than fromIncludedUtc setup default(T) value and none quality
+                        else if (dataBeforeRequest.Timestamp < fromIncludedUtc) 
                         {
                             sortedData.Insert(index, Datum<T>.CreateNone(signal, timestamp));
                         }
                         else if(policy is NoneQualityMissingValuePolicy<T>)
-                                sortedData.Insert(index, Datum<T>.CreateNone(signal, timestamp));                                        
+                                sortedData.Insert(index, Datum<T>.CreateNone(signal, timestamp));
+
                         dataBeforeRequest = null;
-                    }
+                    }                    
             }
 
+            if (policy is ShadowMissingValuePolicy<T>)
+                sortedData = AddShadowDatumsToData(sortedData, fromIncludedUtc, toExcludedUtc, policy);
 
             return sortedData.Where(x => x.Timestamp >= fromIncludedUtc && x.Timestamp < toExcludedUtc).ToList();
         }
@@ -255,6 +259,27 @@ namespace Domain.Services.Implementation
 
             }
             return data;
+        }
+
+        private List<Datum<T>> AddShadowDatumsToData<T>(List<Datum<T>> sortedData, DateTime fromIncludedUtc, DateTime toExcludedUtc, MissingValuePolicy<T> policy)
+        {
+            var shadowPolicy = policy as ShadowMissingValuePolicy<T>;
+            var shadowData = signalsDataRepository.GetData<T>(shadowPolicy.ShadowSignal, fromIncludedUtc, toExcludedUtc)
+                               .OrderBy(d => d.Timestamp)
+                               .ToList();
+
+            for (int i = 0; i < sortedData.Count; i++)
+            {
+                if (sortedData[i].Quality == Quality.None && EqualityComparer<T>.Default.Equals(sortedData[i].Value, default(T)))
+                    foreach (Datum<T> shadowDatum in shadowData)
+                    {
+                        if (shadowDatum.Timestamp.Date == sortedData[i].Timestamp.Date
+                            && shadowDatum.Quality != Quality.None && !EqualityComparer<T>.Default.Equals(shadowDatum.Value, default(T)))
+                            sortedData[i] = shadowDatum;
+                    }
+            }
+
+            return sortedData;
         }
 
         private int LenghtBetweenDatums<T>(Datum<T> datum1, Datum<T> datum2, Granularity granuality)
