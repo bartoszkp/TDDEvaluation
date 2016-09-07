@@ -846,6 +846,7 @@ namespace WebService.Tests
                     .Setup(m => m.Get(It.Is<Signal>(s => s.Id == givenSignal.Id)))
                     .Returns(new ZeroOrderMissingValuePolicyDouble());
 
+
                 signalsDataRepoMock.Setup(sdr => sdr.GetData<double>(It.Is<Signal>
                     (s => s.Id == givenSignal.Id && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path)),
                     new DateTime(2000, 1, 1), new DateTime(2000, 5, 1))).Returns(new Datum<double>[] { new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1), Value = 1.0},
