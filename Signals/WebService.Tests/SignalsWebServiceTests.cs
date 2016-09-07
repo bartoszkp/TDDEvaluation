@@ -716,6 +716,57 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void WhenGettingData_WithTheSameFromAndToTimestamp_NonePolicyCorrectlyFillsMissingData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Path = Domain.Path.FromString("example/signal")
+                };
+
+                var expectedDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 10), Value = false},
+                };
+                var firstTimestamp = new DateTime(2000, 1, 10);
+                var lastTimestamp = new DateTime(2000, 1, 20);
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<bool>(existingSignal, firstTimestamp, lastTimestamp))
+                    .Returns(new Dto.Datum[0].ToDomain<IEnumerable<Domain.Datum<bool>>>);
+
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(1))
+                    .Returns(existingSignal);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyBoolean());
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(1, firstTimestamp, lastTimestamp);
+
+                int index = 0;
+                foreach (var ed in expectedDatum)
+                {
+                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
+                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
+                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
+                    index++;
+                }
+            }
+
+            [TestMethod]
             public void GivenASignal_SetMissingValuePolicy_RepoIsCalled()
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
