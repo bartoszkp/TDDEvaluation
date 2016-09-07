@@ -159,7 +159,20 @@ namespace Domain.Services.Implementation
 
         public void Delete(int signalId)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new IdNotNullException();
+            SetMissingValuePolicyBase(signalId, null);
+            var switchDataType = new Dictionary<DataType, Action>()
+            {
+                {DataType.Boolean,()=>signalsDataRepository.DeleteData<bool>(signal) },
+                {DataType.Decimal,()=>signalsDataRepository.DeleteData<decimal>(signal) },
+                {DataType.Double,()=>signalsDataRepository.DeleteData<double>(signal) },
+                {DataType.Integer,()=>signalsDataRepository.DeleteData<int>(signal) },
+                {DataType.String,()=>signalsDataRepository.DeleteData<string>(signal) }
+            };
+            switchDataType[signal.DataType].Invoke();
+            signalsRepository.Delete(signal);
         }
 
 
