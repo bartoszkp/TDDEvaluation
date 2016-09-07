@@ -121,16 +121,33 @@ namespace Domain.Services.Implementation
         private IEnumerable<Datum<T>> FillDatum<T>(DateTime fromIncludedUtc, DateTime toExcludedUtc, Signal signal, Datum<T> datum, MissingValuePolicyBase mvp)
         {
             var gettingList = this.signalsDataRepository?.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
-            if (fromIncludedUtc == toExcludedUtc)
-            {
-                return gettingList;
-            }
 
             Datum<T> xx = null;
             var returnList = new List<Datum<T>>();
 
             T step = default(T);
             Quality quality = 0;
+
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                if (mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                {
+                    datum = SetDatumForSpecificOrderMissingValuePolicy<T>((MissingValuePolicy.SpecificValueMissingValuePolicy<T>)mvp);
+                }
+                else if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                {
+                    datum = SetDatumForZeroOrderMissingValuePolicy<T>(signal, fromIncludedUtc);
+                }
+                else if (mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                {
+                    datum = SetDatumForFirstOrderMissingValuePolicy(signal, datum, fromIncludedUtc, quality, ref step);
+                }
+                else if (mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
+                {
+                    datum = new Datum<T>() { Quality = Quality.None, Signal = signal, Timestamp = fromIncludedUtc, Value = default(T) };
+                }
+                returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
+            }
 
             while (fromIncludedUtc < toExcludedUtc)
             {
