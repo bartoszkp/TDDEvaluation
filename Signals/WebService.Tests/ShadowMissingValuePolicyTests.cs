@@ -128,80 +128,9 @@ namespace WebService.Tests
             
             signalsWebService.SetMissingValuePolicy(1, existingShadowPolicy);
         }
-
+        
         [TestMethod]
-        public void GivenAnExistingSignalAndDatumAndShadowPolicy_WhenGettingData_ProperlyFilledDatumIsReturned()
-        {
-            var existingSignal = new Signal()
-            {
-                Id = 1,
-                DataType = DataType.Integer,
-                Granularity = Granularity.Month
-            };
-            
-            var existingDatum = new Dto.Datum[]
-            {
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (int)2 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = (int)5 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 9, 1), Value = (int)9 }
-            };
-            
-            var filledDatum = new Dto.Datum[]
-            {
-                new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (int)2 },
-                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = (int)0 },
-                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1), Value = (int)0 },
-                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = (int)0 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = (int)5 },
-                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1), Value = (int)0 },
-                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = (int)0 },
-                new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 8, 1), Value = (int)0 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 9, 1), Value = (int)9 }
-            };
-
-            var firstTimestamp = new DateTime(2000, 1, 1);
-            var lastTimestamp = new DateTime(2000, 10, 1);
-
-            signalsRepositoryMock = new Mock<ISignalsRepository>();
-
-            GivenASignal(existingSignal);
-
-            signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
-
-            signalDataRepositoryMock
-                .Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(signal => (
-                signal.Id == 1
-                && signal.DataType == DataType.Integer
-                && signal.Granularity == Granularity.Month)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<int>>>);
-            
-            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
-
-            missingValuePolicyRepositoryMock
-                .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
-                .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyInteger());
-
-            var signalsDomainService = new SignalsDomainService(
-                signalsRepositoryMock.Object,
-                signalDataRepositoryMock.Object,
-                missingValuePolicyRepositoryMock.Object);
-
-            signalsWebService = new SignalsWebService(signalsDomainService);
-
-            var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
-
-            int index = 0;
-            foreach (var fd in filledDatum)
-            {
-                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
-                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
-                Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
-                index++;
-            }
-        }
-
-        [TestMethod]
-        public void GivenAnExistingSignalAndDatumAndShadowSignalAndDatum_WhenGettingData_ProperlyFilledDatumIsReturned()
+        public void GivenAnExistingSignalAndDatumAndShadowSignalAndDatumAndShadowPolicy_WhenGettingData_ProperlyFilledDatumIsReturned()
         {
             var existingSignal = new Signal()
             {

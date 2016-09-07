@@ -248,11 +248,19 @@ namespace Domain.Services.Implementation
                 {
                     while (date < toExcludedUtc)
                     {
+                        var shadowSignal = mvp.GetShadowSignal();
+                        var shadowDatum = signalsDataRepository.GetData<T>(shadowSignal, fromIncludedUtc, toExcludedUtc);
+
                         var actualData = result.FirstOrDefault(d => d.Timestamp == date);
+                        var shadowData = shadowDatum.FirstOrDefault(d => d.Timestamp == date);
 
                         if (actualData != null)
                         {
                             datums.Add(actualData);
+                        }
+                        else if(shadowData != null)
+                        {
+                            datums.Add(shadowData);
                         }
                         else
                         {

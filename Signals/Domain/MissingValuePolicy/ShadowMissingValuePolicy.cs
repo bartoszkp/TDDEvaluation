@@ -13,5 +13,10 @@ namespace Domain.MissingValuePolicy
             else if (ShadowSignal.Granularity != signal.Granularity)
                 throw new IncompatibleGranularities();
         }
+
+        public override Signal GetShadowSignal()
+        {
+            return ShadowSignal;
+        }
     }
 }
