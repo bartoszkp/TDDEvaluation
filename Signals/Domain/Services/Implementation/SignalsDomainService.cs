@@ -84,12 +84,12 @@ namespace Domain.Services.Implementation
             var datum = new Datum<T>();
             var mvp = GetMissingValuePolicy(signal);
 
-            CheckMissingValuePolicyAndSetInitialDatum(mvp, datum, signal.DataType.GetNativeType().Name);
+            CheckMissingValuePolicyAndSetInitialDatum(mvp, ref datum, signal.DataType.GetNativeType().Name);
             
             return FillDatum<T>(fromIncludedUtc, toExcludedUtc, signal, datum, mvp);
         }
 
-        private void CheckMissingValuePolicyAndSetInitialDatum<T>(MissingValuePolicyBase mvp, Datum<T> datum, string typeName)
+        private void CheckMissingValuePolicyAndSetInitialDatum<T>(MissingValuePolicyBase mvp, ref Datum<T> datum, string typeName)
         {
             if (mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
                 datum = new Datum<T>()
