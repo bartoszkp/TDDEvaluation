@@ -831,31 +831,41 @@ namespace WebService.Tests
             [TestMethod]
             public void GivenASignal_HavingZeroOrderMVPAdded_GetData_ReturnsProperData()
             {
-                int signalId = 1;
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+                mvpRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepoMock.Object, mvpRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
 
-                var someSignal = new Signal() { Id = signalId, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
+                var givenSignal = new Signal() { Id = 1, DataType = DataType.Double, Granularity = Granularity.Month, Path = Domain.Path.FromString("root/s1") };
 
-                GivenASignal(someSignal);
-
-                GivenData(signalId, new[]
-               {
-                    new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1,0,0,0), Value = 1.0},
-                    new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2000,3,1,0,0,0), Value = 5.0}
-                });
+                signalsRepositoryMock.Setup(sr => sr.Get(It.Is<Path>(p => p.Equals(givenSignal.Path)))).Returns(givenSignal);
+                signalsRepositoryMock.Setup(sr => sr.Get(givenSignal.Id.Value)).Returns(givenSignal);
 
                 mvpRepositoryMock
-                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == signalId)))
+                    .Setup(m => m.Get(It.Is<Signal>(s => s.Id == givenSignal.Id)))
                     .Returns(new ZeroOrderMissingValuePolicyDouble());
 
-                var policy = new Dto.MissingValuePolicy.ZeroOrderMissingValuePolicy();
-                signalsWebService.SetMissingValuePolicy(signalId, policy);
+                signalsDataRepoMock.Setup(sdr => sdr.GetData<double>(It.Is<Signal>
+                    (s => s.Id == givenSignal.Id && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path)),
+                    new DateTime(2000, 1, 1), new DateTime(2000, 5, 1))).Returns(new Datum<double>[] { new Datum<double> {Quality = Quality.Fair, Timestamp = new DateTime(2000,1,1), Value = 1.0},
+                                                                                                       new Datum<double> {Quality = Quality.Good, Timestamp = new DateTime(2000,3,1), Value = 5.0} });
 
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataOlderThan<double>(It.Is<Signal>
+                    (s => s.Id == givenSignal.Id && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path)),
+                    It.Is<DateTime>(dt => dt > new DateTime(2000, 1, 1) && dt <= new DateTime(2000, 3, 1)), 1))
+                .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1.0 } });
 
-                var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 5, 1, 0, 0, 0));
+                signalsDataRepoMock.Setup(sdr => sdr.GetDataOlderThan<double>(It.Is<Signal>
+                    (s => s.Id == givenSignal.Id && s.DataType == givenSignal.DataType && s.Granularity == givenSignal.Granularity && s.Path.Equals(givenSignal.Path)),
+                    It.Is<DateTime>(dt => dt > new DateTime(2000, 3, 1) && dt <= new DateTime(2000, 5, 1)), 1))
+                .Returns(new Datum<double>[] { new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 5.0 } });
+
+                var result = signalsWebService.GetData(givenSignal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 5, 1));
 
                 Assert.AreEqual(4, result.Count());
-                Assert.AreEqual(result.ElementAt(1).Quality, Dto.Quality.Fair);
-                Assert.AreEqual(result.ElementAt(3).Value, 5.0);
+                Assert.AreEqual(Dto.Quality.Fair, result.ElementAt(1).Quality);
+                Assert.AreEqual(5.0, result.ElementAt(3).Value);
             }
 
             [TestMethod]

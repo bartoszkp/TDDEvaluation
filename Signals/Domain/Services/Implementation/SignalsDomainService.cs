@@ -158,38 +158,75 @@ namespace Domain.Services.Implementation
             {
                 if (policy is ZeroOrderMissingValuePolicy<T>)
                 {
-                    var timeNextMethod = GetTimeNextMethod(signal.Granularity);
-                    var timePreviousMethod = GetTimePreviousMethod(signal.Granularity);
-                    var date = fromIncluded;
-                    var newData = new List<Datum<T>>();
-                    while (date < toExcluded)
+                    if (fromIncluded > toExcluded) return new List<Datum<T>>();
+
+                    var data = signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded).ToList();
+                    var filledData = new List<Datum<T>>();
+                    DateTime tmp = fromIncluded;
+
+                    if (fromIncluded == toExcluded)
                     {
-                        Datum<T> datum;
-                        Datum<T> previousDatum;
-
-                        if (date == fromIncluded)
-                        {
-                            datum = result.FirstOrDefault(d => d.Timestamp == date);
-                            if (datum == null) datum = new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = date };
-                            newData.Add(datum);
-                        }
-
-                        else
-                        {
-                            datum = result.FirstOrDefault(d => d.Timestamp == date);
-                            previousDatum = result.FirstOrDefault(d => d.Timestamp == timePreviousMethod(date));
-                            if (datum != null) newData.Add(datum);
-
-                            else
-                            {
-                                if (previousDatum != null) newData.Add(Datum<T>.CreateSpecific(policy.Signal, date, previousDatum.Quality, previousDatum.Value));
-                                else throw new ZeroOrderMVPException();
-                            }
-                        }
-                        date = timeNextMethod(date);
+                        AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                        return filledData;
                     }
 
-                    return newData;
+                    else
+                    {
+                        switch (signal.Granularity)
+                        {
+                            case Granularity.Second:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddSeconds(1);
+                                }
+                                break;
+                            case Granularity.Minute:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddMinutes(1);
+                                }
+                                break;
+                            case Granularity.Hour:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddHours(1);
+                                }
+                                break;
+                            case Granularity.Day:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddDays(1);
+                                }
+                                break;
+                            case Granularity.Week:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddDays(7);
+                                }
+                                break;
+                            case Granularity.Month:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddMonths(1);
+                                }
+                                break;
+                            case Granularity.Year:
+                                while (tmp < toExcluded)
+                                {
+                                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
+                                    tmp = tmp.AddYears(1);
+                                }
+                                break;
+                            default: break;
+                        }
+                    }
+                    return filledData;
                 }
                 else if (policy is FirstOrderMissingValuePolicy<T>)
                 {
@@ -378,7 +415,39 @@ namespace Domain.Services.Implementation
                 }
             }
         }
-       
+
+        private void AddToListSuitableDatumWhenGivenIsZOMVP<T>(Signal signal, List<Datum<T>> data, List<Datum<T>> filledData, DateTime tmp)
+        {
+            Datum<T> datumWithTimestampEqualToTmp = null;
+
+            if (data != null)
+            {
+                foreach (var datum in data)
+                {
+                    if (datum.Timestamp == tmp)
+                    {
+                        datumWithTimestampEqualToTmp = new Datum<T>()
+                        {
+                            Quality = datum.Quality,
+                            Value = datum.Value,
+                            Timestamp = tmp
+                        };
+                        break;
+                    }
+                }
+            }
+
+            if (datumWithTimestampEqualToTmp != null) filledData.Add(datumWithTimestampEqualToTmp);
+
+            else
+            {
+                var previousDatum = signalsDataRepository.GetDataOlderThan<T>(signal, tmp, 1).FirstOrDefault();
+
+                if (previousDatum == null) filledData.Add(new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = tmp });
+
+                else filledData.Add(new Datum<T>() { Quality = previousDatum.Quality, Value = previousDatum.Value, Timestamp = tmp });
+            }
+        }
 
         private void AddToListSuitableDatumWhenGivenIsFOMVP<T>(Signal signal, IEnumerable<Datum<T>> data, List<Datum<T>> filledData, DateTime tmp)
         {
