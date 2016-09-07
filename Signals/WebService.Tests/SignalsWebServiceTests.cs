@@ -1179,11 +1179,11 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
 
                 var expected = new[] {
-                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 10},
-                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 2), Value = 15},
-                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 3), Value = 20},
-                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 4), Value = 25},
-                  new Dto.Datum(){ Quality = Dto.Quality.Fair, Timestamp = new DateTime(2018, 1, 5), Value = 30}
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 10},
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 2), Value = 15},
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 3), Value = 20},
+                  new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 4), Value = 25},
+                  new Dto.Datum(){ Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 5), Value = 30}
                 };
 
                 Assert.IsTrue(CompareDatum(expected, result));

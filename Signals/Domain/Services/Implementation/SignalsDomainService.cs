@@ -195,10 +195,20 @@ namespace Domain.Services.Implementation
             {
                 Datum<T> olderDatum = olderDatums.FirstOrDefault();
                 Datum<T> newerDatum = newerDatums.FirstOrDefault();
+                Quality quality;
 
                 var result = CalcLinearInterpolation(olderDatum, newerDatum, timeStamp);
 
-                returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, newerDatum.Quality, (T)result);
+                if ((int)olderDatum.Quality > (int)newerDatum.Quality)
+                {
+                    quality = olderDatum.Quality;
+                }
+                else
+                {
+                    quality = newerDatum.Quality;
+                }
+
+                returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, quality, (T)result);
 
             }
             return returnDatum;
