@@ -139,7 +139,30 @@ namespace WebService.Tests
                 new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDecimal(), filledDatum);
         }
 
-
+        [TestMethod]
+        public void TestFixedBug_TaskZeroOrderPolicyCrashes()
+        {
+            var existingSignal = SignalWith(1, DataType.Boolean, Granularity.Day, Path.FromString("root/signal1"));
+            var existingDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1),  Value = (bool)false },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 5),  Value = (bool)true }
+            };
+            var filledDatum = new Dto.Datum[]
+            {
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1),  Value = (bool)false },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 2),  Value = (bool)false },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 3),  Value = (bool)false },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 4),  Value = (bool)false },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 5),  Value = (bool)true },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 6),  Value = (bool)true },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 7),  Value = (bool)true },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 8),  Value = (bool)true },
+                       new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 9),  Value = (bool)true }
+            };
+            SetupZeroQuality(existingSignal, existingDatum, new DateTime(2000, 1, 1), new DateTime(2000, 1, 10),
+                new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyBoolean(), filledDatum);
+        }
 
         private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
         {
