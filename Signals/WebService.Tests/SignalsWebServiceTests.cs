@@ -2483,6 +2483,43 @@ namespace WebService.Tests
                     index++;
                 }
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.ShadowSignalDataTypeOrGranularityDoesntMatch))]
+            public void WhenSettingShadowPolicy_WithShadowSignal_WhichDataTypeDoesntMatch_AnExceptionIsThrown()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("example/signal")
+                };
+                var shadowSignal = new Signal()
+                {
+                    Id = 2,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("shadowSignal/path"),
+                };
+
+                var domainShadowPolicy = new DataAccess.GenericInstantiations.ShadowMissingValuePolicyInteger() { ShadowSignal = shadowSignal };
+                var dtoShadowPolicy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowSignal.ToDto<Dto.Signal>() };
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Set(existingSignal, domainShadowPolicy));
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(1))
+                    .Returns(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsWebService.SetMissingValuePolicy(1, dtoShadowPolicy);
+            }
             #endregion
 
             private void SetupGetDataForShadowSignal(Signal existingSignal, Dto.Datum[] existingDatum, 
