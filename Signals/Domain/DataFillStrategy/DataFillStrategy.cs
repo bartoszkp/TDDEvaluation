@@ -67,8 +67,10 @@ namespace Domain.DataFillStrategy
             var xx = signalsDataRepository.GetDataOlderThan<T>(signal, after, 1).ToList();
             if (datums.Find(d => d.Timestamp < after) == null)
             {
-                Domain.Datum<T> aa = xx.Single();
-                dict.Add(after, new Datum<T>() { Quality = aa.Quality, Value = aa.Value });
+                
+                Domain.Datum<T> aa = xx.SingleOrDefault();
+                if (aa != null)
+                    dict.Add(after, new Datum<T>() { Quality = aa.Quality, Value = aa.Value });
             }
             foreach (var item in datums)
             {
