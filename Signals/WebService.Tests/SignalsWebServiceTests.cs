@@ -1477,13 +1477,16 @@ namespace WebService.Tests
 
                 SetupMocks_RepositoryAndDataRepository_ForGettingData(shadowSignalDomain, 2, shadowDatum.ToArray());
 
-
-                var policy = new ShadowMissingValuePolicyInteger();
-                policy.ShadowSignal = shadowSignalDomain;
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowSignal, DataType = shadowSignal.DataType };
+                var policyDomain = new ShadowMissingValuePolicyInteger();
+                policyDomain.ShadowSignal = shadowSignalDomain;
 
                 missingValuePolicyRepositoryMock
                    .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == signal.Id)))
-                   .Returns(policy);
+                   .Returns(policyDomain);
+
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
 
             }
             private void DeleteASignal(int id)
