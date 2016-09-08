@@ -221,25 +221,6 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GivenAnIntegerMonthlySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
-        {
-            SetupFirstOrderPolicy(Granularity.Month,
-                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2001, 2, 1, 0, 0, 0), new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 6, 1, 0, 0, 0), Value = (int)11 },
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 10, 1, 0, 0, 0), Value = (int)5 },
-                    new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2001, 1, 1, 0, 0, 0), Value = (int)20 }
-                });
-
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2001, 2, 1, 0, 0, 0));
-
-            var expectedDatum = GetExpectedDatums(Granularity.Month);
-
-            AssertEqual(expectedDatum, result);
-        }
-
-        [TestMethod]
         public void GivenAnIntegerMonthSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData_ForIssue31()
         {
             SetupFirstOrderPolicyFroSpecificExample(Granularity.Month, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 4, 1, 0, 0, 0), new List<Datum<int>>()
@@ -274,18 +255,18 @@ namespace WebService.Tests
             SetupFirstOrderPolicyForLowerQuality(Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1), new List<Datum<int>>()
             {
                 new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (int)10 },
-                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 5), Value = (int)30 }
+                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = (int)30 }
             });
 
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
+            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
 
             var expectedDatum = new List<Dto.Datum>()
             {
                 new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = (int)10 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 2), Value = (int)20 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 3), Value = (int)20 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 4), Value = (int)25 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 5), Value = (int)30 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 2, 1), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 3, 1), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 4, 1), Value = (int)25 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = (int)30 },
             };
 
             int i = 0;
@@ -669,10 +650,10 @@ namespace WebService.Tests
 
                 case Granularity.Month:
                     leftBadDatumTimestamp = new DateTime(2000, 1, 1);
-                    middleFirstBadDatumTimestamp = new DateTime(2000, 1, 2);
-                    middleSecondBadDatumTimestamp = new DateTime(2000, 1, 3);
-                    middleThirdBadDatumTimestamp = new DateTime(2000, 1, 4);
-                    rightFairDatumTimestamp = new DateTime(2000, 1, 5);
+                    middleFirstBadDatumTimestamp = new DateTime(2000, 2, 1);
+                    middleSecondBadDatumTimestamp = new DateTime(2000, 3, 1);
+                    middleThirdBadDatumTimestamp = new DateTime(2000, 4, 1);
+                    rightFairDatumTimestamp = new DateTime(2000, 5, 1);
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftBadDatumTimestamp, 1))
