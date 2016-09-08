@@ -129,9 +129,15 @@ namespace WebService
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
+            var signal = signalsDomainService.GetById(signalId);
             if (policy is ShadowMissingValuePolicy)
             {
-                throw new WrongTypesException();
+                var pol = policy as ShadowMissingValuePolicy;
+                var shadowSignal = pol.ShadowSignal.ToDomain<Domain.Signal>();
+                if (shadowSignal.DataType != signal.DataType)
+                {
+                    throw new WrongTypesException();
+                }
             }
 
             var policyDomain = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
