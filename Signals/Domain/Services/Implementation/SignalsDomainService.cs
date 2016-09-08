@@ -83,39 +83,8 @@ namespace Domain.Services.Implementation
             
             var datum = new Datum<T>();
             var mvp = GetMissingValuePolicy(signal);
-
-            CheckMissingValuePolicyAndSetInitialDatum(mvp, ref datum, signal.DataType.GetNativeType().Name);
             
             return FillDatum<T>(fromIncludedUtc, toExcludedUtc, signal, datum, mvp);
-        }
-
-        private void CheckMissingValuePolicyAndSetInitialDatum<T>(MissingValuePolicyBase mvp, ref Datum<T> datum, string typeName)
-        {
-            if (mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
-                datum = new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T)
-                };
-            if (mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-            {
-                var svmvp = mvp as SpecificValueMissingValuePolicy<T>;
-                datum = new Datum<T>()
-                {
-                    Quality = svmvp.Quality,
-                    Value = svmvp.Value
-                };
-            }
-            if (mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-            {
-                if (typeName == "Boolean" || typeName == "String")
-                    throw new ArgumentException("Boolean and String types are not supported.");
-                datum = new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T)
-                };
-            }
         }
 
         private IEnumerable<Datum<T>> FillDatum<T>(DateTime fromIncludedUtc, DateTime toExcludedUtc, Signal signal, Datum<T> datum, MissingValuePolicyBase mvp)
@@ -141,6 +110,10 @@ namespace Domain.Services.Implementation
                 else if (mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
                 {
                     datum = SetDatumForFirstOrderMissingValuePolicy(signal, datum, fromIncludedUtc, quality, ref step);
+                }
+                else if (mvp.GetType() == typeof(ShadowMissingValuePolicy<T>))
+                {
+                    datum = SetDatumForShadowMissingValuePolicy<T>((MissingValuePolicy.ShadowMissingValuePolicy<T>)mvp, fromIncludedUtc);
                 }
                 else if (mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
                 {
@@ -216,6 +189,9 @@ namespace Domain.Services.Implementation
 
         private Datum<T> SetDatumForFirstOrderMissingValuePolicy<T>(Signal signal, Datum<T> datum, DateTime fromIncludedUtc, Quality quality, ref T step)
         {
+            if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
+                throw new ArgumentException("Boolean and String types are not supported.");
+
             var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
             var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUtc, 1);
             
@@ -255,6 +231,12 @@ namespace Domain.Services.Implementation
             }
 
             return datum;
+        }
+
+        private Datum<T> SetDatumForShadowMissingValuePolicy<T>(MissingValuePolicy.ShadowMissingValuePolicy<T> mvp, DateTime timestamp)
+        {
+            return null;
+            //var shadowSignalData = signalsDataRepository.GetData<T>(mvp.ShadowSignal, timestamp, timestamp)
         }
 
         private int SetTotalSteps<T>(Granularity granularity, Datum<T> olderData, Datum<T> newerData)
