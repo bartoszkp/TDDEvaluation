@@ -578,7 +578,6 @@ namespace Domain.Services.Implementation
                                                 Value = default(T),
                                             });
                                         }
-
                                         else
                                         {
                                             Domain.Quality qualityToAdd;
@@ -607,10 +606,11 @@ namespace Domain.Services.Implementation
                                                 {
                                                     if (j == countElementOfListMinusTwo)
                                                     {
+                                                        qualityToAdd = x1.ElementAt(0).Quality;
                                                         valueToAdd += avarage;
                                                         var itemToAdd = new Datum<T>()
                                                         {
-                                                            Quality = x1.ElementAt(0).Quality,
+                                                            Quality = qualityToAdd,
                                                             Signal = signal,
                                                             Timestamp = checkedDateTime,
                                                             Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
