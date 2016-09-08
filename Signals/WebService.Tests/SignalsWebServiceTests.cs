@@ -2402,6 +2402,122 @@ namespace WebService.Tests
             }
             #endregion
 
+
+            #region tests for Shadow Policy
+            [TestMethod]
+            public void WhenGettingData_ShadowPolicyCorrectlyFillsMissingData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("example/signal")
+                };
+
+                var shadowSignal = new Signal()
+                {
+                    Id = 2,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Month,
+                    Path = Domain.Path.FromString("shadowSignal/path"),
+                };
+
+                var existingDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
+                        new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = 5m },
+                };
+
+                var expectedDatum = new Dto.Datum[]
+                {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 11, 1),  Value = default(decimal) },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(1999, 12, 1),  Value = default(decimal) },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = 1m },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1),  Value = default(decimal) },
+                        new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1),  Value = 1.4m },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1),  Value = default(decimal) },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1),  Value = 2m },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 6, 1),  Value = default(decimal) },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1),  Value = default(decimal) },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 8, 1),  Value = 5m },
+                        new Dto.Datum {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 9, 1),  Value = 7m },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 10, 1),  Value = default(decimal) },
+
+                };
+                var firstTimestamp = new DateTime(1999, 11, 1);
+                var lastTimestamp = new DateTime(2000, 11, 1);
+
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var shadowSignalPolicy = new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDecimal() { ShadowSignal = shadowSignal };
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(shadowSignalPolicy);
+
+                SetupGetDataForShadowSignal(existingSignal, existingDatum, shadowSignal, firstTimestamp, lastTimestamp);
+                
+                signalsRepositoryMock
+                    .Setup(srm => srm.Get(1))
+                    .Returns(existingSignal);
+
+                var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalsDomainService);
+
+                var result = signalsWebService.GetData(existingSignal.Id.Value, firstTimestamp, lastTimestamp);
+
+                int index = 0;
+                foreach (var ed in expectedDatum)
+                {
+                    Assert.AreEqual(ed.Quality, result.ElementAt(index).Quality);
+                    Assert.AreEqual(ed.Timestamp, result.ElementAt(index).Timestamp);
+                    Assert.AreEqual(ed.Value, result.ElementAt(index).Value);
+                    index++;
+                }
+            }
+            #endregion
+
+            private void SetupGetDataForShadowSignal(Signal existingSignal, Dto.Datum[] existingDatum, 
+                Signal shadowSignal, DateTime firstTimestamp, DateTime lastTimestamp)
+            {
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<decimal>(existingSignal, firstTimestamp, lastTimestamp))
+                    .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<decimal>>>);
+
+                var shadowDatum1 = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 1.4m },
+                };
+                var shadowDatum2 = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 5, 1), Value = 0.0m },
+                };
+                var shadowDatum3 = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m },
+                };
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == 2), new DateTime(2000, 3, 1), new DateTime(2000, 3, 1)))
+                    .Returns(shadowDatum1.ToDomain<IEnumerable<Domain.Datum<decimal>>>);
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == 2), new DateTime(2000, 5, 1), new DateTime(2000, 5, 1)))
+                    .Returns(shadowDatum2.ToDomain<IEnumerable<Domain.Datum<decimal>>>);
+
+                signalDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == 2), new DateTime(2000, 9, 1), new DateTime(2000, 9, 1)))
+                    .Returns(shadowDatum3.ToDomain<IEnumerable<Domain.Datum<decimal>>>);
+            }
+
             private Dto.Signal SignalWith(
                 int? id = null,
                 Dto.DataType dataType = Dto.DataType.Boolean,
