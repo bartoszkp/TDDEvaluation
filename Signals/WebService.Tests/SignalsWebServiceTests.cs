@@ -1454,17 +1454,6 @@ namespace WebService.Tests
                 };
                 var signalId = 1;
 
-                var datum = new List<Dto.Datum>
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 3 },
-                    new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2000, 2, 1), Value = 6 }
-                };
-
-                var shadowDatum = new List<Dto.Datum>
-                {
-                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = 71 }
-                };
-
                 signalsRepositoryMock
                      .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
                      .Returns<int>(z => {
@@ -1472,10 +1461,6 @@ namespace WebService.Tests
                          signal.Id = signalId;
                          return signal;
                      });
-
-                SetupMocks_RepositoryAndDataRepository_ForGettingData(signal, signalId, datum.ToArray());
-
-                SetupMocks_RepositoryAndDataRepository_ForGettingData(shadowSignalDomain, 2, shadowDatum.ToArray());
 
                 var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowSignal, DataType = shadowSignal.DataType };
                 var policyDomain = new ShadowMissingValuePolicyInteger();
@@ -1489,6 +1474,9 @@ namespace WebService.Tests
 
 
             }
+
+         
+
             private void DeleteASignal(int id)
             {
 
