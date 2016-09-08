@@ -581,9 +581,22 @@ namespace Domain.Services.Implementation
 
                                         else
                                         {
+                                            Domain.Quality qualityToAdd;
                                             var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Days;
+                                            var countElementOfListMinusTwo = countElementOfList - 2;
 
-                                            var qualityToAdd = x1.ElementAt(0).Quality;
+                                            var qualityForNewerElement = x1.ElementAt(0).Quality;
+                                            var qualityForOlderElement = x0.ElementAt(0).Quality;
+
+                                            if (qualityForNewerElement < qualityForOlderElement)
+                                            {
+                                                qualityToAdd = qualityForOlderElement;
+                                            }
+                                            else if (qualityForOlderElement < qualityForNewerElement)
+                                            {
+                                                qualityToAdd = qualityForNewerElement;
+                                            }
+                                            else qualityToAdd = x0.ElementAt(0).Quality;
 
                                             decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
                                             decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
@@ -592,17 +605,33 @@ namespace Domain.Services.Implementation
                                             {
                                                 if (checkedDateTime != toExcludedUtc)
                                                 {
-                                                    valueToAdd += avarage;
-                                                    var itemToAdd = new Datum<T>()
+                                                    if (j == countElementOfListMinusTwo)
                                                     {
-                                                        Quality = qualityToAdd,
-                                                        Signal = signal,
-                                                        Timestamp = checkedDateTime,
-                                                        Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                    };
+                                                        valueToAdd += avarage;
+                                                        var itemToAdd = new Datum<T>()
+                                                        {
+                                                            Quality = x1.ElementAt(0).Quality,
+                                                            Signal = signal,
+                                                            Timestamp = checkedDateTime,
+                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                                        };
 
-                                                    returnList.Add(itemToAdd);
-                                                    checkedDateTime = checkedDateTime.AddDays(1);
+                                                        returnList.Add(itemToAdd);
+                                                    }
+                                                    else
+                                                    {
+                                                        valueToAdd += avarage;
+                                                        var itemToAdd = new Datum<T>()
+                                                        {
+                                                            Quality = qualityToAdd,
+                                                            Signal = signal,
+                                                            Timestamp = checkedDateTime,
+                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                                        };
+
+                                                        returnList.Add(itemToAdd);
+                                                        checkedDateTime = checkedDateTime.AddDays(1);
+                                                    }
                                                 }
                                             }
                                             i--;

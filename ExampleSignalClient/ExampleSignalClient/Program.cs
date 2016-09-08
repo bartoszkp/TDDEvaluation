@@ -22,6 +22,7 @@ namespace ExampleSignalClient
             {
                 new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 10, Quality = Quality.Bad },
                 new Datum() { Timestamp = new DateTime(2000, 1, 5), Value = 30, Quality = Quality.Fair }
+
             });
 
             var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
