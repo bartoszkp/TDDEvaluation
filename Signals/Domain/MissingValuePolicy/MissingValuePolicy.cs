@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Domain.Infrastructure;
+using Domain.Services.Implementation;
 
 namespace Domain.MissingValuePolicy
 {
@@ -22,7 +23,7 @@ namespace Domain.MissingValuePolicy
 
         public abstract IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, 
             DateTime fromIncludedUtc, DateTime toExcludedUtc, 
-            Datum<T> olderDatum = null, Datum<T> neverDatum = null);
+            Datum<T> olderDatum = null, Datum<T> neverDatum = null, SignalsDomainService service = null);
 
         protected static DateTime AddTime(DateTime time, Granularity granularity, int interval = 1)
         {

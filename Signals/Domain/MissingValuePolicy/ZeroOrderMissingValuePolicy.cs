@@ -10,7 +10,7 @@ namespace Domain.MissingValuePolicy
     {
         public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, 
             DateTime fromIncludedUtc, DateTime toExcludedUtc,
-            Datum<T> olderDatum = null, Datum<T> neverDatum = null)
+            Datum<T> olderDatum = null, Datum<T> neverDatum = null, SignalsDomainService service = null)
         {
             var currentDate = new DateTime(fromIncludedUtc.Ticks);
             List<Datum<T>> result = new List<Datum<T>>(data);

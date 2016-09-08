@@ -161,29 +161,9 @@ namespace Domain.Services.Implementation
             var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUTC, 1);
             if (newerData.Count() > 0)
                 newerDatum = newerData.First();
-
-            if (mvp is ZeroOrderMissingValuePolicy<T>)
-                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC, olderDatum).ToList();
-
-            else if (mvp is SpecificValueMissingValuePolicy<T>)
-                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToList();
-
-            else if (mvp is FirstOrderMissingValuePolicy<T>)
-                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC, olderDatum, newerDatum).ToList();
-
-            else if (mvp is NoneQualityMissingValuePolicy<T>)
-            {
-                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToList();
-                return data.OrderBy(s => s.Timestamp).ToList();
-            }
-
-            else if (mvp is ShadowMissingValuePolicy<T>)
-            {
-                var ShadowMvp = mvp as ShadowMissingValuePolicy<T>;
-                ShadowDataFillHelper.FillMissingData<T>(ShadowMvp, this, data, fromIncludedUTC, toExcludedUTC);
-            }
-
-            return data.OrderBy(d => d.Timestamp).ToArray();
+            
+            data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC, olderDatum, newerDatum, this).ToList();
+            return data.OrderBy(d => d.Timestamp).ToList();
         }
 
         public PathEntry GetPathEntry(Path path)

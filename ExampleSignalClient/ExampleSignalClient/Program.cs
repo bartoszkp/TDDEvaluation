@@ -5,7 +5,8 @@ namespace ExampleSignalClient
 {
     public class Program
     {
-        /*static void Main(string[] args)
+
+        static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
@@ -48,7 +49,7 @@ namespace ExampleSignalClient
 
             Console.ReadKey();
         }//*/
-
+        /*
         static void Main(string[] args)
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
