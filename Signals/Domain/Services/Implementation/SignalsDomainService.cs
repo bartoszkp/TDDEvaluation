@@ -248,6 +248,24 @@ namespace Domain.Services.Implementation
                 else filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
             }
 
+            else if (policy is ShadowMissingValuePolicy<T>)
+            {
+                var shadowPolicy = policy as ShadowMissingValuePolicy<T>;
+
+                var data = signalsDataRepository.GetData<T>(shadowPolicy.ShadowSignal, timestamp, timestamp).FirstOrDefault();
+                if (data != null)
+                {
+                    filledArray[current_index] = new Datum<T>
+                    {
+                        Quality = data.Quality,
+                        Value = data.Value,
+                        Signal = signal,
+                        Timestamp = timestamp
+                    };
+                }
+                else filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
+            }
+
             else
                 filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
 
