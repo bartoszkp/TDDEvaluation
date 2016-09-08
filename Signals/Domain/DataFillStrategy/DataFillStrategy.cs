@@ -282,7 +282,7 @@ namespace Domain.DataFillStrategy
         {
             DateTime currentDate = new DateTime(after.Ticks);
             DateTime lastDate = currentDate;
-            while (currentDate < before)
+            while (currentDate <= before)
             {
                 if (datums.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null && this.missingValuePolicy is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
                 {
