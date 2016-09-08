@@ -272,8 +272,7 @@ namespace Domain.DataFillStrategy
 
         public void RemoveElementsFromDatumAndAddingNewElements<T>(List<Domain.Datum<T>> datums, List<Domain.Datum<T>> datumsFirst)
         {
-            for (int i = 0; i < datums.Count; i++)
-                datums.RemoveAt(i);
+            datums.Clear();
             for (int i = 0; i < datumsFirst.Count; i++)
                 datums.Add(datumsFirst.ElementAt(i));
         }
