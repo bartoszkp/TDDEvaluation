@@ -1518,6 +1518,52 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(WrongTypesException))]
+            public void GivenASignalMonth_WhenSetsShadowMissingValuePolicyDayWithNoData_ThrowsException()
+            {
+
+                Dto.Signal shadowSignal = new Dto.Signal() { Id = 2, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Day, Path = new Dto.Path() { Components = new[] { "x", "z" } } };
+                Signal shadowSignalDomain = new Domain.Signal() { Id = 2, DataType = DataType.Integer, Granularity = Granularity.Day, Path = Path.FromString("x/z") };
+
+
+                SetupWebService();
+
+                var signal = new Signal()
+                {
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("a")
+                };
+                var signalId = 1;
+
+                signalsRepositoryMock
+                 .Setup(x => x.Get(It.Is<int>(y => y == 2)))
+                 .Returns<int>(z =>
+                      shadowSignalDomain
+                 );
+
+                signalsRepositoryMock
+                     .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
+                     .Returns<int>(z => {
+                         var signal2 = signal;
+                         signal.Id = signalId;
+                         return signal;
+                     });
+
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowSignal, DataType = shadowSignal.DataType };
+                var policyDomain = new ShadowMissingValuePolicyInteger();
+                policyDomain.ShadowSignal = shadowSignalDomain;
+
+                missingValuePolicyRepositoryMock
+                   .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == signal.Id)))
+                   .Returns(policyDomain);
+
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
+            }
+
+
             private void DeleteASignal(int id)
             {
 
