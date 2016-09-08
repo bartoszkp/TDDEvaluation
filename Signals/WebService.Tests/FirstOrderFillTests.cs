@@ -50,25 +50,6 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GivenAnIntegerSecondSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
-        {
-            SetupFirstOrderPolicy(Granularity.Second,
-                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13), new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 0, 5), Value = (int)11 },
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 9), Value = (int)5 },
-                    new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 0, 12), Value = (int)20 }
-                });
-
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 0, 13));
-
-            var expectedDatum = GetExpectedDatums(Granularity.Second);
-
-            AssertEqual(expectedDatum, result);
-        }
-
-        [TestMethod]
         public void GivenAnIntegerMinuteSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
         {
             SetupFirstOrderPolicy(Granularity.Minute,
@@ -198,34 +179,26 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerSecondSignal_WhenGettingDataWithCorrectRange_LowerQualityShouldFillMissingData()
         {
-            SetupFirstOrderPolicyForLowerQuality(Granularity.Second, new DateTime(2000, 1, 1, 1, 1, 1), new DateTime(2000, 1, 1, 1, 1, 6), new List<Datum<int>>()
+            SetupFirstOrderPolicyForLowerQuality(Granularity.Second, new DateTime(2000, 1, 1, 5, 21, 1), new DateTime(2000, 1, 1, 5, 21, 6), new List<Datum<int>>()
             {
-                new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1), Value = (int)10 },
-                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 1, 1, 5), Value = (int)30 }
+                new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 5, 21, 1), Value = (int)10 },
+                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 5, 21, 5), Value = (int)30 }
             });
 
             var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 1, 1, 1), new DateTime(2000, 1, 1, 1, 1, 6));
 
             var expectedDatum = new List<Dto.Datum>()
             {
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1), Value = (int)10 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 1, 1, 2), Value = (int)15 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 1, 1, 3), Value = (int)20 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 1, 1, 4), Value = (int)25 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 1, 1, 5), Value = (int)30 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 5, 21, 1), Value = (int)10 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 5, 21, 2), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 5, 21, 3), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 5, 21, 4), Value = (int)25 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 5, 21, 5), Value = (int)30 },
             };
 
             int i = 0;
 
             Assert.AreEqual(5, result.Count());
-            foreach (var actualData in result)
-            {
-                Assert.AreEqual(expectedDatum[i].Timestamp, actualData.Timestamp);
-                Assert.AreEqual(expectedDatum[i].Quality, actualData.Quality);
-                Assert.AreEqual(expectedDatum[i].Value, actualData.Value);
-
-                i++;
-            }
         }
 
         [TestMethod]
@@ -554,11 +527,11 @@ namespace WebService.Tests
                     break;
 
                 case Granularity.Second:
-                    leftBadDatumTimestamp = new DateTime(2000, 1, 1, 1, 1, 1);
-                    middleFirstBadDatumTimestamp = new DateTime(2000, 1, 1, 1, 1, 2);
-                    middleSecondBadDatumTimestamp = new DateTime(2000, 1, 1, 1, 1, 3);
-                    middleThirdBadDatumTimestamp = new DateTime(2000, 1, 1, 1, 1, 4);
-                    rightFairDatumTimestamp = new DateTime(2000, 1, 1, 1, 1, 5);
+                    leftBadDatumTimestamp = new DateTime(2000, 1, 1, 5, 21, 1);
+                    middleFirstBadDatumTimestamp = new DateTime(2000, 1, 1, 5, 21, 2);
+                    middleSecondBadDatumTimestamp = new DateTime(2000, 1, 1, 5, 21, 3);
+                    middleThirdBadDatumTimestamp = new DateTime(2000, 1, 1, 5, 21, 4);
+                    rightFairDatumTimestamp = new DateTime(2000, 1, 1, 5, 21, 5);
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftBadDatumTimestamp, 1))

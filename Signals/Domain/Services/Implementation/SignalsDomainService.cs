@@ -305,7 +305,7 @@ namespace Domain.Services.Implementation
                                                         };
 
                                                         returnList.Add(itemToAdd);
-                                                        checkedDateTime = checkedDateTime.AddDays(1);
+                                                        checkedDateTime = checkedDateTime.AddSeconds(1);
                                                     }
                                                 }
                                             }
