@@ -163,6 +163,24 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new IdNotNullException();
             SetMissingValuePolicy(signalId, null);
+            switch(signal.DataType)
+            {
+                case DataType.Boolean:
+                    signalsDataRepository.DeleteData<bool>(signal);
+                    break;
+                case DataType.Decimal:
+                    signalsDataRepository.DeleteData<decimal>(signal);
+                    break;
+                case DataType.Double:
+                    signalsDataRepository.DeleteData<double>(signal);
+                    break;
+                case DataType.Integer:
+                    signalsDataRepository.DeleteData<int>(signal);
+                    break;
+                case DataType.String:
+                    signalsDataRepository.DeleteData<string>(signal);
+                    break;
+            }
             signalsRepository.Delete(signal);
         }
     }

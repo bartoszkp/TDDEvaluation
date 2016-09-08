@@ -11,24 +11,25 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "ZeroOrderTesasdtasass" } }
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "DeleteTests" } }
             }).Id.Value;
-
-            client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.Boolean });
 
             client.SetData(id, new Datum[]
             {
-    new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = false },
-    new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 5), Value = true }
+    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
             });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 10));
+            client.Delete(id);
 
-            foreach (var d in result)
+            try
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Brak danych usuniętego sygnału");
             }
 
             Console.ReadKey();
