@@ -113,7 +113,7 @@ namespace Domain.Services.Implementation
                 }
                 else if (mvp.GetType() == typeof(ShadowMissingValuePolicy<T>))
                 {
-                    datum = SetDatumForShadowMissingValuePolicy<T>((MissingValuePolicy.ShadowMissingValuePolicy<T>)mvp, fromIncludedUtc);
+                    datum = SetDatumForShadowMissingValuePolicy<T>((MissingValuePolicy.ShadowMissingValuePolicy<T>)mvp, signal, fromIncludedUtc);
                 }
                 else if (mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
                 {
@@ -139,6 +139,10 @@ namespace Domain.Services.Implementation
                     else if (mvp.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
                     {
                         datum = SetDatumForFirstOrderMissingValuePolicy(signal, datum, fromIncludedUtc, quality, ref step);
+                    }
+                    else if (mvp.GetType() == typeof(ShadowMissingValuePolicy<T>))
+                    {
+                        datum = SetDatumForShadowMissingValuePolicy<T>((MissingValuePolicy.ShadowMissingValuePolicy<T>)mvp, signal, fromIncludedUtc);
                     }
                     returnList.Add(new Datum<T>() { Quality = datum.Quality, Timestamp = fromIncludedUtc, Value = datum.Value, Signal = signal });
                 }
@@ -233,10 +237,29 @@ namespace Domain.Services.Implementation
             return datum;
         }
 
-        private Datum<T> SetDatumForShadowMissingValuePolicy<T>(MissingValuePolicy.ShadowMissingValuePolicy<T> mvp, DateTime timestamp)
+        private Datum<T> SetDatumForShadowMissingValuePolicy<T>(MissingValuePolicy.ShadowMissingValuePolicy<T> mvp, Signal signal, DateTime timestamp)
         {
-            return null;
-            //var shadowSignalData = signalsDataRepository.GetData<T>(mvp.ShadowSignal, timestamp, timestamp)
+            var signalData = signalsDataRepository.GetData<T>(signal, timestamp, timestamp);
+            if (signalData.Count() == 0)
+            {
+                var shadowSignalData = signalsDataRepository.GetData<T>(mvp.ShadowSignal, timestamp, timestamp);
+                if (shadowSignalData.Count() == 0)
+                {
+                    return new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                    };
+                }
+                else
+                {
+                    return shadowSignalData.ElementAt(0);
+                }
+            }
+            else
+            {
+                return signalData.ElementAt(0);
+            }
         }
 
         private int SetTotalSteps<T>(Granularity granularity, Datum<T> olderData, Datum<T> newerData)
