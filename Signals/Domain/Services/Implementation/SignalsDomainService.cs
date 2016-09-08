@@ -265,6 +265,7 @@ namespace Domain.Services.Implementation
                                             {
                                                 if (checkedDateTime != toExcludedUtc)
                                                 {
+       
                                                     valueToAdd += avarage;
                                                     var itemToAdd = new Datum<T>()
                                                     {
