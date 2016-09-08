@@ -152,23 +152,24 @@ namespace Domain.Services.Implementation
             if (data == null)
                 return null;
 
-            if (mvp is ZeroOrderMissingValuePolicy<T>)
-            {
-                Datum<T> olderDatum = null;
-                var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUTC, 1);
-                if (olderData.Count() > 0)
-                    olderDatum = olderData.First();
+            Datum<T> olderDatum = null;
+            var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUTC, 1);
+            if (olderData.Count() > 0)
+                olderDatum = olderData.First();
 
+            Datum<T> newerDatum = null;
+            var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUTC, 1);
+            if (newerData.Count() > 0)
+                newerDatum = newerData.First();
+
+            if (mvp is ZeroOrderMissingValuePolicy<T>)
                 data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC, olderDatum).ToList();
-            }
 
             else if (mvp is SpecificValueMissingValuePolicy<T>)
                 data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC).ToList();
 
             else if (mvp is FirstOrderMissingValuePolicy<T>)
-            {
-                FirstOrderDataFillHelper.FillMissingData(signal, this, data, fromIncludedUTC, toExcludedUTC);
-            }
+                data = mvp.FillData(signal, data, fromIncludedUTC, toExcludedUTC, olderDatum, newerDatum).ToList();
 
             else if (mvp is NoneQualityMissingValuePolicy<T>)
             {
