@@ -134,7 +134,7 @@ namespace WebService
             {
                 var pol = policy as ShadowMissingValuePolicy;
                 var shadowSignal = pol.ShadowSignal.ToDomain<Domain.Signal>();
-                if (shadowSignal.DataType != signal.DataType)
+                if (shadowSignal.DataType != signal.DataType||shadowSignal.Granularity!=signal.Granularity)
                 {
                     throw new WrongTypesException();
                 }
