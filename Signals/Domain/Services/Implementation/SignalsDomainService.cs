@@ -63,6 +63,8 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Domain.Signal signal, MissingValuePolicyBase mvpDomain)
         {
+            shadowPolicySignalCase(signal, mvpDomain);
+
             this.missingValuePolicyRepository.Set(signal, mvpDomain);
         }
 
@@ -475,6 +477,50 @@ namespace Domain.Services.Implementation
                     return dateTime.AddYears(-1);
             }
             return new DateTime();
+        }
+
+        private void shadowPolicySignalCase(Signal signal, MissingValuePolicyBase mvpDomain)
+        {
+            if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<bool>))
+            {
+                var shadowSignal = ((ShadowMissingValuePolicy<bool>)mvpDomain).ShadowSignal;
+
+                if (signal.DataType != shadowSignal.DataType ||
+                signal.Granularity != shadowSignal.Granularity)
+                    throw new Exceptions.ShadowSignalDataTypeOrGranularityDoesntMatch();
+            }
+            else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<int>))
+            {
+                var shadowSignal = ((ShadowMissingValuePolicy<int>)mvpDomain).ShadowSignal;
+
+                if (signal.DataType != shadowSignal.DataType ||
+                signal.Granularity != shadowSignal.Granularity)
+                    throw new Exceptions.ShadowSignalDataTypeOrGranularityDoesntMatch();
+            }
+            else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<double>))
+            {
+                var shadowSignal = ((ShadowMissingValuePolicy<double>)mvpDomain).ShadowSignal;
+
+                if (signal.DataType != shadowSignal.DataType ||
+                signal.Granularity != shadowSignal.Granularity)
+                    throw new Exceptions.ShadowSignalDataTypeOrGranularityDoesntMatch();
+            }
+            else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<decimal>))
+            {
+                var shadowSignal = ((ShadowMissingValuePolicy<decimal>)mvpDomain).ShadowSignal;
+
+                if (signal.DataType != shadowSignal.DataType ||
+                signal.Granularity != shadowSignal.Granularity)
+                    throw new Exceptions.ShadowSignalDataTypeOrGranularityDoesntMatch();
+            }
+            else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<string>))
+            {
+                var shadowSignal = ((ShadowMissingValuePolicy<string>)mvpDomain).ShadowSignal;
+
+                if (signal.DataType != shadowSignal.DataType ||
+                signal.Granularity != shadowSignal.Granularity)
+                    throw new Exceptions.ShadowSignalDataTypeOrGranularityDoesntMatch();
+            }
         }
     }
 }
