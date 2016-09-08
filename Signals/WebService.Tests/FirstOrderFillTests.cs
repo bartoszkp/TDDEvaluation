@@ -358,6 +358,38 @@ namespace WebService.Tests
             }
         }
 
+        [TestMethod]
+        public void GivenAnIntegerYearSignal_WhenGettingDataWithCorrectRange_LowerQualityShouldFillMissingData()
+        {
+            SetupFirstOrderPolicyForLowerQuality(Granularity.Year, new DateTime(2001, 1, 1), new DateTime(2006, 1, 1), new List<Datum<int>>()
+            {
+                new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2001, 1, 1), Value = (int)10 },
+                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)30 }
+            });
+
+            var result = signalsWebService.GetData(1, new DateTime(2001, 1, 1), new DateTime(2006, 1, 1));
+
+            var expectedDatum = new List<Dto.Datum>()
+            {
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2001, 1, 1), Value = (int)10 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2002, 1, 1), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2003, 1, 1), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2004, 1, 1), Value = (int)25 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)30 },
+            };
+
+            int i = 0;
+
+            Assert.AreEqual(5, result.Count());
+            foreach (var actualData in result)
+            {
+                Assert.AreEqual(expectedDatum[i].Timestamp, actualData.Timestamp);
+                Assert.AreEqual(expectedDatum[i].Quality, actualData.Quality);
+
+                i++;
+            }
+        }
+
 
 
         private void SetupFirstOrderPolicy(Granularity granularity,
@@ -751,6 +783,115 @@ namespace WebService.Tests
 
                     dataRepoMock
                         .Setup(d => d.GetDataOlderThan<int>(returnedSignal, middleThirdBadDatumTimestamp.AddMonths(-1), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleSecondBadDatumTimestamp, Value = (int)15 }
+                        });
+                    break;
+
+                case Granularity.Year:
+                    leftBadDatumTimestamp = new DateTime(2001, 1, 1);
+                    middleFirstBadDatumTimestamp = new DateTime(2002, 1, 1);
+                    middleSecondBadDatumTimestamp = new DateTime(2003, 1, 1);
+                    middleThirdBadDatumTimestamp = new DateTime(2004, 1, 1);
+                    rightFairDatumTimestamp = new DateTime(2005, 1, 1);
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftBadDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>());
+
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, leftBadDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleFirstBadDatumTimestamp, Value = (int)15 }
+                        });
+
+                    dataRepoMock
+                       .Setup(d => d.GetDataOlderThan<int>(returnedSignal, leftBadDatumTimestamp.AddYears(1), 1))
+                       .Returns(new List<Datum<int>>());
+
+                    dataRepoMock
+                       .Setup(d => d.GetDataNewerThan<int>(returnedSignal, leftBadDatumTimestamp.AddYears(1), 1))
+                       .Returns(new List<Datum<int>>()
+                       {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleFirstBadDatumTimestamp, Value = (int)15 }
+                       });
+
+                    dataRepoMock
+                       .Setup(d => d.GetDataNewerThan<int>(returnedSignal, rightFairDatumTimestamp, 1))
+                       .Returns(new List<Datum<int>>());
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, rightFairDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleThirdBadDatumTimestamp, Value = (int)25 }
+                        });
+
+                    dataRepoMock
+                       .Setup(d => d.GetDataNewerThan<int>(returnedSignal, rightFairDatumTimestamp.AddYears(-1), 1))
+                       .Returns(new List<Datum<int>>());
+
+                    dataRepoMock
+                       .Setup(d => d.GetDataOlderThan<int>(returnedSignal, rightFairDatumTimestamp.AddYears(-1), 1))
+                       .Returns(new List<Datum<int>>()
+                       {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleThirdBadDatumTimestamp, Value = (int)25 }
+                       });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, middleFirstBadDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleSecondBadDatumTimestamp, Value = (int)20 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, middleFirstBadDatumTimestamp.AddYears(1), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleSecondBadDatumTimestamp, Value = (int)20 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, middleSecondBadDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleFirstBadDatumTimestamp, Value = (int)15 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, middleSecondBadDatumTimestamp.AddYears(-1), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleFirstBadDatumTimestamp, Value = (int)15 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, middleSecondBadDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleThirdBadDatumTimestamp, Value = (int)25 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataNewerThan<int>(returnedSignal, middleSecondBadDatumTimestamp.AddYears(1), 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleThirdBadDatumTimestamp, Value = (int)25 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, middleThirdBadDatumTimestamp, 1))
+                        .Returns(new List<Datum<int>>()
+                        {
+                                        new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleSecondBadDatumTimestamp, Value = (int)15 }
+                        });
+
+                    dataRepoMock
+                        .Setup(d => d.GetDataOlderThan<int>(returnedSignal, middleThirdBadDatumTimestamp.AddYears(-1), 1))
                         .Returns(new List<Datum<int>>()
                         {
                                         new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleSecondBadDatumTimestamp, Value = (int)15 }

@@ -12,7 +12,7 @@ namespace ExampleSignalClient
             var id = client.Add(new Signal()
             {
                 DataType = DataType.Integer,
-                Granularity = Granularity.Month,
+                Granularity = Granularity.Year,
                 Path = new Path() { Components = new[] { "FirstOrderTests" } }
             }).Id.Value;
 
@@ -20,12 +20,12 @@ namespace ExampleSignalClient
 
             client.SetData(id, new Datum[]
             {
-                new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 10, Quality = Quality.Bad },
-                new Datum() { Timestamp = new DateTime(2000, 5, 1), Value = 30, Quality = Quality.Fair }
+                new Datum() { Timestamp = new DateTime(2001, 1, 1), Value = 10, Quality = Quality.Bad },
+                new Datum() { Timestamp = new DateTime(2005, 1, 1), Value = 30, Quality = Quality.Fair }
 
             });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+            var result = client.GetData(id, new DateTime(2001, 1, 1), new DateTime(2006, 1, 1));
 
             foreach (var d in result)
             {
