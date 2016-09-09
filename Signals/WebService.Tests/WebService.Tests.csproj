@@ -68,6 +68,7 @@
     <Compile Include="SignalsWebServiceTests.cs" />
     <Compile Include="SpecificQualityDataFillTests.cs" />
     <Compile Include="FirstOrderDataFillTests.cs" />
+    <Compile Include="ShadowMissingValuePolicyFillTest.cs" />
     <Compile Include="ZeroQualityDataFillTests.cs" />
   </ItemGroup>
   <ItemGroup>
