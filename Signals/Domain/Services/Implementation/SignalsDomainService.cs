@@ -102,6 +102,9 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new NoSuchSignalException();
 
+            if (!IsShadowSignalMatch(signal, domainPolicy))
+                throw new InvalidOperationException("Shadow Signal type or granaulity dosen't match");
+
             this.missingValuePolicyRepository.Set(signal, domainPolicy);
         }
 
@@ -183,6 +186,30 @@ namespace Domain.Services.Implementation
             }
             signalsRepository.Delete(signal);
         }
+
+        private bool IsShadowSignalMatch(Signal signal, MissingValuePolicyBase domainPolicy)
+        {
+            Signal signalShadow;
+
+            if (domainPolicy.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<bool>))
+                signalShadow = ((ShadowMissingValuePolicy<bool>)domainPolicy).ShadowSignal;
+            else if (domainPolicy.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<int>))
+                signalShadow = ((ShadowMissingValuePolicy<int>)domainPolicy).ShadowSignal;
+            else if (domainPolicy.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<double>))
+                signalShadow = ((ShadowMissingValuePolicy<double>)domainPolicy).ShadowSignal;
+            else if (domainPolicy.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<decimal>))
+                signalShadow = ((ShadowMissingValuePolicy<decimal>)domainPolicy).ShadowSignal;
+            else if (domainPolicy.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<string>))
+                signalShadow = ((ShadowMissingValuePolicy<string>)domainPolicy).ShadowSignal;
+            else
+                signalShadow = null;
+
+            if (signal.DataType != signalShadow.DataType || signal.Granularity != signalShadow.Granularity)
+                return false;
+
+            return true;
+        }
+
     }
 
 
