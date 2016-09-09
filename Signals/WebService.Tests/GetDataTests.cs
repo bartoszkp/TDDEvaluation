@@ -46,13 +46,13 @@ namespace WebService.Tests
             GivenASignal(existingSignal);
             signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
             choiseDataType(existingSignal, existingDatum, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1));
-            mvpRepoMock = new Mock<IMissingValuePolicyRepository>();
-            mvpRepoMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+            missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
                 .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
             var signalsDomainService = new SignalsDomainService(
                     signalsRepositoryMock.Object,
                     signalsDataRepositoryMock.Object,
-                    mvpRepoMock.Object);
+                    missingValuePolicyRepositoryMock.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
             var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1));
             Assert.AreEqual(result.ElementAt(0).Quality, Dto.Quality.Good);
@@ -360,22 +360,24 @@ namespace WebService.Tests
             GivenASignal(existingSignal);
             signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
             choiseDataType(existingSignal, existingDatum, new DateTime(2000, 1, 3), new DateTime(2000, 1, 1));
-            mvpRepoMock = new Mock<IMissingValuePolicyRepository>();
-            mvpRepoMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+            missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
                 .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyBoolean());
             var signalsDomainService = new SignalsDomainService(
                     signalsRepositoryMock.Object,
                     signalsDataRepositoryMock.Object,
-                    mvpRepoMock.Object);
+                    missingValuePolicyRepositoryMock.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
             var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 3, 1), new DateTime(2000, 1, 1));
             Assert.AreEqual(result.Count(), 0);
         }
+
+        
         #endregion
 
         private void SetupWebService()
         {
-            var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, mvpRepoMock.Object);
+            var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
         }
 
@@ -389,13 +391,13 @@ namespace WebService.Tests
             GivenASignal(existingSignal);
             signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
             choiseDataType(existingSignal, existingDatum, fromIncludedUtc, toExcludedUtc);
-            mvpRepoMock = new Mock<IMissingValuePolicyRepository>();
-            mvpRepoMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+            missingValuePolicyRepositoryMock.Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
                 .Returns(missingValuePolicyBase);
             var signalsDomainService = new SignalsDomainService(
                     signalsRepositoryMock.Object,
                     signalsDataRepositoryMock.Object,
-                    mvpRepoMock.Object);
+                    missingValuePolicyRepositoryMock.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
             var result = signalsWebService.GetData(existingSignal.Id.Value, fromIncludedUtc, toExcludedUtc);
             AssertDatum(result, filledDatum);
@@ -463,7 +465,7 @@ namespace WebService.Tests
 
         private Mock<ISignalsDataRepository> signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
         private Mock<ISignalsRepository> signalsRepositoryMock = new Mock<ISignalsRepository>();
-        private Mock<IMissingValuePolicyRepository> mvpRepoMock = new Mock<IMissingValuePolicyRepository>();
+        private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
 
     }
 }

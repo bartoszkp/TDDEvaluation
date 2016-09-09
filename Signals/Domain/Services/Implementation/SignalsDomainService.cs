@@ -96,8 +96,21 @@ namespace Domain.Services.Implementation
             VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
             secondaryItem = new Datum<T>() { Signal = signal, Timestamp = toExcludedUtc };
             VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
+            DateTime dataFrom= new DateTime();
+            var dataOlder = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
+            if(dataOlder.Count()!=0)
+            {
+                if (dataOlder.ElementAt(0).Timestamp < toExcludedUtc)
+                {
+                    dataFrom = dataOlder.ElementAt(0).Timestamp;
+                }
+            }
+            else
+            {
+                dataFrom = fromIncludedUtc;
+            }
             var data = this.signalsDataRepository
-                .GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+                .GetData<T>(signal, dataFrom, toExcludedUtc);
 
             foreach (var item in data)
             {

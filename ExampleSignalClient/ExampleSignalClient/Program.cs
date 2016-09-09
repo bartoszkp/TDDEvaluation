@@ -13,23 +13,23 @@ namespace ExampleSignalClient
             {
                 DataType = DataType.Decimal,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "DeleteTests2" } }
+                Path = new Path() { Components = new[] { "FirstOrderTests37" } }
             }).Id.Value;
+
+            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Decimal });
 
             client.SetData(id, new Datum[]
             {
     new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
+    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
+    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
             });
 
-            client.Delete(id);
+            var result = client.GetData(id, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
 
-            try
+            foreach (var d in result)
             {
-                client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Brak danych usuniętego sygnału");
+                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
             }
 
             Console.ReadKey();
