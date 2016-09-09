@@ -48,7 +48,26 @@ namespace WebService.Tests
             SetupZeroQuality(existingSignal, existingDatum, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1),
                 new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble(), filledDatum);
         }
-        
+
+
+        [TestMethod]
+        public void GivenASignalAndDatum_Decimal_ReturnOneElement()
+        {
+            var existingSignal = SignalWith(1, DataType.Decimal, Granularity.Month, Path.FromString("root/signal1"));
+            var existingDatum = new Dto.Datum[]
+
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (decimal)1m },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1),  Value = (decimal)2m },
+                        new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 8, 1),  Value = (decimal)5m }
+            };
+            var filledDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 6, 1),  Value = (decimal)3m },
+            };
+            SetupZeroQuality(existingSignal, existingDatum, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1),
+                new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDecimal(), filledDatum);
+        }
         private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
         {
             return new Domain.Signal()
@@ -64,13 +83,7 @@ namespace WebService.Tests
                 Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicyBase,
                 Dto.Datum[] filledDatum)
         {
-            List<Datum<double>> existingDatumFirst = new List<Datum<double>>();
-            existingDatumFirst.Add(new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 });
-            List<Datum<double>> existingDatumSecond = new List<Datum<double>>();
-            existingDatumSecond.Add(new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2 });
-            List<Datum<double>> existingDatumThird = new List<Datum<double>>();
-            existingDatumThird.Add(new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5 });
-
+           
             signalsRepositoryMock = new Mock<ISignalsRepository>();
             GivenASignal(existingSignal);
             signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();           
@@ -79,8 +92,32 @@ namespace WebService.Tests
             missingValuePolicyRepositoryMock
                 .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
                 .Returns(missingValuePolicyBase);
-
+            var choiseSetupMock = new Dictionary<DataType, Action>()
+            {
+                {DataType.Decimal, ()=>DataTypeDecimal_Setup() },
+                {DataType.Double, ()=>DataTypeDouble_Setup() }
+            };
+            choiseSetupMock[existingSignal.DataType].Invoke();
             
+            var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+            var result = signalsWebService.GetData(existingSignal.Id.Value, fromIncludedUtc, toExcludedUtc);
+            AssertDatum(result, filledDatum);
+
+        }
+
+        private void DataTypeDouble_Setup()
+        {
+            List<Datum<double>> existingDatumFirst = new List<Datum<double>>();
+            existingDatumFirst.Add(new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 });
+            List<Datum<double>> existingDatumSecond = new List<Datum<double>>();
+            existingDatumSecond.Add(new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2 });
+            List<Datum<double>> existingDatumThird = new List<Datum<double>>();
+            existingDatumThird.Add(new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5 });
+
             signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<double>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 2, 1), 1)).Returns(existingDatumFirst);
             signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<double>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 3, 1), 1)).Returns(existingDatumFirst);
             signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<double>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 4, 1), 1)).Returns(existingDatumFirst);
@@ -102,13 +139,37 @@ namespace WebService.Tests
             signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<double>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 7, 1), 1)).Returns(existingDatumThird);
             signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<double>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 8, 1), 1)).Returns(existingDatumThird);
 
-            var signalsDomainService = new SignalsDomainService(
-                    signalsRepositoryMock.Object,
-                    signalsDataRepositoryMock.Object,
-                    missingValuePolicyRepositoryMock.Object);
-            signalsWebService = new SignalsWebService(signalsDomainService);
-            var result = signalsWebService.GetData(existingSignal.Id.Value, fromIncludedUtc, toExcludedUtc);
-            AssertDatum(result, filledDatum);
+        }
+
+        private void DataTypeDecimal_Setup()
+        {
+            List<Datum<decimal>> existingDatumFirst = new List<Datum<decimal>>();
+            existingDatumFirst.Add(new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m });
+            List<Datum<decimal>> existingDatumSecond = new List<Datum<decimal>>();
+            existingDatumSecond.Add(new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m });
+            List<Datum<decimal>> existingDatumThird = new List<Datum<decimal>>();
+            existingDatumThird.Add(new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 8, 1), Value = 5m });
+
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 2, 1), 1)).Returns(existingDatumFirst);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 3, 1), 1)).Returns(existingDatumFirst);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 4, 1), 1)).Returns(existingDatumFirst);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 5, 1), 1)).Returns(existingDatumFirst);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 6, 1), 1)).Returns(existingDatumSecond);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 7, 1), 1)).Returns(existingDatumSecond);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 8, 1), 1)).Returns(existingDatumSecond);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 9, 1), 1)).Returns(existingDatumThird);
+            signalsDataRepositoryMock.Setup(s => s.GetDataOlderThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 10, 1), 1)).Returns(existingDatumThird);
+
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(1999, 11, 1), 1)).Returns(existingDatumFirst);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(1999, 12, 1), 1)).Returns(existingDatumFirst);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 1, 1), 1)).Returns(existingDatumFirst);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 2, 1), 1)).Returns(existingDatumSecond);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 3, 1), 1)).Returns(existingDatumSecond);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 4, 1), 1)).Returns(existingDatumSecond);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 5, 1), 1)).Returns(existingDatumSecond);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 6, 1), 1)).Returns(existingDatumThird);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 7, 1), 1)).Returns(existingDatumThird);
+            signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 8, 1), 1)).Returns(existingDatumThird);
 
         }
         private void GivenNoSignals()
