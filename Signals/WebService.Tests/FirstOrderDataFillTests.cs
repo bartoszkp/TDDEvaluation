@@ -68,6 +68,25 @@ namespace WebService.Tests
             SetupZeroQuality(existingSignal, existingDatum, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1),
                 new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDecimal(), filledDatum);
         }
+
+        [TestMethod]
+        public void GivenASignalAndDatum_Integer_ReturnOneElement()
+        {
+            var existingSignal = SignalWith(1, DataType.Integer, Granularity.Month, Path.FromString("root/signal1"));
+            var existingDatum = new Dto.Datum[]
+
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (int)1 },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1),  Value = (int)2 },
+                        new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 8, 1),  Value = (int)5 }
+            };
+            var filledDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 9, 1),  Value = (int)0 },
+            };
+            SetupZeroQuality(existingSignal, existingDatum, new DateTime(2000, 9, 1), new DateTime(2000, 10, 1),
+                new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyInteger(), filledDatum);
+        }
         private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
         {
             return new Domain.Signal()
@@ -95,7 +114,8 @@ namespace WebService.Tests
             var choiseSetupMock = new Dictionary<DataType, Action>()
             {
                 {DataType.Decimal, ()=>DataTypeDecimal_Setup() },
-                {DataType.Double, ()=>DataTypeDouble_Setup() }
+                {DataType.Double, ()=>DataTypeDouble_Setup() },
+                {DataType.Integer,()=>DataTypeInteger_Setup() }
             };
             choiseSetupMock[existingSignal.DataType].Invoke();
             
@@ -170,6 +190,11 @@ namespace WebService.Tests
             signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 6, 1), 1)).Returns(existingDatumThird);
             signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 7, 1), 1)).Returns(existingDatumThird);
             signalsDataRepositoryMock.Setup(s => s.GetDataNewerThan<decimal>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 8, 1), 1)).Returns(existingDatumThird);
+
+        }
+
+        private void DataTypeInteger_Setup()
+        {
 
         }
         private void GivenNoSignals()
