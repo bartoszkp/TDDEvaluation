@@ -45,11 +45,9 @@ namespace WebService.Tests
 
 
             signalsRepositoryMock = new Mock<ISignalsRepository>();
-            GivenASignal(existingSignal);
-            
+            GivenASignal(existingSignal);           
             signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
             signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<decimal>(It.Is<Domain.Signal>(x => x.Id == 2), new DateTime(2000, 6, 1), new DateTime(2000, 7, 1))).Returns(existingDatumFirst);
-
             choiseDataType(existingSignal, existingDatum, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1));
             missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
             missingValuePolicyRepositoryMock
@@ -58,7 +56,6 @@ namespace WebService.Tests
                 {
                     ShadowSignal = shadowSignal
                 });
-
             var signalsDomainService = new SignalsDomainService(
                     signalsRepositoryMock.Object,
                     signalsDataRepositoryMock.Object,
@@ -66,17 +63,61 @@ namespace WebService.Tests
             signalsWebService = new SignalsWebService(signalsDomainService);
 
 
-            SetupZeroQuality(existingSignal, existingDatum, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1),
-                new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDecimal(){ShadowSignal = shadowSignal},filledDatum);
+            SetupZeroQuality(existingSignal, new DateTime(2000, 6, 1), new DateTime(2000, 7, 1),filledDatum);
         }
 
-        private void SetupZeroQuality(Signal existingSignal, Dto.Datum[] existingDatum,
-                DateTime fromIncludedUtc, DateTime toExcludedUtc,
-                Domain.MissingValuePolicy.MissingValuePolicyBase missingValuePolicyBase,
-                Dto.Datum[] filledDatum)
-        {
 
-            
+        [TestMethod]
+        public void GivenASignalAndDatum_Boolean_ReturnDatumShadow()
+        {
+            var existingSignal = SignalWith(1, DataType.Boolean, Granularity.Month, Path.FromString("root/signal1"));
+            var shadowSignal = SignalWith(2, DataType.Boolean, Granularity.Month, Path.FromString("root/signal1/shadow"));
+            var existingDatum = new Dto.Datum[]
+
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 1, 1),  Value = (bool)true },
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1),  Value = (bool)false },
+                        new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 8, 1),  Value = (bool)false }
+            };
+            var filledDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 5, 1),  Value = (bool)false },
+                        new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 6, 1),  Value = (bool)true },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 7, 1),  Value = false },
+            };
+
+            List<Datum<bool>> existingDatumFirst = new List<Datum<bool>>();
+            existingDatumFirst.Add(new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = false });
+            existingDatumFirst.Add(new Datum<bool>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 6, 1), Value = true });
+            existingDatumFirst.Add(new Datum<bool>() { Quality = Quality.None, Timestamp = new DateTime(2000, 7, 1), Value = false });
+
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+            GivenASignal(existingSignal);
+            signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+            signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<bool>(It.Is<Domain.Signal>(x => x.Id == 2), new DateTime(2000, 5, 1), new DateTime(2000, 8, 1))).Returns(existingDatumFirst);
+            choiseDataType(existingSignal, existingDatum, new DateTime(2000, 5, 1), new DateTime(2000, 8, 1));
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+            missingValuePolicyRepositoryMock
+                .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean()
+                {
+                    ShadowSignal = shadowSignal
+                });
+            var signalsDomainService = new SignalsDomainService(
+                    signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object,
+                    missingValuePolicyRepositoryMock.Object);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+
+            SetupZeroQuality(existingSignal, new DateTime(2000, 5, 1), new DateTime(2000, 8, 1), filledDatum);
+        }
+
+
+        private void SetupZeroQuality(Signal existingSignal,
+                DateTime fromIncludedUtc, DateTime toExcludedUtc,
+                Dto.Datum[] filledDatum)
+        {       
             var result = signalsWebService.GetData(existingSignal.Id.Value, fromIncludedUtc, toExcludedUtc);
             AssertDatum(result, filledDatum);
         }
