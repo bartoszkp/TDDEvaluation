@@ -202,7 +202,7 @@ namespace Domain.Services.Implementation
             else if (domainPolicy.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<string>))
                 signalShadow = ((ShadowMissingValuePolicy<string>)domainPolicy).ShadowSignal;
             else
-                signalShadow = null;
+                return true;
 
             if (signal.DataType != signalShadow.DataType || signal.Granularity != signalShadow.Granularity)
                 return false;
