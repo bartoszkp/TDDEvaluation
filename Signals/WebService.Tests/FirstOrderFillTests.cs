@@ -373,21 +373,21 @@ namespace WebService.Tests
         [TestMethod]
         public void GivenAnIntegerHourSignal_WhenGettingDataWithCorrectRange_LowerQualityShouldFillMissingData()
         {
-            SetupFirstOrderPolicyForLowerQuality(Granularity.Year, new DateTime(2001, 1, 1), new DateTime(2006, 1, 1), new List<Datum<int>>()
+            SetupFirstOrderPolicyForLowerQuality(Granularity.Hour, new DateTime(2000, 1, 1, 1, 1, 1), new DateTime(2000, 1, 1, 6, 1, 1), new List<Datum<int>>()
             {
-                new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2001, 1, 1), Value = (int)10 },
-                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)30 }
+                new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1), Value = (int)10 },
+                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 5, 1, 1), Value = (int)30 }
             });
 
             var result = signalsWebService.GetData(1, new DateTime(2001, 1, 1), new DateTime(2006, 1, 1));
 
             var expectedDatum = new List<Dto.Datum>()
             {
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2001, 1, 1), Value = (int)10 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2002, 1, 1), Value = (int)20 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2003, 1, 1), Value = (int)20 },
-                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2004, 1, 1), Value = (int)25 },
-                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2005, 1, 1), Value = (int)30 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 1, 1, 1), Value = (int)10 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 2, 1, 1), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 3, 1, 1), Value = (int)20 },
+                new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1, 4, 1, 1), Value = (int)25 },
+                new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 5, 1, 1), Value = (int)30 },
             };
 
             int i = 0;
@@ -1018,6 +1018,7 @@ namespace WebService.Tests
                                         new Datum<int>() { Quality = Quality.Bad, Signal = returnedSignal, Timestamp = middleSecondBadDatumTimestamp, Value = (int)15 }
                         });
                     break;
+
             }
         }
 
