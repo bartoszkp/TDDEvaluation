@@ -31,13 +31,19 @@ namespace Domain.DataFillStrategy
                 SetupSpecificValueMissingValuePolicy(datum, datums, dict, before, after);
             else if (this.missingValuePolicy is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
                 SetupZeroOrderMissingValuePolicy(datums, dict, signal, signalsDataRepository, after, before, datum);
-            else if (this.missingValuePolicy is MissingValuePolicy.FirstOrderMissingValuePolicy<T>)
-                SetupFirstOrderMissingValuePolicy(datums, signal, signalsDataRepository, after, before, datumsFirst);
+            else if (this.missingValuePolicy is MissingValuePolicy.ShadowMissingValuePolicy<T>)
+                SetupShadowMissingValuePolicy(datums, dict, signalsDataRepository, after, before);
         }
 
-
-
-
+        private void SetupShadowMissingValuePolicy<T>(List<Datum<T>> datums, Dictionary<DateTime, Datum<T>> dict, ISignalsDataRepository signalsDataRepository, DateTime after, DateTime before)
+        {
+            var shadowData = signalsDataRepository.GetData<T>(((ShadowMissingValuePolicy<T>)missingValuePolicy).ShadowSignal, after, before);
+            foreach (var item in shadowData)
+            {
+                dict.Add(item.Timestamp, item);
+            }
+            CreateReturnsListDatum<T>(after, before, datums, null, dict);
+        }
 
 
 
@@ -293,6 +299,27 @@ namespace Domain.DataFillStrategy
                         Value = datum.Value,
                         Timestamp = currentDate
                     });
+                }
+                else if (this.missingValuePolicy is MissingValuePolicy.ShadowMissingValuePolicy<T>)
+                {
+                    var date = datums.Find(x => x.Timestamp == currentDate);
+
+                    if (date == null)
+                    {
+                        if (dict.ContainsKey(currentDate))
+                            datum = dict[currentDate];
+                        else
+                        {
+                            datum = new Datum<T>()
+                            {
+                                Quality = Quality.None,
+                                Value = default(T),
+                                Timestamp = currentDate
+                            };
+                        }
+
+                        datums.Add(datum);
+                    }
                 }
                 else if (datums.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
                     datums.Add(new Datum<T>()
