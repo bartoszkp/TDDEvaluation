@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unity.WebApi\AllClasses.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

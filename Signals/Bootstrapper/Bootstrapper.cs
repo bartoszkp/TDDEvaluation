@@ -52,7 +52,7 @@ namespace Bootstrapper
         public void SetupUnityContainer()
         {
             UnityContainer.RegisterTypes(
-                AllClasses.FromAssembliesInBasePath().Where(HasUnityRegisterAttribute),
+                Unity.WebApi.AllClasses.FromAssembliesInSearchPath().Where(HasUnityRegisterAttribute),
                 getFromTypes: WithMappings.FromAllInterfaces,
                 getLifetimeManager: GetLifetimeManager,
                 getInjectionMembers: GetInjectionMembers);
