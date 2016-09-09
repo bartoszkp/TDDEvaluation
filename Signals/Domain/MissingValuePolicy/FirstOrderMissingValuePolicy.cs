@@ -15,6 +15,7 @@ namespace Domain.MissingValuePolicy
             List<Domain.Datum<T>> datums = datumsIEnumerable.ToList<Datum<T>>();
             while (fromIncludedUtc < toExcludedUtc)
             {
+                
                 var dataOlder = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
                 var dataNewer = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUtc, 1);
                 if ((dataOlder == null) || (dataOlder.Count() == 0))
