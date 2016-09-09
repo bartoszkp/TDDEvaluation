@@ -69,25 +69,6 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GivenAnIntegerHourSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
-        {
-            SetupFirstOrderPolicy(Granularity.Hour,
-                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 13, 0, 0), new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 5, 0, 0), Value = (int)11 },
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 9, 0, 0), Value = (int)5 },
-                    new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 12, 0, 0), Value = (int)20 }
-                });
-
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 13, 0, 0));
-
-            var expectedDatum = GetExpectedDatums(Granularity.Hour);
-
-            AssertEqual(expectedDatum, result);
-        }
-
-        [TestMethod]
         public void GivenAnIntegerDailySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData_ForIssue31()
         {
             SetupFirstOrderPolicyFroSpecificExample(Granularity.Day, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 4, 0, 0, 0), new List<Datum<int>>()
