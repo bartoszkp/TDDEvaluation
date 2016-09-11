@@ -24,6 +24,14 @@ namespace DataAccess
             get { return unitOfWorkLocal.Value; }
         }
 
+        public bool IsSessionOpened
+        {
+            get
+            {
+                return unitOfWorkLocal.Value != null;
+            }
+        }
+
         public ISession Session
         {
             get

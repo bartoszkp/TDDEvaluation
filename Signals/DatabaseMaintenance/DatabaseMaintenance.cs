@@ -15,7 +15,7 @@ namespace DatabaseMaintenance
 
         public void RebuildDatabase()
         {
-            if (this.sessionProvider.Session == null)
+            if (!this.sessionProvider.IsSessionOpened)
             {
                 new SchemaExport(this.sessionProvider.NHibernateConfiguration)
                     .Execute(true, true, false);
