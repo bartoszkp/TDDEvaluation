@@ -92,6 +92,11 @@ namespace WebService
             return new Datum[] { new Datum()};
         }
 
+        public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
+
         private bool VerifyTimeStamp(Domain.Signal signal, DateTime timestamp)
         {
             if (signal.Granularity == Domain.Granularity.Year && timestamp != new DateTime(timestamp.Year, 1, 1))
