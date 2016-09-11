@@ -2444,6 +2444,36 @@ namespace SignalsIntegrationTests
             Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, shadowSignal));
         }
 
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            // TODO multiply
+            var granularity = Granularity.Year;
+            var dataType = typeof(string).FromNativeType();
+            GivenASignalWith(dataType, granularity);
+
+            Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, client.GetById(signalId)));
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAThreeSignals_WhenCreatingShadowCycle_ShouldThrow()
+        {
+            // TODO multiply
+            var granularity = Granularity.Year;
+            var dataType = typeof(string).FromNativeType();
+
+            var signal1 = AddNewSignal(dataType, granularity);
+            var signal2 = AddNewSignal(dataType, granularity);
+            var signal3 = AddNewSignal(dataType, granularity);
+
+            SetShadowMissingValuePolicy(signal1, signal2);
+            SetShadowMissingValuePolicy(signal2, signal3);
+
+            Assertions.AssertThrows(() => SetShadowMissingValuePolicy(signal3, signal1));
+        }
+
         private static Domain.MissingValuePolicy.MissingValuePolicyBase CreateForNativeType(
             Type genericPolicyType,
             Type nativeType)
@@ -2452,6 +2482,18 @@ namespace SignalsIntegrationTests
                 .MakeGenericType(nativeType)
                 .GetConstructor(Type.EmptyTypes)
                 .Invoke(null) as Domain.MissingValuePolicy.MissingValuePolicyBase;
+        }
+
+        private void SetShadowMissingValuePolicy(Dto.Signal signal, Dto.Signal shadowSignal)
+        {
+            var newPolicy = CreateForNativeType(
+              typeof(Domain.MissingValuePolicy.ShadowMissingValuePolicy<>),
+              Domain.Infrastructure.DataTypeUtils.GetNativeType(signal.DataType.ToDomain<Domain.DataType>()));
+
+            var dtoPolicy = newPolicy.ToDto<Dto.MissingValuePolicy.ShadowMissingValuePolicy>();
+            dtoPolicy.ShadowSignal = shadowSignal;
+
+            client.SetMissingValuePolicy(signal.Id.Value, dtoPolicy);
         }
 
         private void WhenSettingShadowMissingValuePolicy(DataType dataType, Dto.Signal shadowSignal)

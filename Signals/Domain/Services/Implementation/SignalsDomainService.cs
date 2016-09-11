@@ -130,6 +130,13 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
         {
+            CheckSignalsCompatibilityWithPolicy(signal, missingValuePolicy);
+
+            this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
+        }
+
+        private void CheckSignalsCompatibilityWithPolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
+        {
             if (!missingValuePolicy.CompatibleNativeTypes.Contains(signal.DataType.GetNativeType()))
             {
                 throw new IncompatibleSignalDataType();
@@ -140,7 +147,10 @@ namespace Domain.Services.Implementation
                 throw new IncompatibleSignalGranularity();
             }
 
-            this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
+            if (missingValuePolicy.DependsOn(signal, missingValuePolicyRepository))
+            {
+                throw new MissingValuePolicyDependencyCycleException();
+            }
         }
     }
 }

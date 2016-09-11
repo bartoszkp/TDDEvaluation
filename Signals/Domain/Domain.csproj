@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\MissingValuePolicyDependencyCycleException.cs" />
     <Compile Include="Exceptions\IncompatibleSignalDataType.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\IncompatibleSignalGranularity.cs" />

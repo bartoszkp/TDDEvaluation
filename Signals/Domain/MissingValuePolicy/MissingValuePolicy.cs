@@ -45,6 +45,11 @@ namespace Domain.MissingValuePolicy
                     .Cast<Granularity>();
             }
         }
+
+        public virtual bool DependsOn(Signal signal, IMissingValuePolicyRepository repository)
+        {
+            return false;
+        }
     }
 
     public abstract class MissingValuePolicy<T> : MissingValuePolicyBase

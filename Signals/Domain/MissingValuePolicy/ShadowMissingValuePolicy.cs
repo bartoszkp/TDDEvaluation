@@ -3,6 +3,7 @@ using Domain.Repositories;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Domain.Exceptions;
 
 namespace Domain.MissingValuePolicy
 {
@@ -42,6 +43,14 @@ namespace Domain.MissingValuePolicy
                      ? shadowDataDict[ts]
                      : Datum<T>.CreateNone(Signal, ts))
                 .ToArray();
+        }
+
+        public override bool DependsOn(Signal signal, IMissingValuePolicyRepository repository)
+        {
+            if (signal.Id == ShadowSignal.Id)
+                return true;
+            var shadowSignalPolicy = repository.Get(ShadowSignal);
+            return shadowSignalPolicy.DependsOn(signal, repository);
         }
     }
 }
