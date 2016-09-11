@@ -2446,11 +2446,251 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issueShadowCycle")]
-        public void GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        public void GivenASecondBooleanSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
         {
-            // TODO multiply
-            var granularity = Granularity.Year;
-            var dataType = typeof(string).FromNativeType();
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Second, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenASecondIntegerSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Second, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenASecondDoubleSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Second, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenASecondDecimalSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Second, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenASecondStringSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Second, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMinuteBooleanSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Minute, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMinuteIntegerSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Minute, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMinuteDoubleSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Minute, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMinuteDecimalSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Minute, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMinuteStringSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Minute, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAHourBooleanSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Hour, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAHourIntegerSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Hour, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAHourDoubleSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Hour, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAHourDecimalSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Hour, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAHourStringSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Hour, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenADayBooleanSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Day, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenADayIntegerSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Day, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenADayDoubleSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Day, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenADayDecimalSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Day, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenADayStringSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Day, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAWeekBooleanSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Week, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAWeekIntegerSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Week, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAWeekDoubleSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Week, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAWeekDecimalSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Week, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAWeekStringSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Week, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMonthBooleanSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Month, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMonthIntegerSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Month, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMonthDoubleSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Month, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMonthDecimalSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Month, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAMonthStringSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Month, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAYearBooleanSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Year, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAYearIntegerSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Year, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAYearDoubleSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Year, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAYearDecimalSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Year, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenAYearStringSignal_WhenSettingItAsItsOwnShadow_ShouldThrow()
+        {
+            GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity.Year, DataType.String);
+        }
+
+        private void GivenASignal_WhenSettingItAsItsOwnShadow_ShouldThrow(Granularity granularity, DataType dataType)
+        {
             GivenASignalWith(dataType, granularity);
 
             Assertions.AssertThrows(() => WhenSettingShadowMissingValuePolicy(dataType, client.GetById(signalId)));
@@ -2458,12 +2698,251 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issueShadowCycle")]
-        public void GivenAThreeSignals_WhenCreatingShadowCycle_ShouldThrow()
+        public void GivenThreeSecondBooleanSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
         {
-            // TODO multiply
-            var granularity = Granularity.Year;
-            var dataType = typeof(string).FromNativeType();
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Second, DataType.Boolean);
+        }
 
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeSecondIntegerSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Second, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeSecondDoubleSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Second, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeSecondDecimalSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Second, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeSecondStringSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Second, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMinuteBooleanSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Minute, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMinuteIntegerSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Minute, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMinuteDoubleSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Minute, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMinuteDecimalSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Minute, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMinuteStringSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Minute, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeHourBooleanSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Hour, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeHourIntegerSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Hour, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeHourDoubleSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Hour, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeHourDecimalSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Hour, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeHourStringSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Hour, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeDayBooleanSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Day, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeDayIntegerSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Day, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeDayDoubleSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Day, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeDayDecimalSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Day, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeDayStringSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Day, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeWeekBooleanSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Week, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeWeekIntegerSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Week, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeWeekDoubleSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Week, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeWeekDecimalSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Week, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeWeekStringSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Week, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMonthBooleanSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Month, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMonthIntegerSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Month, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMonthDoubleSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Month, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMonthDecimalSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Month, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeMonthStringSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Month, DataType.String);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeYearBooleanSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Year, DataType.Boolean);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeYearIntegerSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Year, DataType.Integer);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeYearDoubleSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Year, DataType.Double);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeYearDecimalSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Year, DataType.Decimal);
+        }
+
+        [TestMethod]
+        [TestCategory("issueShadowCycle")]
+        public void GivenThreeYearStringSignals_WhenCreatingShadowDependencyCycle_ShouldThrow()
+        {
+            GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity.Year, DataType.String);
+        }
+
+        private void GivenThreeSignals_WhenCreatingShadowDependencyCycle_ShouldThrow(Granularity granularity, DataType dataType)
+        {
             var signal1 = AddNewSignal(dataType, granularity);
             var signal2 = AddNewSignal(dataType, granularity);
             var signal3 = AddNewSignal(dataType, granularity);
