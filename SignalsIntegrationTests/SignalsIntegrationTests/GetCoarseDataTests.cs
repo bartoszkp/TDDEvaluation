@@ -95,20 +95,4 @@ namespace SignalsIntegrationTests
             GetCoarseDataTests<double>.ClassCleanup();
         }
     }
-
-    [TestClass]
-    public class GetCoarseDataBoolTests : GetCoarseDataTests<bool>
-    {
-        [ClassInitialize]
-        public static new void ClassInitialize(TestContext testContext)
-        {
-            GetCoarseDataTests<bool>.ClassInitialize(testContext);
-        }
-
-        [ClassCleanup]
-        public static new void ClassCleanup()
-        {
-            GetCoarseDataTests<bool>.ClassCleanup();
-        }
-    }
 }
