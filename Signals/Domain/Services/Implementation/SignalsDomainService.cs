@@ -152,5 +152,57 @@ namespace Domain.Services.Implementation
                 throw new MissingValuePolicyDependencyCycleException();
             }
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            // TODO validate granularity > Signal.granularity
+            // TODO throw on String?
+            granularity.ValidateTimestamp(fromIncludedUtc); // TODO tests?
+            granularity.ValidateTimestamp(toExcludedUtc); // TODO ? / tests?
+
+            var fromTimestampCoarse = fromIncludedUtc;
+            var coarseToTimestampEnumerator
+                = new TimeEnumerator(
+                    GetNextDate(fromIncludedUtc, granularity),
+                    GetNextDate(toExcludedUtc, granularity),
+                    granularity);
+            foreach (var toTimestampCoarse in coarseToTimestampEnumerator)
+            {
+                var samples = GetData<T>(signal, fromTimestampCoarse, toTimestampCoarse);
+
+                yield return new Datum<T>
+                {
+                    Signal = signal,
+                    Timestamp = fromTimestampCoarse,
+                    Value = (T)Convert.ChangeType(samples.Average(d => Convert.ToDecimal(d.Value)), typeof(T)),
+                    Quality = samples.Select(d => d.Quality).Aggregate(GranularityUtils.GetMinQuality),
+                };
+
+                fromTimestampCoarse = toTimestampCoarse;
+            }
+        }
+
+        private DateTime GetNextDate(DateTime time, Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return time.AddSeconds(1);
+                case Granularity.Minute:
+                    return time.AddMinutes(1);
+                case Granularity.Hour:
+                    return time.AddHours(1);
+                case Granularity.Day:
+                    return time.AddDays(1);
+                case Granularity.Week:
+                    return time.AddDays(7);
+                case Granularity.Month:
+                    return time.AddMonths(1);
+                case Granularity.Year:
+                    return time.AddYears(1);
+            }
+
+            throw new InvalidOperationException();
+        }
     }
 }

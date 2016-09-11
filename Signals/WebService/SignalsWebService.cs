@@ -22,8 +22,8 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
@@ -96,7 +96,7 @@ namespace WebService
             var dataArray = data.ToArray();
             var concreteData = Array.CreateInstance(concreteDatum, dataArray.Length);
 
-            for (int i = 0;i < dataArray.Length;++i)
+            for (int i = 0; i < dataArray.Length; ++i)
             {
                 var dataType = dataArray[i].Value?.GetType();
                 if (dataType != null && !dataType.Equals(signal.DataType.GetNativeType()))
@@ -167,6 +167,42 @@ namespace WebService
             this.signalsDomainService.SetMissingValuePolicy(
                 signal,
                 mvp);
+        }
+
+        public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = this.signalsDomainService.Get(signalId);
+
+            var getCoarseData = GetAppropriateGetCoarseDataMethod(signal.DataType);
+
+            IEnumerable result;
+
+            try
+            {
+                result = getCoarseData
+                    .Invoke(this.signalsDomainService, new object[] { signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc })
+                    as IEnumerable;
+            }
+            catch (TargetInvocationException te)
+            {
+                throw te.InnerException;
+            }
+
+            if (result == null)
+                return null;
+
+            return result
+                .Cast<object>()
+                .Select(d => d.ToDto<Datum>())
+                .ToArray();
+        }
+
+        private static MethodInfo GetAppropriateGetCoarseDataMethod(Domain.DataType dataType)
+        {
+            var methodInfo = ReflectionUtils
+                .GetMethodInfo<ISignalsDomainService>(x => x.GetCoarseData<object>(null, default(Domain.Granularity), default(DateTime), default(DateTime)));
+
+            return GetAppropriateMethod(methodInfo.GetGenericMethodDefinition(), dataType);
         }
     }
 }

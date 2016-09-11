@@ -14,6 +14,12 @@ namespace SignalsIntegrationTests.Infrastructure
             whenReadingDataResult = client.GetData(signalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<T>[]>();
         }
 
+        public void WhenReadingCoarseData(Granularity coarseGranularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var coarseGranularityDto = coarseGranularity.ToDto<Dto.Granularity>();
+            whenReadingDataResult = client.GetCoarseData(signalId, coarseGranularityDto, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<T>[]>();
+        }
+
         public void ThenResultEquals(IEnumerable<Datum<T>> expected)
         {
             Assertions.AreEqual(expected, whenReadingDataResult);

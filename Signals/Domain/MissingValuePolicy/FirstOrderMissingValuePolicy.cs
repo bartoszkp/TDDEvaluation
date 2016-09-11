@@ -42,20 +42,9 @@ namespace Domain.MissingValuePolicy
             }
         }
 
-        private Quality GetMinQuality(Quality a, Quality b)
-        {
-            if (a == Quality.None || b == Quality.None)
-                return Quality.None;
-
-            return Enum
-                .GetValues(typeof(Quality))
-                .Cast<Quality>()
-                .Last(q => q == a || q == b);
-        }
-
         private Datum<T> Interpolate(Datum<T> older, Datum<T> newer, DateTime currentTs)
         {
-            var resultQuality = GetMinQuality(older.Quality, newer.Quality);
+            var resultQuality = GranularityUtils.GetMinQuality(older.Quality, newer.Quality);
 
             if (resultQuality == Quality.None)
                 return Datum<T>.CreateNone(Signal, currentTs);
