@@ -61,6 +61,13 @@ namespace Domain.Services.Implementation
             if (signal.DataType != mvp.ShadowSignal.DataType ||
                 signal.Granularity != mvp.ShadowSignal.Granularity)
                 throw new Exception("ShadowSignal doesnt meet signal criteria.");
+
+            if (mvp != null && mvp.ShadowSignal != null)
+            {
+                var shadowMvp = missingValuePolicyRepository.Get(mvp.ShadowSignal);
+                if(shadowMvp is ShadowMissingValuePolicy<T>)
+                    throw new Exception("ShadowSignal doesnt meet signal criteria.");
+            }
         }
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase domainMissingValuePolicy)
