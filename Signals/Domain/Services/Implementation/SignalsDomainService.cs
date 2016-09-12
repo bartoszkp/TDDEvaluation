@@ -111,177 +111,35 @@ namespace Domain.Services.Implementation
             if(mvp is ShadowMissingValuePolicy<T>)
                 shadowData = signalsDataRepository.GetData<T>((policy as ShadowMissingValuePolicy<T>).ShadowSignal, fromIncluded, toExcluded).ToList();
 
-            if (fromIncluded == toExcluded)
-            {                
-                filledData.Add(mvp.FillMissingValue(signal, tmp, result, previousDatum, nextDatum, shadowData));
-            }
+            if (fromIncluded == toExcluded)                            
+                filledData.Add(mvp.FillMissingValue(signal, tmp, result, previousDatum, nextDatum, shadowData));            
             else
             {
                 while (tmp < toExcluded)
                 {
+                    if(mvp is FirstOrderMissingValuePolicy<T> || mvp is ZeroOrderMissingValuePolicy<T>)
+                    {
+                        var prev = signalsDataRepository.GetDataOlderThan<T>(signal, tmp, 1);
+                        var next = signalsDataRepository.GetDataNewerThan<T>(signal, tmp, 1);
+                        if (prev == null || next == null)
+                        {
+                            filledData.Add(Datum<T>.CreateNone(signal, tmp));
+                            tmp = timeNextMethod(tmp);
+                            continue;
+                        }
+                        else
+                        {
+                            previousDatum = prev.FirstOrDefault();
+                            nextDatum = next.FirstOrDefault();
+                        }                            
+                    }
                     filledData.Add(mvp.FillMissingValue(signal, tmp, result, previousDatum, nextDatum, shadowData));
                     tmp = timeNextMethod(tmp);
                 }
             }
-                
-            /*
-            if (policy is ZeroOrderMissingValuePolicy<T>)
-            {
-                var data = result.ToList();           
-
-                if (fromIncluded == toExcluded)
-                    AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
-                else
-                {
-                    while (tmp < toExcluded)
-                    {
-                        AddToListSuitableDatumWhenGivenIsZOMVP(signal, data, filledData, tmp);
-                        tmp = timeNextMethod(tmp);
-                    }
-                }
-            }
-            else if (policy is FirstOrderMissingValuePolicy<T>)
-            {
-                if (typeof(T) == typeof(string) | typeof(T) == typeof(bool))
-                    return signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
-
-                if (fromIncluded == toExcluded)
-                    AddToListSuitableDatumWhenGivenIsFOMVP(signal, result, filledData, tmp);
-                else
-                {
-                    while (tmp < toExcluded)
-                    {
-                        AddToListSuitableDatumWhenGivenIsFOMVP(signal, result, filledData, tmp);
-                        tmp = timeNextMethod(tmp);
-                    }
-                }
-            }
-            else if (policy is ShadowMissingValuePolicy<T>)
-            {
-                var shadowData = signalsDataRepository.GetData<T>((policy as ShadowMissingValuePolicy<T>).ShadowSignal, fromIncluded, toExcluded);
-
-                if (fromIncluded == toExcluded)                
-                    AddToListSuitableDatumWhenGivenIsSMVP(signal, filledData, result, shadowData, fromIncluded);                
-                else
-                {                    
-                    while (tmp < toExcluded)
-                    {
-                        AddToListSuitableDatumWhenGivenIsSMVP(signal, filledData, result, shadowData, tmp);
-                        tmp = timeNextMethod(tmp);
-                    }
-                }
-            }
-            else
-            {
-                if (policy is NoneQualityMissingValuePolicy<T>)
-                {
-                    if (fromIncluded == toExcluded)
-                    {
-                        var datum = result.FirstOrDefault(d => d.Timestamp == tmp);
-                        filledData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, tmp));
-                    }
-                    else
-                    {
-                        while (tmp < toExcluded)
-                        {
-                            var datum = result.FirstOrDefault(d => d.Timestamp == tmp);
-                            filledData.Add(datum ?? Datum<T>.CreateNone(policy.Signal, tmp));
-                            tmp = timeNextMethod(tmp);
-                        }
-                    }
-                }
-                else if (policy is SpecificValueMissingValuePolicy<T>)
-                {
-                    var mvp = policy as SpecificValueMissingValuePolicy<T>;
-                    while (tmp < toExcluded)
-                    {
-                        var datum = result.FirstOrDefault(d => d.Timestamp == tmp);
-                        filledData.Add(datum ?? Datum<T>.CreateSpecific(policy.Signal, tmp, mvp.Quality, mvp.Value));
-                        tmp = timeNextMethod(tmp);
-                    }
-                }
-
-                else throw new NotImplementedException();
-            }
-            */
 
             return filledData;          
-        }
-        /*
-        private void AddToListSuitableDatumWhenGivenIsZOMVP<T>(Signal signal, List<Datum<T>> data, List<Datum<T>> filledData, DateTime tmp)
-        {
-            var datum = data.FirstOrDefault(d => d.Timestamp == tmp);
-            if (datum != null)
-                filledData.Add(datum);
-            else
-            {
-                var previousDatum = signalsDataRepository.GetDataOlderThan<T>(signal, tmp, 1).FirstOrDefault();
-                if (previousDatum == null)
-                    filledData.Add(Datum<T>.CreateNone(signal, tmp));
-                else
-                    filledData.Add(new Datum<T>()
-                    {
-                        Quality = previousDatum.Quality,
-                        Value = previousDatum.Value,
-                        Timestamp = tmp
-                    });
-            }
-        }
-
-        private void AddToListSuitableDatumWhenGivenIsFOMVP<T>(Signal signal, IEnumerable<Datum<T>> data, List<Datum<T>> filledData, DateTime tmp)
-        {
-            var datum = data.FirstOrDefault(d => d.Timestamp == tmp);
-            if (datum != null)
-                filledData.Add(datum);
-            else
-            {
-                Datum<T> previousDatum = signalsDataRepository.GetDataOlderThan<T>(signal, tmp, 1).FirstOrDefault();
-                Datum<T> nextDatum = signalsDataRepository.GetDataNewerThan<T>(signal, tmp, 1).FirstOrDefault();
-
-                if (previousDatum == null | nextDatum == null)
-                    filledData.Add(Datum<T>.CreateNone(signal, tmp));
-                else
-                {
-                    Granularity granularity = signal.Granularity;
-
-                    T newValue;
-                    int numberOfTimePeriodsBetweenPreviousAndNext = FindNumberOfPeriodsBetweenTwoDates(previousDatum.Timestamp, nextDatum.Timestamp, granularity);
-                    int numberOfTimePeriodsBetweenPreviousAndTmp = FindNumberOfPeriodsBetweenTwoDates(previousDatum.Timestamp, tmp, granularity);
-                    double valuesDifferenceBetweenPreviousAndNext = Convert.ToDouble(nextDatum.Value) - Convert.ToDouble(previousDatum.Value);
-                    double growthForOnePeriod = valuesDifferenceBetweenPreviousAndNext / numberOfTimePeriodsBetweenPreviousAndNext;
-                    newValue = (T)Convert.ChangeType(Convert.ToDouble(previousDatum.Value) + growthForOnePeriod * numberOfTimePeriodsBetweenPreviousAndTmp, typeof(T));
-
-                    Quality newQuality;
-                    int comparitionOfQualities = CompareQualities(previousDatum.Quality, nextDatum.Quality);
-                    if (comparitionOfQualities == -1) newQuality = previousDatum.Quality;
-                    else newQuality = nextDatum.Quality;
-
-                    filledData.Add(new Datum<T>()
-                    {
-                        Value = newValue,
-                        Quality = newQuality,
-                        Timestamp = tmp
-                    });
-                }
-            }
-        }
-
-        private void AddToListSuitableDatumWhenGivenIsSMVP<T>(Signal signal, List<Datum<T>> filledData, IEnumerable<Datum<T>> signalData, IEnumerable<Datum<T>> shadowData, DateTime tmp)
-        {
-            var signalDatum = signalData.FirstOrDefault(d => d.Timestamp == tmp);
-            if(signalDatum != null)            
-                filledData.Add(signalDatum);
-            else
-            {
-                var shadowDatum = shadowData.FirstOrDefault(d => d.Timestamp == tmp);
-                if (shadowDatum != null)
-                    filledData.Add(shadowDatum);
-                else
-                    filledData.Add(Datum<T>.CreateNone(signal, tmp));
-            }            
-        }
-
-        */
+        }        
 
         private void TimestampsCheck<T>(IEnumerable<Datum<T>> data)
         {
