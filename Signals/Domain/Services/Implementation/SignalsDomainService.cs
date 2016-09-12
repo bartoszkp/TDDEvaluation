@@ -353,6 +353,11 @@ namespace Domain.Services.Implementation
 
             var mvp = missingValuePolicy as ShadowMissingValuePolicy<T>;
 
+            if (!CheckShadowSignalDependancy<T>(signal, mvp.ShadowSignal))
+                throw new ArgumentException(string.Format("Setting shadow missing value policy to signal with Id = {0} with chosen shadow signal (Id = {1}) would create a dependancy cycle.",
+                    signal.Id.Value,
+                    mvp.ShadowSignal.Id.Value));
+
             if (signal.Granularity != mvp.ShadowSignal.Granularity)
                 throw new ArgumentException(String.Format("The signals Granularity ({0}) does not match the Granularity of its shadow ({1})", 
                     signal.Granularity, 
@@ -379,6 +384,24 @@ namespace Domain.Services.Implementation
             }
 
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
+        }
+
+        private bool CheckShadowSignalDependancy<T>(Signal signal, Signal shadowSignal)
+        {
+            var shadowSignalMVP = GetMissingValuePolicy(shadowSignal);
+
+            while (shadowSignalMVP is ShadowMissingValuePolicy<T>)
+            {
+                shadowSignalMVP = GetMissingValuePolicy(shadowSignal);
+                var shadowMVP = shadowSignalMVP as ShadowMissingValuePolicy<T>;
+
+                if (shadowSignal.Id.Value == signal.Id.Value)
+                    return false;
+
+                shadowSignal = shadowMVP.ShadowSignal;  
+            }
+
+            return true;
         }
 
         private DateTime AddTime(Granularity granularity, DateTime date)
