@@ -308,10 +308,69 @@ namespace WebService.Tests
                 signalsWebService.Add(existingSignal.ToDto<Dto.Signal>());
                 missingValuePolicyRepositoryMock
                     .Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()));
-
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenAddingNewDoubleSignal_NoneQualityMissingValuePolicy_IsDefault()
+            {
+                var existingSignal = new Domain.Signal() { DataType = DataType.Double, Granularity = Granularity.Day };
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock.Setup(srm => srm.Add(It.IsAny<Domain.Signal>()))
+                    .Returns(existingSignal);
 
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var choiseDataType = new Dictionary<DataType, Action>()
+                {
+                    {DataType.Boolean, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()))},
+                    {DataType.Decimal, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<decimal>>()))},
+                    {DataType.Double, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()))},
+                    {DataType.Integer, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()))},
+                    {DataType.String, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<string>>()))},
+                };
+                choiseDataType[existingSignal.DataType].Invoke();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsWebService.Add(existingSignal.ToDto<Dto.Signal>());
+                missingValuePolicyRepositoryMock
+                    .Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()));
+            }
+
+            [TestMethod]
+            public void GivenASignal_WhenAddingNewDecimalSignal_NoneQualityMissingValuePolicy_IsDefault()
+            {
+                var existingSignal = new Domain.Signal() { DataType = DataType.Decimal, Granularity = Granularity.Day };
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock.Setup(srm => srm.Add(It.IsAny<Domain.Signal>()))
+                    .Returns(existingSignal);
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                var choiseDataType = new Dictionary<DataType, Action>()
+                {
+                    {DataType.Boolean, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<bool>>()))},
+                    {DataType.Decimal, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<decimal>>()))},
+                    {DataType.Double, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<double>>()))},
+                    {DataType.Integer, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<int>>()))},
+                    {DataType.String, ()=>missingValuePolicyRepositoryMock
+                        .Setup(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<string>>()))},
+                };
+                choiseDataType[existingSignal.DataType].Invoke();
+
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
+                signalsWebService.Add(existingSignal.ToDto<Dto.Signal>());
+                missingValuePolicyRepositoryMock
+                    .Verify(mvprm => mvprm.Set(It.IsAny<Domain.Signal>(), It.IsAny<Domain.MissingValuePolicy.NoneQualityMissingValuePolicy<decimal>>()));
+            }
 
             private void SetupGetRepositories(DateTime fromIncluded, DateTime toExcluded, List<Dto.Datum> expectedResult)
             {

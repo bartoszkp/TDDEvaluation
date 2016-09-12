@@ -38,8 +38,8 @@ namespace Domain.Services.Implementation
             var switchDataType = new Dictionary<DataType, Action>()
             {
                 {DataType.Boolean, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<bool>()) },
-                {DataType.Decimal, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>()) },
-                {DataType.Double, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>()) },
+                {DataType.Decimal, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<decimal>()) },
+                {DataType.Double, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<double>()) },
                 {DataType.Integer, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<int>()) },
                 {DataType.String, ()=>this.missingValuePolicyRepository.Set(signal, new NoneQualityMissingValuePolicy<string>()) }
             };
