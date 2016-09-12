@@ -80,11 +80,19 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
-            var data = typeof(Domain.Services.Implementation.SignalsDomainService).
+            object data;
+            try
+            {
+                data = typeof(Domain.Services.Implementation.SignalsDomainService).
                 GetMethod("GetCoarseData").
                 MakeGenericMethod(DataTypeUtils.GetNativeType(signal.DataType)).
-                Invoke(signalsDomainService,new object[] { signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc });
-                
+                Invoke(signalsDomainService, new object[] { signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc });
+            }
+            catch(System.Reflection.TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
+
             return data.ToDto<IEnumerable<Dto.Datum>>();
         }
 

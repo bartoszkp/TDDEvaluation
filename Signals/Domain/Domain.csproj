@@ -63,7 +63,10 @@
   <ItemGroup>
     <Compile Include="Exceptions\CouldntGetASignalException.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
+    <Compile Include="Exceptions\IncorrectGranularityException.cs" />
     <Compile Include="Exceptions\IncorrectShadowSignalException.cs" />
+    <Compile Include="Exceptions\IncorrectTimeStampException.cs" />
+    <Compile Include="Exceptions\InvalidDataTypeForGetCoarseDataException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />

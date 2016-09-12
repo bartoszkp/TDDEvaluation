@@ -94,14 +94,13 @@ namespace WebService.Tests
             [TestMethod]
             public void Get_SignalWithThisPathExist_ReturnThisSignal()
             {
-                var signal =  SignalWith(null,Dto.DataType.Boolean, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y" } });
+                var signal =  SignalWith(1,Dto.DataType.Boolean, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y" } });
                 GivenASignal(signal.ToDomain<Domain.Signal>());
               
                 var result = signalsWebService.Get(new Dto.Path() { Components = new[] { "x", "y" } });
 
                 Assert.AreEqual(CompareSignals(signal, result), true);
             }
-
 
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
@@ -366,7 +365,7 @@ namespace WebService.Tests
 
 
             [TestMethod]
-            public void GivenASignal_WehnGettingPathEntryWithWrongPrefix_ReturnsEmptyPathEntry()
+            public void GivenASignal_WhenGettingPathEntryWithWrongPrefix_ReturnsEmptyPathEntry()
             {
                 GivenSignalsForPathEntry(new Signal[]
                 {
@@ -492,7 +491,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(IncorrectTimeStampException))]
             public void GivenASignal_WhenSetDataWithIncorrectTimestamp_ExpectedException()
             {
                 int signalId = 5;
@@ -507,7 +506,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(IncorrectTimeStampException))]
             public void GivenASignal_WhenGetDataWithIncorrectTimestamp_ExpectedException()
             {
                 int signalId = 5;
@@ -814,7 +813,6 @@ namespace WebService.Tests
             public void GivenASignalsWithShadowMissingValuePolicy_WhenSettingMissingValuePolicy_ThrowsIncorrectShadowSignalException()
             {
                 GivenNoSignals();
-
                 Signal[] signals = new Signal[3];
 
                 for (int i = 0; i < 3; i++)
@@ -824,18 +822,114 @@ namespace WebService.Tests
                 for (int i = 0; i < 3; i++)
                 { 
                     signalsRepositoryMock.Setup(x => x.Get(signals[i].Id.Value)).Returns(signals[i]);
-
                     var signalMvp = new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
                     {
                         ShadowSignal = signals[i + 1 > 2 ? i + 1 - 3 : i + 1].ToDto<Dto.Signal>(),
                         Signal = signals[i].ToDto<Dto.Signal>(),
                         DataType = Dto.DataType.Double
                     };
-
                     SetupMissingValuePolicyMock(signals[i], signalMvp.ToDomain<ShadowMissingValuePolicy<double>>());
 
                     signalsWebService.SetMissingValuePolicy(signals[i].Id.Value, signalMvp);
                 }
+            }
+
+            [TestMethod]
+            public void GivenASignalAndData_WhenGettingCoarseData_ComparingResults()
+            {
+                var signal = SignalWith(1,Dto.DataType.Double,Dto.Granularity.Day,new Dto.Path() { Components = new[] { "x", "y6" } });
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+
+                signalsRepositoryMock_SetData_WeekByDay_Double();
+
+                var returnedData = 
+                    signalsWebService.GetCoarseData(signal.Id.Value,Dto.Granularity.Week,new DateTime(2015,5,4), new DateTime(2015,5,11));
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair,Timestamp = new DateTime(2015,5,4), Value = 24.9d / 7d }
+                };
+
+                int expectedCountData = 1;
+                Assert.AreEqual(expectedCountData,returnedData.Count());
+                Assert.IsTrue(CompareDatum(expectedData,returnedData));
+            }
+
+            [TestMethod]
+            public void GivenASignalAndData_WhenGettingCoarseDataWithTheSameStartAndEndTimestamp_ComparingResults()
+            {
+                var signal = SignalWith(1, Dto.DataType.Double, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y6" } });
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+
+                signalsRepositoryMock_SetData_WeekByDay_Double();
+                
+                var returnedData =
+                    signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2015, 5, 4), new DateTime(2015, 5, 4));
+
+                var expectedData = new Dto.Datum[]
+                {
+                    new Dto.Datum() { Quality = Dto.Quality.Fair,Timestamp = new DateTime(2015,5,4), Value = 24.9d / 7d }
+                };
+
+                int expectedCountData = 1;
+                Assert.AreEqual(expectedCountData, returnedData.Count());
+                Assert.IsTrue(CompareDatum(expectedData, returnedData));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectTimeStampException))]
+            public void GivenASignalAndData_WhenGettingCoarseDataWithIncorrectStartTimestamp_ThrowsIncorrectTimeStampException()
+            {
+                var signal = SignalWith(1, Dto.DataType.Double, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y7" } });
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+
+                signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2015, 5, 1), new DateTime(2015, 5, 11));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectTimeStampException))]
+            public void GivenASignalAndData_WhenGettingCoarseDataWithIncorrectEndTimestamp_ThrowsIncorrectTimeStampException()
+            {
+                var signal = SignalWith(1, Dto.DataType.Double, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y7" } });
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+
+                signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2015, 5, 4), new DateTime(2015, 5, 9));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectGranularityException))]
+            public void GivenASignalAndData_WhenGettingCoarseData_ThrowsIncorrectGranularityException()
+            {
+                var signal = SignalWith(1, Dto.DataType.Double, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y8" } });
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+
+                signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Hour, new DateTime(2015, 5, 4), new DateTime(2015, 5, 11));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(InvalidDataTypeForGetCoarseDataException))]
+            public void GivenASignalAndData_WhenGettingCoarseData_ThrowsInvalidDataTypeForGetCoarseDataException()
+            {
+                var signal = SignalWith(1, Dto.DataType.Boolean, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y9" } });
+                GivenASignal(signal.ToDomain<Domain.Signal>());
+
+                signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2015, 5, 4), new DateTime(2015, 5, 11));
+            }
+
+            private void signalsRepositoryMock_SetData_WeekByDay_Double()
+            {
+                var data = new Datum<double>[]
+                {
+                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,4), Value = 0.4d },
+                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,5), Value = 1.4d },
+                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,6), Value = 4.5d },
+                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,7), Value = 8.6d },
+                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,8), Value = 6.4d },
+                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,9), Value = 2.1d },
+                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,10), Value = 1.5d },
+                };
+
+                SetupGetData(data);
             }
 
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
@@ -945,16 +1039,11 @@ namespace WebService.Tests
             {
                 GivenNoSignals();
 
-                try
-                {
-                    signalsRepositoryMock
-                        .Setup(sr => sr.Get(signal.Id.Value))
-                        .Returns(signal);
-                }
-                catch { }
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
                 
-                    signalsRepositoryMock.Setup(x => x.Get(Path.FromString("x/y"))).Returns(signal.ToDomain<Domain.Signal>());
-                
+                signalsRepositoryMock.Setup(x => x.Get(Path.FromString("x/y"))).Returns(signal.ToDomain<Domain.Signal>());
             }
 
             private void GivenSignalsForPathEntry(IEnumerable<Signal> signals, Path Prefix)

@@ -117,7 +117,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            CheckTimestampsCorrection(signal, fromIncludedUtc);
+            CheckTimestampsCorrection(signal.Granularity, fromIncludedUtc);
 
             var getData = signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc)
@@ -223,22 +223,22 @@ namespace Domain.Services.Implementation
         {
             foreach (var d in data)
             {
-                CheckTimestampsCorrection(d.Signal, d.Timestamp);
+                CheckTimestampsCorrection(d.Signal.Granularity, d.Timestamp);
             }
         }
 
-        private void CheckTimestampsCorrection(Signal signal, DateTime dateTime)
+        private void CheckTimestampsCorrection(Granularity granularity, DateTime dateTime)
         {
-            if ((signal.Granularity == Granularity.Second && dateTime.Millisecond != 0)
-                || (signal.Granularity == Granularity.Minute && (dateTime.Second != 0 || dateTime.Millisecond != 0) )
-                || (signal.Granularity == Granularity.Hour && (dateTime.Minute != 0 || dateTime.Second != 0 || dateTime.Millisecond != 0) )
-                || (signal.Granularity == Granularity.Day && dateTime.TimeOfDay.Ticks != 0)
-                || (signal.Granularity == Granularity.Week && (dateTime.TimeOfDay.Ticks != 0 || dateTime.DayOfWeek != DayOfWeek.Monday) )
-                || (signal.Granularity == Granularity.Month
+            if ((granularity == Granularity.Second && dateTime.Millisecond != 0)
+                || (granularity == Granularity.Minute && (dateTime.Second != 0 || dateTime.Millisecond != 0) )
+                || (granularity == Granularity.Hour && (dateTime.Minute != 0 || dateTime.Second != 0 || dateTime.Millisecond != 0) )
+                || (granularity == Granularity.Day && dateTime.TimeOfDay.Ticks != 0)
+                || (granularity == Granularity.Week && (dateTime.TimeOfDay.Ticks != 0 || dateTime.DayOfWeek != DayOfWeek.Monday) )
+                || (granularity == Granularity.Month
                     && (dateTime.TimeOfDay.Ticks != 0 || DateTime.Compare(dateTime, new DateTime(dateTime.Year, dateTime.Month, 1)) != 0))
-                || (signal.Granularity == Granularity.Year 
+                || (granularity == Granularity.Year 
                     && (dateTime.TimeOfDay.Ticks != 0 || DateTime.Compare(dateTime, new DateTime(dateTime.Year, 1, 1)) != 0)) )
-                throw new ArgumentException("DateTime is incorrect");
+                throw new IncorrectTimeStampException();
         }
 
         public void Delete(int signalId)
@@ -275,6 +275,16 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            CheckTimestampsCorrection(granularity, fromIncludedUtc);
+            CheckTimestampsCorrection(granularity, toExcludedUtc);
+
+            if (signal.Granularity > granularity)
+                throw new IncorrectGranularityException();
+
+            if (signal.DataType == DataType.Boolean ||
+                signal.DataType == DataType.String)
+                throw new InvalidDataTypeForGetCoarseDataException();
+
             IEnumerable<Datum<T>> data = GetData<T>(signal,fromIncludedUtc,toExcludedUtc);
             List<Datum<T>> coarsedData = new List<Datum<T>>();
             DateTime date = fromIncludedUtc;
@@ -282,6 +292,11 @@ namespace Domain.Services.Implementation
             dynamic value = 0, numberOfValues = 0;
             Quality lowestQuality = Quality.Good;
             DateTime timestamp = fromIncludedUtc;
+
+            if(date == toExcludedUtc)
+            {
+                toExcludedUtc = destenationDate;
+            }
 
             while (date <= toExcludedUtc)
             {
