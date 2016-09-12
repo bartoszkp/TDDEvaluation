@@ -86,6 +86,7 @@ namespace Domain.Services.Implementation
             var signal = signalsRepository.Get(signalId);
             if (signal == null)
                 throw new NoSuchSignalException();
+            policy.CheckGranularitiesAndDataTypes(signal);
             missingValuePolicyRepository.Set(signal, policy);
         }
 

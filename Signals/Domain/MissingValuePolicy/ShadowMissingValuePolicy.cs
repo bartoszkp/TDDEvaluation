@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Exceptions;
 
 namespace Domain.MissingValuePolicy
 {
@@ -39,6 +40,14 @@ namespace Domain.MissingValuePolicy
                 fromIncludedUtc = AddingTimespanToDataTime(fromIncludedUtc, signal.Granularity);
             }
             return datumsFirst;
+        }
+
+        public override void CheckGranularitiesAndDataTypes(Signal signal)
+        {
+            if (signal.DataType != ShadowSignal.DataType)
+                throw new NotMatchingDataTypes();
+            else if (signal.Granularity != ShadowSignal.Granularity)
+                throw new NotMatchingGranularities();
         }
 
         private DateTime AddingTimespanToDataTime(DateTime addedData, Granularity granularitySignal)

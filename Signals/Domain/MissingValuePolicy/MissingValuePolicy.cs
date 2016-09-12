@@ -12,6 +12,8 @@ namespace Domain.MissingValuePolicy
 
         public virtual Signal Signal { get; set; }
 
+        public virtual void CheckGranularitiesAndDataTypes(Signal signal) { }
+
         [NHibernateIgnore]
         public abstract Type NativeDataType { get; }
     }
