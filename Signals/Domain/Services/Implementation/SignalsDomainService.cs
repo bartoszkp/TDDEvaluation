@@ -467,7 +467,7 @@ namespace Domain.Services.Implementation
             if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                 throw new TypeUnsupportedException();
 
-            return Enumerable.Empty<Datum<T>>();
+            return new List<Datum<T>>() { Datum<T>.CreateNone(signal, fromIncludedUtc) };
         }
     }
 }
