@@ -88,31 +88,36 @@ namespace Domain.Services.Implementation
             if (missingValuePolicy is ShadowMissingValuePolicy<bool>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<bool>;
-                if (signal.DataType != ShadowMVP.ShadowSignal.DataType)
+                if (signal.DataType != ShadowMVP.ShadowSignal.DataType
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<decimal>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<decimal>;
-                if (signal.DataType != ShadowMVP.ShadowSignal.DataType)
+                if (signal.DataType != ShadowMVP.ShadowSignal.DataType
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<double>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<double>;
-                if (signal.DataType != ShadowMVP.ShadowSignal.DataType)
+                if (signal.DataType != ShadowMVP.ShadowSignal.DataType
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<int>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<int>;
-                if (signal.DataType != ShadowMVP.ShadowSignal.DataType)
+                if (signal.DataType != ShadowMVP.ShadowSignal.DataType
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<string>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<string>;
-                if (signal.DataType != ShadowMVP.ShadowSignal.DataType)
+                if (signal.DataType != ShadowMVP.ShadowSignal.DataType
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
                     throw new ArgumentException();
             }
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
