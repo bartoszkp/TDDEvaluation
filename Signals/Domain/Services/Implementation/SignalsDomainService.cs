@@ -292,10 +292,7 @@ namespace Domain.Services.Implementation
         {
             var signal = GetById(signalId);
 
-            CheckArgumentTimestamp<T>(granularity, fromIncludedUtc, toExcludedUtc);
-
-            if (signal.Granularity >= granularity)
-                throw new Domain.Exceptions.GetCoarseDataBadGranularityException();
+            CheckArguments<T>(signal.Granularity, granularity, fromIncludedUtc, toExcludedUtc);
 
             decimal averageValue = 0.0m;
             var quality = Domain.Quality.Good;
@@ -371,16 +368,20 @@ namespace Domain.Services.Implementation
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
-        private void CheckArgumentTimestamp<T>(Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        private void CheckArguments<T>(Granularity signalGranularity, Granularity argumentGranularity, 
+            DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            VerifyTimeStamp(granularity, new Datum<T>()
+            VerifyTimeStamp(argumentGranularity, new Datum<T>()
             {
                 Timestamp = fromIncludedUtc,
             });
-            VerifyTimeStamp(granularity, new Datum<T>()
+            VerifyTimeStamp(argumentGranularity, new Datum<T>()
             {
                 Timestamp = toExcludedUtc,
             });
+
+            if (signalGranularity >= argumentGranularity)
+                throw new Domain.Exceptions.GetCoarseDataBadGranularityException();
         }
     }
 }
