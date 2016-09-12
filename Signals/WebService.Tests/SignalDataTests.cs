@@ -2,6 +2,7 @@
 using Domain.Exceptions;
 using Domain.Repositories;
 using Domain.Services.Implementation;
+using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -305,6 +306,69 @@ namespace WebService.Tests
             Assert.AreEqual(result.ElementAt(1).Value, expectedDatums[1].Value);
         }
 
+        [TestMethod]
+        public void TestFixedBug_SpecificValuepolicyWork_WhenInTheSameTimeStamp_ReturmOneElement()
+        {
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Day,
+                Path = Path.FromString("r/vbc")
+            };
+
+            var policy = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyBoolean()
+            {
+                Value = true,
+                Quality = Quality.Good
+            };
+          
+
+            var filledDatum = new Dto.Datum[]
+            {
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 12, 12),  Value = (bool)false }
+            };
+            signalsRepoMock = new Mock<ISignalsRepository>();
+            GivenASignal(signal);
+            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<bool>(signal, new DateTime(2018, 12, 12), new DateTime(2018, 12, 12)))
+                            .Returns(It.IsAny<IEnumerable<Datum<bool>>>());
+            missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
+            missingValueRepoMock
+                .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
+                .Returns(policy);
+            var signalsDomainService = new SignalsDomainService(
+                    signalsRepoMock.Object,
+                    signalsDataRepoMock.Object,
+                    missingValueRepoMock.Object);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+            var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2018, 12, 12), new DateTime(2018, 12, 12));
+            int index = 0;
+            foreach (var fd in filledDatum)
+            {
+                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
+                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
+                Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
+                index++;
+            }
+        }
+        private void GivenNoSignals()
+        {
+            signalsRepoMock = new Mock<ISignalsRepository>();
+            signalsRepoMock
+                .Setup(sr => sr.Add(It.IsAny<Domain.Signal>()))
+                .Returns<Domain.Signal>(s => s);
+            var signalsDomainService = new SignalsDomainService(signalsRepoMock.Object, null, null);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+        }
+
+        private void GivenASignal(Domain.Signal existingSignal)
+        {
+            GivenNoSignals();
+            signalsRepoMock
+                .Setup(sr => sr.Get(existingSignal.Id.Value))
+                .Returns(existingSignal);
+        }
         private void SetupWebService(Signal signal=null)
         {
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();

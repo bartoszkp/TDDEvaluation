@@ -165,7 +165,7 @@ namespace Domain.Services.Implementation
                     as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
             if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
             {
-                if ((result.Last(x => x == x).Timestamp) < date)
+                if ((result.LastOrDefault(x => x == x).Timestamp) < date)
                 {
                     var dataOlder = result.Last(x => x == x);
                     quality = dataOlder.Quality;
