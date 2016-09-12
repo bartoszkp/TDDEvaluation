@@ -93,6 +93,11 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            var signal = this.signalsDomainService.GetById(signalId);
+
+            if (signal.Granularity.ToDto<Dto.Granularity>() >= granularity)
+                throw new ArgumentException("The given granularity should be bigger than the signals granularity.");
+
             return Enumerable.Empty<Datum>();
         }
 
