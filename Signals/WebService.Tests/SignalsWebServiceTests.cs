@@ -548,6 +548,20 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenADailySignalWithoutData_WhenGettingDataWithTheSameTimeStamp_ReturnOneNonePolicySample()
+            {
+                var existingSignal = SignalWith(1, DataType.Double, Granularity.Day, Path.FromString("root/signal1"));
+                var existingDatum = new Dto.Datum[]{ };
+
+                SetupSignalAndDatumWithPolicyMock(existingSignal, existingDatum, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1), new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDouble());
+                var result = signalsWebService.GetData(existingSignal.Id.Value, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1));
+
+                Assert.AreEqual(result.ElementAt(0).Quality, Dto.Quality.None);
+                Assert.AreEqual(result.ElementAt(0).Timestamp, new DateTime(2000, 2, 1));
+                Assert.AreEqual(result.ElementAt(0).Value, default(double));
+            }
+
+            [TestMethod]
             [ExpectedException(typeof(TimestampHaveWrongFormatException))]
             public void GivenASignalAndDatum_WhenGettingDataQueriesWithIncorrectWithGranularitySeconds_CallException()
             {
