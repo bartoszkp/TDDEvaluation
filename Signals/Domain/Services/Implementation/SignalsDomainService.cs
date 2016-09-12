@@ -457,6 +457,8 @@ namespace Domain.Services.Implementation
 
             if(!checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(signal.Granularity, toExcludedUtc))
                 throw new ArgumentException("incorrect timestamp(s)");
+            if (!checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(granularity, toExcludedUtc))
+                throw new ArgumentException("incorrect timestamp(s)");
 
             return Enumerable.Empty<Datum<T>>();
         }
