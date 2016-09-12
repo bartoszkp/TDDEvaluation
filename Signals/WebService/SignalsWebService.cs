@@ -11,6 +11,7 @@ using Dto;
 using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.Practices.Unity;
+using Domain.Exceptions;
 
 namespace WebService
 {
@@ -75,7 +76,16 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+            if (signal == null)
+                throw new CouldntGetASignalException();
+
+            var data = typeof(Domain.Services.Implementation.SignalsDomainService).
+                GetMethod("GetCoarseData").
+                MakeGenericMethod(DataTypeUtils.GetNativeType(signal.DataType)).
+                Invoke(signalsDomainService,new object[] { signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc });
+                
+            return data.ToDto<IEnumerable<Dto.Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

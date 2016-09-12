@@ -272,5 +272,52 @@ namespace Domain.Services.Implementation
 
             this.signalsRepository.Delete(signal);
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            IEnumerable<Datum<T>> data = GetData<T>(signal,fromIncludedUtc,toExcludedUtc);
+            List<Datum<T>> coarsedData = new List<Datum<T>>();
+            DateTime date = fromIncludedUtc;
+            DateTime destenationDate = SignalUtils.GetNextDate(fromIncludedUtc,granularity);
+            dynamic value = 0, numberOfValues = 0;
+            Quality lowestQuality = Quality.Good;
+            DateTime timestamp = fromIncludedUtc;
+
+            while (date <= toExcludedUtc)
+            {
+                dynamic datum = data.FirstOrDefault(d => date == d.Timestamp);
+                if (date == destenationDate)
+                {
+                    var datumToAdd = new Datum<T>()
+                    {
+                        Quality = lowestQuality,
+                        Signal = signal,
+                        Timestamp = timestamp,
+                        Value = value / numberOfValues
+                    };
+                    value = 0;
+                    numberOfValues = 0;
+                    lowestQuality = Quality.Good;
+                    timestamp = destenationDate;
+                    destenationDate = SignalUtils.GetNextDate(destenationDate,granularity);
+                    coarsedData.Add(datumToAdd);
+
+                    if (date == toExcludedUtc) break;
+                }
+                if (datum != null) {
+                    value += datum.Value;
+                    numberOfValues++;
+                    if (lowestQuality != Quality.None)
+                    {
+                        if (datum.Quality == Quality.None)
+                            lowestQuality = datum.Quality;
+                        else if (datum.Quality > lowestQuality)
+                            lowestQuality = datum.Quality;
+                    }
+                }
+                date = SignalUtils.GetNextDate(date, signal.Granularity);
+            }
+            return coarsedData;
+        }
     }
 }
