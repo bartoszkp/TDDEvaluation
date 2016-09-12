@@ -267,8 +267,7 @@ namespace Domain.Services.Implementation
             try
             {
                 dynamic result = default(T);
-                if (older < newer) result = (newer - older) * diffOlder_Actual / diffOlder_Newer + older;
-                else if (older > newer) result = older - ((older - newer) * diffOlder_Actual / diffOlder_Newer);
+                result = older + (newer - older) * diffOlder_Actual / diffOlder_Newer;
                 if (typeof(int) == typeof(T)) { return result; } else { return Math.Round(result, 5); }
             }
             catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException) { throw new ArgumentException(); }
