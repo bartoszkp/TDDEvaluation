@@ -1410,26 +1410,20 @@ namespace WebService.Tests
                 GivenASignal(signal);
                 var timestamp = new DateTime(2016, 1, 4);
 
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), timestamp, timestamp)).Returns(new Datum<int>[]
-                    {
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 }
-                    });
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), timestamp, new DateTime(2016, 1, 11))).Returns(new Datum<int>[]
-                    {
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 5), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 6), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 7), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 8), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 9), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 10), Value = 1 },
-                    });
+                SetupGetData<int>(signal, timestamp, timestamp, new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 }
+                });
+                SetupGetData<int>(signal, timestamp, new DateTime(2016, 1, 11), new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 5), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 6), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 7), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 8), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 9), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 10), Value = 1 },
+                });
 
                 var expectedResult = new Dto.Datum[]
                 {
@@ -1455,52 +1449,43 @@ namespace WebService.Tests
                 var toTimestamp = new DateTime(2016, 1, 25);
                 var midTimestamp = new DateTime(2016, 1, 18);
 
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), fromTimestamp, toTimestamp)).Returns(new Datum<double>[]
-                    {
-                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 13), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 15), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 21), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 22), Value = 0d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0d }
-                    });
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), fromTimestamp, midTimestamp)).Returns(new Datum<double>[]
-                    {
-                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 13), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 15), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1d }
-                    });
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<double>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), midTimestamp, toTimestamp)).Returns(new Datum<double>[]
-                    {
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 21), Value = 5d },
-                        new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 22), Value = 0d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1d },
-                        new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0d }
-                    });
+                SetupGetData<double>(signal, fromTimestamp, toTimestamp, new Datum<double>[]
+                {
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 13), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 15), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 21), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 22), Value = 0d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0d }
+                });
+                SetupGetData<double>(signal, fromTimestamp, midTimestamp, new Datum<double>[]
+                {
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 13), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 15), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1d }
+                });
+                SetupGetData<double>(signal, midTimestamp, toTimestamp, new Datum<double>[]
+                {
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 21), Value = 5d },
+                    new Datum<double>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016, 1, 22), Value = 0d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0d }
+                });
 
                 var expectedResult = new Dto.Datum[]
                 {
@@ -1527,52 +1512,43 @@ namespace WebService.Tests
                 var toTimestamp = new DateTime(2016, 1, 1);
                 var midTimestamp = new DateTime(2015, 1, 1);
 
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), fromTimestamp, toTimestamp)).Returns(new Datum<decimal>[]
-                    {
-                        new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 1, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 3, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 4, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 5, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 8, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 9, 1),  Value = 2m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 10, 1), Value = 1m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 12, 1), Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 1, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 2, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 5, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 6, 1),  Value = 0m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 9, 1),  Value = 1m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 11, 1), Value = 0m }
-                    });
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                   s.Granularity == signal.Granularity &&
-                   s.DataType == signal.DataType &&
-                   s.Path.ToString().Equals(signal.Path.ToString())), fromTimestamp, midTimestamp)).Returns(new Datum<decimal>[]
-                   {
-                        new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 1, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 3, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 4, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 5, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 8, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 9, 1),  Value = 2m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 10, 1), Value = 1m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 12, 1), Value = 5m }
-                   });
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<decimal>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                   s.Granularity == signal.Granularity &&
-                   s.DataType == signal.DataType &&
-                   s.Path.ToString().Equals(signal.Path.ToString())), midTimestamp, toTimestamp)).Returns(new Datum<decimal>[]
-                   {
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 1, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 2, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 5, 1),  Value = 5m },
-                        new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 6, 1),  Value = 0m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 9, 1),  Value = 1m },
-                        new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 11, 1), Value = 2m }
-                   });
+                SetupGetData<decimal>(signal, fromTimestamp, toTimestamp, new Datum<decimal>[]
+                {
+                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 1, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 3, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 4, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 5, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 8, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 9, 1),  Value = 2m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 10, 1), Value = 1m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 12, 1), Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 1, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 2, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 5, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 6, 1),  Value = 0m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 9, 1),  Value = 1m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 11, 1), Value = 0m }
+                });
+                SetupGetData<decimal>(signal, fromTimestamp, midTimestamp, new Datum<decimal>[]
+                {
+                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 1, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 3, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 4, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 5, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Good, Timestamp = new DateTime(2014, 8, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 9, 1),  Value = 2m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 10, 1), Value = 1m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2014, 12, 1), Value = 5m }
+                });
+                SetupGetData<decimal>(signal, midTimestamp, toTimestamp, new Datum<decimal>[]
+                {
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 1, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 2, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 5, 1),  Value = 5m },
+                    new Datum<decimal>() { Quality = Quality.Bad,  Timestamp = new DateTime(2015, 6, 1),  Value = 0m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 9, 1),  Value = 1m },
+                    new Datum<decimal>() { Quality = Quality.Fair, Timestamp = new DateTime(2015, 11, 1), Value = 2m }
+                });
 
                 var expectedResult = new Dto.Datum[]
                 {
@@ -1608,48 +1584,39 @@ namespace WebService.Tests
                     s.Granularity == signal.Granularity &&
                     s.DataType == signal.DataType &&
                     s.Path.ToString().Equals(signal.Path.ToString())))).Returns(specificMVP).Returns(specificMVP).Returns(specificMVP);
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), fromTimestamp, toTimestamp)).Returns(new Datum<int>[]
-                    {
-                        new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 13), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 22), Value = 0 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0 }
-                    });
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), fromTimestamp, midTimestamp)).Returns(new Datum<int>[]
-                    {
-                        new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 13), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 0 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1 }
-                    });
-                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
-                    s.Granularity == signal.Granularity &&
-                    s.DataType == signal.DataType &&
-                    s.Path.ToString().Equals(signal.Path.ToString())), midTimestamp, toTimestamp)).Returns(new Datum<int>[]
-                    {
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 22), Value = 0 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 6 },
-                        new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0 }
-                    });
+                SetupGetData<int>(signal, fromTimestamp, toTimestamp, new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 13), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 22), Value = 0 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0 }
+                });
+                SetupGetData<int>(signal, fromTimestamp, midTimestamp, new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 13), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 0 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1 }
+                });
+                SetupGetData<int>(signal, midTimestamp, toTimestamp, new Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 22), Value = 0 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 6 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0 }
+                });
 
                 var expectedResult = new Dto.Datum[]
                 {
@@ -1659,6 +1626,14 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(9, Dto.Granularity.Week, fromTimestamp, toTimestamp);
 
                 AssertDataDtoEquals(result, expectedResult);
+            }
+
+            private void SetupGetData<T>(Signal signal, DateTime from, DateTime to, IEnumerable<Domain.Datum<T>> data)
+            {
+                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
+                    s.Granularity == signal.Granularity &&
+                    s.DataType == signal.DataType &&
+                    s.Path.ToString().Equals(signal.Path.ToString())), from, to)).Returns(data);
             }
 
             private Signal GetDefaultSignal_IntegerMonth()
