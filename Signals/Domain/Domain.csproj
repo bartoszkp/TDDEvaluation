@@ -64,6 +64,7 @@
     <Compile Include="Calculations\CompareDates.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\InvalidDataType.cs" />
+    <Compile Include="Exceptions\InvalidGranularity.cs" />
     <Compile Include="Exceptions\SignalForDatumHasNotBeenSet.cs" />
     <Compile Include="Exceptions\CouldntGetASignalException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />

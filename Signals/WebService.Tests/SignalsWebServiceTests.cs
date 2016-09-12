@@ -1356,26 +1356,25 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(f => f.Get(signal_bool))
                     .Returns(SignalWith(signal_bool, DataType.Boolean, Granularity.Day, Path.FromString("b")));
 
-                try
-                {
-                    signalsWebService.GetCoarseData(signal_str, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1));
+                if (!IsThrowingException(signal_str, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1)) ||
+                    !IsThrowingException(signal_bool, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1)))
                     Assert.Fail();
-                }
-                catch (Exception ex) {
-                    if (ex.InnerException.GetType() != typeof(InvalidDataType))
-                        Assert.Fail();
-                }
+            }
 
+            private bool IsThrowingException(int signalId, Dto.Granularity granularity, DateTime from, DateTime to)
+            {
                 try
                 {
-                    signalsWebService.GetCoarseData(signal_bool, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1));
-                    Assert.Fail();
+                    signalsWebService.GetCoarseData(signalId, granularity, from, to);
+                    return false;
                 }
                 catch (Exception ex)
                 {
                     if (ex.InnerException.GetType() != typeof(InvalidDataType))
-                        Assert.Fail();
+                        return false;
                 }
+
+                return true;
             }
 
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)

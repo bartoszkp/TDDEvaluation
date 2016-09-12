@@ -318,7 +318,7 @@ namespace Domain.Services.Implementation
                 throw new InvalidDataType();
 
             if ((int)signal.Granularity >= (int)granularity)
-                throw new Exception("Given granularity has to be lower than singal.");
+                throw new InvalidGranularity();
 
             var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
             var result = new List<Datum<T>>();
