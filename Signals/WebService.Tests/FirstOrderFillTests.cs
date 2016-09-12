@@ -50,25 +50,6 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        public void GivenAnIntegerMinuteSignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
-        {
-            SetupFirstOrderPolicy(Granularity.Minute,
-                new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 13, 0), new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 0, 0), Value = (int)1 },
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1, 0, 5, 0), Value = (int)11 },
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1, 0, 9, 0), Value = (int)5 },
-                    new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 1, 1, 0, 12, 0), Value = (int)20 }
-                });
-
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 0, 13, 0));
-
-            var expectedDatum = GetExpectedDatums(Granularity.Minute);
-
-            AssertEqual(expectedDatum, result);
-        }
-
-        [TestMethod]
         public void GivenAnIntegerDailySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData_ForIssue31()
         {
             SetupFirstOrderPolicyFroSpecificExample(Granularity.Day, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 4, 0, 0, 0), new List<Datum<int>>()
@@ -180,25 +161,6 @@ namespace WebService.Tests
             int i = 0;
 
             Assert.AreEqual(5, result.Count());
-        }
-
-        [TestMethod]
-        public void GivenAnIntegerWeeklySignal_WhenGettingDataWithCorrectRange_FirstOrderPolicy_CorrectlyFillsMissingData()
-        {
-            SetupFirstOrderPolicy(Granularity.Week,
-                new DateTime(2000, 1, 3, 0, 0, 0), new DateTime(2000, 4, 3, 0, 0, 0), new List<Datum<int>>()
-                {
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 3, 0, 0, 0), Value = (int)1 },
-                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 2, 7, 0, 0, 0), Value = (int)11 },
-                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 6, 0, 0, 0), Value = (int)5 },
-                    new Datum<int>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 3, 27, 0, 0, 0), Value = (int)20 }
-                });
-
-            var result = signalsWebService.GetData(1, new DateTime(2000, 1, 3, 0, 0, 0), new DateTime(2000, 4, 3, 0, 0, 0));
-
-            var expectedDatum = GetExpectedDatums(Granularity.Week);
-
-            AssertEqual(expectedDatum, result);
         }
 
         [TestMethod]
@@ -381,8 +343,6 @@ namespace WebService.Tests
                 i++;
             }
         }
-
-
 
         private void SetupFirstOrderPolicy(Granularity granularity,
             DateTime fromIncluded, DateTime toExcluded, List<Datum<int>> actualToBeReturnedByMockDatums)

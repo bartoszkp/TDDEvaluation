@@ -79,7 +79,7 @@ namespace Domain.Services.Implementation
             }
             else
             {
-                return result; 
+                return result;
             }
         }
 
@@ -103,17 +103,17 @@ namespace Domain.Services.Implementation
 
         public void SetData<T>(Signal signal, IEnumerable<Datum<T>> datum)
         {
-            if(datum == null)
+            if (datum == null)
             {
                 this.signalsDataRepository.SetData<T>(datum);
                 return;
             }
             var ListOfDatum = datum.ToList();
-            foreach(var d in ListOfDatum)
+            foreach (var d in ListOfDatum)
             {
                 if (ValidateTimestamp(d.Timestamp, signal.Granularity))
                     d.Signal = signal;
-                else 
+                else
                     throw new InvalidTimestampException();
             }
 
@@ -180,933 +180,151 @@ namespace Domain.Services.Implementation
                 }
             }
 
-            if(policy != null)
+            if (policy != null)
             {
                 var gettingList = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
                 var returnList = new List<Datum<T>>();
                 var granulitary = signal.Granularity;
                 DateTime checkedDateTime = fromIncludedUtc;
-                switch (granulitary)
+
+                int countElementOfList = TimeDifference(granulitary, toExcludedUtc, fromIncludedUtc);
+                if (countElementOfList + 1 == gettingList?.Length)
+                    return gettingList;
+                for (int i = 0; i < countElementOfList; i++)
                 {
-                    case Granularity.Second:
+
+                    Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
+                    if (xx == null)
+                    {
+
+                        Datum<T> addingItem;
+
+                        if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                         {
-                            var time = toExcludedUtc - fromIncludedUtc;
+                            addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
+                        }
 
-                            int countElementOfList = (int)time.TotalSeconds;
-                            if (countElementOfList + 1 == gettingList?.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
+                        else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+                        {
+                            if (i == 0)
                             {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
+                                returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
+                                if (returnList.Count == 0)
+                                    addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
+                                else
                                 {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            if (returnList.Count == 0)
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            else
-                                            {
-                                                returnList[0].Timestamp = checkedDateTime;
-                                                addingItem = null;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (returnList.Count == 0)
-                                            {
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }
-                                            else
-                                            {
-                                                var previousItem = returnList.ElementAt(i - 1);
-                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                            }
-                                        }
-                                    }
-
-                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                                    {
-                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
-                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
-
-                                        if (x0.Count() == 0 || x1.Count() == 0)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
-                                                Signal = signal,
-                                                Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
-
-                                        else
-                                        {
-                                            Domain.Quality qualityToAdd;
-                                            var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Seconds;
-                                            var countElementOfListMinusTwo = countElementOfList - 2;
-
-                                            var qualityForNewerElement = x1.ElementAt(0).Quality;
-                                            var qualityForOlderElement = x0.ElementAt(0).Quality;
-
-                                            if (qualityForNewerElement < qualityForOlderElement)
-                                            {
-                                                qualityToAdd = qualityForOlderElement;
-                                            }
-                                            else if (qualityForOlderElement < qualityForNewerElement)
-                                            {
-                                                qualityToAdd = qualityForNewerElement;
-                                            }
-                                            else qualityToAdd = x0.ElementAt(0).Quality;
-
-                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
-                                            {
-                                                if (checkedDateTime != toExcludedUtc)
-                                                {
-
-                                                    if (j == countElementOfListMinusTwo)
-                                                    {
-                                                        qualityToAdd = x1.ElementAt(0).Quality;
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                    }
-                                                    else
-                                                    {
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                        checkedDateTime = checkedDateTime.AddSeconds(1);
-                                                    }
-                                                }
-                                            }
-                                            i--;
-
-                                            checkedDateTime = checkedDateTime.AddSeconds(-1);
-                                        }
-                                        addingItem = null;
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    if (addingItem != null)
-                                        returnList.Add(addingItem);
+                                    returnList[0].Timestamp = checkedDateTime;
+                                    addingItem = null;
+                                }
+                            }
+                            else
+                            {
+                                if (returnList.Count == 0)
+                                {
+                                    addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                                 }
                                 else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddSeconds(1);
-                            }
-                            break;
-                        }
-                    case Granularity.Minute:
-                        {
-                            int countElementOfList = toExcludedUtc.Minute - fromIncludedUtc.Minute;
-                            if (countElementOfList + 1 == gettingList.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
                                 {
+                                    var previousItem = returnList.ElementAt(i - 1);
+                                    addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
+                                }
+                            }
+                        }
 
-                                    Datum<T> addingItem;
+                        else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
+                        {
+                            var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
+                            var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
 
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
+                            if (x0.Count() == 0 || x1.Count() == 0)
+                            {
+                                returnList.Add(new Datum<T>()
+                                {
+                                    Quality = Quality.None,
+                                    Signal = signal,
+                                    Timestamp = checkedDateTime,
+                                    Value = default(T),
+                                });
+                            }
+
+                            else
+                            {
+                                Domain.Quality qualityToAdd;
+                                var timeDifference = TimeDifference(granulitary, x1.ElementAt(0).Timestamp, x0.ElementAt(0).Timestamp);
+                                var countElementOfListMinusTwo = countElementOfList - 2;
+
+                                var qualityForNewerElement = x1.ElementAt(0).Quality;
+                                var qualityForOlderElement = x0.ElementAt(0).Quality;
+
+                                if (qualityForNewerElement < qualityForOlderElement)
+                                {
+                                    qualityToAdd = qualityForOlderElement;
+                                }
+                                else if (qualityForOlderElement < qualityForNewerElement)
+                                {
+                                    qualityToAdd = qualityForNewerElement;
+                                }
+                                else qualityToAdd = x0.ElementAt(0).Quality;
+
+                                decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
+                                decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
+
+                                for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
+                                {
+                                    if (checkedDateTime != toExcludedUtc)
                                     {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
 
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
+                                        if (j == countElementOfListMinusTwo)
                                         {
-                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            if (returnList.Count == 0)
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            else
+                                            qualityToAdd = x1.ElementAt(0).Quality;
+                                            valueToAdd += avarage;
+                                            var itemToAdd = new Datum<T>()
                                             {
-                                                returnList[0].Timestamp = checkedDateTime;
-                                                addingItem = null;
-                                            }
-                                        } 
-                                        else
-                                        {
-                                            if (returnList.Count == 0)
-                                            {
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }else
-                                            {
-                                                var previousItem = returnList.ElementAt(i - 1);
-                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                            }
-                                            
-                                        }   
-                                    }
-
-                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                                    {
-                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
-                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
-
-
-                                        if (x0.Count() == 0 || x1.Count() == 0)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
+                                                Quality = qualityToAdd,
                                                 Signal = signal,
                                                 Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
+                                                Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                            };
 
-                                        else
-                                        {
-                                            var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Minutes;
-
-                                            var qualityToAdd = x1.ElementAt(0).Quality;
-
-                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
-                                            {
-                                                if (checkedDateTime != toExcludedUtc)
-                                                {
-                                                    valueToAdd += avarage;
-                                                    var itemToAdd = new Datum<T>()
-                                                    {
-                                                        Quality = qualityToAdd,
-                                                        Signal = signal,
-                                                        Timestamp = checkedDateTime,
-                                                        Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                    };
-
-                                                    returnList.Add(itemToAdd);
-                                                    checkedDateTime = checkedDateTime.AddMinutes(1);
-                                                }
-                                            }
-                                            i--;
-
-                                            checkedDateTime = checkedDateTime.AddMinutes(-1);
-                                        }
-                                        
-                                        addingItem = null;
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    if (addingItem != null)
-                                        returnList.Add(addingItem);
-                                }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddMinutes(1);
-                            }
-                            break;
-                        }
-                    case Granularity.Hour:
-                        {
-                            int countElementOfList = toExcludedUtc.Hour - fromIncludedUtc.Hour;
-                            if (countElementOfList + 1 == gettingList.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
-                                {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            if (returnList.Count == 0)
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            else
-                                            {
-                                                returnList[0].Timestamp = checkedDateTime;
-                                                addingItem = null;
-                                            }
+                                            returnList.Add(itemToAdd);
                                         }
                                         else
                                         {
-                                            if (returnList.Count == 0)
+                                            valueToAdd += avarage;
+                                            var itemToAdd = new Datum<T>()
                                             {
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }
-                                            else
-                                            {
-                                                var previousItem = returnList.ElementAt(i - 1);
-                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                            }
-                                        }
-                                    }
-
-                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                                    {
-                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
-                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
-
-                                        if (x0.Count() == 0|| x1.Count() == 0)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
+                                                Quality = qualityToAdd,
                                                 Signal = signal,
                                                 Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
+                                                Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
+                                            };
+
+                                            returnList.Add(itemToAdd);
+                                            checkedDateTime = addTime(signal.Granularity, checkedDateTime);
                                         }
-
-                                        else
-                                        {
-                                            Domain.Quality qualityToAdd;
-                                            var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Hours;
-
-                                            var countElementOfListMinusTwo = countElementOfList - 2;
-
-                                            var qualityForNewerElement = x1.ElementAt(0).Quality;
-                                            var qualityForOlderElement = x0.ElementAt(0).Quality;
-
-                                            if (qualityForNewerElement < qualityForOlderElement)
-                                            {
-                                                qualityToAdd = qualityForOlderElement;
-                                            }
-                                            else if (qualityForOlderElement < qualityForNewerElement)
-                                            {
-                                                qualityToAdd = qualityForNewerElement;
-                                            }
-                                            else qualityToAdd = x0.ElementAt(0).Quality;
-
-                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
-                                            {
-                                                if (checkedDateTime != toExcludedUtc)
-                                                {
-                                                    if (j == countElementOfListMinusTwo)
-                                                    {
-                                                        qualityToAdd = x1.ElementAt(0).Quality;
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                    }
-                                                    else
-                                                    {
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                        checkedDateTime = checkedDateTime.AddDays(1);
-                                                    }
-                                                }
-                                            }
-                                            i--;
-
-                                            checkedDateTime = checkedDateTime.AddHours(-1);
-                                        }
-                                        addingItem = null;
                                     }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    if (addingItem != null)
-                                        returnList.Add(addingItem);
                                 }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddHours(1);
+                                i--;
+
+                                checkedDateTime = addTime(signal.Granularity, checkedDateTime, -1);
                             }
-                            break;
+                            addingItem = null;
                         }
-                    case Granularity.Day:
+
+                        else
                         {
-                            int countElementOfList = toExcludedUtc.Day - fromIncludedUtc.Day;
-                            if (countElementOfList + 1 == gettingList.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
-                                {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            if (returnList.Count == 0)
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            else
-                                            {
-                                                returnList[0].Timestamp = checkedDateTime;
-                                                addingItem = null;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (returnList.Count == 0)
-                                            {
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }
-                                            else
-                                            {
-                                                var previousItem = returnList.ElementAt(i - 1);
-                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                            }
-                                        }
-                                    }
-
-                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                                    {
-                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
-                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
-
-                                        if (x0.Count() == 0 || x1.Count() == 0)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
-                                                Signal = signal,
-                                                Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
-                                        else
-                                        {
-                                            Domain.Quality qualityToAdd;
-                                            var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Days;
-                                            var countElementOfListMinusTwo = countElementOfList - 2;
-
-                                            var qualityForNewerElement = x1.ElementAt(0).Quality;
-                                            var qualityForOlderElement = x0.ElementAt(0).Quality;
-
-                                            if (qualityForNewerElement < qualityForOlderElement)
-                                            {
-                                                qualityToAdd = qualityForOlderElement;
-                                            }
-                                            else if (qualityForOlderElement < qualityForNewerElement)
-                                            {
-                                                qualityToAdd = qualityForNewerElement;
-                                            }
-                                            else qualityToAdd = x0.ElementAt(0).Quality;
-
-                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
-                                            {
-                                                if (checkedDateTime != toExcludedUtc)
-                                                {
-                                                    if (j == countElementOfListMinusTwo)
-                                                    {
-                                                        qualityToAdd = x1.ElementAt(0).Quality;
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                    }
-                                                    else
-                                                    {
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                        checkedDateTime = checkedDateTime.AddDays(1);
-                                                    }
-                                                }
-                                            }
-                                            i--;
-
-                                            checkedDateTime = checkedDateTime.AddDays(-1);
-                                        }
-                                        
-                                        addingItem = null;
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    if (addingItem != null)
-                                        returnList.Add(addingItem);
-                                }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddDays(1);
-                            }
-                            break;
+                            addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
                         }
-                    case Granularity.Week:
-                        {
-                            int countElementOfList = toExcludedUtc.DayOfYear / 7 - fromIncludedUtc.DayOfYear / 7;
-                            if (countElementOfList + 1 == gettingList.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
-                                {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            if (returnList.Count == 0)
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            else
-                                            {
-                                                returnList[0].Timestamp = checkedDateTime;
-                                                addingItem = null;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (returnList.Count == 0)
-                                            {
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }
-                                            else
-                                            {
-                                                var previousItem = returnList.ElementAt(i - 1);
-                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                            }
-                                        }
-                                    }
-
-                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                                    {
-                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
-                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
-
-
-                                        if (x0.Count() == 0 || x1.Count() == 0)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
-                                                Signal = signal,
-                                                Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
-
-                                        else
-                                        {
-                                            var timeDifference = (x1.ElementAt(0).Timestamp - x0.ElementAt(0).Timestamp).Days / 7;
-
-                                            var qualityToAdd = x1.ElementAt(0).Quality;
-
-                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
-                                            {
-                                                valueToAdd += avarage;
-                                                var itemToAdd = new Datum<T>()
-                                                {
-                                                    Quality = qualityToAdd,
-                                                    Signal = signal,
-                                                    Timestamp = checkedDateTime,
-                                                    Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                };
-
-                                                returnList.Add(itemToAdd);
-                                                checkedDateTime = checkedDateTime.AddDays(7);
-                                            }
-                                            i--;
-
-                                            checkedDateTime = checkedDateTime.AddDays(-7);
-                                        }
-                                        
-                                        addingItem = null;
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    if (addingItem != null)
-                                        returnList.Add(addingItem);
-                                }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddDays(7);
-                            }
-                            break;
-                        }
-                    case Granularity.Month:
-                        {
-                            int countElementOfList = ((toExcludedUtc.Year - fromIncludedUtc.Year) * 12) + toExcludedUtc.Month - fromIncludedUtc.Month;
-                            if (countElementOfList+1 == gettingList.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
-                                {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            if(returnList.Count == 0)
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            else
-                                            {
-                                                returnList[0].Timestamp = checkedDateTime;
-                                                addingItem = null;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (returnList.Count == 0)
-                                            {
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }
-                                            else
-                                            {
-                                                var previousItem = returnList.ElementAt(i - 1);
-                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                            }
-                                        }
-                                    }
-
-                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                                    {
-                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
-                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
-
-
-                                        if (x0.Count() == 0 || x1.Count() == 0)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
-                                                Signal = signal,
-                                                Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
-
-                                        else
-                                        {
-                                            Domain.Quality qualityToAdd;
-                                            var timeDifference = ((x1.ElementAt(0).Timestamp.Year - x0.ElementAt(0).Timestamp.Year) * 12)
-                                            + (x1.ElementAt(0).Timestamp.Month - x0.ElementAt(0).Timestamp.Month);
-
-                                            var countElementOfListMinusTwo = countElementOfList - 2;
-                                            var qualityForNewerElement = x1.ElementAt(0).Quality;
-                                            var qualityForOlderElement = x0.ElementAt(0).Quality;
-
-                                            if (qualityForNewerElement < qualityForOlderElement)
-                                            {
-                                                qualityToAdd = qualityForOlderElement;
-                                            }
-                                            else if (qualityForOlderElement < qualityForNewerElement)
-                                            {
-                                                qualityToAdd = qualityForNewerElement;
-                                            }
-                                            else qualityToAdd = x0.ElementAt(0).Quality;
-
-                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
-                                            {
-                                                if (checkedDateTime != toExcludedUtc)
-                                                {
-                                                    if (j == countElementOfListMinusTwo)
-                                                    {
-                                                        qualityToAdd = x1.ElementAt(0).Quality;
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                    }
-                                                    else
-                                                    {
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                        checkedDateTime = checkedDateTime.AddMonths(1);
-                                                    }
-                                                }
-                                            }
-                                            i--;
-
-                                            checkedDateTime = checkedDateTime.AddMonths(-1);
-                                        }
-                                        
-                                        addingItem = null;
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    if (addingItem != null)
-                                        returnList.Add(addingItem);
-                                }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddMonths(1);
-                            }
-                            break;
-                        }
-                    case Granularity.Year:
-                        {
-                            int countElementOfList = toExcludedUtc.Year - fromIncludedUtc.Year;
-                            if (countElementOfList + 1 == gettingList.Length)
-                                return gettingList;
-                            for (int i = 0; i < countElementOfList; i++)
-                            {
-
-                                Datum<T> xx = gettingList.FirstOrDefault(x => x.Timestamp == checkedDateTime);
-                                if (xx == null)
-                                {
-
-                                    Datum<T> addingItem;
-
-                                    if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                                    {
-                                        addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                                    }
-
-                                    else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                                    {
-                                        if (i == 0)
-                                        {
-                                            returnList = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1).ToList();
-                                            if (returnList.Count == 0)
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            else
-                                            {
-                                                returnList[0].Timestamp = checkedDateTime;
-                                                addingItem = null;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (returnList.Count == 0)
-                                            {
-                                                addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                            }
-                                            else
-                                            {
-                                                var previousItem = returnList.ElementAt(i - 1);
-                                                addingItem = new Datum<T>() { Quality = previousItem.Quality, Timestamp = checkedDateTime, Value = previousItem.Value };
-                                            }
-                                        }
-                                    }
-
-                                    else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                                    {
-                                        var x0 = signalsDataRepository.GetDataOlderThan<T>(signal, checkedDateTime, 1);
-                                        var x1 = signalsDataRepository.GetDataNewerThan<T>(signal, checkedDateTime, 1);
-
-                                        if (x0.Count() == 0 || x1.Count() == 0)
-                                        {
-                                            returnList.Add(new Datum<T>()
-                                            {
-                                                Quality = Quality.None,
-                                                Signal = signal,
-                                                Timestamp = checkedDateTime,
-                                                Value = default(T),
-                                            });
-                                        }
-
-                                        else
-                                        {
-                                            Domain.Quality qualityToAdd;
-                                            var timeDifference = x1.ElementAt(0).Timestamp.Year - x0.ElementAt(0).Timestamp.Year;
-
-                                            var countElementOfListMinusTwo = countElementOfList - 2;
-                                            var qualityForNewerElement = x1.ElementAt(0).Quality;
-                                            var qualityForOlderElement = x0.ElementAt(0).Quality;
-
-                                            if (qualityForNewerElement < qualityForOlderElement)
-                                            {
-                                                qualityToAdd = qualityForOlderElement;
-                                            }
-                                            else if (qualityForOlderElement < qualityForNewerElement)
-                                            {
-                                                qualityToAdd = qualityForNewerElement;
-                                            }
-                                            else qualityToAdd = x0.ElementAt(0).Quality;
-
-                                            decimal avarage = (Convert.ToDecimal((Convert.ChangeType(x1.ElementAt(0).Value, typeof(T)))) - Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)))) / timeDifference;
-                                            decimal valueToAdd = Convert.ToDecimal(Convert.ChangeType(x0.ElementAt(0).Value, typeof(T)));
-
-                                            for (int j = 0; j < timeDifference && j < countElementOfList; j++, i++)
-                                            {
-                                                if (checkedDateTime != toExcludedUtc)
-                                                {
-                                                    if (j == countElementOfListMinusTwo)
-                                                    {
-                                                        qualityToAdd = x1.ElementAt(0).Quality;
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                    }
-                                                    else
-                                                    {
-                                                        valueToAdd += avarage;
-                                                        var itemToAdd = new Datum<T>()
-                                                        {
-                                                            Quality = qualityToAdd,
-                                                            Signal = signal,
-                                                            Timestamp = checkedDateTime,
-                                                            Value = (T)Convert.ChangeType(valueToAdd, typeof(T)),
-                                                        };
-
-                                                        returnList.Add(itemToAdd);
-                                                        checkedDateTime = checkedDateTime.AddYears(1);
-                                                    }
-                                                }
-                                            }
-                                            i--;
-
-                                            checkedDateTime = checkedDateTime.AddYears(-1);
-                                        }
-                                        
-                                        addingItem = null;
-                                    }
-
-                                    else
-                                    {
-                                        addingItem = new Datum<T>() { Quality = Quality.None, Timestamp = checkedDateTime, Value = default(T) };
-                                    }
-                                    if (addingItem != null)
-                                        returnList.Add(addingItem);
-                                }
-                                else
-                                    returnList.Add(xx);
-                                checkedDateTime = checkedDateTime.AddYears(1);
-                            }
-                            break;
-                        }
+                        if (addingItem != null)
+                            returnList.Add(addingItem);
+                    }
+                    else
+                        returnList.Add(xx);
+                    checkedDateTime = addTime(signal.Granularity, checkedDateTime);
                 }
-                
-               return returnList;
-                
+
+                return returnList;
+
             }
             return this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc)?.ToArray();
         }
@@ -1141,13 +359,13 @@ namespace Domain.Services.Implementation
         }
 
 
-        private bool ValidateTimestamp(DateTime timestamp,Granularity granularity)
+        private bool ValidateTimestamp(DateTime timestamp, Granularity granularity)
         {
             switch (granularity)
             {
                 case Granularity.Second:
                     return timestamp.Millisecond == 0;
-                    
+
                 case Granularity.Minute:
                     return timestamp.Second == 0 && timestamp.Millisecond == 0;
 
@@ -1164,7 +382,7 @@ namespace Domain.Services.Implementation
                     return timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
 
                 case Granularity.Year:
-                    return timestamp.Month == 1 &&  timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
+                    return timestamp.Month == 1 && timestamp.Day == 1 && timestamp.Hour == 0 && timestamp.Minute == 0 && timestamp.Second == 0 && timestamp.Millisecond == 0;
 
                 default:
                     break;
@@ -1205,6 +423,64 @@ namespace Domain.Services.Implementation
             }
 
             signalsRepository.Delete(signalToDelete);
+        }
+
+        public DateTime addTime(Granularity granularity, DateTime time, int timeToAdd = 1)
+        {
+            switch (granularity)
+            {
+                case Granularity.Day:
+                    return time.AddDays(timeToAdd);
+
+                case Granularity.Hour:
+                    return time.AddHours(timeToAdd);
+
+                case Granularity.Minute:
+                    return time.AddMinutes(timeToAdd);
+
+                case Granularity.Month:
+                    return time.AddMonths(timeToAdd);
+
+                case Granularity.Second:
+                    return time.AddSeconds(timeToAdd);
+
+                case Granularity.Week:
+                    return time.AddDays(7 * timeToAdd);
+
+                case Granularity.Year:
+                    return time.AddYears(timeToAdd);
+            }
+
+            throw new NotSupportedException("Granularity " + granularity.ToString() + " is not supported");
+        }
+
+        public int TimeDifference(Granularity granularity, DateTime newer, DateTime older)
+        {
+            switch(granularity)
+            {
+                case Granularity.Day:
+                    return (int)(newer - older).TotalDays;
+
+                case Granularity.Hour:
+                    return (int)(newer - older).TotalHours;
+
+                case Granularity.Minute:
+                    return (int)(newer - older).TotalMinutes;
+
+                case Granularity.Month:
+                    return (newer.Year - older.Year) * 12 + newer.Month - older.Month;
+
+                case Granularity.Second:
+                    return (int)(newer - older).TotalSeconds;
+
+                case Granularity.Week:
+                    return (int)(newer - older).TotalDays / 7;
+
+                case Granularity.Year:
+                    return newer.Year - older.Year;
+            }
+
+            throw new NotSupportedException("Granularity " + granularity.ToString() + " is not supported");
         }
     }
 }
