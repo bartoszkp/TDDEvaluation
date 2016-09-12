@@ -273,8 +273,7 @@ namespace Domain.Services.Implementation
                 if (sortedData[i].Quality == Quality.None && EqualityComparer<T>.Default.Equals(sortedData[i].Value, default(T)))
                     foreach (Datum<T> shadowDatum in shadowData)
                     {
-                        if (shadowDatum.Timestamp.Date == sortedData[i].Timestamp.Date
-                            && shadowDatum.Quality != Quality.None && !EqualityComparer<T>.Default.Equals(shadowDatum.Value, default(T)))
+                        if (shadowDatum.Timestamp.Date == sortedData[i].Timestamp.Date )
                             sortedData[i] = shadowDatum;
                     }
             }
