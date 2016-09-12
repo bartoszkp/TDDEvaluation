@@ -160,7 +160,7 @@ namespace Domain.Services.Implementation
             if (!ValidateTimestamp(fromIncludedUtc, signal.Granularity) || !ValidateTimestamp(toExcludedUtc, signal.Granularity))
                 throw new InvalidTimestampException();
 
-            var policy = GetMissingValuePolicy(signal);
+            var policy = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
             var datumReturnList = new List<Datum<T>>();
 
             if (fromIncludedUtc == toExcludedUtc)
@@ -187,10 +187,9 @@ namespace Domain.Services.Implementation
 
                         Datum<T> addingItem;
 
-                        if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                        {
-                            addingItem = new Datum<T>() { Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality, Timestamp = checkedDateTime, Value = ((SpecificValueMissingValuePolicy<T>)policy).Value };
-                        }
+                        if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>)
+                            || policy.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
+                            addingItem = policy.GetDatumToFill(checkedDateTime);
 
                         else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                         {
