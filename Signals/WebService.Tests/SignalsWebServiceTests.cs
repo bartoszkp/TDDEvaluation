@@ -1027,6 +1027,33 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            public void GivenASignal_HavingBothEarlierAndOlderData_WhenGettingDataWithFirstOrderMVP_WithDataOfSameValueDifferentQuality_ReturnsProperData()
+            {
+                int dummyId = 1;
+
+                var newdata = new[] { new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 1), Value = 1 } };
+                var oldData = new[] { new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1 } };
+
+                GivenASignalWithDataOfType(dummyId, newdata, DataType.Integer, Granularity.Month);
+                GivenMissingValuePolicy(dummyId, new FirstOrderMissingValuePolicyInteger());
+
+                var date = new DateTime(2000, 3, 1);
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataOlderThan<int>(It.Is<Signal>(s => s.Id == dummyId), date, 1))
+                    .Returns(oldData);
+
+                signalsDataRepositoryMock
+                    .Setup(gdot => gdot.GetDataNewerThan<int>(It.Is<Signal>(s => s.Id == dummyId), date, 1))
+                    .Returns(newdata);
+
+                var resultData = signalsWebService.GetData(dummyId, date, date).Single();
+
+                Assert.AreEqual(Dto.Quality.Fair, resultData.Quality);
+                Assert.AreEqual(1, resultData.Value);
+            }
+
+            [TestMethod]
             [ExpectedException(typeof(ShadowMissingValuePolicyDataTypeException))]
             public void WhenSetingShadowMissingValuePolicy_DataTypeMustBeTheSame()
             {
