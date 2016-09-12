@@ -516,7 +516,10 @@ namespace Domain.Services.Implementation
             int resultQuality = data.Select(d => (int)d.Quality).Max();
 
             if (data.Where(d => d.Quality == Quality.None).Any())
+            {
                 resultQuality = 0;
+                resultValue = default(T);
+            }
 
             return new Datum<T>()
             {

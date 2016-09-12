@@ -1576,8 +1576,8 @@ namespace WebService.Tests
 
                 var expectedResult = new Dto.Datum[]
                 {
-                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = fromTimestamp, Value = 2.75m },
-                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = midTimestamp, Value = 1.5m },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = fromTimestamp, Value = 0m },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = midTimestamp, Value = 0m },
                 };
                 var result = signalsWebService.GetCoarseData(8, Dto.Granularity.Year, fromTimestamp, toTimestamp);
 
