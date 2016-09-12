@@ -15,12 +15,18 @@ namespace Domain.MissingValuePolicy
         public override IEnumerable<Datum<T>> FillData(Signal signal, IEnumerable<Datum<T>> data, DateTime fromIncludedUtc, DateTime toExcludedUtc, ISignalsDataRepository signalsDataRepository)
         {
             returnListDatum = new List<Datum<T>>();
-            if((data.Last(x=>x==x).Timestamp)<fromIncludedUtc)
+            if(data.Count() == 0)
             {
-                var dataOlder = data.Last(x => x == x);
+                this.Quality = Quality.None;
+                this.Value = default(T);
+            }
+            else if((data.Last().Timestamp)<fromIncludedUtc)
+            {
+                var dataOlder = data.Last();
                 this.Quality = dataOlder.Quality;
                 this.Value = dataOlder.Value;
             }
+
             while (fromIncludedUtc < toExcludedUtc)
             {
                 Datum<T> elementOfList = data.FirstOrDefault(x => x.Timestamp == fromIncludedUtc);
@@ -28,7 +34,6 @@ namespace Domain.MissingValuePolicy
                 {
                     this.Quality = elementOfList.Quality;
                     this.Value = elementOfList.Value;
-
                 }
                 returnListDatum.Add(new Datum<T>() { Signal = signal, Quality = this.Quality, Timestamp = fromIncludedUtc, Value = this.Value });
                 fromIncludedUtc = AddToDateTime(fromIncludedUtc, signal);

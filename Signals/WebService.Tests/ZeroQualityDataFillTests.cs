@@ -180,6 +180,27 @@ namespace WebService.Tests
                new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDecimal(), filledDatum);
         }
 
+        [TestMethod]
+        public void GivenASignalAndDatum_WhenGettingDataFromInvalidRange_ReturnsEmptyResults()
+        {
+            var existingSignal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("root/signal1"));
+
+            var existingDatum = new Dto.Datum[]
+            {
+                new Dto.Datum { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 12, 1), Value = (double)1.5}
+            };
+
+            var filledDatum = new Dto.Datum[]
+            {
+                new Dto.Datum { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = (double)0},
+                new Dto.Datum { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 3, 1), Value = (double)0},
+                new Dto.Datum { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 4, 1), Value = (double)0}
+            };
+
+            SetupZeroQuality(existingSignal, existingDatum, new DateTime(2000, 2, 1), new DateTime(2000, 5, 1),
+                new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyDouble(), filledDatum);
+        }
+
         private Domain.Signal SignalWith(int id, Domain.DataType dataType, Domain.Granularity granularity, Domain.Path path)
         {
             return new Domain.Signal()
