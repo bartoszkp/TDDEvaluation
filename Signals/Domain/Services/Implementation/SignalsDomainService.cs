@@ -450,6 +450,14 @@ namespace Domain.Services.Implementation
             }
         }
 
+        private Quality SelectWorstQualityFromRange(IEnumerable<Quality> range)
+        {
+            if (range.Contains(Quality.None))
+                return Quality.None;
+
+            return range.Max();
+        }
+
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             if (signal.Granularity >= granularity)
@@ -472,10 +480,13 @@ namespace Domain.Services.Implementation
             if (fromIncludedUtc == toExcludedUtc)
             {
                 AddTimeBasedOnGranulatity(granularity, ref toExcludedUtc);
+
                 var data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
                 dynamic value = data.Average(d => (dynamic)d.Value);
                 value = Convert.ChangeType(value, typeof(T));
-                return new List<Datum<T>>() { new Datum<T>() { Value = value } };
+                var quality = SelectWorstQualityFromRange(data.Select(d => d.Quality));
+
+                return new List<Datum<T>>() { new Datum<T>() { Value = value, Quality = quality } };
             }
 
 
