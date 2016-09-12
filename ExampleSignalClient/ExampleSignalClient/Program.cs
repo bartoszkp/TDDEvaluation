@@ -9,77 +9,35 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = 1;
-            var bool_month_id = client.Add(new Signal()
-            {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "bool", "month", id.ToString() } }
-            }).Id.Value;
-            var bool_second_id = client.Add(new Signal()
-            {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Second,
-                Path = new Path() { Components = new[] { "bool", "second", id.ToString() } }
-            }).Id.Value;
-            var decimal_month_id = client.Add(new Signal()
-            {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "decimal", "month", id.ToString() } }
-            }).Id.Value;
+            var id = client.Add(new Signal() { Granularity = Granularity.Month ,DataType = DataType.Double, Path = new Path() { Components = new[] { string.Empty } } })
+                .Id.Value;
 
-            var bool_month_shadow = client.Add(new Signal()
-            {
-                DataType = DataType.Boolean,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "shadows", "bool", "month", id.ToString() } }
-            });
+            var result = client.GetById(id);
 
-            try
+            if (result != null)
             {
-                client.SetMissingValuePolicy(
-                    bool_second_id,
-                    new ShadowMissingValuePolicy()
-                    {
-                        DataType = DataType.Boolean,
-                        ShadowSignal = bool_month_shadow
-                    });
+                Console.WriteLine("Sygnał poprawnie utworzony");
             }
-            catch (Exception)
+            else
             {
-                Console.WriteLine("Failed to assign");
+                Console.WriteLine("Błąd - nie udało się utworzyć sygnału");
             }
 
-            try
+            client.Delete(id);
+
+            result = client.GetById(id);
+
+            if (result == null)
             {
-                client.SetMissingValuePolicy(
-                    decimal_month_id,
-                    new ShadowMissingValuePolicy()
-                    {
-                        DataType = DataType.Decimal,
-                        ShadowSignal = bool_month_shadow
-                    });
+                Console.WriteLine("Sygnał poprawnie skasowany");
             }
-            catch (Exception)
+            else
             {
-                Console.WriteLine("Failed to assign");
+                Console.WriteLine("Błąd - sygnał nadal istnieje");
             }
-
-            client.SetMissingValuePolicy(
-                bool_month_id,
-                new ShadowMissingValuePolicy()
-                {
-                    DataType = DataType.Boolean,
-                    ShadowSignal = bool_month_shadow
-                });
-
-            var mvp = client.GetMissingValuePolicy(bool_month_id);
-
-            Console.WriteLine(mvp.GetType().ToString());
-            Console.WriteLine(string.Join(",", ((ShadowMissingValuePolicy)mvp).ShadowSignal.Path.Components));
 
             Console.ReadKey();
+
 
 
         }

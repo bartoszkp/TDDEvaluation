@@ -165,8 +165,10 @@ namespace Domain.Services.Implementation
             var signal = GetById(signalId);
             if (signal == null)
                 throw new IdNotNullException();
+
             SetMissingValuePolicy(signalId, null);
-            switch(signal.DataType)
+
+            switch (signal.DataType)
             {
                 case DataType.Boolean:
                     signalsDataRepository.DeleteData<bool>(signal);
@@ -190,6 +192,11 @@ namespace Domain.Services.Implementation
         private bool IsShadowSignalMatch(Signal signal, MissingValuePolicyBase domainPolicy)
         {
             Signal signalShadow;
+
+            if (domainPolicy == null)
+            {
+                return true;
+            }
 
             if (domainPolicy.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<bool>))
                 signalShadow = ((ShadowMissingValuePolicy<bool>)domainPolicy).ShadowSignal;
