@@ -1294,6 +1294,15 @@ namespace WebService.Tests
                 });
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GetCoarseData_WithNoSignal_ExpectNoSignalFoundException()
+            {
+                GivenNoSignals();
+
+                signalsWebService.GetCoarseData(0, Dto.Granularity.Day, DateTime.Now, DateTime.Now);
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
