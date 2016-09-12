@@ -9,42 +9,53 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal()
+            var signal1 = client.Add(new Signal()
             {
                 DataType = DataType.Boolean,
-                Granularity = Granularity.Year,
-                Path = new Path() { Components = new[] { "ShadowTests" } }
-            }).Id.Value;
-
-            var shadow = client.Add(new Signal()
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal1" } }
+            });
+            var signal2 = client.Add(new Signal()
             {
                 DataType = DataType.Boolean,
-                Granularity = Granularity.Year,
-                Path = new Path() { Components = new[] { "shadows", "shadow1" } }
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal2" } }
+            });
+            var signal3 = client.Add(new Signal()
+            {
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal3" } }
             });
 
+            client.SetMissingValuePolicy(
+                    signal1.Id.Value,
+                    new ShadowMissingValuePolicy()
+                    {
+                        DataType = DataType.Boolean,
+                        ShadowSignal = signal2
+                    });
+            client.SetMissingValuePolicy(
+                    signal2.Id.Value,
+                    new ShadowMissingValuePolicy()
+                    {
+                        DataType = DataType.Boolean,
+                        ShadowSignal = signal3
+                    });
 
-            client.SetData(shadow.Id.Value, new Datum[]
-                {
-    new Datum() { Quality = Quality.None, Timestamp = new DateTime(2000, 1, 1), Value = false },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2001, 1, 1), Value = true },
-    new Datum() { Quality = Quality.None, Timestamp = new DateTime(2002, 1, 1), Value = false },
-    new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2003, 1, 1), Value = false },
-    new Datum() { Quality = Quality.None, Timestamp = new DateTime(2004, 1, 1), Value = false },
-                });
-
-            client.SetMissingValuePolicy(id, new ShadowMissingValuePolicy() { DataType = DataType.Boolean, ShadowSignal = shadow });
-
-            client.SetData(id, new Datum[]
+            try
             {
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2002, 1, 1), Value = true },
-            });
-
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2005, 1, 1));
-
-            foreach (var d in result)
+                client.SetMissingValuePolicy(
+                      signal3.Id.Value,
+                      new ShadowMissingValuePolicy()
+                      {
+                          DataType = DataType.Boolean,
+                          ShadowSignal = signal1
+                      });
+            }
+            catch (Exception)
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                Console.WriteLine("Failed to assign");
             }
 
             Console.ReadKey();

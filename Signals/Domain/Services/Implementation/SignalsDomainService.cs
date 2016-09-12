@@ -162,9 +162,37 @@ namespace Domain.Services.Implementation
             {
                 var specificMvp = domainMvp as ShadowMissingValuePolicy<T>;
                 CheckIfSignalsDataTypesAndGranularitesAreTheSame(foundSignal, specificMvp.ShadowSignal); // throws Exception
+                CheckIfShadowSignalsDoNotDoCycle<T>(foundSignal, specificMvp.ShadowSignal);
             }
                 
             missingValuePolicyRepository.Set(foundSignal, domainMvp);
+        }
+
+        private void CheckIfShadowSignalsDoNotDoCycle<T>(Signal foundSignal, Signal shadowSignal)
+        {
+            List<int> list = new List<int>();
+            list.Add((int)foundSignal.Id);
+            list.Add((int)shadowSignal.Id);
+            var actualSignal = shadowSignal;
+            while (true)
+            {
+             var policy=    missingValuePolicyRepository.Get(actualSignal);
+                if (policy is ShadowMissingValuePolicy<T>)
+                {
+                    var pol = policy as ShadowMissingValuePolicy<T>;
+                    actualSignal = pol.ShadowSignal;
+                    if (list.FindIndex(x => x == (int)actualSignal.Id) >= 0)
+                    {
+                        throw new ShadowCycleException();
+                    }
+                    else list.Add((int)actualSignal.Id);
+                }
+                else
+                {
+                    break;
+                }
+            }
+         
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(int signalId)

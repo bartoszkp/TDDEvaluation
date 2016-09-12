@@ -65,18 +65,21 @@ namespace WebService.Tests.SignalsWebServiceTests
         public void GivenASignal_ShadowMissingValuePolicy_WhenSignalsAreDifferent_CheckIsSetted()
         {
             int signalId = 5;
+            int shadowId = 2;
             Dto.Signal shadowSignal = new Dto.Signal()
             {
                 DataType = Dto.DataType.Double,
                 Granularity = Dto.Granularity.Minute,
-                Path = new Dto.Path { Components = new[] { "aaa" } }
+                Path = new Dto.Path { Components = new[] { "aaa" } },
+                Id=shadowId
+                
             };
 
             SetupGet(Utils.SignalWith(signalId, Domain.DataType.Double, Domain.Granularity.Minute));
 
             signalsWebService.SetMissingValuePolicy(
                signalId,
-               new ShadowMissingValuePolicy { DataType = Dto.DataType.Double, ShadowSignal = shadowSignal });
+               new ShadowMissingValuePolicy { DataType = Dto.DataType.Double, ShadowSignal = shadowSignal,Id=shadowId });
 
             missingValuePolicyRepoMock
              .Verify(mvp => mvp.Set(It.Is<Domain.Signal>(sig => sig.Id == signalId),
