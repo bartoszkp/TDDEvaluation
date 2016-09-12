@@ -113,8 +113,32 @@ namespace Domain.Services.Implementation
             if (policy is MissingValuePolicy.FirstOrderMissingValuePolicy<string>
                 || policy is MissingValuePolicy.FirstOrderMissingValuePolicy<bool>)
                 throw new ArgumentException("First order mvp mustn't string or bool");
+
+            if (policy != null && policy.GetType().GetGenericTypeDefinition() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<>))
+            {
+                var genericMethod = typeof(SignalsDomainService)
+                    .GetMethod("DetectCircleDependency")
+                    .MakeGenericMethod(DataTypeUtils.GetNativeType(signal.DataType));
+
+                if ((bool)genericMethod.Invoke(this, new object[] { signal, policy }))
+                    throw new Exception("Circle Dependency in ShadowMissingValuePolicy detected.");
+            }
+
             this.missingValuePolicyRepository.Set(signal, policy);
         }
+
+        public bool DetectCircleDependency<T>(Signal signal, MissingValuePolicy.MissingValuePolicyBase policy)
+        {
+            if (policy == null || !(policy is MissingValuePolicy.ShadowMissingValuePolicy<T>))
+                return false;
+
+            var shadowSignal = ((MissingValuePolicy.ShadowMissingValuePolicy<T>)policy).ShadowSignal;
+            if (shadowSignal.Id == signal.Id)
+                return true;
+
+            return DetectCircleDependency<T>(signal, missingValuePolicyRepository.Get(shadowSignal));
+        }
+
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
