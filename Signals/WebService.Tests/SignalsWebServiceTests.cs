@@ -1691,6 +1691,22 @@ namespace WebService.Tests
             }
 
 
+            [TestMethod]
+            [ExpectedException(typeof(CouldntGetASignalException))]
+            public void GivenNoSignal_WhenGettingCoarseData_ThrowsCouldntGetSignalException()
+            {
+                SetupWebService();
+                int signalId = 4;
+
+                DateTime timestamp = new DateTime(2000, 1, 1);
+
+                SetupMock_missingValuePolicy_DefaultMissingValuePolicy();
+
+
+                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Second, timestamp, timestamp);
+            }
+
+
             private void DeleteASignal(int id)
             {
 
