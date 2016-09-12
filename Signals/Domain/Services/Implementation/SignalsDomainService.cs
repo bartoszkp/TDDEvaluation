@@ -99,11 +99,11 @@ namespace Domain.Services.Implementation
             T step = default(T);
             Quality quality = 0;
 
-            if (gettingList.Count() > 0)
-                return gettingList;
-
             if (fromIncludedUtc == toExcludedUtc)
             {
+                if (gettingList.Count() > 0)
+                    return gettingList;
+
                 if (mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
                 {
                     datum = SetDatumForSpecificOrderMissingValuePolicy<T>((MissingValuePolicy.SpecificValueMissingValuePolicy<T>)mvp);
@@ -201,25 +201,28 @@ namespace Domain.Services.Implementation
             if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                 throw new ArgumentException("Boolean and String types are not supported.");
 
+
+
             var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
             var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUtc, 1);
+
+            Datum<T> olderDatum = null;
+            Datum<T> newerDatum = null;
             
-            if (olderData.Count() == 0)
-            {
-                datum = new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T)
-                };
-            }
-            else if (newerData.Count() == 0)
-            {
-                datum = new Datum<T>()
-                {
-                    Quality = Quality.None,
-                    Value = default(T)
-                };
-            }
+            var defaultDatum = new Datum<T>() {
+                Quality = Quality.None,
+                Value = default(T),
+                Timestamp = fromIncludedUtc
+            };
+
+            if (olderData.Count() > 0)
+                olderDatum = olderData.ElementAt(0);
+            if (newerData.Count() > 0)
+                newerDatum = newerData.ElementAt(0);
+
+            else if (olderDatum.Quality == Quality.None || newerData.ElementAt(0).Quality == Quality.None)
+                return defaultDatum;
+
             else
             {
                 T value = olderData.First().Value;
