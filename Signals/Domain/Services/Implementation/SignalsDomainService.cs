@@ -189,17 +189,17 @@ namespace Domain.Services.Implementation
             {
                 if (!timestampsFollowingExistingDates)
                 {
-                    var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 100);
+                    var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).SingleOrDefault();
 
-                    if (olderDatum == null || olderDatum.Count() < 1) filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
+                    if (olderDatum == null) filledArray[current_index] = Datum<T>.CreateNone(signal, timestamp);
 
                     else
                     {
                         filledArray[current_index] = new Datum<T>
                         {
-                            Quality = olderDatum.First().Quality,
-                            Value = olderDatum.First().Value,
-                            Signal = olderDatum.First().Signal,
+                            Quality = olderDatum.Quality,
+                            Value = olderDatum.Value,
+                            Signal = olderDatum.Signal,
                             Timestamp = timestamp
                         };
                     }
@@ -218,28 +218,19 @@ namespace Domain.Services.Implementation
 
             else if (policy is FirstOrderMissingValuePolicy<T>)
             {
-                var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1);
-                var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1);
+                var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).SingleOrDefault();
+                var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1).SingleOrDefault();
 
-                if (olderData != null && olderData.Count() > 0 && olderData.First().Quality != Quality.None && newerData.Count() > 0 && newerData != null && newerData.First().Quality != Quality.None) // jesli znalazlem wczesniejsza probke
+                if (olderData != null && olderData.Quality != Quality.None && newerData != null && newerData.Quality != Quality.None) // jesli znalazlem wczesniejsza probke
                 {
-                    var diffNumberOlder_Newer = NumberOfPeriods(olderData.First().Timestamp, newerData.First().Timestamp, signal.Granularity);
-                    var diffNumberOlder_Actual = NumberOfPeriods(olderData.First().Timestamp, timestamp, signal.Granularity);
-                    var stepValue = ValueStep<T>(signal, olderData.First().Value, newerData.First().Value, diffNumberOlder_Newer, diffNumberOlder_Actual);
-
-                    Quality quality;
-                    if (olderData.First().Quality != newerData.First().Quality)
-                    {
-                        if (olderData.First().Quality == Quality.None || newerData.First().Quality == Quality.None) quality = Quality.None;
-                        else quality = (olderData.First().Quality > newerData.First().Quality) ? olderData.First().Quality : newerData.First().Quality;
-                    }
-
-                    else quality = olderData.First().Quality;
+                    var diffNumberOlder_Newer = NumberOfPeriods(olderData.Timestamp, newerData.Timestamp, signal.Granularity);
+                    var diffNumberOlder_Actual = NumberOfPeriods(olderData.Timestamp, timestamp, signal.Granularity);
+                    var stepValue = ValueStep<T>(signal, olderData.Value, newerData.Value, diffNumberOlder_Newer, diffNumberOlder_Actual);
 
                     filledArray[current_index] = new Datum<T>()
                     {
-                        Quality = quality,
-                        Signal = olderData.First().Signal,
+                        Quality = (olderData.Quality > newerData.Quality) ? olderData.Quality : newerData.Quality,
+                        Signal = olderData.Signal,
                         Value = stepValue,
                         Timestamp = timestamp
                     };
@@ -271,16 +262,14 @@ namespace Domain.Services.Implementation
 
         }
 
-        private T ValueStep<T>(Signal signal, dynamic older, dynamic newer, int diffOlder_Newer, int diffOlder_Acrual)
+        private T ValueStep<T>(Signal signal, dynamic older, dynamic newer, int diffOlder_Newer, int diffOlder_Actual)
         {
-            T temp = default(T);
             try
             {
                 dynamic result = default(T);
-                if (older < newer) result = Math.Abs(older - newer) * diffOlder_Acrual / diffOlder_Newer + older;
-                else
-                if (older > newer) result = older - ((older - newer) * diffOlder_Acrual / diffOlder_Newer);
-                if (typeof(int) == temp.GetType()) { return result; } else { return Math.Round(result, 5); }
+                if (older < newer) result = (newer - older) * diffOlder_Actual / diffOlder_Newer + older;
+                else if (older > newer) result = older - ((older - newer) * diffOlder_Actual / diffOlder_Newer);
+                if (typeof(int) == typeof(T)) { return result; } else { return Math.Round(result, 5); }
             }
             catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException) { throw new ArgumentException(); }
         }

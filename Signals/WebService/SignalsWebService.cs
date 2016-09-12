@@ -31,9 +31,7 @@ namespace WebService
 
             var result = signalsDomainService.GetByPath(path);
 
-            if (result == null) return null;
-
-            else return result.ToDto<Dto.Signal>();
+            return result?.ToDto<Dto.Signal>();
         }
 
         public Signal GetById(int signalId)
@@ -111,14 +109,10 @@ namespace WebService
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
         {
-            if (signalsDomainService.GetById(signalId) == null) throw new ArgumentException();
+            if (signalsDomainService.GetById(signalId) == null)
+                throw new ArgumentException();
 
-            else
-            {
-                if (signalsDomainService.GetMissingValuePolicy(signalId) == null) return null;
-
-                else return signalsDomainService.GetMissingValuePolicy(signalId).ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
-            }
+            return signalsDomainService.GetMissingValuePolicy(signalId)?.ToDto<MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
