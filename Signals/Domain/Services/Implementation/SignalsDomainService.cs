@@ -85,7 +85,7 @@ namespace Domain.Services.Implementation
             
             var datum = new Datum<T>();
             var mvp = GetMissingValuePolicy(signal);
-            
+
             return FillDatum<T>(fromIncludedUtc, toExcludedUtc, signal, datum, mvp);
         }
 
@@ -98,6 +98,9 @@ namespace Domain.Services.Implementation
 
             T step = default(T);
             Quality quality = 0;
+
+            if (gettingList.Count() > 0)
+                return gettingList;
 
             if (fromIncludedUtc == toExcludedUtc)
             {
