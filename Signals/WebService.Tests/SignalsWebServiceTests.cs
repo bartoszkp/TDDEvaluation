@@ -1312,6 +1312,42 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(signalId, Dto.Granularity.Day, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
             }
 
+            [TestMethod]
+            public void GetCoarseData_WithASignal_ExpectIt()
+            {
+                var signalId = 1;
+                var signal = SignalWith(signalId, DataType.Decimal, Granularity.Day, Path.FromString("a/b/c"));
+                GivenASignal(signal);
+
+                signalsDataRepositoryMock
+                    .Setup(f => f.GetData<Decimal>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new[]
+                    {
+                        new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                        new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 2), Value = 1 },
+                        new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 3), Value = 1 },
+                        new Datum<Decimal>() { Quality = Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 1, 4), Value = 1 },
+                        new Datum<Decimal>() { Quality = Quality.Bad, Signal = signal, Timestamp = new DateTime(2000, 1, 5), Value = 1 },
+                        new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 6), Value = 1 },
+                        new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 7), Value = 1 },
+
+                        new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 8), Value = 1 },
+                        new Datum<Decimal>() { Quality = Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 1, 9), Value = 2 },
+                        new Datum<Decimal>() { Quality = Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 1, 10), Value = 2 },
+                        new Datum<Decimal>() { Quality = Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 1, 11), Value = 3 },
+                        new Datum<Decimal>() { Quality = Quality.None, Signal = signal, Timestamp = new DateTime(2000, 1, 12), Value = 4 },
+                        new Datum<Decimal>() { Quality = Quality.Good, Signal = signal, Timestamp = new DateTime(2000, 1, 13), Value = 4 },
+                        new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 14), Value = 5 }
+                    });
+
+                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Week, new DateTime(2000, 1, 1), new DateTime(2000, 1, 21));
+
+                Assert.IsTrue(CompareDatum(result, new [] {
+                        new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 1 },
+                        new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 8), Value = 3 }
+                    }));
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
