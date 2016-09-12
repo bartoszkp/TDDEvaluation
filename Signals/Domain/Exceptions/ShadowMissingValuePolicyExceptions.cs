@@ -20,4 +20,11 @@ namespace Domain.Exceptions
         {
         }
     }
+    public class ShadowMissingValuePolicyCycleException : Exception
+    {
+        public ShadowMissingValuePolicyCycleException()
+            : base("Assigning this policy will cause a dependency cycle of signals")
+        {
+        }
+    }
 }

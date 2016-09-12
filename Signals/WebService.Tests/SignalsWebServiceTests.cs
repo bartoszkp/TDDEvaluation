@@ -1106,7 +1106,7 @@ namespace WebService.Tests
                 signalsMissingValuePolicyRepositoryMock.Setup(smvp => smvp.Get(signal2))
                     .Returns(new ShadowMissingValuePolicyDouble { ShadowSignal = signal3 });
 
-                signalsWebService.SetMissingValuePolicy(3, new Dto.MissingValuePolicy.ShadowMissingValuePolicy { ShadowSignal = signal1.ToDto<Dto.Signal>() });
+                signalsWebService.SetMissingValuePolicy(3, new Dto.MissingValuePolicy.ShadowMissingValuePolicy { DataType = Dto.DataType.Double, ShadowSignal = signal1.ToDto<Dto.Signal>() });
             }
 
             [TestMethod]

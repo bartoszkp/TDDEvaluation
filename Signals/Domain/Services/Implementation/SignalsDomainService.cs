@@ -119,11 +119,29 @@ namespace Domain.Services.Implementation
         {
             var signal = signalsRepository.Get(signalId);
 
-            if (missingValuePolicyBase is ShadowMissingValuePolicy<T>) checkShadowDataTypeAndGranularityonToEquality<T>(signal, missingValuePolicyBase);
+            if (missingValuePolicyBase is ShadowMissingValuePolicy<T>)
+            {
+                CheckShadowDataTypeAndGranularityonToEquality<T>(signal, missingValuePolicyBase);
+                CheckShadowDependencyCycle<T>(signal, missingValuePolicyBase);
+            }
 
             missingValuePolicyRepository.Set(signal, missingValuePolicyBase);
         }
-        private void checkShadowDataTypeAndGranularityonToEquality<T>(Signal signal, MissingValuePolicyBase mvp)
+
+        private void CheckShadowDependencyCycle<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
+        {
+            Signal shadow = null;
+            while(missingValuePolicy is ShadowMissingValuePolicy<T>)
+            {
+                var shadowMVP = missingValuePolicy as ShadowMissingValuePolicy<T>;
+                shadow = shadowMVP.ShadowSignal;
+                if (signal.Id == shadow.Id)
+                    throw new ShadowMissingValuePolicyCycleException();
+                missingValuePolicy = GetMissingValuePolicy(shadow.Id.Value);
+            }
+        }
+
+        private void CheckShadowDataTypeAndGranularityonToEquality<T>(Signal signal, MissingValuePolicyBase mvp)
         {
             var shadowMVP = mvp as ShadowMissingValuePolicy<T>;
             if (shadowMVP.ShadowSignal.DataType != signal.DataType) throw new ShadowMissingValuePolicyDataTypeException();
