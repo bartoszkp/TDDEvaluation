@@ -883,6 +883,40 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void WhenGettingASingleDatum_ReturnsIt()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 14,
+                    DataType = Domain.DataType.Decimal,
+                    Granularity = Domain.Granularity.Day
+                };
+
+                var datums = new Domain.Datum<decimal>[] { new Domain.Datum<decimal>() {
+                    Quality = Domain.Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1m } };
+
+                GivenASignalSetupAddSignal();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(It.IsAny<int>()))
+                    .Returns(signal);
+
+                signalsDataRepositoryMock
+                    .Setup(sdr => sdr.GetData<decimal>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datums);
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvpr => mvpr.Get(It.IsAny<Domain.Signal>()))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal());
+
+                var result = signalsWebService.GetData(signal.Id.Value, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+                Assert.AreEqual(Dto.Quality.Fair, result.First().Quality);
+                Assert.AreEqual(new DateTime(2000, 1, 1), result.First().Timestamp);
+                Assert.AreEqual(1m, result.First().Value);
+            }
+
             #endregion
 
             #region GetPathEntry()
@@ -1344,9 +1378,9 @@ namespace WebService.Tests
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
-            private Mock<ISignalsRepository> signalsRepositoryMock;
-            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock;
-            private Mock<ISignalsDataRepository> signalsDataRepositoryMock;
+            private Mock<ISignalsRepository> signalsRepositoryMock = new Mock<ISignalsRepository>();
+            private Mock<IMissingValuePolicyRepository> missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+            private Mock<ISignalsDataRepository> signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
         }
     }
 }

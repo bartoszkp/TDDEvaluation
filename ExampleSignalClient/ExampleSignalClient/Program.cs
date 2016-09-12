@@ -9,26 +9,23 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal()
+            var signal = new Signal()
             {
-                DataType = DataType.Integer,
+                DataType = DataType.Decimal,
                 Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "FirstOrderTests" } }
-            }).Id.Value;
+                Path = new Path() { Components = new[] { "signal1" } }
+            };
 
-            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Integer });
+            var id = client.Add(signal).Id.Value;
 
-            client.SetData(id, new Datum[]
-            {
-                new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 10, Quality = Quality.Bad },
-                new Datum() { Timestamp = new DateTime(2000, 1, 5), Value = 30, Quality = Quality.Fair }
-            });
+            client.SetMissingValuePolicy(id, new NoneQualityMissingValuePolicy() { DataType = DataType.Decimal });
+            client.SetData(id, new Datum[] { new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 1), Value = 1m } });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
+            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
 
             foreach (var d in result)
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                Console.WriteLine(d.Timestamp.ToString() + ": " + d.Value.ToString() + " (" + d.Quality.ToString() + ")");
             }
 
             Console.ReadKey();
