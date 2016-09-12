@@ -1110,6 +1110,17 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(ShadowMissingValuePolicyCycleException))]
+            public void GivenASignal_WhenSettingShadowMissingValuePolicy_NoDependencyCyclePresent()
+            {
+                var signal1 = new Signal { Id = 1, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("s1") };
+
+                GivenASignal(signal1);
+
+                signalsWebService.SetMissingValuePolicy(1, new Dto.MissingValuePolicy.ShadowMissingValuePolicy { DataType = Dto.DataType.Double, ShadowSignal = signal1.ToDto<Dto.Signal>() });
+            }
+
+            [TestMethod]
             public void GivenASignal_HavingBothEalierAndOlderData_WhenGettingDataWithFirstOrderMVP_ForDatumsInReversOrder_ReturnsProperData()
             {
                 int dummyId = 1;
