@@ -292,6 +292,8 @@ namespace Domain.Services.Implementation
         {
             var signal = GetById(signalId);
 
+            CheckArgumentTimestamp<T>(granularity, fromIncludedUtc, toExcludedUtc);
+
             if (signal.Granularity >= granularity)
                 throw new Domain.Exceptions.GetCoarseDataBadGranularityException();
 
@@ -367,6 +369,18 @@ namespace Domain.Services.Implementation
         {
             var value = averageValue / howManyValues;
             return (T)Convert.ChangeType(value, typeof(T));
+        }
+
+        private void CheckArgumentTimestamp<T>(Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            VerifyTimeStamp(granularity, new Datum<T>()
+            {
+                Timestamp = fromIncludedUtc,
+            });
+            VerifyTimeStamp(granularity, new Datum<T>()
+            {
+                Timestamp = toExcludedUtc,
+            });
         }
     }
 }

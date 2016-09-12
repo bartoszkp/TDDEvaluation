@@ -1573,10 +1573,10 @@ namespace WebService.Tests
                 };
                 var existingDatum = GetExistingDatumForGetCoarseDataWeek();
 
-                SetupGetData(existingSignal, existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
+                SetupGetData(existingSignal, existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
 
                 var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, 
-                    new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
+                    new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
 
                 var expectedDatum = GetExpectedDatumForGetCoarseDataWeek();
                 AssertDatum(result, expectedDatum.ToArray());
