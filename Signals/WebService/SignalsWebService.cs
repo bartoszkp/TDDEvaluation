@@ -115,6 +115,11 @@ namespace WebService
             return null;
         }
 
+        public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
+
         private IEnumerable<Domain.Datum<T>> ConvertDtoDataToDomain<T>(IEnumerable<Dto.Datum> data, Dto.Signal signal)
         {
             return data.Select(d =>
