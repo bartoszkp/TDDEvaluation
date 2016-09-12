@@ -1601,6 +1601,60 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignalWithShadowMVP_WhenCreatingDependencyCycle_ThrowsArgumentException()
+            {
+                int signalId = 2;
+                int shadowSignalId = 3;
+                int shadowShadowSignalId = 4;
+
+                Dto.Signal signal = new Dto.Signal() { Id = signalId, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Day};
+                Signal signalDomain = new Domain.Signal() { Id = signalId, DataType = DataType.Integer, Granularity = Granularity.Day};
+                Dto.Signal shadowSignal = new Dto.Signal() { Id = shadowSignalId, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Day };
+                Signal shadowSignalDomain = new Domain.Signal() { Id = shadowSignalId, DataType = DataType.Integer, Granularity = Granularity.Day };
+                Dto.Signal shadowShadowSignal = new Dto.Signal() { Id = shadowShadowSignalId, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Day };
+                Signal shadowShadowSignalDomain = new Domain.Signal() { Id = shadowShadowSignalId, DataType = DataType.Integer, Granularity = Granularity.Day };
+
+
+                SetupWebService();
+
+
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowSignal, DataType = shadowSignal.DataType };
+                var policyDomain = new ShadowMissingValuePolicyInteger();
+                policyDomain.ShadowSignal = shadowSignalDomain;
+                var shadowPolicy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowShadowSignal, DataType = shadowShadowSignal.DataType };
+                var shadowPolicyDomain = new ShadowMissingValuePolicyInteger();
+                policyDomain.ShadowSignal = shadowShadowSignalDomain;
+                var shadowShadowPolicy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = signal, DataType = signal.DataType };
+                var shadowShadowPolicyDomain = new ShadowMissingValuePolicyInteger();
+                policyDomain.ShadowSignal = signalDomain;
+
+                signalsRepositoryMock
+                    .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
+                    .Returns<int>(id => signalDomain);
+                signalsRepositoryMock
+                    .Setup(x => x.Get(It.Is<int>(y => y == shadowSignalId)))
+                    .Returns<int>(id => shadowSignalDomain);
+                signalsRepositoryMock
+                    .Setup(x => x.Get(It.Is<int>(y => y == shadowShadowSignalId)))
+                    .Returns<int>(id => shadowShadowSignalDomain);
+
+
+                //missingValuePolicyRepositoryMock
+                //   .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == signal.Id)))
+                //   .Returns(policyDomain);
+                missingValuePolicyRepositoryMock
+                   .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == shadowSignal.Id)))
+                   .Returns(shadowPolicyDomain);
+                missingValuePolicyRepositoryMock
+                   .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == shadowShadowSignal.Id)))
+                   .Returns(shadowShadowPolicyDomain);
+
+                signalsWebService.SetMissingValuePolicy(2, policy);
+
+            }
+
 
             private void DeleteASignal(int id)
             {
