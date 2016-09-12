@@ -1582,6 +1582,24 @@ namespace WebService.Tests
                 AssertDatum(result, expectedDatum.ToArray());
             }
 
+            [ExpectedException(typeof(Domain.Exceptions.TimestampHaveWrongFormatException))]
+            [TestMethod]
+            public void GivenADailySignal_WhenGettingCoarseData_WithBadArgumentTimestamp_ThrowsAnException()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                SetupGetData(existingSignal, null, new DateTime(2016, 1, 3), new DateTime(2016, 1, 23));
+
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week,
+                    new DateTime(2016, 1, 3), new DateTime(2016, 1, 23));
+            }
+
             private void SetupGetData(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
