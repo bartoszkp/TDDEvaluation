@@ -1239,10 +1239,10 @@ namespace WebService.Tests
                 var result = signalsWebService.GetData(signalId, new DateTime(2018, 1, 1), new DateTime(2018, 1, 29));
 
                 var expected = new[] {
-                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 1m },
-                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 8), Value = 1m },
-                   new Dto.Datum(){ Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 15), Value = 3m },
-                   new Dto.Datum(){ Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 22), Value = 3m }
+                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = false },
+                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 8), Value = false },
+                   new Dto.Datum(){ Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 15), Value = true },
+                   new Dto.Datum(){ Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 22), Value = true }
                 };
 
                 Assert.IsTrue(CompareDatum(expected, result));

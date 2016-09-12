@@ -161,16 +161,11 @@ namespace Domain.Services.Implementation
             }
             else if (mvp is MissingValuePolicy.ZeroOrderMissingValuePolicy<T>)
             {
-                Datum<T> returnDatum = Datum<T>.CreateSpecific(signal, timeStamp, before.Quality, before.Value);
-                if (returnDatum.Value == null || EqualityComparer<T>.Default.Equals(returnDatum.Value, default(T)))
-                {
-                    returnDatum = this.signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).FirstOrDefault();
-                    if (returnDatum == null )
-                        returnDatum = Datum<T>.CreateNone(signal, timeStamp);
-                    else
-                        returnDatum.Timestamp = new DateTime(timeStamp.Ticks);
-                }
-                return returnDatum;
+                var returnDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timeStamp, 1).FirstOrDefault();
+                if (returnDatum == null)
+                    return new Datum<T>() { Quality = Quality.None, Value = default(T), Timestamp = timeStamp };
+                else
+                    return new Datum<T>() { Quality = returnDatum.Quality, Value = returnDatum.Value, Timestamp = timeStamp };
             }
             else if (mvp is MissingValuePolicy.FirstOrderMissingValuePolicy<T>)
             {
