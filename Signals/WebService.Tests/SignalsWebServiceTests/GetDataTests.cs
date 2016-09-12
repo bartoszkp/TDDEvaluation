@@ -546,6 +546,44 @@ namespace WebService.Tests.SignalsWebServiceTests
             Assert.IsTrue(IsGetDataTimestampValid(Utils.validTimestamp, Utils.validTimestamp.AddMonths(1)));
         }
 
+        [TestMethod]
+        public void GivenASignal_GetDataWithShadowMVPWithDatum_ReturnsDatum()
+        {
+            int shadowSignalId = 3;
+            int signalId = 5;
+            Signal signal = Utils.SignalWith(signalId, Domain.DataType.Boolean, Domain.Granularity.Month);
+            Signal shadowSignal = Utils.SignalWith(shadowSignalId, Domain.DataType.Boolean, Domain.Granularity.Month);
+            SetupGet(signal);
+            SetupGet(shadowSignal);
+            SetupMVPGet(new ShadowMissingValuePolicyBoolean() { ShadowSignal = shadowSignal });
+
+            var shadowDatum = new[] {
+               new Domain.Datum<bool> {Quality = Domain.Quality.None, Timestamp = new DateTime(2016,1,1), Value = false },
+               new Domain.Datum<bool> {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,2,1), Value = true },
+               new Domain.Datum<bool> {Quality = Domain.Quality.None, Timestamp = new DateTime(2016,3,1), Value = false },
+               new Domain.Datum<bool> {Quality = Domain.Quality.Poor, Timestamp = new DateTime(2016,4,1), Value = false },
+               new Domain.Datum<bool> {Quality = Domain.Quality.None, Timestamp = new DateTime(2016,5,1), Value = false },
+            };
+            var datum = new Domain.Datum<bool>[] {
+                    
+            };
+
+            SetupGetData<bool>(shadowDatum, shadowSignal);
+            SetupGetData<bool>(datum, signal);
+            var result = signalsWebService.GetData(signalId, new DateTime(2016, 1, 1), new DateTime(2016, 6, 1)).ToArray();
+
+            var expected = new[] {
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 1), Value = false },
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 2, 1), Value = true },
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 3, 1), Value = false},
+                  new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 4, 1), Value = false },
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 5, 1), Value = false },
+                           };
+
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+
+        }
         private bool IsGetDataTimestampValid(DateTime dtCorrect, DateTime dtWrong)
         {
             var signalId = 1;
