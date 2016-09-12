@@ -9,41 +9,24 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal()
+            var id = client.Add(new Signal() { Granularity = Granularity.Day, Path = new Path() { Components = new[] { String.Empty } } }).Id.Value;
+
+            var result = client.GetById(id);
+
+            if (result != null)
             {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "ShadowTests" } }
-            }).Id.Value;
-
-            var shadow = client.Add(new Signal()
+                Console.WriteLine("Sygnał poprawnie utworzony");
+            }
+            else
             {
-                DataType = DataType.Decimal,
-                Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "shadows", "shadow1" } }
-            });
+                Console.WriteLine("Błąd - nie udało się utworzyć sygnału");
+            }
 
-            client.SetData(shadow.Id.Value, new Datum[]
+            var data = client.GetData(id, new DateTime(2018, 12, 12), new DateTime(2018, 12, 12));
+
+            foreach (var datum in data)
             {
-                new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 1.4m },
-                new Datum() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 5, 1), Value = 0.0m },
-                new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m }
-            });
-
-            client.SetMissingValuePolicy(id, new ShadowMissingValuePolicy() { DataType = DataType.Decimal, ShadowSignal = shadow });
-
-            client.SetData(id, new Datum[]
-            {
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = 1m },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = 2m },
-                new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2000, 8, 1), Value = 5m }
-            });
-
-            var result = client.GetData(id, new DateTime(1999, 11, 1), new DateTime(2000, 11, 1));
-
-            foreach (var d in result)
-            {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                Console.WriteLine("Datum: " + datum.Quality + " " + datum.Timestamp);
             }
 
             Console.ReadKey();

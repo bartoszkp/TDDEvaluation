@@ -52,6 +52,8 @@ namespace Domain.MissingValuePolicy
 
                 case Granularity.Day:
                     count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays;
+                    if (count == 0)
+                        count = 1;
                     CreateDateTimeList(data, timestamp, key, count);
                     break;
 
