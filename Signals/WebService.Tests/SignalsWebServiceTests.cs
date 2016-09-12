@@ -1544,6 +1544,23 @@ namespace WebService.Tests
             }
             #endregion
 
+            #region GetCoarseData
+            [ExpectedException(typeof(GetCoarseDataBadGranularityException))]
+            [TestMethod]
+            public void GivenADailySignal_WhenGettingCoarseData_WithDenserGranularity_ThrowsAnException()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+
+                GivenASignal(existingSignal);
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Minute, new DateTime(), new DateTime());
+            }
+            #endregion
 
             private void SetupDelete (Signal signal)
             {
