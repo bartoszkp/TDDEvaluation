@@ -1303,6 +1303,15 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(0, Dto.Granularity.Day, DateTime.Now, DateTime.Now);
             }
 
+            [TestMethod]
+            public void GetCoarseData_WithASignal_ExpectNoExceptionThrown()
+            {
+                var signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Decimal, Granularity.Hour, Path.FromString("a/b/c")));
+
+                signalsWebService.GetCoarseData(signalId, Dto.Granularity.Day, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
