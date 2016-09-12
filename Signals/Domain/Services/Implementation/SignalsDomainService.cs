@@ -469,5 +469,61 @@ namespace Domain.Services.Implementation
         {
             signalsDataRepository.DeleteData<T>(signal);
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            CheckTimestamp(fromIncludedUtc, granularity);
+            CheckTimestamp(toExcludedUtc, granularity);
+            CheckTimestamp(fromIncludedUtc, signal.Granularity);
+            CheckTimestamp(toExcludedUtc, signal.Granularity);
+
+            if (granularity < signal.Granularity)
+                throw new ArgumentException("Invalid granularity.");
+
+            if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
+                throw new ArgumentException(string.Format("GetCoarseData cannot be used with signal with datatype {0}.", signal.DataType));
+
+            var actualData = this.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            if (actualData.Count() == 0)
+                return actualData;
+
+            List<Datum<T>> coarseData = new List<Datum<T>>();
+
+            var time = fromIncludedUtc;
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                var data = this.GetData<T>(signal, time, AddTime(granularity, time));
+                coarseData.Add(GetMeanAverageDatum<T>(data, time));
+                return coarseData;
+            }
+            while (time < toExcludedUtc)
+            {
+                var data = this.GetData<T>(signal, time, AddTime(granularity, time));
+                coarseData.Add(GetMeanAverageDatum<T>(data, time));
+                time = AddTime(granularity, time);
+            }
+
+            return coarseData;
+        }
+
+        private Datum<T> GetMeanAverageDatum<T>(IEnumerable<Datum<T>> data, DateTime timestamp)
+        {
+            dynamic sumOfValues = data.ElementAt(0).Value;
+            for (int i = 1; i < data.Count(); i++)
+                sumOfValues += data.ElementAt(i).Value;
+
+            dynamic resultValue = sumOfValues / data.Count();
+            int resultQuality = data.Select(d => (int)d.Quality).Max();
+
+            if (data.Where(d => d.Quality == Quality.None).Any())
+                resultQuality = 0;
+
+            return new Datum<T>()
+            {
+                Quality = (Domain.Quality)resultQuality,
+                Timestamp = timestamp,
+                Value = resultValue
+            };
+        }
     }
 }
