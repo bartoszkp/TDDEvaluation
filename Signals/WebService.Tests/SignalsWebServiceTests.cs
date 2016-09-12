@@ -1713,6 +1713,7 @@ namespace WebService.Tests
                 int signalId = 4;
 
                 DateTime timestamp = new DateTime(2000, 1, 4);
+                DateTime goodTimestamp = new DateTime(2000, 1, 1);
 
                 var signalDomain = GetDefaultSignal_IntegerMonth();
                 signalDomain.Id = signalId;
@@ -1721,7 +1722,7 @@ namespace WebService.Tests
 
                 this.signalsRepositoryMock.Setup(x => x.Get(signalId)).Returns(signalDomain);
 
-                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Year, timestamp, timestamp);
+                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Year, goodTimestamp, timestamp);
             }
 
             [TestMethod]
@@ -1732,6 +1733,7 @@ namespace WebService.Tests
                 int signalId = 4;
 
                 DateTime timestamp = new DateTime(2000, 2, 1);
+                DateTime goodTimestamp = new DateTime(2000, 1, 1);
 
                 var signalDomain = GetDefaultSignal_IntegerMonth();
                 signalDomain.Id = signalId;
@@ -1740,7 +1742,7 @@ namespace WebService.Tests
 
                 this.signalsRepositoryMock.Setup(x => x.Get(signalId)).Returns(signalDomain);
 
-                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Year, timestamp, timestamp);
+                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Year, goodTimestamp, timestamp);
             }
 
             private void DeleteASignal(int id)
