@@ -486,7 +486,7 @@ namespace Domain.Services.Implementation
                 value = Convert.ChangeType(value, typeof(T));
                 var quality = SelectWorstQualityFromRange(data.Select(d => d.Quality));
 
-                return new List<Datum<T>>() { new Datum<T>() { Value = value, Quality = quality } };
+                return new List<Datum<T>>() { new Datum<T>() { Value = value, Quality = quality, Timestamp = fromIncludedUtc } };
             }
 
             var result = new List<Datum<T>>();
