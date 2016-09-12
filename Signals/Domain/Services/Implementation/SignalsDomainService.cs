@@ -311,5 +311,37 @@ namespace Domain.Services.Implementation
 
             return current;
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            // TODO: String/Bool check
+            if ((int)signal.Granularity >= (int)granularity)
+                throw new Exception("Given granularity has to be lower than singal.");
+
+            var data = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var result = new List<Datum<T>>();
+
+            while(fromIncludedUtc < toExcludedUtc)
+            {
+                var nextDate = GetNextDateFromGranularity(fromIncludedUtc, granularity);
+
+                var scopeData = data.Where(d => d.Timestamp >= fromIncludedUtc && d.Timestamp < nextDate);
+                dynamic sum = default(T);
+                var quality = Quality.Good;
+                foreach (Datum<T> d in scopeData) {
+                    sum += d.Value;
+                    if (quality < d.Quality) quality = d.Quality;
+                }
+
+                if (scopeData.Where(d => d.Quality == Quality.None).Count() != 0)
+                    quality = Quality.None;
+
+                result.Add(new Datum<T>() { Quality = quality, Signal = signal, Timestamp = fromIncludedUtc, Value = sum/scopeData.Count() });
+
+                fromIncludedUtc = nextDate;
+            }
+
+            return result;
+        }
     }
 }

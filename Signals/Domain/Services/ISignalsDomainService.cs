@@ -22,5 +22,7 @@ namespace Domain.Services
         MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal);
 
         PathEntry GetPathEntry(Path path);
+
+        IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }

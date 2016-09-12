@@ -1309,7 +1309,7 @@ namespace WebService.Tests
                 var signalId = 1;
                 GivenASignal(SignalWith(signalId, DataType.Decimal, Granularity.Hour, Path.FromString("a/b/c")));
 
-                signalsWebService.GetCoarseData(signalId, Dto.Granularity.Day, new DateTime(2000, 1, 1), new DateTime(2000, 1, 2));
+                signalsWebService.GetCoarseData(signalId, Dto.Granularity.Day, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
             }
 
             [TestMethod]
@@ -1340,7 +1340,7 @@ namespace WebService.Tests
                         new Datum<Decimal>() { Quality = Quality.Fair, Signal = signal, Timestamp = new DateTime(2000, 1, 14), Value = 5 }
                     });
 
-                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Week, new DateTime(2000, 1, 1), new DateTime(2000, 1, 21));
+                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Week, new DateTime(2000, 1, 1), new DateTime(2000, 1, 15));
 
                 Assert.IsTrue(CompareDatum(result, new [] {
                         new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2000, 1, 1), Value = 1 },

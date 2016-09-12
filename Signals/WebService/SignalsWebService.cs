@@ -115,7 +115,11 @@ namespace WebService
             if (signal == null)
                 throw new CouldntGetASignalException();
 
-            return null;
+            return typeof(Domain.Services.Implementation.SignalsDomainService)
+                .GetMethod("GetCoarseData")
+                .MakeGenericMethod(DataTypeUtils.GetNativeType(signal.DataType))
+                .Invoke(signalsDomainService, new object[] { signal, granularity, fromIncludedUtc, toExcludedUtc })
+                .ToDto<IEnumerable<Datum>>();
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
