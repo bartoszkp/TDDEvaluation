@@ -35,8 +35,7 @@ namespace Domain.MissingValuePolicy
                     }
                     fromIncludedUtc = AddingTimespanToDataTime(fromIncludedUtc, signal.Granularity);
                 }
-                else
-                if ((dataNewer == null) || (dataNewer.Count() == 0))
+                else if ((dataNewer == null) || (dataNewer.Count() == 0))
                 {
                     if (datums.Find(x => x.Timestamp == fromIncludedUtc) == null)
                     {
@@ -47,6 +46,16 @@ namespace Domain.MissingValuePolicy
                             Timestamp = fromIncludedUtc
                         });
                     }
+                    fromIncludedUtc = AddingTimespanToDataTime(fromIncludedUtc, signal.Granularity);
+                }
+                else if(dataOlder.First().Value.Equals(default(T)) || dataNewer.First().Value.Equals(default(T)))
+                {
+                    datumsFirst.Add(new Datum<T>()
+                    {
+                        Quality = Quality.None,
+                        Value = default(T),
+                        Timestamp = fromIncludedUtc
+                    });
                     fromIncludedUtc = AddingTimespanToDataTime(fromIncludedUtc, signal.Granularity);
                 }
                 else
@@ -176,9 +185,7 @@ namespace Domain.MissingValuePolicy
                     }
                 }
             }
-            
             return datumsFirst;
-
         }
 
         
