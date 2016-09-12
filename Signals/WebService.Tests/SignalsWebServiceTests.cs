@@ -1248,6 +1248,52 @@ namespace WebService.Tests
                 Assert.IsTrue(CompareDatum(expected, result));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Exception))]
+            public void GetData_WithShadowMVP_ThrowExceptionOnDependencyCircle()
+            {
+                var signalsDto = new[]
+                {
+                    new Dto.Signal() { Id = 1, DataType = Dto.DataType.Double, Granularity = Dto.Granularity.Day, Path = new Dto.Path() {Components = new[] {"a"} } },
+                    new Dto.Signal() { Id = 2, DataType = Dto.DataType.Double, Granularity = Dto.Granularity.Day, Path = new Dto.Path() {Components = new[] {"b"} } }
+                };
+                var signalsDomain = new[]
+                {
+                    new Domain.Signal() { Id = 1, DataType = DataType.Double, Granularity = Granularity.Day, Path = Path.FromString("a") },
+                    new Domain.Signal() { Id = 2, DataType = DataType.Double, Granularity = Granularity.Day, Path = Path.FromString("b") }
+                };
+
+                GivenNoSignals();
+                for (int i = 0; i < 2; i++)
+                {
+                    signalsRepositoryMock
+                        .Setup(sr => sr.Get(signalsDomain[i].Id.Value))
+                        .Returns(signalsDomain[i]);
+                    signalsRepositoryMock
+                        .Setup(f => f.Get(signalsDomain[i].Path))
+                        .Returns(signalsDomain[i]);
+                }
+                
+                signalsWebService.SetMissingValuePolicy(signalsDomain[0].Id.Value, new ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Double,
+                    ShadowSignal = signalsDto[1]
+                });
+
+                missingValuePolicyRepositoryMock
+                    .Setup(f => f.Get(It.Is<Signal>(sig => sig.Id == signalsDomain[0].Id)))
+                    .Returns(new ShadowMissingValuePolicyDouble()
+                    {
+                        ShadowSignal = signalsDomain[1]
+                    });
+
+                signalsWebService.SetMissingValuePolicy(signalsDomain[1].Id.Value, new ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Double,
+                    ShadowSignal = signalsDto[0]
+                });
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
