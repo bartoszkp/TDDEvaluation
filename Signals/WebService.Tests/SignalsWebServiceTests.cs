@@ -1373,6 +1373,16 @@ namespace WebService.Tests
                 Assert.AreEqual(mvp.Value, result[0].Value);
             }
 
+            [ExpectedException(typeof(DatumTimestampException))]
+            [TestMethod]
+            public void GivenASignalAndInvalidTimestamp_WhenSettingData_ThrowsDatumTimestampException()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Week, Path.FromString("root/signal")));
+
+                signalsWebService.SetData(signalId, new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 2), Value = 2.2} });
+            }
+
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
