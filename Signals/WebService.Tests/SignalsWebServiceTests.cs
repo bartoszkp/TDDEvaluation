@@ -1825,6 +1825,31 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Year, timestamp, timestamp);
             }
 
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingCoarseDataWithEqualFromAndToTimeStamps_ReturnsOneDatum()
+            {
+                SetupWebService();
+                int id = 6;
+
+                DateTime dateFrom = new DateTime(2000, 1, 1);
+                DateTime dateTo = new DateTime(2000, 1, 1);
+
+                var signal = SignalWith(DataType.Integer, Granularity.Day, Path.FromString("root/signalInt"), id);
+
+                var dataReturned = new Domain.Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (int)2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 1, 2), Value = (int)3 }
+                };
+
+                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<int>(id, signal, dateFrom, dateTo, dataReturned);
+
+                var result = signalsWebService.GetCoarseData(id, Dto.Granularity.Year, dateFrom, dateTo);
+
+                Assert.AreEqual(1, result.Count());
+            }
+
             private void DeleteASignal(int id)
             {
 
