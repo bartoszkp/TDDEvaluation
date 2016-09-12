@@ -80,6 +80,11 @@ namespace WebService
             }
         }
 
+        public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var setDataSignal = this.signalsDomainService.GetById(signalId);
@@ -118,6 +123,6 @@ namespace WebService
             var domainSetMVPSignal = this.GetById(signalId).ToDomain<Domain.Signal>();
             var domainPolicyBase = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             this.signalsDomainService.SetMVP(domainSetMVPSignal, domainPolicyBase);
-        } 
+        }
     }
 }
