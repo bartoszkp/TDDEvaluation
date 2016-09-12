@@ -322,17 +322,19 @@ namespace WebService.Tests
                 Value = true,
                 Quality = Quality.Good
             };
-          
+            List<Datum<bool>> existingDatumFirst = new List<Datum<bool>>();
+            existingDatumFirst.Add(new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2018, 12, 12), Value = true });
+
 
             var filledDatum = new Dto.Datum[]
             {
-                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 12, 12),  Value = (bool)false }
+                        new Dto.Datum {Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 12, 12),  Value = (bool)true }
             };
             signalsRepoMock = new Mock<ISignalsRepository>();
             GivenASignal(signal);
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
-            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<bool>(signal, new DateTime(2018, 12, 12), new DateTime(2018, 12, 12)))
-                            .Returns(It.IsAny<IEnumerable<Datum<bool>>>());
+            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<bool>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2018, 12, 12), new DateTime(2018, 12, 12)))
+                            .Returns(existingDatumFirst);
             missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
             missingValueRepoMock
                 .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))

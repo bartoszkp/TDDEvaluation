@@ -163,50 +163,60 @@ namespace Domain.Services.Implementation
 
             var mvpSpec = mvp.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
                     as MissingValuePolicy.SpecificValueMissingValuePolicy<T>;
-            if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
+            if (date == toExcludedUtc)
             {
-                if ((result.LastOrDefault(x => x == x).Timestamp) < date)
-                {
-                    var dataOlder = result.Last(x => x == x);
-                    quality = dataOlder.Quality;
-                    value = dataOlder.Value;
-                }
-                while (date < toExcludedUtc)
-                {
-                    Datum<T> elementOfList = result.FirstOrDefault(x => x.Timestamp == date);
-                    if (elementOfList != null)
-                    {
-                        quality = elementOfList.Quality;
-                        value = elementOfList.Value;
-
-                    }
-                    datums.Add(new Datum<T>() { Signal = signal, Quality = quality, Timestamp = date, Value = value });
-                    date = AddingTimespanToDataTime(date, signal.Granularity);
-                }
+                if ((mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>)))
+                    datums.Add(new Datum<T>() { Signal = signal, Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
             }
             else
             {
-                while (date < toExcludedUtc)
+                
+                if (mvp.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
                 {
-                    var actualDate = result.FirstOrDefault(d => d.Timestamp == date);
+                    if ((result.LastOrDefault(x => x == x).Timestamp) < date)
+                    {
+                        var dataOlder = result.Last(x => x == x);
+                        quality = dataOlder.Quality;
+                        value = dataOlder.Value;
+                    }
+                    while (date < toExcludedUtc)
+                    {
+                        Datum<T> elementOfList = result.FirstOrDefault(x => x.Timestamp == date);
+                        if (elementOfList != null)
+                        {
+                            quality = elementOfList.Quality;
+                            value = elementOfList.Value;
 
-                    if (actualDate != null)
-                    {
-                        value = actualDate.Value;
-                        quality = actualDate.Quality;
-                        datums.Add(actualDate);
+                        }
+                        datums.Add(new Datum<T>() { Signal = signal, Quality = quality, Timestamp = date, Value = value });
+                        date = AddingTimespanToDataTime(date, signal.Granularity);
                     }
-                    else if ((mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>)))
+                }
+                else
+                {
+                    while (date < toExcludedUtc)
                     {
-                        datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+                        var actualDate = result.FirstOrDefault(d => d.Timestamp == date);
+
+                        if (actualDate != null)
+                        {
+                            value = actualDate.Value;
+                            quality = actualDate.Quality;
+                            datums.Add(actualDate);
+                        }
+                        else if ((mvp.GetType() == typeof(NoneQualityMissingValuePolicy<T>)))
+                        {
+                            datums.Add(new Datum<T>() { Quality = Quality.None, Timestamp = date, Value = default(T) });
+                        }
+                        else
+                        {
+                            datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
+                        }
+                        increaseDate(ref date, signal.Granularity);
                     }
-                    else
-                    {
-                        datums.Add(new Datum<T>() { Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
-                    }
-                    increaseDate(ref date, signal.Granularity);
                 }
             }
+            
            
         }
         
