@@ -1573,23 +1573,32 @@ namespace WebService.Tests
                 };
                 var existingDatum = GetExistingDatumForGetCoarseDataWeek();
 
-                SetupGetData(existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
+                SetupGetData(existingSignal, existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
 
-                GivenASignal(existingSignal);
                 var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, 
                     new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
-
 
                 var expectedDatum = GetExpectedDatumForGetCoarseDataWeek();
                 AssertDatum(result, expectedDatum.ToArray());
             }
 
-            private void SetupGetData(IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
+            private void SetupGetData(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+
                 signalsDataRepositoryMock
                     .Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == 1), fromIncluded, toExcluded))
                     .Returns(existingDatum);
+
+                var signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object, null);
+
+                signalsWebService = new SignalsWebService(signalDomainService);
             }
 
             private IEnumerable<Dto.Datum> GetExpectedDatumForGetCoarseDataWeek()
