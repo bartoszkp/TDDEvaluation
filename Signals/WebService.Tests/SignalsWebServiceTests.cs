@@ -1273,7 +1273,11 @@ namespace WebService.Tests
                     path: Domain.Path.FromString("root/signal"));
                 GivenASignal(signal);
                 GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyString());
-                GivenData(signalId, new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } });
+                var givenDatum = new Domain.Datum<string>[] { new Domain.Datum<string>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = "test1" } };
+                GivenData(signalId, givenDatum);
+
+                signalsDataRepositoryMock.Setup(x => x.GetDataOlderThan<String>(It.IsAny<Signal>(), It.Is<DateTime>(dt => dt == new DateTime(2000, 2, 1)), It.IsAny<int>()))
+                    .Returns(givenDatum);
             }
 
             private void SetupSignalsDataRepository_ReturnsOlderAndNewerDatums<T>(int signalId, Datum<T> olderDatum, Datum<T> newerDatum)
