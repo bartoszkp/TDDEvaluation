@@ -1805,6 +1805,26 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Year, timestamp, timestamp);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(TypeUnsupportedException))]
+            public void GivenASignal_WhenGettingCoarseDataWithStringData_ThrowsTypeUnsupportedException()
+            {
+                SetupWebService();
+                int signalId = 4;
+
+                DateTime timestamp = new DateTime(2000, 1, 1);
+
+                var signalDomain = GetDefaultSignal_IntegerMonth();
+                signalDomain.Id = signalId;
+                signalDomain.DataType = DataType.String;
+
+                SetupMock_missingValuePolicy_DefaultMissingValuePolicy();
+
+                this.signalsRepositoryMock.Setup(x => x.Get(signalId)).Returns(signalDomain);
+
+                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Year, timestamp, timestamp);
+            }
+
             private void DeleteASignal(int id)
             {
 
