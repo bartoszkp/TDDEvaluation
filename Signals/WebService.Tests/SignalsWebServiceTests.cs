@@ -1882,6 +1882,7 @@ namespace WebService.Tests
 
                 DateTime dateFrom = new DateTime(2000, 5, 1);
                 DateTime dateTo = new DateTime(2000, 5, 1);
+                DateTime realDateTo = new DateTime(2000, 5, 8);
 
                 var signal = SignalWith(DataType.Integer, Granularity.Day, Path.FromString("root/signalInt"), id);
 
@@ -1896,7 +1897,7 @@ namespace WebService.Tests
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 7), Value = (int)4 },
                 };
 
-                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<int>(id, signal, dateFrom, dateTo, dataReturned);
+                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<int>(id, signal, dateFrom, realDateTo, dataReturned);
 
                 var result = signalsWebService.GetCoarseData(id, Dto.Granularity.Week, dateFrom, dateTo);
 

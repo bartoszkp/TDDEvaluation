@@ -469,6 +469,16 @@ namespace Domain.Services.Implementation
             if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                 throw new TypeUnsupportedException();
 
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                AddTimeBasedOnGranulatity(granularity, ref toExcludedUtc);
+                var data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+                dynamic value = data.Average(d => (dynamic)d.Value);
+                value = Convert.ChangeType(value, typeof(T));
+                return new List<Datum<T>>() { new Datum<T>() { Value = value } };
+            }
+
+
             return new List<Datum<T>>() { Datum<T>.CreateNone(signal, fromIncludedUtc) };
         }
     }
