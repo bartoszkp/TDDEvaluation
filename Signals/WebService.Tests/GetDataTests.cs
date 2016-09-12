@@ -80,6 +80,42 @@ namespace WebService.Tests
             Assert.AreEqual(1.5, returnedDatum.Value);
         }
 
+        [TestMethod]
+        public void FirstOrderMvp_GetData_CorrectlyInterpolatesNoneQualitySamples() 
+        {
+            SetupWebService();
+            var returnedSignal = new Signal() {
+                Id = 1,
+                DataType = DataType.Double,
+                Granularity = Granularity.Month
+            };
+
+            missingValuePolicyRepositoryMock.Setup(m => m.Get(returnedSignal)).Returns(new ZeroOrderMissingValuePolicyDouble() {
+                Signal = returnedSignal
+            });
+
+            var from = new DateTime(2000, 1, 1);
+            var to = new DateTime(2000, 3, 1);
+
+            signalDataRepositoryMock.Setup(s => s.GetData<double>(returnedSignal, from, to)).Returns(new List<Datum<double>>());
+
+            signalDataRepositoryMock.Setup(s => s.GetDataOlderThan<double>(returnedSignal, It.Is<DateTime>(d => d.Month == 2), 1))
+                .Returns(new List<Datum<double>>());
+
+            signalDataRepositoryMock.Setup(s => s.GetDataNewerThan<double>(returnedSignal, It.Is<DateTime>(d => d.Month == 2), 1))
+                .Returns(new List<Datum<double>>());
+
+            signalsRepositoryMock.Setup(sr => sr.Get(1)).Returns(returnedSignal);
+
+            var results = signalsWebService.GetData(1, from, to);
+            var returnedDatum = results.ElementAt(0);
+
+            Assert.AreEqual(2, results.Count());
+            Assert.AreEqual(Dto.Quality.None, returnedDatum.Quality);
+            Assert.AreEqual((double)0, returnedDatum.Value);
+
+        }
+
 
 
         private void SetupWebService() 
