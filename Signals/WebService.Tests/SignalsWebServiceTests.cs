@@ -22,6 +22,8 @@ namespace WebService.Tests
             private ISignalsWebService signalsWebService;
             private VerifyOrAssertTestResults verifyOrAssert;
 
+            #region Add()
+
             [TestMethod]
             public void GivenNoSignals_WhenAddingASignal_ReturnsNotNull()
             {
@@ -76,6 +78,10 @@ namespace WebService.Tests
                 Assert.AreEqual(signalId, result.Id);
             }
 
+            #endregion
+            
+            #region GetById()
+
             [TestMethod]
             public void GivenNoSignals_WhenGettingById_DoesNotThrow()
             {
@@ -97,9 +103,7 @@ namespace WebService.Tests
                 var result = signalsWebService.GetById(999);
                 Assert.IsNull(result);
             }
-
-
-
+            
             [TestMethod]
             public void GivenASignal_WhenGettingByItsId_ReturnsIt()
             {
@@ -136,6 +140,10 @@ namespace WebService.Tests
 
                 Assert.IsNull(result);
             }
+
+            #endregion
+
+            #region Get()
 
             [TestMethod]
             public void GivenNoSignals_WhenGettingByPath_DoesNotThrow()
@@ -206,6 +214,10 @@ namespace WebService.Tests
                 Assert.IsNull(signalsWebService.Get(new Dto.Path() { Components = new[] { "bad", "path" } }));
             }
 
+            #endregion
+
+            #region MVP
+
             [TestMethod]
             public void GivenASignal_WhenSettingMissingValuePolicy_RepositorySetAndGetIsCalled()
             {
@@ -219,8 +231,7 @@ namespace WebService.Tests
                 SetupVerifyOrAssert();
                 verifyOrAssert.VerifyRepositorySetAndGetIsCalled(signalsRepositoryMock, missingValuePolicyRepositoryMock);
             }
-
-
+            
             [TestMethod]
             public void GivenASignal_WhenSettingMissingValuePolicyForSpecificSignal_RepositorySetAndGetIsCalled()
             {
@@ -312,6 +323,81 @@ namespace WebService.Tests
                 SetupVerifyOrAssert();
                 verifyOrAssert.AssertGetMissingValuePolicyIsExceptionThrownWhenInvalidKey(signalsWebService, wrongId);
             }
+
+            [TestMethod]
+            public void GivenASignal_WhenGettingData_SpecificValueMissingValuePolicyFill()
+            {
+                var signal1 = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
+
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
+
+                Mock<SpecificValueMissingValuePolicy<double>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<double>>();
+                specificMvpMock.Object.Value = 42.52;
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
+                    .Returns(specificMvpMock.Object);
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new Datum<double>[]
+                        {
+                            new Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
+                            new Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
+                        });
+
+                var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                Assert.AreEqual(items.Count(), 3);
+                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, specificMvpMock.Object.Value);
+
+            }
+
+            [TestMethod]
+            public void SpecificValueMissingValuePolicy_WhenGetData_FillInt()
+            {
+                int value = 4;
+                var signal1 = SignalWith(1, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
+
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
+
+                Mock<SpecificValueMissingValuePolicy<int>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<int>>();
+                specificMvpMock.Object.Value = value;
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
+                    .Returns(specificMvpMock.Object);
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(DetDefaultDatumCollection<int>(new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)));
+
+                var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
+
+                Assert.AreEqual(items.Count(), 3);
+                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, specificMvpMock.Object.Value);
+            }
+
+            [TestMethod]
+            public void NoneQualityMissingValuePolicy_WhenGettingData_FillDatumWithNoneQuality_WhenSignalDataIsEmpty()
+            {
+                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer };
+
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
+
+                Mock<NoneQualityMissingValuePolicy<int>> noneMvpMock = new Mock<NoneQualityMissingValuePolicy<int>>();
+
+                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
+                    .Returns(noneMvpMock.Object);
+
+                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(DefaultElementOfCollection<int>(new DateTime(2018, 11, 11)));
+
+                var item = signalsWebService.GetData(1, new DateTime(2018, 11, 11), new DateTime(2018, 11, 11));
+
+                Assert.AreEqual(item.Count(), 1);
+                Assert.AreEqual(item.Single(f => f.Timestamp == new DateTime(2018, 11, 11)).Value, noneMvpMock.Object.Value);
+            }
+            
+            #endregion
+
+            #region SetData()
 
             [TestMethod]
             public void GivenASignalAndDatum_WhenSettingData_RepositorySetDataAndGetIsCalled()
@@ -507,8 +593,7 @@ namespace WebService.Tests
                     index++;
                 }
             }
-
-
+            
             [TestMethod]
             public void GivenASignalAndStringDatym_WhenSettingData_RepositorySetDataAndGetIsCalled()
             {
@@ -575,8 +660,51 @@ namespace WebService.Tests
                 SetupVerifyOrAssert();
                 verifyOrAssert.AssertSetDataIsExceptionThrownWhenInvalidKey(signalsWebService, wrongSignalId);
             }
-
             
+            [TestMethod]
+            public void GivenASignalWithEmptyDatum_WhenSet_ReturnNull()
+            {
+                Domain.Signal signal = this.SignalWith(1, Domain.DataType.Double, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
+
+                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
+
+                signalsWebService.SetData(1, new List<Datum>());
+            }
+
+            [TestMethod]
+            public void GiveenASignalWithNullValueDatum_WhenSet_AddData()
+            {
+                Domain.Signal signal = this.SignalWith(1, Domain.DataType.String, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
+
+                SetupSettingData(signal);
+
+                signalsWebService.SetData(1, new List<Datum>()
+                {
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000,1,1,2,0,0), Value = null }
+                });
+
+                signalsDataRepositoryMock.Verify(x => x.SetData<string>(
+                    It.IsAny<IEnumerable<Datum<string>>>()));
+            }
+
+            [TestMethod]
+            public void GivenASignalWithDatum_WhenSet_SignalIdIsNotNull()
+            {
+                Domain.Signal signal = this.SignalWith(1, Domain.DataType.String, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
+
+                SetupSettingData(signal);
+
+                signalsWebService.SetData(1, new List<Datum>()
+                {
+                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000,1,1,1,1,0), Value = null }
+                });
+
+                signalsDataRepositoryMock.Verify(x => x.SetData<string>(
+                    It.Is<IEnumerable<Datum<string>>>(z => z.First().Signal != null)));
+
+            }
+            
+            #endregion
 
             private void SetupSignalsDataRepositoryAndSignalsRepository(Domain.Signal existingSignal)
             {
@@ -591,6 +719,8 @@ namespace WebService.Tests
 
                 signalsWebService = new SignalsWebService(signalsDomainService);
             }
+
+            #region GetData()
 
             [TestMethod]
             public void GivenASignal_WhenGettingSpecificDataForSpecificSignal_RepositoryGetDataAndGetIsCalled()
@@ -660,9 +790,7 @@ namespace WebService.Tests
                 SetupVerifyOrAssert();
                 verifyOrAssert.AssertGetDataExceptionIsThrownWhenInvalidKey(signalsWebService, wrongSignalId);
             }
-
-
-
+            
             [TestMethod]
             public void GivenASignal_WhenGettingNoSortedList_ReturnSortedList()
             {
@@ -700,7 +828,6 @@ namespace WebService.Tests
                     new DateTime[] { new DateTime(2000, 1, 1), new DateTime(2000, 1, 2), new DateTime(2000, 1, 3) });
             }
             
-
             [TestMethod]
             public void GivenASignalAndatumWithGranularityYear_WhenGettingData_ReturnListWithelementsNone()
             {
@@ -708,8 +835,7 @@ namespace WebService.Tests
                     new DateTime[] { new DateTime(2001, 1, 1), new DateTime(2003, 1, 1), new DateTime(2004, 1, 1) },
                     new DateTime[] { new DateTime(2001, 1, 1), new DateTime(2002, 1, 1), new DateTime(2003, 1, 1) });
             }
-
-
+            
             [TestMethod]
             public void GivenASignalAndatumWithGranularityHour_WhenGettingData_ReturnListWithelementsNone()
             {
@@ -725,8 +851,7 @@ namespace WebService.Tests
                     new DateTime[] { new DateTime(2000, 1, 1, 4, 1, 0), new DateTime(2000, 1, 1, 4, 2, 0), new DateTime(2000, 1, 1, 4, 4, 0) },
                     new DateTime[] { new DateTime(2000, 1, 1, 4, 1, 0), new DateTime(2000, 1, 1, 4, 2, 0), new DateTime(2000, 1, 1, 4, 3, 0) });
             }
-
-
+            
             [TestMethod]
             public void GivenASignalAndatumWithGranularitySecond_WhenGettingData_ReturnListWithelementsNone()
             {
@@ -743,50 +868,7 @@ namespace WebService.Tests
                     new DateTime[] { new DateTime(2016, 8, 1), new DateTime(2016, 8, 8), new DateTime(2016, 8, 15) });
                 
             }
-
-            [TestMethod]
-            public void GivenASignalWithEmptyDatum_WhenSet_ReturnNull()
-            {
-                Domain.Signal signal = this.SignalWith(1, Domain.DataType.Double, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
-
-                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
-
-                signalsWebService.SetData(1, new List<Datum>());
-            }
-
-            [TestMethod]
-            public void GiveenASignalWithNullValueDatum_WhenSet_AddData()
-            {
-                Domain.Signal signal = this.SignalWith(1, Domain.DataType.String, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
-
-                SetupSettingData(signal);
-
-                signalsWebService.SetData(1, new List<Datum>()
-                {
-                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000,1,1,2,0,0), Value = null }
-                });
-
-                signalsDataRepositoryMock.Verify(x => x.SetData<string>(
-                    It.IsAny<IEnumerable<Datum<string>>>()));
-            }
-
-            [TestMethod]
-            public void GivenASignalWithDatum_WhenSet_SignalIdIsNotNull()
-            {
-                Domain.Signal signal = this.SignalWith(1, Domain.DataType.String, Domain.Granularity.Minute, Domain.Path.FromString("x/y"));
-
-                SetupSettingData(signal);
-
-                signalsWebService.SetData(1, new List<Datum>()
-                {
-                    new Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2000,1,1,1,1,0), Value = null }
-                });
-
-                signalsDataRepositoryMock.Verify(x => x.SetData<string>(
-                    It.Is<IEnumerable<Datum<string>>>(z => z.First().Signal != null)));
-
-            }
-
+            
             [TestMethod]
             public void GivenASignalWithTimeRange_WhenGet_ReturnFilledCollection()
             {
@@ -800,7 +882,11 @@ namespace WebService.Tests
                 Assert.AreEqual(collection.Count(), 60);
 
             }
-            
+
+            #endregion
+
+            #region GetPathEntry()
+
             [TestMethod]
             public void GivenNullPath_WhenGetPathEntry_ReturnNull()
             {
@@ -924,76 +1010,9 @@ namespace WebService.Tests
                 Assert.AreEqual(item.SubPaths.Count(), 1);
             }
 
-            [TestMethod]
-            public void GivenASignal_WhenGettingData_SpecificValueMissingValuePolicyFill()
-            {
-                var signal1 = SignalWith(1, Domain.DataType.Double, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
+            #endregion
 
-                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
-
-                Mock<SpecificValueMissingValuePolicy<double>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<double>>();
-                specificMvpMock.Object.Value = 42.52;
-
-                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
-                    .Returns(specificMvpMock.Object);
-
-                signalsDataRepositoryMock.Setup(x => x.GetData<double>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new Datum<double>[]
-                        {
-                            new Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 1, 1), Value = (double)1.5 },
-                            new Datum<double>() { Quality = Domain.Quality.Good, Timestamp = new DateTime(2000, 3, 1), Value = (double)2.5 }
-                        });
-
-                var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
-
-                Assert.AreEqual(items.Count(), 3);
-                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, specificMvpMock.Object.Value);
-
-            }
-
-            [TestMethod]
-            public void SpecificValueMissingValuePolicy_WhenGetData_FillInt()
-            {
-                int value = 4;
-                var signal1 = SignalWith(1, Domain.DataType.Integer, Domain.Granularity.Month, Domain.Path.FromString("root/signal1"));
-
-                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal1);
-
-                Mock<SpecificValueMissingValuePolicy<int>> specificMvpMock = new Mock<SpecificValueMissingValuePolicy<int>>();
-                specificMvpMock.Object.Value = value;
-
-                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
-                    .Returns(specificMvpMock.Object);
-
-                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(DetDefaultDatumCollection<int>(new DateTime(2000, 1, 1), new DateTime(2000, 4, 1)));
-
-                var items = signalsWebService.GetData(1, new DateTime(2000, 1, 1), new DateTime(2000, 4, 1));
-
-                Assert.AreEqual(items.Count(), 3);
-                Assert.AreEqual(items.Single(z => z.Timestamp == new DateTime(2000, 2, 1)).Value, specificMvpMock.Object.Value);
-            }
-
-            [TestMethod]
-            public void NoneQualityMissingValuePolicy_WhenGettingData_FillDatumWithNoneQuality_WhenSignalDataIsEmpty()
-            {
-                var signal = new Domain.Signal() { Id = 1, DataType = Domain.DataType.Integer };
-
-                SetupMissingValuePolicyRepositoryMockAndSignalsRepositoryMock(signal);
-
-                Mock<NoneQualityMissingValuePolicy<int>> noneMvpMock = new Mock<NoneQualityMissingValuePolicy<int>>();
-
-                missingValuePolicyRepositoryMock.Setup(x => x.Get(It.Is<Domain.Signal>(z => z.Id == 1)))
-                    .Returns(noneMvpMock.Object);
-
-                signalsDataRepositoryMock.Setup(x => x.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(DefaultElementOfCollection<int>(new DateTime(2018, 11, 11)));
-
-                var item = signalsWebService.GetData(1, new DateTime(2018, 11, 11), new DateTime(2018, 11, 11));
-
-                Assert.AreEqual(item.Count(), 1);
-                Assert.AreEqual(item.Single(f => f.Timestamp == new DateTime(2018, 11, 11)).Value, noneMvpMock.Object.Value);
-            }
+            #region Delete()
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.SignalDoesNotExists))]
@@ -1013,6 +1032,8 @@ namespace WebService.Tests
 
                 signalsRepositoryMock.Verify(x => x.Delete(It.IsAny<Domain.Signal>()));
             }
+
+            #endregion
 
             private void SetupMockDeleteFunction()
             {
