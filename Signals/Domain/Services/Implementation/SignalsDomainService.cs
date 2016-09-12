@@ -455,6 +455,9 @@ namespace Domain.Services.Implementation
             if (signal.Granularity >= granularity)
                 throw new ArgumentException("The given granularity should be bigger than the signals granularity.");
 
+            if(!checkIfTimestampsAreCorrectBasedOnGranualityOfSignal(signal.Granularity, toExcludedUtc))
+                throw new ArgumentException("incorrect timestamp(s)");
+
             return Enumerable.Empty<Datum<T>>();
         }
     }
