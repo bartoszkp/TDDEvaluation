@@ -487,9 +487,15 @@ namespace Domain.Services.Implementation
 
         private void shadowPolicySignalCase(Signal signal, MissingValuePolicyBase mvpDomain)
         {
-            if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<bool>))
+            if (mvpDomain.GetType() == typeof(ShadowMissingValuePolicy<bool>))
             {
-                var shadowSignal = ((ShadowMissingValuePolicy<bool>)mvpDomain).ShadowSignal;
+
+                var shadowMvp = mvpDomain as ShadowMissingValuePolicy<bool>;
+                var shadowSignal = shadowMvp.ShadowSignal;
+
+                if (!NotAShadowDependencyCycle(shadowMvp, signal))
+                    throw new Exception();
+
 
                 if (signal.DataType != shadowSignal.DataType ||
                 signal.Granularity != shadowSignal.Granularity)
@@ -497,7 +503,12 @@ namespace Domain.Services.Implementation
             }
             else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<int>))
             {
-                var shadowSignal = ((ShadowMissingValuePolicy<int>)mvpDomain).ShadowSignal;
+                var shadowMvp = mvpDomain as ShadowMissingValuePolicy<int>;
+                var shadowSignal = shadowMvp.ShadowSignal;
+
+                if (!NotAShadowDependencyCycle(shadowMvp, signal))
+                    throw new Exception();
+
 
                 if (signal.DataType != shadowSignal.DataType ||
                 signal.Granularity != shadowSignal.Granularity)
@@ -505,7 +516,12 @@ namespace Domain.Services.Implementation
             }
             else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<double>))
             {
-                var shadowSignal = ((ShadowMissingValuePolicy<double>)mvpDomain).ShadowSignal;
+                var shadowMvp = mvpDomain as ShadowMissingValuePolicy<double>;
+                var shadowSignal = shadowMvp.ShadowSignal;
+
+                if (!NotAShadowDependencyCycle(shadowMvp, signal))
+                    throw new Exception();
+
 
                 if (signal.DataType != shadowSignal.DataType ||
                 signal.Granularity != shadowSignal.Granularity)
@@ -513,7 +529,11 @@ namespace Domain.Services.Implementation
             }
             else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<decimal>))
             {
-                var shadowSignal = ((ShadowMissingValuePolicy<decimal>)mvpDomain).ShadowSignal;
+                var shadowMvp = mvpDomain as ShadowMissingValuePolicy<decimal>;
+                var shadowSignal = shadowMvp.ShadowSignal;
+
+                if (!NotAShadowDependencyCycle(shadowMvp, signal))
+                    throw new Exception();
 
                 if (signal.DataType != shadowSignal.DataType ||
                 signal.Granularity != shadowSignal.Granularity)
@@ -521,12 +541,44 @@ namespace Domain.Services.Implementation
             }
             else if (mvpDomain.GetType() == typeof(MissingValuePolicy.ShadowMissingValuePolicy<string>))
             {
-                var shadowSignal = ((ShadowMissingValuePolicy<string>)mvpDomain).ShadowSignal;
+                var shadowMvp = mvpDomain as ShadowMissingValuePolicy<string>;
+                var shadowSignal = shadowMvp.ShadowSignal;
+
+                if (!NotAShadowDependencyCycle(shadowMvp, signal))
+                    throw new Exception();
 
                 if (signal.DataType != shadowSignal.DataType ||
                 signal.Granularity != shadowSignal.Granularity)
                     throw new Exceptions.ShadowSignalDataTypeOrGranularityDoesntMatch();
             }
         }
+
+        private bool NotAShadowDependencyCycle<T>(ShadowMissingValuePolicy<T> shadowMvp,Signal signal) 
+        {
+            var shadowSignal = shadowMvp.ShadowSignal;
+            var signalMvp = GetMissingValuePolicy(shadowSignal);
+
+            if (shadowSignal.Id == signal.Id)
+                return false;
+
+            while (true) 
+            {
+
+                if (signalMvp is ShadowMissingValuePolicy<T>) {
+                    var shadowSignalMvp = signalMvp as ShadowMissingValuePolicy<T>;
+                    shadowSignal = shadowSignalMvp.ShadowSignal;
+
+                    if (shadowSignal.Id == signal.Id) {
+                        return false;
+                    }
+                    signalMvp = GetMissingValuePolicy(shadowSignal);
+
+
+                } else return true;
+
+
+            }
+        }
+
     }
 }
