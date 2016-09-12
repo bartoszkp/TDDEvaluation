@@ -143,6 +143,9 @@ namespace WebService
                 {
                     throw new WrongTypesException();
                 }
+
+                if (pol.ShadowSignal.Id == signalId)
+                    throw new ArgumentException("Shadow signals should not create a dependency cycle.");
             }
 
             var policyDomain = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();

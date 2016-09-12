@@ -1568,19 +1568,23 @@ namespace WebService.Tests
             [ExpectedException(typeof(ArgumentException))]
             public void GivenASignalWithShadowMVP_WhenSettingItselfAsShadow_ThrowsArgumentException()
             {
+                var signalId = 1;
+
                 SetupWebService();
                 var signalDto = new Dto.Signal()
                 {
+                    Id = signalId,
                     DataType = Dto.DataType.Integer,
                     Granularity = Dto.Granularity.Month
                 };
                 var signal = new Signal()
                 {
+                    Id = signalId,
                     DataType = DataType.Integer,
                     Granularity = Granularity.Month
                 };
 
-                var signalId = 2;
+
 
                 signalsRepositoryMock
                      .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
