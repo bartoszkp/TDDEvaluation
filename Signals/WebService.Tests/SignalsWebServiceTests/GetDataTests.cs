@@ -616,9 +616,9 @@ namespace WebService.Tests.SignalsWebServiceTests
                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 1), Value = 1 },
                   new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2017, 1, 1), Value = 2 },
                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2018, 1, 1), Value = 3},
-                  new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2019, 1, 1), Value = default(int) },
+                  new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2019, 1, 1), Value = default(int) },
                   new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2020, 1, 1), Value = -5 },
-                  new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2021, 1, 1), Value = 5 },
+                  new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2021, 1, 1), Value = 5 },
                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2022, 1, 1), Value = 6 },
                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2023, 1, 1), Value = 7 },
                            };
