@@ -101,6 +101,11 @@ namespace WebService
             else throw new NotImplementedException();          
         }
 
+        public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var signal = GetById(signalId);
