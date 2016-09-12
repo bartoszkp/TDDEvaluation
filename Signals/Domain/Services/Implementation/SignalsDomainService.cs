@@ -130,54 +130,7 @@ namespace Domain.Services.Implementation
 
             if (fromIncludedUtc == toExcludedUtc)
             {
-                Datum<T> dataToAdd;
-
-                if (policy.GetType() == typeof(NoneQualityMissingValuePolicy<T>))
-                {
-                    dataToAdd = new Datum<T>() { Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) };
-                    datumReturnList.Add(dataToAdd);
-
-                    return datumReturnList;
-                }
-                else if (policy.GetType() == typeof(SpecificValueMissingValuePolicy<T>))
-                {
-                    dataToAdd = new Datum<T>()
-                    {
-                        Quality = ((SpecificValueMissingValuePolicy<T>)policy).Quality,
-                        Timestamp = fromIncludedUtc,
-                        Value = ((SpecificValueMissingValuePolicy<T>)policy).Value
-                    };
-
-                    datumReturnList.Add(dataToAdd);
-
-                    return datumReturnList;
-                }
-                else if (policy.GetType() == typeof(ZeroOrderMissingValuePolicy<T>))
-                {
-                    dataToAdd = new Datum<T>()
-                    {
-                        Quality = ((ZeroOrderMissingValuePolicy<T>)policy).Quality,
-                        Timestamp = fromIncludedUtc,
-                        Value = ((ZeroOrderMissingValuePolicy<T>)policy).Value
-                    };
-
-                    datumReturnList.Add(dataToAdd);
-
-                    return datumReturnList;
-                }
-                else if (policy.GetType() == typeof(FirstOrderMissingValuePolicy<T>))
-                {
-                    dataToAdd = new Datum<T>()
-                    {
-                        Quality = ((FirstOrderMissingValuePolicy<T>)policy).Quality,
-                        Timestamp = fromIncludedUtc,
-                        Value = ((FirstOrderMissingValuePolicy<T>)policy).Value
-                    };
-
-                    datumReturnList.Add(dataToAdd);
-
-                    return datumReturnList;
-                }
+                toExcludedUtc = addTime(signal.Granularity, toExcludedUtc);
             }
 
             if (policy != null)
