@@ -110,7 +110,7 @@ namespace WebService
 
                 case DataType.String:
                     break;
-            } 
+            }
 
             throw new NotImplementedException();
         }

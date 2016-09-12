@@ -1560,6 +1560,76 @@ namespace WebService.Tests
                 GivenASignal(existingSignal);
                 var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Minute, new DateTime(), new DateTime());
             }
+
+            [TestMethod]
+            public void GivenADailySignal_WhenGettingCoarseData_WithWeekGranularity_CorrectlyReturnsData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var existingDatum = GetExistingDatumForGetCoarseDataWeek();
+
+                SetupGetData(existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
+
+                GivenASignal(existingSignal);
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, 
+                    new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
+
+
+                var expectedDatum = GetExpectedDatumForGetCoarseDataWeek();
+                AssertDatum(result, expectedDatum.ToArray());
+            }
+
+            private void SetupGetData(IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == 1), fromIncluded, toExcluded))
+                    .Returns(existingDatum);
+            }
+
+            private IEnumerable<Dto.Datum> GetExpectedDatumForGetCoarseDataWeek()
+            {
+                return new List<Dto.Datum>()
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 },
+                    new Dto.Datum() {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 11), Value = 4 },
+                    new Dto.Datum() {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2016, 1, 18), Value = 3 },
+                };
+            }
+
+            private IEnumerable<Domain.Datum<int>> GetExistingDatumForGetCoarseDataWeek()
+            {
+                return new List<Domain.Datum<int>>() {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 4), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 5), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 6), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 7), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 8), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 9), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,10), Value = 1 },
+
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016,1,11), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,12), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,13), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,14), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,15), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,16), Value = 2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,17), Value = 1 },
+
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,18), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,19), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,20), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016,1,21), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,22), Value = 0 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,23), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,24), Value = 0 },
+                };
+            }
             #endregion
 
             private void SetupDelete (Signal signal)
