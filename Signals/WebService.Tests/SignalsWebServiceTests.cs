@@ -807,13 +807,6 @@ namespace WebService.Tests
                 }));
             }
 
-            private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
-            {
-                signalsDataRepositryMock
-                    .Setup(x => x.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(datum);
-            }
-
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)
             {
                 if (datum1.Count() != datum2.Count()) return false;
@@ -830,12 +823,11 @@ namespace WebService.Tests
                 return true;
             }
 
-            private bool CompareSignal(Signal sig1, Signal sig2)
+            private void SetupGetData<T>(IEnumerable<Datum<T>> datum)
             {
-                return sig1.Id == sig2.Id &&
-                    sig1.Granularity == sig2.Granularity &&
-                    sig1.DataType == sig2.DataType &&
-                    sig1.Path.ToString() == sig1.Path.ToString(); 
+                signalsDataRepositryMock
+                    .Setup(x => x.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(datum);
             }
 
             private void SetupSignalsDataRepositoryMock<T>(){
@@ -853,6 +845,14 @@ namespace WebService.Tests
             private void SetupMissingValuePolicyMock(Domain.MissingValuePolicy.MissingValuePolicyBase policy)
             {
                 missingValuePolicyMock.Setup(x => x.Get(It.IsAny<Domain.Signal>())).Returns(policy);
+            }
+
+            private bool CompareSignal(Signal sig1, Signal sig2)
+            {
+                return sig1.Id == sig2.Id &&
+                    sig1.Granularity == sig2.Granularity &&
+                    sig1.DataType == sig2.DataType &&
+                    sig1.Path.ToString() == sig1.Path.ToString();
             }
 
             private bool CompareSignals(Dto.Signal signal1, Dto.Signal signal2)
