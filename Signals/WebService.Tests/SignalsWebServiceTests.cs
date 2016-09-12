@@ -1092,6 +1092,24 @@ namespace WebService.Tests
             }
 
             [TestMethod]
+            [ExpectedException(typeof(ShadowMissingValuePolicyCycleException))]
+            public void GivenSomeSignals_WhenSettingShadowMissingValuePolicy_NoDependencyCycleIsPresent()
+            {
+                var signal1 = new Signal { Id = 1, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("s1") };
+                var signal2 = new Signal { Id = 2, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("s2") };
+                var signal3 = new Signal { Id = 3, DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("s3") };
+
+                GivenSomeSignals(signal1, signal2, signal3);
+
+                signalsMissingValuePolicyRepositoryMock.Setup(smvp => smvp.Get(signal1))
+                   .Returns(new ShadowMissingValuePolicyDouble { ShadowSignal = signal2 });
+                signalsMissingValuePolicyRepositoryMock.Setup(smvp => smvp.Get(signal2))
+                    .Returns(new ShadowMissingValuePolicyDouble { ShadowSignal = signal3 });
+
+                signalsWebService.SetMissingValuePolicy(3, new Dto.MissingValuePolicy.ShadowMissingValuePolicy { ShadowSignal = signal1.ToDto<Dto.Signal>() });
+            }
+
+            [TestMethod]
             public void GivenASignal_HavingBothEalierAndOlderData_WhenGettingDataWithFirstOrderMVP_ForDatumsInReversOrder_ReturnsProperData()
             {
                 int dummyId = 1;
@@ -1235,7 +1253,7 @@ namespace WebService.Tests
                     });
             }
 
-            private void GivenSomeSignals(Signal[] signals)
+            private void GivenSomeSignals(params Signal[] signals)
             {
                 GivenNoSignals();
 
