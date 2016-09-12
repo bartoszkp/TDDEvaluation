@@ -120,6 +120,12 @@ namespace Domain.Services.Implementation
             {
                 List<Datum<T>> returnElement = new List<Datum<T>>();
                 int indeks = 0;
+                if (data.Count() == 0)
+                {
+                    returnElement.Add(secondaryItem);
+                    return returnElement;
+                }
+                    
                 foreach (var x in data)
                 {
                     if (fromIncludedUtc == x.Timestamp)

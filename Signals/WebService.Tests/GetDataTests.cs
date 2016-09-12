@@ -372,8 +372,38 @@ namespace WebService.Tests
             Assert.AreEqual(result.Count(), 0);
         }
 
-        
+
         #endregion
+
+
+        [TestMethod]
+        public void GivenASignal_WhenGettingSingleDatum_ReturnsEmptyDatum()
+        {
+            var existingSignal = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("root/signal1"));
+
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+            GivenASignal(existingSignal);
+
+            var filledDatum = new Dto.Datum[]
+            {
+                new Dto.Datum() {Quality = Dto.Quality.Good, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }
+            };
+
+            signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+            var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+            var result = signalsWebService.GetData(1, new DateTime(2000, 2, 1), new DateTime(2000, 2, 1));
+
+            Assert.AreEqual(result.ElementAt(0).Quality, Dto.Quality.None);
+            Assert.AreEqual(result.ElementAt(0).Timestamp, new DateTime(2000, 2, 1));
+            Assert.AreEqual(result.ElementAt(0).Value, (double)0);
+        }
 
         private void SetupWebService()
         {
