@@ -1211,6 +1211,42 @@ namespace WebService.Tests
                 signalsDataRepositoryMock.Verify(sdr => sdr.GetDataNewerThan<double>(signal, new DateTime(1999, 11, 1), 1));
             }
 
+            [TestMethod]
+            public void GetData_WithZeroOrderMVPBool_ReturnsCorrectData()
+            {
+                int signalId = 1;
+
+                var givenDatums = new[] {
+                    new Domain.Datum<Boolean> { Quality = Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = false },
+                    new Domain.Datum<Boolean> { Quality = Quality.Good, Timestamp = new DateTime(2018, 1, 15), Value = true }
+                };
+
+                var signal = SignalWith(
+                   id: signalId,
+                   dataType: Domain.DataType.Boolean,
+                   granularity: Domain.Granularity.Week,
+                   path: Domain.Path.FromString("root/signal"));
+                GivenASignal(signal);
+
+                GivenMissingValuePolicy(signalId, new DataAccess.GenericInstantiations.ZeroOrderMissingValuePolicyBoolean());
+
+                signalsDataRepositoryMock.Setup(x => x.GetDataOlderThan<Boolean>(It.IsAny<Signal>(), It.Is<DateTime>(dt => dt == new DateTime(2018, 1, 8)), It.IsAny<int>()))
+                    .Returns(new[] { givenDatums[0] });
+                signalsDataRepositoryMock.Setup(x => x.GetDataOlderThan<Boolean>(It.IsAny<Signal>(), It.Is<DateTime>(dt => dt == new DateTime(2018, 1, 22)), It.IsAny<int>()))
+                    .Returns(new[] { givenDatums[1] });
+                signalsDataRepositoryMock.Setup(x => x.GetData<Boolean>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(givenDatums);
+
+                var result = signalsWebService.GetData(signalId, new DateTime(2018, 1, 1), new DateTime(2018, 1, 29));
+
+                var expected = new[] {
+                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = 1m },
+                   new Dto.Datum(){ Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 8), Value = 1m },
+                   new Dto.Datum(){ Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 15), Value = 3m },
+                   new Dto.Datum(){ Quality = Dto.Quality.Good, Timestamp = new DateTime(2018, 1, 22), Value = 3m }
+                };
+
+                Assert.IsTrue(CompareDatum(expected, result));
+            }
 
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {

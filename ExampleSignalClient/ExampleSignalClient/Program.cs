@@ -11,20 +11,20 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal()
             {
-                DataType = DataType.Integer,
-                Granularity = Granularity.Day,
-                Path = new Path() { Components = new[] { "FirstOrderTests2" } }
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Week,
+                Path = new Path() { Components = new[] { "ZeroOrderTests" } }
             }).Id.Value;
 
-            client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Integer });
+            client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.Boolean });
 
             client.SetData(id, new Datum[]
             {
-    new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = 10, Quality = Quality.Bad },
-    new Datum() { Timestamp = new DateTime(2000, 1, 5), Value = 30, Quality = Quality.Fair }
+    new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = false },
+    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2018, 1, 15), Value = true }
             });
 
-            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 1, 6));
+            var result = client.GetData(id, new DateTime(2018, 1, 1), new DateTime(2018, 1, 29));
 
             foreach (var d in result)
             {
@@ -32,64 +32,6 @@ namespace ExampleSignalClient
             }
 
             Console.ReadKey();
-
-
-
-
-
-            //SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-
-            //var id = client.Add(new Signal()
-            //{
-            //    DataType = DataType.String,
-            //    Granularity = Granularity.Day,
-            //    Path = new Path() { Components = new[] { "ZeroOrderTests27" } }
-            //}).Id.Value;
-
-            //client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.String });
-
-            //client.SetData(id, new Datum[]
-            //{
-            //new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2018, 1, 1), Value = "cos" }
-            //});
-
-            //var result = client.GetData(id, new DateTime(2018, 1, 10), new DateTime(2018, 1, 11));
-
-            //foreach (var d in result)
-            //{
-            //    Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
-            //}
-
-            //Console.ReadKey();
-
-
-
-
-
-            //        SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
-
-            //        var id = client.Add(new Signal()
-            //        {
-            //            DataType = DataType.String,
-            //            Granularity = Granularity.Day,
-            //            Path = new Path() { Components = new[] { "day" } }
-            //        }).Id.Value;
-
-            //        client.SetMissingValuePolicy(id, new ZeroOrderMissingValuePolicy() { DataType = DataType.String });
-            //        client.SetData(id, new Datum[]
-            //        {
-            //new Datum() { Timestamp = new DateTime(2000, 1, 1), Value = "first", Quality = Quality.Good },
-            //        });
-
-            //        var result = client.GetData(id, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11));
-
-            //        foreach (var d in result)
-            //        {
-            //            Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
-            //        }
-
-            //        Console.ReadKey();
-
         }
     }
 }
