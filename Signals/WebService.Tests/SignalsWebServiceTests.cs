@@ -1786,8 +1786,8 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(WrongTypesException))]
-            public void GivenASignal_WhenGettingCoarseDataWithBoolData_ThrowsWrongTypeException()
+            [ExpectedException(typeof(TypeUnsupportedException))]
+            public void GivenASignal_WhenGettingCoarseDataWithBoolData_ThrowsTypeUnsupportedException()
             {
                 SetupWebService();
                 int signalId = 4;
