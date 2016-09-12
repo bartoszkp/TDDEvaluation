@@ -93,6 +93,11 @@ namespace WebService
             
         }
 
+        public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
+
         private IEnumerable<Dto.Datum> GetDataWithType<T>(Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             CheckTimestamp(fromIncludedUtc, signal.Granularity);
