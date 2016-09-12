@@ -502,7 +502,7 @@ namespace Domain.Services.Implementation
                 value = Convert.ChangeType(value, typeof(T));
                 var quality = SelectWorstQualityFromRange(data.Select(d => d.Quality));
 
-                result.Add(new Datum<T>() { Value = value, Quality = quality });
+                result.Add(new Datum<T>() { Value = value, Quality = quality, Timestamp = beginRange });
             }
 
             return result;
