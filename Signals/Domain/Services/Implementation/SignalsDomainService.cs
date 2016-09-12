@@ -295,7 +295,78 @@ namespace Domain.Services.Implementation
             if (signal.Granularity >= granularity)
                 throw new Domain.Exceptions.GetCoarseDataBadGranularityException();
 
-            throw new NotImplementedException();
+            decimal averageValue = 0.0m;
+            var quality = Domain.Quality.Good;
+            var dateTime = fromIncludedUtc;
+            var timeStamp = AddOrSubtractDateTime(dateTime, granularity, 1);
+
+            var data = GetData<T>(signalId, fromIncludedUtc, toExcludedUtc);
+            var dataToReturn = new List<Datum<T>>();
+
+            int howManyValues = 0;
+            foreach (var item in data)
+            {
+                averageValue += Convert.ToDecimal(item.Value);
+                howManyValues++;
+
+                if (item.Quality > quality || item.Quality == Quality.None)
+                    quality = item.Quality;
+
+                dateTime = AddOrSubtractDateTime(dateTime, signal.Granularity, 1);
+
+                if (dateTime == timeStamp)
+                {
+                    dataToReturn.Add(new Datum<T>()
+                    {
+                        Quality = quality,
+                        Signal = signal,
+                        Timestamp = AddOrSubtractDateTime(dateTime, granularity, -1),
+                        Value = CountAverageValue<T>(averageValue, howManyValues),
+                    });
+
+                    quality = Domain.Quality.Good;
+                    howManyValues = 0;
+                    averageValue = 0.0m;
+                    timeStamp = AddOrSubtractDateTime(timeStamp, granularity, 1);
+                }
+            }
+
+            return dataToReturn;
+        }
+
+        private DateTime AddOrSubtractDateTime(DateTime dateTime, Granularity granularity, int addOrSubtract)
+        {
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    return dateTime.AddSeconds(1 * addOrSubtract);
+
+                case Granularity.Minute:
+                    return dateTime.AddMinutes(1 * addOrSubtract);
+
+                case Granularity.Hour:
+                    return dateTime.AddHours(1 * addOrSubtract);
+
+                case Granularity.Day:
+                    return dateTime.AddDays(1 * addOrSubtract);
+
+                case Granularity.Week:
+                    return dateTime.AddDays(7 * addOrSubtract);
+
+                case Granularity.Month:
+                    return dateTime.AddMonths(1 * addOrSubtract);
+
+                case Granularity.Year:
+                    return dateTime.AddYears(1 * addOrSubtract);
+            }
+
+            return new DateTime();
+        }
+
+        private T CountAverageValue<T>(decimal averageValue, int howManyValues)
+        {
+            var value = averageValue / howManyValues;
+            return (T)Convert.ChangeType(value, typeof(T));
         }
     }
 }
