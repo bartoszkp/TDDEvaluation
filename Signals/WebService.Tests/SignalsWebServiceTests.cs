@@ -1897,7 +1897,7 @@ namespace WebService.Tests
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 7), Value = (int)4 },
                 };
 
-                SetupRepositoryMocks_GetData_ReturnsGivenDataCollection<int>(id, signal, dateFrom, realDateTo, dataReturned);
+                SetupRepositoryMocks_GetData_ReturnsData_WithinTime<int>(id, signal, dateFrom, realDateTo, dataReturned);
 
                 var result = signalsWebService.GetCoarseData(id, Dto.Granularity.Week, dateFrom, dateTo);
 
@@ -2049,7 +2049,15 @@ namespace WebService.Tests
 
                 signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<T>(It.IsAny<Signal>(), fromIncludedUtc, toExcludedUtc)).Returns(dataReturned);
             }
-            
+
+            private void SetupRepositoryMocks_GetData_ReturnsData_WithinTime<T>(int id, Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, IEnumerable<Domain.Datum<T>> dataReturned)
+            {
+                signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
+
+                signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<T>(It.Is<Signal>(s => s.Id == id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(dataReturned.Where(d => (d.Timestamp >= fromIncludedUtc && d.Timestamp < toExcludedUtc) || (fromIncludedUtc == toExcludedUtc && d.Timestamp == fromIncludedUtc)));
+            }
+
             private void VerifyGetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
             {
                 signalsDataRepositoryMock.Verify(sdrm => sdrm.GetData<T>(It.Is<Domain.Signal>(s => s.Id == signal.Id &&
