@@ -144,9 +144,6 @@ namespace WebService
                     throw new WrongTypesException();
                 }
 
-                //if (pol.ShadowSignal.Id == signalId)
-                //    throw new ArgumentException("Shadow signals should not create a dependency cycle.");
-
                 int? current = pol.ShadowSignal.Id;
 
                 while (current != null)

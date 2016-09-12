@@ -1616,9 +1616,7 @@ namespace WebService.Tests
                 Dto.Signal shadowShadowSignal = new Dto.Signal() { Id = shadowShadowSignalId, DataType = Dto.DataType.Integer, Granularity = Dto.Granularity.Day };
                 Signal shadowShadowSignalDomain = new Domain.Signal() { Id = shadowShadowSignalId, DataType = DataType.Integer, Granularity = Granularity.Day };
 
-
                 SetupWebServiceWithoutDefaultMVP();
-
 
                 var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowSignal, DataType = shadowSignal.DataType };
                 var policyDomain = new ShadowMissingValuePolicyInteger();
@@ -1640,10 +1638,6 @@ namespace WebService.Tests
                     .Setup(x => x.Get(It.Is<int>(y => y == shadowShadowSignalId)))
                     .Returns<int>(id => shadowShadowSignalDomain);
 
-
-                //missingValuePolicyRepositoryMock
-                //   .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == signal.Id)))
-                //   .Returns(policyDomain);
                 missingValuePolicyRepositoryMock
                    .Setup(f => f.Get(It.Is<Domain.Signal>(s => s.Id == shadowSignal.Id)))
                    .Returns(shadowPolicyDomain);
