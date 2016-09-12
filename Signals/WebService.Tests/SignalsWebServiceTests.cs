@@ -1564,6 +1564,40 @@ namespace WebService.Tests
             }
 
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignalWithShadowMVP_WhenSettingItselfAsShadow_ThrowsArgumentException()
+            {
+                SetupWebService();
+                var signalDto = new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Integer,
+                    Granularity = Dto.Granularity.Month
+                };
+                var signal = new Signal()
+                {
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month
+                };
+
+                var signalId = 2;
+
+                signalsRepositoryMock
+                     .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
+                     .Returns<int>(z => {
+                         var signal2 = signal;
+                         signal.Id = signalId;
+                         return signal;
+                     });
+
+
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = signalDto, DataType = signalDto.DataType };
+
+                signalsWebService.SetMissingValuePolicy(signalId, policy);
+
+            }
+
+
             private void DeleteASignal(int id)
             {
 
