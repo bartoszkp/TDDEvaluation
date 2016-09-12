@@ -110,7 +110,12 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new CouldntGetASignalException();
+            var signal = signalsDomainService.GetById(signalId)?.ToDomain<Domain.Signal>();
+
+            if (signal == null)
+                throw new CouldntGetASignalException();
+
+            return null;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
