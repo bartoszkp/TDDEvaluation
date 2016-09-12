@@ -1617,7 +1617,7 @@ namespace WebService.Tests
                 Signal shadowShadowSignalDomain = new Domain.Signal() { Id = shadowShadowSignalId, DataType = DataType.Integer, Granularity = Granularity.Day };
 
 
-                SetupWebService();
+                SetupWebServiceWithoutDefaultMVP();
 
 
                 var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowSignal, DataType = shadowSignal.DataType };
@@ -1625,10 +1625,10 @@ namespace WebService.Tests
                 policyDomain.ShadowSignal = shadowSignalDomain;
                 var shadowPolicy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = shadowShadowSignal, DataType = shadowShadowSignal.DataType };
                 var shadowPolicyDomain = new ShadowMissingValuePolicyInteger();
-                policyDomain.ShadowSignal = shadowShadowSignalDomain;
+                shadowPolicyDomain.ShadowSignal = shadowShadowSignalDomain;
                 var shadowShadowPolicy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { ShadowSignal = signal, DataType = signal.DataType };
                 var shadowShadowPolicyDomain = new ShadowMissingValuePolicyInteger();
-                policyDomain.ShadowSignal = signalDomain;
+                shadowShadowPolicyDomain.ShadowSignal = signalDomain;
 
                 signalsRepositoryMock
                     .Setup(x => x.Get(It.Is<int>(y => y == signalId)))
@@ -1827,6 +1827,12 @@ namespace WebService.Tests
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
                 SetupMock_missingValuePolicy_DefaultMissingValuePolicy();
+            }
+
+            private void SetupWebServiceWithoutDefaultMVP()
+            {
+                var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalsDomainService);
             }
 
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path, int? id = null)

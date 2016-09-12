@@ -144,8 +144,29 @@ namespace WebService
                     throw new WrongTypesException();
                 }
 
-                if (pol.ShadowSignal.Id == signalId)
-                    throw new ArgumentException("Shadow signals should not create a dependency cycle.");
+                //if (pol.ShadowSignal.Id == signalId)
+                //    throw new ArgumentException("Shadow signals should not create a dependency cycle.");
+
+                int? current = pol.ShadowSignal.Id;
+
+                while (current != null)
+                {
+                    if(current == signalId)
+                        throw new ArgumentException("Shadow signals should not create a dependency cycle.");
+
+                    var curPolicy = GetMissingValuePolicy(current.Value);
+
+                    if (!(curPolicy is ShadowMissingValuePolicy))
+                        current = null;
+                    else
+                    {
+                        var curPol = curPolicy as ShadowMissingValuePolicy;
+
+                        current = curPol.ShadowSignal.Id;
+                    }
+
+
+                }
             }
 
             var policyDomain = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
