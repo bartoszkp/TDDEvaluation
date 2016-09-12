@@ -592,6 +592,12 @@ namespace ExampleSignalClient.Signals {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetData", ReplyAction="http://tempuri.org/ISignalsWebService/GetDataResponse")]
         System.Threading.Tasks.Task<ExampleSignalClient.Signals.Datum[]> GetDataAsync(int signalId, System.DateTime fromIncludedUtc, System.DateTime toExcludedUtc);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetCoarseData", ReplyAction="http://tempuri.org/ISignalsWebService/GetCoarseDataResponse")]
+        ExampleSignalClient.Signals.Datum[] GetCoarseData(int signalId, ExampleSignalClient.Signals.Granularity granularity, System.DateTime fromIncludedUtc, System.DateTime toExcludedUtc);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/GetCoarseData", ReplyAction="http://tempuri.org/ISignalsWebService/GetCoarseDataResponse")]
+        System.Threading.Tasks.Task<ExampleSignalClient.Signals.Datum[]> GetCoarseDataAsync(int signalId, ExampleSignalClient.Signals.Granularity granularity, System.DateTime fromIncludedUtc, System.DateTime toExcludedUtc);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ISignalsWebService/SetData", ReplyAction="http://tempuri.org/ISignalsWebService/SetDataResponse")]
         void SetData(int signalId, ExampleSignalClient.Signals.Datum[] data);
         
@@ -684,6 +690,14 @@ namespace ExampleSignalClient.Signals {
         
         public System.Threading.Tasks.Task<ExampleSignalClient.Signals.Datum[]> GetDataAsync(int signalId, System.DateTime fromIncludedUtc, System.DateTime toExcludedUtc) {
             return base.Channel.GetDataAsync(signalId, fromIncludedUtc, toExcludedUtc);
+        }
+        
+        public ExampleSignalClient.Signals.Datum[] GetCoarseData(int signalId, ExampleSignalClient.Signals.Granularity granularity, System.DateTime fromIncludedUtc, System.DateTime toExcludedUtc) {
+            return base.Channel.GetCoarseData(signalId, granularity, fromIncludedUtc, toExcludedUtc);
+        }
+        
+        public System.Threading.Tasks.Task<ExampleSignalClient.Signals.Datum[]> GetCoarseDataAsync(int signalId, ExampleSignalClient.Signals.Granularity granularity, System.DateTime fromIncludedUtc, System.DateTime toExcludedUtc) {
+            return base.Channel.GetCoarseDataAsync(signalId, granularity, fromIncludedUtc, toExcludedUtc);
         }
         
         public void SetData(int signalId, ExampleSignalClient.Signals.Datum[] data) {
