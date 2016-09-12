@@ -449,5 +449,13 @@ namespace Domain.Services.Implementation
                     return true;
             }
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            if (signal.Granularity >= granularity)
+                throw new ArgumentException("The given granularity should be bigger than the signals granularity.");
+
+            return Enumerable.Empty<Datum<T>>();
+        }
     }
 }
