@@ -268,7 +268,7 @@ namespace WebService.Tests
             signalsRepoMock = new Mock<ISignalsRepository>();
             GivenASignal(existingSignal);
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
-            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<string>(existingSignal, new DateTime(2000, 1, 10), new DateTime(2000, 1, 11)))
+            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<string>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2000, 1, 10), new DateTime(2000, 1, 11)))
                             .Returns(existingDatum.ToDomain<IEnumerable<Domain.Datum<string>>>);
             mvpRepoMock = new Mock<IMissingValuePolicyRepository>();
             mvpRepoMock
