@@ -1671,6 +1671,26 @@ namespace WebService.Tests
             }
 
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGettingCoarseDataWithGranularityNotSmallerThanOriginal_ThrowsArgumentExcpetion()
+            {
+                SetupWebService();
+                int signalId = 4;
+
+                DateTime timestamp = new DateTime(2000, 1, 1);
+
+                var signalDomain = GetDefaultSignal_IntegerMonth();
+                signalDomain.Id = signalId;
+
+                SetupMock_missingValuePolicy_DefaultMissingValuePolicy();
+
+                this.signalsRepositoryMock.Setup(x => x.Get(signalId)).Returns(signalDomain);
+
+                var result = signalsWebService.GetCoarseData(signalId, Dto.Granularity.Second, timestamp, timestamp);
+            }
+
+
             private void DeleteASignal(int id)
             {
 
