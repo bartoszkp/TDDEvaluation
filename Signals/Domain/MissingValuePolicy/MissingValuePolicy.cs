@@ -12,7 +12,9 @@ namespace Domain.MissingValuePolicy
 
         public virtual Signal Signal { get; set; }
 
-        public virtual void CheckGranularitiesAndDataTypes(Signal signal) { }
+        public virtual void CheckGranularitiesAndDataTypes(Signal signal){ }
+
+        public virtual void IsDependencyCycle(Signal signal, IMissingValuePolicyRepository mvpRepository) { }
 
         [NHibernateIgnore]
         public abstract Type NativeDataType { get; }

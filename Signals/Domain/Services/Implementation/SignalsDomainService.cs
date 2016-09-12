@@ -87,6 +87,7 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new NoSuchSignalException();
             policy.CheckGranularitiesAndDataTypes(signal);
+            policy.IsDependencyCycle(signal, missingValuePolicyRepository);
             missingValuePolicyRepository.Set(signal, policy);
         }
 

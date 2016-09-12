@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class NotMatchingDataTypes : Exception
+    public class NotMatchingDataTypesException : Exception
     {
-        public NotMatchingDataTypes() :
+        public NotMatchingDataTypesException() :
             base("Data Types of signal and shadow signal are not the same.")
         {
 

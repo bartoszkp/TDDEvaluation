@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\DependencyCycleException.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\NotMatchingDataTypes.cs" />
     <Compile Include="Exceptions\NotMatchingGranularities.cs" />

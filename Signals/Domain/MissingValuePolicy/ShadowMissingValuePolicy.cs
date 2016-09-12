@@ -1,8 +1,11 @@
-﻿using Domain.Repositories;
+﻿using Domain.Infrastructure;
+using Domain.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Exceptions;
+
+
 
 namespace Domain.MissingValuePolicy
 {
@@ -45,9 +48,17 @@ namespace Domain.MissingValuePolicy
         public override void CheckGranularitiesAndDataTypes(Signal signal)
         {
             if (signal.DataType != ShadowSignal.DataType)
-                throw new NotMatchingDataTypes();
+                throw new NotMatchingDataTypesException();
             else if (signal.Granularity != ShadowSignal.Granularity)
-                throw new NotMatchingGranularities();
+                throw new NotMatchingGranularitiesException();
+        }
+
+        public override void IsDependencyCycle(Signal signal, IMissingValuePolicyRepository mvpRepository)
+        {
+            if (signal.Id == ShadowSignal.Id)
+                throw new DependencyCycleException();
+            var shadowSignalPolicy = mvpRepository.Get(ShadowSignal);
+            shadowSignalPolicy.IsDependencyCycle(signal, mvpRepository);
         }
 
         private DateTime AddingTimespanToDataTime(DateTime addedData, Granularity granularitySignal)

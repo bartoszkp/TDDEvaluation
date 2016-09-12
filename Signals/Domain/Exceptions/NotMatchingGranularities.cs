@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class NotMatchingGranularities : Exception
+    public class NotMatchingGranularitiesException : Exception
     {
-        public NotMatchingGranularities() :
+        public NotMatchingGranularitiesException() :
             base("Granularity of signal and shadow signal are not the same")
         {
 

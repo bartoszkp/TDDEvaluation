@@ -253,7 +253,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Domain.Exceptions.NotMatchingDataTypes))]
+        [ExpectedException(typeof(Domain.Exceptions.NotMatchingDataTypesException))]
         public void GivenADoubleSignalAndDecimalShadowSignal_WhenSettingMVP_ExceptionIsThrown()
         {
             signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -289,7 +289,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Domain.Exceptions.NotMatchingGranularities))]
+        [ExpectedException(typeof(Domain.Exceptions.NotMatchingGranularitiesException))]
         public void GivenAMonthSignalAndDayShadowSignal_WhenSettingMVP_ExceptionIsThrown()
         {
             signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -322,6 +322,55 @@ namespace WebService.Tests
             signalsWebService = new SignalsWebService(signalsDomainService);
 
             signalsWebService.SetMissingValuePolicy(1, existingShadowPolicy);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(DependencyCycleException))]
+        public void GivenASignal_WhenTryingToSetDependencyCycle_ExeptionIsThrown()
+        {
+            var signal1 = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Double,
+                Granularity = Granularity.Second
+            };
+            var signal2 = new Signal()
+            {
+                Id = 2,
+                DataType = DataType.Double,
+                Granularity = Granularity.Second
+            };
+            
+            signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+            GivenASignal(signal1);
+            GivenASignal(signal2);
+
+            missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+            missingValuePolicyRepositoryMock
+                .Setup(mvprm => mvprm.Get(It.Is<Domain.Signal>(signal => 
+                (
+                    signal.Id == 1
+                    && signal.DataType == DataType.Double
+                    && signal.Granularity == Granularity.Second
+                ))))
+                .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble() { ShadowSignal = signal1, Signal = signal2 });
+
+            missingValuePolicyRepositoryMock
+                .Setup(mvprm => mvprm.Get(It.Is<Domain.Signal>(signal => 
+                (
+                    signal.Id == 1
+                    && signal.DataType == DataType.Double
+                    && signal.Granularity == Granularity.Second
+                ))))
+                .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyDouble() { ShadowSignal = signal2, Signal = signal1 });
+
+            var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
+
+            signalsWebService = new SignalsWebService(signalsDomainService);
+
+            signalsWebService.SetMissingValuePolicy(2, new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { DataType = Dto.DataType.Double, ShadowSignal = signal1.ToDto<Dto.Signal>() });
         }
 
         private void SetupZeroQuality(Signal existingSignal,
