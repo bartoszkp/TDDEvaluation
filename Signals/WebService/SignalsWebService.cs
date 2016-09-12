@@ -96,6 +96,11 @@ namespace WebService
             var signal = this.signalsDomainService.GetById(signalId);
             var domainGranularity = granularity.ToDomain<Domain.Granularity>();
 
+            if (signal == null)
+            {
+                throw new CouldntGetASignalException();
+            }
+
             switch (signal.DataType)
             {
                 case Domain.DataType.Boolean:
