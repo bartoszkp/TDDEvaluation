@@ -1260,6 +1260,78 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(signal.Id.Value, policy);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingShadowMVP_IfSignalIsEqualToChosenShadowSignal_ArgumentExceptionIsThrown()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 5,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("path")
+                };
+                GivenASignal(signal);
+
+                missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.Is<Domain.Signal>(s => s.Id == 5 &&
+                    s.Granularity == Domain.Granularity.Day &&
+                    s.DataType == Domain.DataType.Decimal &&
+                    s.Path.ToString().Equals("path")))).Returns(new ShadowMissingValuePolicyDecimal()).Returns(new ShadowMissingValuePolicyDecimal());
+
+                signalsWebService.SetMissingValuePolicy(signal.Id.Value, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Decimal,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        Id = 5,
+                        DataType = Dto.DataType.Decimal,
+                        Granularity = Dto.Granularity.Day,
+                        Path = new Dto.Path() { Components = new[] {"path"} }
+                    }
+                });
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenSettingShadowMVP_IfChosenShadowSignalHasItsShadowSignalEqualToFirstSignal_ArgumentExceptionIsThrown()
+            {
+                var signal2 = new Domain.Signal()
+                {
+                    Id = 7,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Month,
+                    Path = Domain.Path.FromString("path/2")
+                };
+                GivenASignal(signal2);
+                var signal1 = new Dto.Signal()
+                {
+                    Id = 6,
+                    DataType = Dto.DataType.Integer,
+                    Granularity = Dto.Granularity.Month,
+                    Path = new Dto.Path()
+                    {
+                        Components = new[] {"path", "1"}
+                    }
+                };
+
+                missingValuePolicyRepositoryMock.SetupSequence(mvprm => mvprm.Get(It.Is<Domain.Signal>(s => s.Id == 6 &&
+                    s.Granularity == Domain.Granularity.Month &&
+                    s.DataType == Domain.DataType.Integer &&
+                    s.Path.ToString().Equals("path/1")))).Returns(new ShadowMissingValuePolicyInteger()
+                    {
+                        ShadowSignal = signal2
+                    }).Returns(new ShadowMissingValuePolicyInteger()
+                    {
+                        ShadowSignal = signal2
+                    });
+
+                signalsWebService.SetMissingValuePolicy(signal2.Id.Value, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Integer,
+                    ShadowSignal = signal1 
+                });
+            }
+
             private Signal GetDefaultSignal_IntegerMonth()
             {
                 return new Signal()
