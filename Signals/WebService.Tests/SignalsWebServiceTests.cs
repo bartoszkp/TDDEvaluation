@@ -1371,13 +1371,27 @@ namespace WebService.Tests
                 GivenMissingValuePolicy(signalId, policy);
 
                 signalsWebService.GetData(signalId, fromDate, toDate);
-
             }
 
             [TestMethod]
             public void GivenASignalWithNoDataAndSpecificValueMVP_WhenGettingDataUsingTheSameDate_ReturnsDatumAccordingToSVMVP()
             {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Month, Path.FromString("root/signal")));
 
+                var mvp = new SpecificValueMissingValuePolicyDouble()
+                {
+                    Quality = Quality.Bad,
+                    Value = 3.0
+                };
+                GivenMissingValuePolicy(signalId, mvp);
+
+                var date = new DateTime(2000, 2, 1);
+                var result = signalsWebService.GetData(signalId, date, date).ToArray();
+
+                Assert.AreEqual(1, result.Length);
+                Assert.AreEqual(mvp.Quality.ToDto<Dto.Quality>(), result[0].Quality);
+                Assert.AreEqual(mvp.Value, result[0].Value);
             }
 
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
@@ -1394,7 +1408,6 @@ namespace WebService.Tests
                         .Setup(sr => sr.Get(existingSignal.Path))
                         .Returns(existingSignal);
                 }
-
             }
 
             private void GivenDatum<T>(int signalId, DateTime fromDate, DateTime toDate, IEnumerable<Datum<T>> datum = null)
