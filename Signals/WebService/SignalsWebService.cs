@@ -86,6 +86,11 @@ namespace WebService
             throw new NotSupportedException("Type is not supported");
         }
 
+        public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<Datum> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var enumerable = signalsDomainService.GetData<T>(signalId, fromIncludedUtc, toExcludedUtc);
@@ -141,7 +146,5 @@ namespace WebService
             var policyDomain = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             signalsDomainService.SetMissingValuePolicyBase(signalId, policyDomain);
         }
-
-
     }
 }
