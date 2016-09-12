@@ -44,6 +44,34 @@ namespace WebService.Tests
             signalsWebService.SetMissingValuePolicy(signal.Id.Value, shadowMVP);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void WhenSettingShadowMVP_WithNoMatchingGranularity_ThrowsException()
+        {
+            var signal = new Domain.Signal()
+            {
+                Id = 243,
+                DataType = Domain.DataType.Boolean,
+                Granularity = Domain.Granularity.Day
+            };
+
+            var shadowMVP = new ShadowMissingValuePolicy()
+            {
+                DataType = Dto.DataType.Boolean,
+                ShadowSignal = new Dto.Signal()
+                {
+                    Id = 5234,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Year
+                }
+            };
+
+            setupWebService();
+            setupGet(signal);
+
+            signalsWebService.SetMissingValuePolicy(signal.Id.Value, shadowMVP);
+        }
+
         private void setupWebService()
         {
             var signalsDomainService = new SignalsDomainService(
