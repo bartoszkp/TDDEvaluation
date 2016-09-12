@@ -200,7 +200,7 @@ namespace Domain.Services.Implementation
                 var dataNewer = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUtc, 1);
                 if ((dataOlder == null) || (dataOlder.Count() == 0))
                 {
-                    if (result.First(x => x.Timestamp == fromIncludedUtc) == null)
+                    if (result.FirstOrDefault(x => x.Timestamp == fromIncludedUtc) == null)
                     {
                         datumsFirst.Add(new Datum<T>()
                         {
@@ -218,7 +218,7 @@ namespace Domain.Services.Implementation
                 else
                 if ((dataNewer == null) || (dataNewer.Count() == 0))
                 {
-                    if (result.First(x => x.Timestamp == fromIncludedUtc) == null)
+                    if (result.FirstOrDefault(x => x.Timestamp == fromIncludedUtc) == null)
                     {
                         datumsFirst.Add(new Datum<T>()
                         {
