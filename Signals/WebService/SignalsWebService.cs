@@ -90,6 +90,28 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            var signal = GetById(signalId);
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    break;
+
+                case DataType.Decimal:
+                    var result1 = signalsDomainService.GetCoarseData<decimal>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc);
+                    return result1.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Double:
+                    var result2 = signalsDomainService.GetCoarseData<double>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc);
+                    return result2.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Integer:
+                    var result3 = signalsDomainService.GetCoarseData<int>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc);
+                    return result3.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.String:
+                    break;
+            } 
+
             throw new NotImplementedException();
         }
 

@@ -288,6 +288,14 @@ namespace Domain.Services.Implementation
             }
         }
 
+        public IEnumerable<Datum<T>> GetCoarseData<T>(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = GetById(signalId);
 
+            if (signal.Granularity >= granularity)
+                throw new Domain.Exceptions.GetCoarseDataBadGranularityException();
+
+            throw new NotImplementedException();
+        }
     }
 }
