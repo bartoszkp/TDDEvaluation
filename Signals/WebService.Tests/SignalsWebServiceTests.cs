@@ -9,6 +9,8 @@ using Moq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Domain.Exceptions;
+using DataAccess.GenericInstantiations;
 
 namespace WebService.Tests
 {
@@ -751,7 +753,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(System.Reflection.TargetInvocationException))]
+            [ExpectedException(typeof(IncorrectShadowSignalException))]
             public void GivenASignal_WhenSettingShadowMVPWithInvalidShadowSignal_ExpectedException()
             {
                 GivenASignal(SignalWith(1, DataType.Boolean, Granularity.Month, Path.FromString("a/b")));
@@ -805,6 +807,35 @@ namespace WebService.Tests
                     new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 2, 1), Value = default(double) },
                     new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 3, 1), Value = 2.5 },
                 }));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectShadowSignalException))]
+            public void GivenASignalsWithShadowMissingValuePolicy_WhenSettingMissingValuePolicy_ThrowsIncorrectShadowSignalException()
+            {
+                GivenNoSignals();
+
+                Signal[] signals = new Signal[3];
+
+                for (int i = 0; i < 3; i++)
+                {
+                    signals[i] = SignalWith(1, DataType.Double, Granularity.Month, Path.FromString("x/y" + i));
+                }
+                for (int i = 0; i < 3; i++)
+                { 
+                    signalsRepositoryMock.Setup(x => x.Get(signals[i].Id.Value)).Returns(signals[i]);
+
+                    var signalMvp = new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                    {
+                        ShadowSignal = signals[i + 1 > 2 ? i + 1 - 3 : i + 1].ToDto<Dto.Signal>(),
+                        Signal = signals[i].ToDto<Dto.Signal>(),
+                        DataType = Dto.DataType.Double
+                    };
+
+                    SetupMissingValuePolicyMock(signals[i], signalMvp.ToDomain<ShadowMissingValuePolicy<double>>());
+
+                    signalsWebService.SetMissingValuePolicy(signals[i].Id.Value, signalMvp);
+                }
             }
 
             private bool CompareDatum(IEnumerable<Dto.Datum> datum1, IEnumerable<Dto.Datum> datum2)

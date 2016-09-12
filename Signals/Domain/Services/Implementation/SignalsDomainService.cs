@@ -6,6 +6,7 @@ using Domain.Infrastructure;
 using Domain.MissingValuePolicy;
 using Domain.Repositories;
 using Mapster;
+using System.Reflection;
 
 namespace Domain.Services.Implementation
 {
@@ -54,19 +55,19 @@ namespace Domain.Services.Implementation
 
         public void CheckShadowMVP<T>(Signal signal, MissingValuePolicyBase domainMissingValuePolicy)
         {
-            if (domainMissingValuePolicy is ShadowMissingValuePolicy<T> == false) return;
+            if (!(domainMissingValuePolicy is ShadowMissingValuePolicy<T>)) return;
 
             var mvp = domainMissingValuePolicy as ShadowMissingValuePolicy<T>;
 
             if (signal.DataType != mvp.ShadowSignal.DataType ||
                 signal.Granularity != mvp.ShadowSignal.Granularity)
-                throw new Exception("ShadowSignal doesnt meet signal criteria.");
+                throw new IncorrectShadowSignalException();
 
             if (mvp != null && mvp.ShadowSignal != null)
             {
                 var shadowMvp = missingValuePolicyRepository.Get(mvp.ShadowSignal);
                 if(shadowMvp is ShadowMissingValuePolicy<T>)
-                    throw new Exception("ShadowSignal doesnt meet signal criteria.");
+                    throw new IncorrectShadowSignalException();
             }
         }
 
@@ -75,11 +76,17 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new ArgumentException("no signal with this id");
 
-            var method = typeof(SignalsDomainService)
+            try
+            {
+                typeof(SignalsDomainService)
                 .GetMethod("CheckShadowMVP")
-                .MakeGenericMethod(signal.DataType.GetNativeType())
+                .MakeGenericMethod(DataTypeUtils.GetNativeType(signal.DataType))
                 .Invoke(this, new object[] { signal, domainMissingValuePolicy });
-
+            }
+            catch (TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
             missingValuePolicyRepository.Set(signal, domainMissingValuePolicy);
         }
 
