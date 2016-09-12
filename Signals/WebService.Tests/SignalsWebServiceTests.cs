@@ -1600,6 +1600,23 @@ namespace WebService.Tests
                     new DateTime(2016, 1, 3), new DateTime(2016, 1, 23));
             }
 
+            [ExpectedException(typeof(Domain.Exceptions.BadDataTypeException))]
+            [TestMethod]
+            public void GivenAStringSignal_WhenGettingCoarseData_ThrowsAnException()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.String,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                SetupGetData(existingSignal, null, new DateTime(), new DateTime());
+
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week,
+                    new DateTime(), new DateTime());
+            }
+
             private void SetupGetData(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
