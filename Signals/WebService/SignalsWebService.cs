@@ -94,7 +94,7 @@ namespace WebService
             switch (signal.DataType)
             {
                 case DataType.Boolean:
-                    break;
+                    throw new Domain.Exceptions.BadDataTypeException();
 
                 case DataType.Decimal:
                     var result1 = signalsDomainService.GetCoarseData<decimal>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc);
@@ -109,7 +109,7 @@ namespace WebService
                     return result3.ToDto<IEnumerable<Dto.Datum>>();
 
                 case DataType.String:
-                    break;
+                    throw new Domain.Exceptions.BadDataTypeException();
             }
 
             throw new NotImplementedException();
