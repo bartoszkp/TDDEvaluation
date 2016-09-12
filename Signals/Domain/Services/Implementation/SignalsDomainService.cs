@@ -500,8 +500,9 @@ namespace Domain.Services.Implementation
                 var data = GetData<T>(signal, beginRange, timeIterator);
                 dynamic value = data.Average(d => (dynamic)d.Value);
                 value = Convert.ChangeType(value, typeof(T));
+                var quality = SelectWorstQualityFromRange(data.Select(d => d.Quality));
 
-                result.Add(new Datum<T>() { Value = value });
+                result.Add(new Datum<T>() { Value = value, Quality = quality });
             }
 
             return result;

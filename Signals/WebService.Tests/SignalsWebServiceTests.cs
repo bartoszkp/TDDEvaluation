@@ -1996,8 +1996,8 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(id, Dto.Granularity.Week, dateFrom, dateTo);
 
                 Assert.AreEqual(2, result.Count());
-                Assert.AreEqual(Quality.Bad, result.First().Quality);
-                Assert.AreEqual(Quality.None, result.Skip(1).First().Quality);
+                Assert.AreEqual(Dto.Quality.Bad, result.First().Quality);
+                Assert.AreEqual(Dto.Quality.None, result.Skip(1).First().Quality);
             }
 
             private void DeleteASignal(int id)
