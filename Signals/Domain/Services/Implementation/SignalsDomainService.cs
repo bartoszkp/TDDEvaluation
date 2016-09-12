@@ -314,7 +314,9 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            // TODO: String/Bool check
+            if (signal.DataType == DataType.String || signal.DataType == DataType.Boolean)
+                throw new InvalidDataType();
+
             if ((int)signal.Granularity >= (int)granularity)
                 throw new Exception("Given granularity has to be lower than singal.");
 

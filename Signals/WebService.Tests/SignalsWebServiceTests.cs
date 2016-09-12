@@ -1361,14 +1361,21 @@ namespace WebService.Tests
                     signalsWebService.GetCoarseData(signal_str, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1));
                     Assert.Fail();
                 }
-                catch (InvalidDataType) { }
+                catch (Exception ex) {
+                    if (ex.InnerException.GetType() != typeof(InvalidDataType))
+                        Assert.Fail();
+                }
 
                 try
                 {
                     signalsWebService.GetCoarseData(signal_bool, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1));
                     Assert.Fail();
                 }
-                catch (InvalidDataType) { }
+                catch (Exception ex)
+                {
+                    if (ex.InnerException.GetType() != typeof(InvalidDataType))
+                        Assert.Fail();
+                }
             }
 
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
