@@ -489,8 +489,22 @@ namespace Domain.Services.Implementation
                 return new List<Datum<T>>() { new Datum<T>() { Value = value, Quality = quality } };
             }
 
+            var result = new List<Datum<T>>();
+            var timeIterator = fromIncludedUtc;
 
-            return new List<Datum<T>>() { Datum<T>.CreateNone(signal, fromIncludedUtc) };
+            while(timeIterator < toExcludedUtc)
+            {
+                var beginRange = timeIterator;
+                AddTimeBasedOnGranulatity(granularity, ref timeIterator);
+
+                var data = GetData<T>(signal, beginRange, timeIterator);
+                dynamic value = data.Average(d => (dynamic)d.Value);
+                value = Convert.ChangeType(value, typeof(T));
+
+                result.Add(new Datum<T>() { Value = value });
+            }
+
+            return result;
         }
     }
 }

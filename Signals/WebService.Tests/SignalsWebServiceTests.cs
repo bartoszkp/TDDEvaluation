@@ -1936,6 +1936,38 @@ namespace WebService.Tests
                 Assert.AreEqual(Dto.Quality.Bad, result.Single().Quality);
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingCoarseData_ReturnsAveragesFromRanges()
+            {
+                SetupWebService();
+                int id = 6;
+
+                DateTime dateFrom = new DateTime(2000, 5, 1);
+                DateTime dateTo = new DateTime(2000, 5, 15);
+
+                var signal = SignalWith(DataType.Integer, Granularity.Day, Path.FromString("root/signalInt"), id);
+
+                var dataReturned = new Domain.Datum<int>[]
+                {
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2000, 5, 1), Value = (int)2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 2), Value = (int)0 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 3), Value = (int)3 },
+                    new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 5, 4), Value = (int)5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 5), Value = (int)3 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 6), Value = (int)4 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 7), Value = (int)4 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 5, 8), Value = (int)28 },
+                };
+
+                SetupRepositoryMocks_GetData_ReturnsData_WithinTime<int>(id, signal, dateFrom, dateTo, dataReturned);
+
+                var result = signalsWebService.GetCoarseData(id, Dto.Granularity.Week, dateFrom, dateTo);
+
+                Assert.AreEqual(2, result.Count());
+                Assert.AreEqual(3, result.First().Value);
+                Assert.AreEqual(4, result.Skip(1).First().Value);
+            }
+
             private void DeleteASignal(int id)
             {
 
@@ -2086,7 +2118,7 @@ namespace WebService.Tests
                 signalsRepositoryMock.Setup(srm => srm.Get(id)).Returns(signal);
 
                 signalsDataRepositoryMock.Setup(sdrm => sdrm.GetData<T>(It.Is<Signal>(s => s.Id == id), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(dataReturned.Where(d => (d.Timestamp >= fromIncludedUtc && d.Timestamp < toExcludedUtc) || (fromIncludedUtc == toExcludedUtc && d.Timestamp == fromIncludedUtc)));
+                    .Returns<Signal, DateTime, DateTime>((s,f,t) => dataReturned.Where(d => (d.Timestamp >= f && d.Timestamp < t) || (t == f && d.Timestamp == f)));
             }
 
             private void VerifyGetDataCallOnSignalsDataRepositoryMock<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
