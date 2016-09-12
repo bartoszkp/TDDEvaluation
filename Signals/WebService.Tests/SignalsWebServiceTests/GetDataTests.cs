@@ -547,7 +547,7 @@ namespace WebService.Tests.SignalsWebServiceTests
         }
 
         [TestMethod]
-        public void GivenASignal_GetDataWithShadowMVPWithDatum_ReturnsDatum()
+        public void GivenASignalBoolean_GetDataWithShadowMVPWithDatum_ReturnsDatum()
         {
             int shadowSignalId = 3;
             int signalId = 5;
@@ -578,6 +578,49 @@ namespace WebService.Tests.SignalsWebServiceTests
                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 3, 1), Value = false},
                   new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2016, 4, 1), Value = false },
                   new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 5, 1), Value = false },
+                           };
+
+
+            Assert.IsTrue(Utils.CompareDatum(expected, result));
+
+        }
+        [TestMethod]
+        public void GivenASignalInt_GetDataWithShadowMVPWithDatum_ReturnsDatum()
+        {
+            int shadowSignalId = 3;
+            int signalId = 5;
+            Signal signal = Utils.SignalWith(signalId, Domain.DataType.Integer, Domain.Granularity.Year);
+            Signal shadowSignal = Utils.SignalWith(shadowSignalId, Domain.DataType.Integer, Domain.Granularity.Year);
+            SetupGet(signal);
+            SetupGet(shadowSignal);
+            SetupMVPGet(new ShadowMissingValuePolicyInteger() { ShadowSignal = shadowSignal });
+
+            var shadowDatum = new[] {
+               new Domain.Datum<int> {Quality = Domain.Quality.None, Timestamp = new DateTime(2016,1,1), Value = 1 },
+               new Domain.Datum<int> {Quality = Domain.Quality.Fair, Timestamp = new DateTime(2017,1,1), Value = 2 },
+               new Domain.Datum<int> {Quality = Domain.Quality.None, Timestamp = new DateTime(2018,1,1), Value = 3 },
+               new Domain.Datum<int> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2019,1,1), Value = default(int) },
+               new Domain.Datum<int> {Quality = Domain.Quality.Bad, Timestamp = new DateTime(2021,1,1), Value = 5 },
+               new Domain.Datum<int> {Quality = Domain.Quality.Poor, Timestamp = new DateTime(2022,1,1), Value = 6 },
+               new Domain.Datum<int> {Quality = Domain.Quality.None, Timestamp = new DateTime(2023,1,1), Value = 7 },
+            };
+            var datum = new Domain.Datum<int>[] {
+                      new Domain.Datum<int> {Quality = Domain.Quality.Good, Timestamp = new DateTime(2020,1,1), Value = -5 },
+            };
+
+            SetupGetData<int>(shadowDatum, shadowSignal);
+            SetupGetData<int>(datum, signal);
+            var result = signalsWebService.GetData(signalId, new DateTime(2016, 1, 1), new DateTime(2024, 1, 1)).ToArray();
+
+            var expected = new[] {
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 1), Value = 1 },
+                  new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2017, 1, 1), Value = 2 },
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2018, 1, 1), Value = 3},
+                  new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2019, 1, 1), Value = default(int) },
+                  new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2020, 1, 1), Value = -5 },
+                  new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2021, 1, 1), Value = 5 },
+                  new Dto.Datum() { Quality = Dto.Quality.Poor, Timestamp = new DateTime(2022, 1, 1), Value = 6 },
+                  new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2023, 1, 1), Value = 7 },
                            };
 
 
