@@ -1348,6 +1348,29 @@ namespace WebService.Tests
                     }));
             }
 
+            [TestMethod]
+            public void GetCoarseData_WithInvalidDataType_ExpectedException()
+            {
+                int signal_str = 1, signal_bool = 2; 
+                GivenASignal(SignalWith(signal_str, DataType.String, Granularity.Day, Path.FromString("a")));
+                signalsRepositoryMock.Setup(f => f.Get(signal_bool))
+                    .Returns(SignalWith(signal_bool, DataType.Boolean, Granularity.Day, Path.FromString("b")));
+
+                try
+                {
+                    signalsWebService.GetCoarseData(signal_str, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1));
+                    Assert.Fail();
+                }
+                catch (InvalidDataType) { }
+
+                try
+                {
+                    signalsWebService.GetCoarseData(signal_bool, Dto.Granularity.Year, new DateTime(2000, 1, 1), new DateTime(2001, 1, 1));
+                    Assert.Fail();
+                }
+                catch (InvalidDataType) { }
+            }
+
             private void SetupSignalsRepoGetDataOlderThan_ReturnsDatum(IEnumerable<Datum<string>> givenDatums, int signalId)
             {
                 Datum<string> oneDatum = givenDatums.OrderBy(d => d.Timestamp).LastOrDefault();
