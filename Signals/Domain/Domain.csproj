@@ -69,6 +69,7 @@
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\SettingNotExistingSignalDataException.cs" />
     <Compile Include="Exceptions\SettingPolicyNotExistingSignalException.cs" />
+    <Compile Include="Exceptions\SettingShadowPolicyCreatesADependencyCycle.cs" />
     <Compile Include="Exceptions\ShadowSignalNotMatchingException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
