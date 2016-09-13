@@ -106,6 +106,8 @@ namespace WebService
             var signal = GetById(signalId);
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
+            if (granularity < signal.Granularity)
+                throw new InvalidCoarseGranularityException();
             
             var filledList = new List<Datum>();
             if (fromIncludedUtc > toExcludedUtc)
