@@ -106,8 +106,13 @@ namespace WebService
             var signal = GetById(signalId);
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
+            
+            var filledList = new List<Datum>();
+            if (fromIncludedUtc > toExcludedUtc)
+                return filledList;
 
-            throw new NotImplementedException();
+
+            return filledList;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
