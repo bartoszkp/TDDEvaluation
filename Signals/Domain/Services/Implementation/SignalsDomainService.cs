@@ -371,14 +371,10 @@ namespace Domain.Services.Implementation
         private void CheckArguments<T>(Granularity signalGranularity, Granularity argumentGranularity, 
             DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            VerifyTimeStamp(argumentGranularity, new Datum<T>()
-            {
-                Timestamp = fromIncludedUtc,
-            });
-            VerifyTimeStamp(argumentGranularity, new Datum<T>()
-            {
-                Timestamp = toExcludedUtc,
-            });
+            VerifyTimeStamp(argumentGranularity, new Datum<T>() { Timestamp = fromIncludedUtc, });
+            VerifyTimeStamp(argumentGranularity, new Datum<T>() { Timestamp = toExcludedUtc, });
+            VerifyTimeStamp(signalGranularity, new Datum<T>() { Timestamp = fromIncludedUtc, });
+            VerifyTimeStamp(signalGranularity, new Datum<T>() { Timestamp = toExcludedUtc, });
 
             if (signalGranularity >= argumentGranularity)
                 throw new Domain.Exceptions.GetCoarseDataBadGranularityException();
