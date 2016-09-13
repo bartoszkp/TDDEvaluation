@@ -174,7 +174,14 @@ namespace Domain.Services.Implementation
                     break;
             }
 
+            CheckIfSignalIsOwnShadow(missingValuePolicy, signal); //throws ArgumentException
+
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
+        }
+
+        private void CheckIfSignalIsOwnShadow(MissingValuePolicyBase missingValuePolicy, Signal signal)
+        {
+            throw new NotImplementedException();
         }
 
         public MissingValuePolicyBase Get(Signal signal)
