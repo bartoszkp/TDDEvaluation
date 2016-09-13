@@ -104,6 +104,7 @@ namespace WebService
                 throw new NoSuchSignalException("Could not get data for not existing signal");
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum>();
+            GranularityMatch(signal, granularity);
             return null;
         }
 
@@ -157,5 +158,34 @@ namespace WebService
             var domainPolicy = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             signalsDomainService.SetMissingValuePolicy(signalId, domainPolicy);
         }
+
+
+        public void GranularityMatch(Signal signal, Granularity granularity)
+        {
+            int valueSignalGranularity = SetValueToGranularity(signal.Granularity);
+            int valueGranularity = SetValueToGranularity(granularity);
+            if (valueGranularity > valueSignalGranularity)
+            {
+                throw new NoSuchGranularityException();
+            }
+        }
+
+        public int SetValueToGranularity(Granularity granularity)
+        {
+            int valueReturn = 0;
+            var choiseGranularity = new Dictionary<Granularity, Action>()
+            {
+                {Granularity.Second, ()=> valueReturn=0 },
+                {Granularity.Minute, ()=> valueReturn=1 },
+                {Granularity.Hour, ()=> valueReturn=2 },
+                {Granularity.Day, ()=> valueReturn=3 },
+                {Granularity.Week, ()=> valueReturn=4 },
+                {Granularity.Month, ()=> valueReturn=5 },
+                {Granularity.Year, ()=> valueReturn=6 }
+            };
+            choiseGranularity[granularity].Invoke();
+            return valueReturn;
+        }
+
     }
 }

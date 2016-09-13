@@ -378,6 +378,7 @@ namespace WebService.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(NoSuchGranularityException))]
         public void GivenASignal_GetCoarseDataWhenGranularityGreaterThanSignalGranularity_ThrowsException()
         {
             var signal = new Signal()
