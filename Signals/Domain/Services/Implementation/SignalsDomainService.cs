@@ -288,6 +288,24 @@ namespace Domain.Services.Implementation
             if (smvp.ShadowSignal.Granularity != signal.Granularity
                 || smvp.ShadowSignal.DataType != signal.DataType)
                 throw new ShadowSignalNotCorrectlyException();
+            if (smvp.Signal == signal)
+                throw new InvalidOperationException("Dependency cycle exception. Signal can't be shadow for itself");
+
+            List<int> listofDependencyId = new List<int>();
+            listofDependencyId.Add(signal.Id.Value);
+            listofDependencyId.Add(smvp.ShadowSignal.Id.Value);
+
+            MissingValuePolicyBase signalmvpb = GetMissingValuePolicy(smvp.ShadowSignal);
+
+            while (signalmvpb.GetType() == typeof(ShadowMissingValuePolicy<T>))
+            {
+                if (listofDependencyId.Contains(((ShadowMissingValuePolicy<T>)signalmvpb).ShadowSignal.Id.Value))
+                    throw new InvalidOperationException("Dependency cycle exception.");
+                else
+                    listofDependencyId.Add(((ShadowMissingValuePolicy<T>)signalmvpb).ShadowSignal.Id.Value);
+
+                signalmvpb = GetMissingValuePolicy(((ShadowMissingValuePolicy<T>)signalmvpb).ShadowSignal);
+            }
         }
     }
 }
