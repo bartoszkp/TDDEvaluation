@@ -99,7 +99,12 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new NoSuchSignalException("Could not get data for not existing signal");
+
+            return null;
+
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
