@@ -393,5 +393,18 @@ namespace Domain.Services.Implementation
                 case DataType.String: signalsDataRepository.DeleteData<string>(signal); break;
             }
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var signal = GetById(signalId);
+
+            if (signal.Granularity >= granularity)
+                throw new ArgumentException("The granularity for coarse data has to be smaller than signal's granularity.");
+
+            if (!IsTimestampRegular(granularity, fromIncludedUtc))
+                throw new IncorrectTimestampException();
+
+            return default(IEnumerable<Datum<T>>);
+        }
     }
 }

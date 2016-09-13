@@ -79,9 +79,17 @@ namespace WebService
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = signalsDomainService.GetById(signalId);
-            if (signal.Granularity >= granularity.ToDomain<Domain.Granularity>())
-                throw new ArgumentException("The granularity for coarse data has to be smaller than signal's granularity.");
-            else return default(IEnumerable<Datum>);
+
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Boolean: return signalsDomainService.GetCoarseData<bool>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Integer: return signalsDomainService.GetCoarseData<int>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Double: return signalsDomainService.GetCoarseData<double>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Decimal: return signalsDomainService.GetCoarseData<decimal>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.String: return signalsDomainService.GetCoarseData<string>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
+                default:
+                    return default(IEnumerable<Datum>);
+            }
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
