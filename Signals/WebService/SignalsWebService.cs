@@ -82,7 +82,7 @@ namespace WebService
 
             switch (signal.DataType)
             {
-                case Domain.DataType.Boolean: return signalsDomainService.GetCoarseData<bool>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Boolean: throw new ArgumentException("Cannot get coarse data on a signal of this type.");
                 case Domain.DataType.Integer: return signalsDomainService.GetCoarseData<int>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
                 case Domain.DataType.Double: return signalsDomainService.GetCoarseData<double>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
                 case Domain.DataType.Decimal: return signalsDomainService.GetCoarseData<decimal>(signalId, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList();
