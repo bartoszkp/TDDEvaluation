@@ -154,12 +154,21 @@ namespace Domain.Services.Implementation
                 CheckIfSignalIsOwnShadow<T>(missingValuePolicy, signal); //throws ArgumentException
             }
 
-            missingValuePolicyRepository.Set(signal, missingValuePolicy);
+            missingValuePolicyRepository?.Set(signal, missingValuePolicy);
         }
 
         private void CheckIfSignalIsOwnShadow<T>(MissingValuePolicyBase missingValuePolicy, Signal signal)
         {
-            throw new NotImplementedException();
+            var shadowMvp = missingValuePolicy as ShadowMissingValuePolicy<T>;
+            var shadowSignal = shadowMvp.ShadowSignal;
+            AreSignalsTheSame(signal, shadowSignal);
+        }
+
+        private bool AreSignalsTheSame(Signal signal1, Signal signal2)
+        {
+            return (signal1.DataType == signal2.DataType)
+                && (signal1.Granularity == signal2.Granularity)
+                && Enumerable.SequenceEqual(signal1.Path.Components.ToArray(), signal2.Path.Components.ToArray());
         }
 
         public MissingValuePolicyBase Get(Signal signal)
