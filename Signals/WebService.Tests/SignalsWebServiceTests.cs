@@ -1164,6 +1164,23 @@ namespace WebService.Tests
                 Assert.AreEqual(4, d.Value);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(NotSupportedException))]
+            public void WhenGettingCoarseDataWithNotSupportedDataType_ThrowsException()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 785,
+                    DataType = Domain.DataType.String,
+                    Granularity = Domain.Granularity.Day
+                };
+
+                SetupGetCoarseData<string>(signal, null);
+
+                signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 11));
+
+            }
+
 
             private void SetupGetCoarseData<T>(Domain.Signal signal, Domain.Datum<T>[] data)
             {
