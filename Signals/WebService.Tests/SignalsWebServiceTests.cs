@@ -1443,7 +1443,23 @@ namespace WebService.Tests
                 int signalId = 1;
                 GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
 
-                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Second, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));                
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Second, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(InvalidSignalTypeException))]
+            public void GivenBooleanAndStringSignals_GettingCoarseData_ThrowsInvalidSignalTypeException()
+            {
+                int id1 = 1, id2 = 2;
+                var signals = new Signal[]
+                {
+                    SignalWith(id1, DataType.String, Granularity.Day, Path.FromString("root/str")),
+                    SignalWith(id2, DataType.Boolean, Granularity.Day, Path.FromString("root/bool")),
+                };
+                GivenExisitingSignals(signals);
+
+                signalsWebService.GetCoarseData(id1, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
+                signalsWebService.GetCoarseData(id2, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
             }
 
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
