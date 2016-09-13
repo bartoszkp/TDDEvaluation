@@ -1422,7 +1422,7 @@ namespace WebService.Tests
             public void GivenNoSignals_GettingCoarseData_ThrowsSignalNotFoundException()
             {
                 GivenNoSignals();
-                signalsWebService.GetCoarseData(10, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 31));
+                signalsWebService.GetCoarseData(10, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
             }
 
             [TestMethod]
@@ -1431,7 +1431,7 @@ namespace WebService.Tests
                 int signalId = 1;
                 GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
 
-                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Month, new DateTime(2000, 1, 10), new DateTime(2000, 1, 31));
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Month, new DateTime(2000, 1, 10), new DateTime(2000, 1, 3));
 
                 Assert.AreEqual(0, result.Count());
             }
@@ -1443,7 +1443,7 @@ namespace WebService.Tests
                 int signalId = 1;
                 GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
 
-                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Second, new DateTime(2000, 1, 1), new DateTime(2000, 1, 31));
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Second, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
             }
 
             [TestMethod]
@@ -1458,18 +1458,8 @@ namespace WebService.Tests
                 };
                 GivenExisitingSignals(signals);
 
-                signalsWebService.GetCoarseData(id1, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 31));
-                signalsWebService.GetCoarseData(id2, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 31));
-            }
-
-            [TestMethod]
-            [ExpectedException(typeof(InvalidCoarseGranularityException))]
-            public void GivenASignal_GettingCoarseDataWithIrregularPeriods_ThrowsException()
-            {
-                int signalId = 1;
-                GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
-
-                signalsWebService.GetCoarseData(1, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
+                signalsWebService.GetCoarseData(id1, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
+                signalsWebService.GetCoarseData(id2, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
             }
 
             private void GivenExisitingSignals(IEnumerable<Signal> signals)

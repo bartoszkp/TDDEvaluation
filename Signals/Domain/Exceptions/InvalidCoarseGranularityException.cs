@@ -9,7 +9,7 @@ namespace Domain.Exceptions
     public class InvalidCoarseGranularityException : Exception
     {
         public InvalidCoarseGranularityException() : 
-            base("Tried to get coarse data for granularity that is smaller than signal's using an irregular time period.")
+            base("Tried to get coarse data for granularity that is smaller than signal's.")
         {
 
         }
