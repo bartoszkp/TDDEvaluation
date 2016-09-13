@@ -155,7 +155,45 @@ namespace Domain.Services.Implementation
 
         public void SetMissingValuePolicy(Signal exampleSignal, MissingValuePolicyBase policy)
         {
+            if (CheckShadowPolicyInCaseDependencyCycle(exampleSignal, policy))
+                throw new SettingShadowPolicyCreatesADependencyCycle();
+
             this.missingValuePolicyRepository.Set(exampleSignal, policy);
+        }
+
+        private bool CheckShadowPolicyInCaseDependencyCycle(Signal exampleSignal, MissingValuePolicyBase policy)
+        {
+            if (policy.GetType() == typeof(Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>))
+                return CheckShadowPolicyInCaseDependencyCycleGeneric<bool>(exampleSignal, (Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>)policy);
+            else if (policy.GetType() == typeof(Domain.MissingValuePolicy.ShadowMissingValuePolicy<int>))
+                return CheckShadowPolicyInCaseDependencyCycleGeneric<int>(exampleSignal, (Domain.MissingValuePolicy.ShadowMissingValuePolicy<int>)policy);
+            else if (policy.GetType() == typeof(Domain.MissingValuePolicy.ShadowMissingValuePolicy<double>))
+                return CheckShadowPolicyInCaseDependencyCycleGeneric<double>(exampleSignal, (Domain.MissingValuePolicy.ShadowMissingValuePolicy<double>)policy);
+            else if (policy.GetType() == typeof(Domain.MissingValuePolicy.ShadowMissingValuePolicy<decimal>))
+                return CheckShadowPolicyInCaseDependencyCycleGeneric<decimal>(exampleSignal, (Domain.MissingValuePolicy.ShadowMissingValuePolicy<decimal>)policy);
+            else if (policy.GetType() == typeof(Domain.MissingValuePolicy.ShadowMissingValuePolicy<string>))
+                return CheckShadowPolicyInCaseDependencyCycleGeneric<string>(exampleSignal, (Domain.MissingValuePolicy.ShadowMissingValuePolicy<string>)policy);
+
+            return false;
+        }
+
+        private bool CheckShadowPolicyInCaseDependencyCycleGeneric<T>(Signal actualSignal, ShadowMissingValuePolicy<T> shadowPolicy)
+        {
+            var tmpPolicy = shadowPolicy;
+            while(true)
+            {
+                var signalToCheck = tmpPolicy.ShadowSignal;
+
+                if (signalToCheck.Id.Value == actualSignal.Id.Value)
+                    return true;
+                else
+                {
+                    tmpPolicy = (ShadowMissingValuePolicy<T>)missingValuePolicyRepository.Get(signalToCheck);
+
+                    if (tmpPolicy == null)
+                        return false;
+                }
+            }
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
