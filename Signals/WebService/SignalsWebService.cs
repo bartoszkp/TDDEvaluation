@@ -69,8 +69,32 @@ namespace WebService
             if (signal == null)
                 throw new NoSuchSignalException("Could not get data for not existing signal");
 
-            
-            return null;
+            var domainSignal = signal.ToDomain<Domain.Signal>();
+
+            switch (signal.DataType)
+            {
+                case DataType.Boolean:
+                    return signalsDomainService.GetData<bool>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Integer:
+                    return signalsDomainService.GetData<int>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Double:
+                    return signalsDomainService.GetData<double>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.Decimal:
+                    return signalsDomainService.GetData<decimal>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+
+                case DataType.String:
+                    return signalsDomainService.GetData<string>(domainSignal, fromIncludedUtc, toExcludedUtc)
+                        ?.ToDto<IEnumerable<Dto.Datum>>();
+                default:
+                    return null;
+            }
         }
 
         public IEnumerable<Datum> GetCoarseData<T>(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -78,33 +102,11 @@ namespace WebService
             var signal = GetById(signalId);
             if (signal == null)
                 throw new NoSuchSignalException("Could not get data for not existing signal");
-            var domainSignal = signal.ToDomain<Domain.Signal>();
-            var domainGranularity = granularity.ToDomain<Domain.Granularity>();
-            switch (signal.DataType)
+            if (fromIncludedUtc > toExcludedUtc)
             {
-                case DataType.Boolean:
-                    return signalsDomainService.GetCoarseData<bool>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc)
-                        ?.ToDto<IEnumerable<Dto.Datum>>();
-
-                case DataType.Integer:
-                    return signalsDomainService.GetCoarseData<int>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc)
-                        ?.ToDto<IEnumerable<Dto.Datum>>();
-
-                case DataType.Double:
-                    return signalsDomainService.GetCoarseData<double>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc)
-                        ?.ToDto<IEnumerable<Dto.Datum>>();
-
-                case DataType.Decimal:
-                    return signalsDomainService.GetCoarseData<decimal>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc)
-                        ?.ToDto<IEnumerable<Dto.Datum>>();
-
-                case DataType.String:
-                    return signalsDomainService.GetCoarseData<string>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc)
-                        ?.ToDto<IEnumerable<Dto.Datum>>();
-                default:
-                    return null;
+                return new List<Datum>();
             }
-
+            return null;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

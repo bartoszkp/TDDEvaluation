@@ -374,7 +374,7 @@ namespace WebService.Tests
 
             var result = signalsWebService.GetCoarseData<double>(1, Dto.Granularity.Day, new DateTime(2000, 2, 1), new DateTime(2000, 1, 1));
 
-            Assert.IsNull(result);
+            Assert.AreEqual(result.Count(),0);
         }
         private void GivenNoSignals()
         {
