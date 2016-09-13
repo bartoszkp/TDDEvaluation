@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\DatumTimestampException.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />
+    <Compile Include="Exceptions\IncompatibleShadowSignalException.cs" />
     <Compile Include="Exceptions\ShadowDependencyCycleException.cs" />
     <Compile Include="Exceptions\ZeroOrderMVPException.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />

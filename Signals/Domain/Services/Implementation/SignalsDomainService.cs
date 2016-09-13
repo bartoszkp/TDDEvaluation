@@ -144,127 +144,96 @@ namespace Domain.Services.Implementation
             }
 
             return filledData;          
-        }   
-        
-        private bool TimestampIsValid(DateTime tmp, Granularity g)
+        }  
+
+        public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
-            bool seconds = tmp.Millisecond == 0;
-            if (g == Granularity.Second)
-                return seconds;
-            bool minutes = seconds && tmp.Second == 0;
-            if (g == Granularity.Minute)
-                return minutes;
-            bool hours = minutes && tmp.Minute == 0;
-            if (g == Granularity.Hour)
-                return hours;
-            bool days = hours && tmp.Hour == 0;
-            if (g == Granularity.Day)
-                return days;
-            bool weeks = days && tmp.Day % 7 == 1;
-            if (g == Granularity.Week)
-                return weeks;
-            bool months = days && tmp.Day == 1;
-            if (g == Granularity.Month)
-                return months;
-            bool years = months && tmp.Month == 1;
-            if (g == Granularity.Year)
-                return years;
-
-            return false;
-        }      
-
-        private dynamic GetStep<T>(Signal signal, Datum<T> currentDatum, Datum<T> nextDatum)
-        {
-            int timeDifference = 0;
-            switch (signal.Granularity)
-            {
-                case Granularity.Second: timeDifference = nextDatum.Timestamp.Second - currentDatum.Timestamp.Second; break;
-                case Granularity.Minute: timeDifference = nextDatum.Timestamp.Minute - currentDatum.Timestamp.Minute; break;
-                case Granularity.Hour: timeDifference = nextDatum.Timestamp.Hour - currentDatum.Timestamp.Hour; break;
-                case Granularity.Day: timeDifference = nextDatum.Timestamp.Day - currentDatum.Timestamp.Day; break;
-                case Granularity.Week: timeDifference = (int)(nextDatum.Timestamp -currentDatum.Timestamp).TotalDays / 7; break;
-                case Granularity.Month: timeDifference = nextDatum.Timestamp.Month - currentDatum.Timestamp.Month; break;
-                case Granularity.Year: timeDifference = nextDatum.Timestamp.Year - currentDatum.Timestamp.Year; break;
-            }
-
-            var valuesDifference = (dynamic)nextDatum.Value - (dynamic)currentDatum.Value;
-            if (timeDifference == 0) timeDifference = 1;
-            return valuesDifference / timeDifference;
+            ShadowMVPHandling(signal, missingValuePolicy);
+            this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
-        private Datum<T> getNewerDatum<T>(Signal signal, DateTime to)
-        {
-            var datum = signalsDataRepository.GetData<T>(signal, to, to);
-            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataNewerThan<T>(signal, to, 1); }
-            return datum.FirstOrDefault();
-        }
-        private Datum<T> getOlderDatum<T>(Signal signal, DateTime from)
-        {
-            var datum = signalsDataRepository.GetData<T>(signal, from, from);
-            if (datum.Count() == 0) { datum = signalsDataRepository.GetDataOlderThan<T>(signal, from, 1); }
-            return datum.FirstOrDefault();
-        }
-
-        public void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy)
-        {
-            if (missingValuePolicy is ShadowMissingValuePolicy<bool> |
-                missingValuePolicy is ShadowMissingValuePolicy<int> |
-                missingValuePolicy is ShadowMissingValuePolicy<double> |
-                missingValuePolicy is ShadowMissingValuePolicy<decimal> |
-                missingValuePolicy is ShadowMissingValuePolicy<string> )
-            {
-                switch (signal.DataType)
-                {
-                    case DataType.Boolean:
-                        if (missingValuePolicy.NativeDataType == typeof(bool) &&
-                             (missingValuePolicy as ShadowMissingValuePolicy<bool>).ShadowSignal.DataType == signal.DataType &
-                             (missingValuePolicy as ShadowMissingValuePolicy<bool>).ShadowSignal.Granularity == signal.Granularity)
-                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
-                        else throw new ArgumentException();
-                       break;
-                    case DataType.Integer:
-                        if (missingValuePolicy.NativeDataType == typeof(int) &&
-                             (missingValuePolicy as ShadowMissingValuePolicy<int>).ShadowSignal.DataType == signal.DataType &
-                             (missingValuePolicy as ShadowMissingValuePolicy<int>).ShadowSignal.Granularity == signal.Granularity)
-                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
-                        else throw new ArgumentException();
-                        break;
-                    case DataType.Double:
-                        if (missingValuePolicy.NativeDataType == typeof(double) &&
-                             (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.DataType == signal.DataType &
-                             (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.Granularity == signal.Granularity)
-                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
-                        else throw new ArgumentException();
-                        break;
-                    case DataType.Decimal:
-                        if (missingValuePolicy.NativeDataType == typeof(decimal) &&
-                             (missingValuePolicy as ShadowMissingValuePolicy<decimal>).ShadowSignal.DataType == signal.DataType &
-                             (missingValuePolicy as ShadowMissingValuePolicy<decimal>).ShadowSignal.Granularity == signal.Granularity)
-                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
-                        else throw new ArgumentException();
-                        break;
-                    case DataType.String:
-                        if (missingValuePolicy.NativeDataType == typeof(string) &&
-                             (missingValuePolicy as ShadowMissingValuePolicy<string>).ShadowSignal.DataType == signal.DataType &
-                             (missingValuePolicy as ShadowMissingValuePolicy<string>).ShadowSignal.Granularity == signal.Granularity)
-                            missingValuePolicyRepository.Set(signal, missingValuePolicy);
-                        else throw new ArgumentException();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
-        }
-
-        public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
+        public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
         {
             var mvp = this.missingValuePolicyRepository.Get(signal);
             if (mvp == null)
                 return null;
 
             return TypeAdapter.Adapt(mvp, mvp.GetType(), mvp.GetType().BaseType)
-                as MissingValuePolicy.MissingValuePolicyBase;
+                as MissingValuePolicyBase;
+        }
+
+        private void ShadowMVPHandling(Signal signal, MissingValuePolicyBase missingValuePolicy)
+        {
+            if (missingValuePolicy is ShadowMissingValuePolicy<bool> |
+                missingValuePolicy is ShadowMissingValuePolicy<int> |
+                missingValuePolicy is ShadowMissingValuePolicy<double> |
+                missingValuePolicy is ShadowMissingValuePolicy<decimal> |
+                missingValuePolicy is ShadowMissingValuePolicy<string>)
+            {
+                switch (signal.DataType)
+                {
+                    case DataType.Boolean:
+                        if (missingValuePolicy.NativeDataType == typeof(bool) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<bool>).ShadowSignal.DataType == signal.DataType &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<bool>).ShadowSignal.Granularity == signal.Granularity &&
+                            ShadowDependencyCycleCheck(signal, missingValuePolicy as ShadowMissingValuePolicy<bool>))
+                            return;
+                        else throw new IncompatibleShadowSignalException();
+                    case DataType.Integer:
+                        if (missingValuePolicy.NativeDataType == typeof(int) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<int>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<int>).ShadowSignal.Granularity == signal.Granularity &&
+                            ShadowDependencyCycleCheck(signal, missingValuePolicy as ShadowMissingValuePolicy<int>))
+                            return;
+                        else throw new IncompatibleShadowSignalException();
+                    case DataType.Double:
+                        if (missingValuePolicy.NativeDataType == typeof(double) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<double>).ShadowSignal.Granularity == signal.Granularity &&
+                            ShadowDependencyCycleCheck(signal, missingValuePolicy as ShadowMissingValuePolicy<double>))
+                            return;
+                        else throw new IncompatibleShadowSignalException();                        
+                    case DataType.Decimal:
+                        if (missingValuePolicy.NativeDataType == typeof(decimal) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<decimal>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<decimal>).ShadowSignal.Granularity == signal.Granularity &&
+                            ShadowDependencyCycleCheck(signal, missingValuePolicy as ShadowMissingValuePolicy<decimal>))
+                            return;
+                        else throw new IncompatibleShadowSignalException();                        
+                    case DataType.String:
+                        if (missingValuePolicy.NativeDataType == typeof(string) &&
+                             (missingValuePolicy as ShadowMissingValuePolicy<string>).ShadowSignal.DataType == signal.DataType &
+                             (missingValuePolicy as ShadowMissingValuePolicy<string>).ShadowSignal.Granularity == signal.Granularity &&
+                            ShadowDependencyCycleCheck(signal, missingValuePolicy as ShadowMissingValuePolicy<string>))
+                            return;
+                        else throw new IncompatibleShadowSignalException();                        
+                    default:
+                        break;
+                }
+            }
+        }
+        private bool ShadowDependencyCycleCheck<T>(Signal signal, ShadowMissingValuePolicy<T> mvp)
+        {
+            List<int> ids = new List<int>();
+            int newId = signal.Id.Value;
+
+            ShadowMissingValuePolicy<T> temp_mvp = mvp;
+            while (temp_mvp != null)
+            {
+                if (temp_mvp.ShadowSignal != null)
+                    ids.Add(temp_mvp.ShadowSignal.Id.Value);
+                var shadowSignal = signalsRepository.Get(temp_mvp.ShadowSignal.Id.Value);
+
+                var next_mvp = missingValuePolicyRepository.Get(shadowSignal);
+                if (next_mvp == null || !(next_mvp is ShadowMissingValuePolicy<T>))
+                    break;
+                temp_mvp = next_mvp as ShadowMissingValuePolicy<T>;
+            }
+
+            if (ids.Contains(newId))
+                throw new ShadowDependencyCycleException();
+                        
+            return true;
         }
 
         private void SetDefaultMissingValuePolicy(Signal signal)
@@ -302,6 +271,51 @@ namespace Domain.Services.Implementation
                 default:
                     throw new NotImplementedException();
             }
-        }        
+        }
+        private bool TimestampIsValid(DateTime tmp, Granularity g)
+        {
+            bool seconds = tmp.Millisecond == 0;
+            if (g == Granularity.Second)
+                return seconds;
+            bool minutes = seconds && tmp.Second == 0;
+            if (g == Granularity.Minute)
+                return minutes;
+            bool hours = minutes && tmp.Minute == 0;
+            if (g == Granularity.Hour)
+                return hours;
+            bool days = hours && tmp.Hour == 0;
+            if (g == Granularity.Day)
+                return days;
+            bool weeks = days && tmp.Day % 7 == 1;
+            if (g == Granularity.Week)
+                return weeks;
+            bool months = days && tmp.Day == 1;
+            if (g == Granularity.Month)
+                return months;
+            bool years = months && tmp.Month == 1;
+            if (g == Granularity.Year)
+                return years;
+
+            return false;
+        }
+
+        private dynamic GetStep<T>(Signal signal, Datum<T> currentDatum, Datum<T> nextDatum)
+        {
+            int timeDifference = 0;
+            switch (signal.Granularity)
+            {
+                case Granularity.Second: timeDifference = nextDatum.Timestamp.Second - currentDatum.Timestamp.Second; break;
+                case Granularity.Minute: timeDifference = nextDatum.Timestamp.Minute - currentDatum.Timestamp.Minute; break;
+                case Granularity.Hour: timeDifference = nextDatum.Timestamp.Hour - currentDatum.Timestamp.Hour; break;
+                case Granularity.Day: timeDifference = nextDatum.Timestamp.Day - currentDatum.Timestamp.Day; break;
+                case Granularity.Week: timeDifference = (int)(nextDatum.Timestamp - currentDatum.Timestamp).TotalDays / 7; break;
+                case Granularity.Month: timeDifference = nextDatum.Timestamp.Month - currentDatum.Timestamp.Month; break;
+                case Granularity.Year: timeDifference = nextDatum.Timestamp.Year - currentDatum.Timestamp.Year; break;
+            }
+
+            var valuesDifference = (dynamic)nextDatum.Value - (dynamic)currentDatum.Value;
+            if (timeDifference == 0) timeDifference = 1;
+            return valuesDifference / timeDifference;
+        }
     }
 }

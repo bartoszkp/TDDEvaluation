@@ -1041,7 +1041,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(IncompatibleShadowSignalException))]
             public void GivenASignalWithGranularitySecondAndDatatypeBool_WhenAssigningToTheSignalSMVPWithSignalWithOtherGranularityAndOtherDatatype_ThrowedIsArgumentException()
             {
                 int signalId = 1;
@@ -1062,13 +1062,24 @@ namespace WebService.Tests
             public void GivenASignal_WhenAssigningToTheSignalSMVPWithSignalWithGranularityAndDatatypeSameAsInGivenSignal_CalledIsMVPRepositorySetMethod()
             {
                 int signalId = 1;
-                GivenASignal(SignalWith(signalId, DataType.Boolean, Granularity.Second, Domain.Path.FromString("root/s1")));
+                int shadowId = 2;                
+                var signals = new Signal[]
+                {
+                    SignalWith(signalId, DataType.Boolean, Granularity.Second, Domain.Path.FromString("root/s1")),
+                    SignalWith(shadowId, DataType.Boolean, Granularity.Second, Domain.Path.FromString("root/shadow"))
+                };
+                GivenExisitingSignals(signals);
+                GivenMissingValuePolicy(2, null);
 
-                signalsWebService.SetMissingValuePolicy(signalId,
-                    new Dto.MissingValuePolicy.ShadowMissingValuePolicy() { DataType = Dto.DataType.Boolean, ShadowSignal = new Dto.Signal() { DataType = Dto.DataType.Boolean, Granularity = Dto.Granularity.Second } });
+                var mvp = new ShadowMissingValuePolicy<bool>()
+                {
+                    Signal = signals[0],
+                    ShadowSignal = signals[1]
+                };
 
-                mvpRepositoryMock.Verify(mvpr => mvpr.Set(It.Is<Signal>((s => s.Id == signalId)),
-                    It.Is<ShadowMissingValuePolicy<bool>>(smvp => smvp.NativeDataType == typeof(bool) & smvp.ShadowSignal.DataType == DataType.Boolean & smvp.ShadowSignal.Granularity == Granularity.Second)));
+                signalsWebService.SetMissingValuePolicy(signalId, mvp.ToDto<Dto.MissingValuePolicy.ShadowMissingValuePolicy>());
+
+                mvpRepositoryMock.Verify(mvpr => mvpr.Set(It.Is<Signal>(s => s.Id == signalId), It.IsAny<ShadowMissingValuePolicy<bool>>()));
             }
 
             [TestMethod]
