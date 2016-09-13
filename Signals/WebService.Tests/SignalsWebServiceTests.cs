@@ -1652,6 +1652,23 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Day, new DateTime(), new DateTime());
             }
 
+            [TestMethod]
+            public void WhenGettingCoarseData_WithEmptyTimeStampRange_ReturnsEmptyData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Decimal,
+                    Granularity = Granularity.Day,
+                };
+
+                SetupGetData(existingSignal, null, new DateTime(2016, 9, 12), new DateTime(2016, 9, 5));
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, new DateTime(2016, 9, 12), 
+                    new DateTime(2016, 9, 5));
+
+                Assert.AreEqual(0, result.Count());
+            }
+
             private void SetupNoneMissingValuePolicyForGetCoarseData(Signal signal)
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
