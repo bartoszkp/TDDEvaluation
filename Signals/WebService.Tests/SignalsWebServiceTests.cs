@@ -1232,6 +1232,15 @@ namespace WebService.Tests
                 Assert.AreEqual(6, count);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectTimestampException))]
+            public void GivenASignal_WhenGettingCoarseData_IfDateIsInvalid_ThrowsException()
+            {
+                var dummyId = 1;
+                GivenASignal(SignalWith(dummyId, DataType.Decimal, Granularity.Hour, null));
+
+                signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Month, new DateTime(2000, 1, 5), new DateTime(2000, 2, 1));
+            }
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
