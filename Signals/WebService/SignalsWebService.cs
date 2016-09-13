@@ -63,23 +63,32 @@ namespace WebService
         public IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = GetById(signalId).ToDomain<Domain.Signal>();
-            if (signal == null) throw new ArgumentException("no signal with this id");
-
-            if (signal.DataType == Domain.DataType.Integer) return signalsDomainService.GetData<int>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
-            if (signal.DataType == Domain.DataType.Double) return signalsDomainService.GetData<double>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
-            if (signal.DataType == Domain.DataType.Decimal) return signalsDomainService.GetData<decimal>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
-            if (signal.DataType == Domain.DataType.Boolean) return signalsDomainService.GetData<bool>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
-            if (signal.DataType == Domain.DataType.String) return signalsDomainService.GetData<string>(signal, fromIncludedUtc, toExcludedUtc)?.ToDto<IEnumerable<Dto.Datum>>();
-
-            return null;
+            if (signal == null)
+            {
+                throw new CouldntGetASignalException();
+            }
+            try
+            {
+                return typeof(Domain.Services.Implementation.SignalsDomainService)
+                .GetMethod("GetData")
+                .MakeGenericMethod(Domain.Infrastructure.DataTypeUtils.GetNativeType(signal.DataType))
+                .Invoke(signalsDomainService, new object[] { signal, fromIncludedUtc, toExcludedUtc })
+                ?.ToDto<IEnumerable<Dto.Datum>>();
+            }
+            catch(TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
         }
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var signal = signalsDomainService.GetById(signalId);
             if (signal == null)
+            {
                 throw new CouldntGetASignalException();
-
+            }
+            
             object data;
             try
             {
@@ -99,55 +108,30 @@ namespace WebService
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             var signal = GetById(signalId).ToDomain<Domain.Signal>();
-            if (signal == null) throw new ArgumentException("no signals with this id");
-
-            if(signal.DataType == Domain.DataType.Integer)
+            if (signal == null)
             {
-                var domainData= data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumInteger>>().ToArray();
-                foreach (var x in domainData)
-                {
-                    x.Signal = signal;
-                }
-                signalsDomainService.SetData<int>(domainData);
+                throw new CouldntGetASignalException();
             }
 
-            if (signal.DataType == Domain.DataType.Double)
-            {
-                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumDouble>>().ToArray();
-                foreach (var x in domainData)
-                {
-                    x.Signal = signal;
-                }
-                signalsDomainService.SetData<double>(domainData);
+            switch(signal.DataType) {
+                case Domain.DataType.Integer:
+                    signalsDomainService.SetData<int>(signal, data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumInteger>>().ToArray());
+                    return;
+                case Domain.DataType.Double:
+                    signalsDomainService.SetData<double>(signal, data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumDouble>>().ToArray());
+                    return;
+                case Domain.DataType.Decimal:
+                    signalsDomainService.SetData<decimal>(signal, data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumDecimal>>().ToArray());
+                    return;
+                case Domain.DataType.Boolean:
+                    signalsDomainService.SetData<bool>(signal, data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumBoolean>>().ToArray());
+                    return;
+                case Domain.DataType.String:
+                    signalsDomainService.SetData<string>(signal, data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumString>>().ToArray());
+                    return;
+                default:
+                    throw new InvalidDataTypeException();
             }
-            if (signal.DataType == Domain.DataType.Decimal)
-            {
-                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumDecimal>>().ToArray();
-                foreach (var x in domainData)
-                {
-                    x.Signal = signal;
-                }
-                signalsDomainService.SetData<decimal>(domainData);
-            }
-            if (signal.DataType == Domain.DataType.Boolean)
-            {
-                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumBoolean>>().ToArray();
-                foreach (var x in domainData)
-                {
-                    x.Signal = signal;
-                }
-                signalsDomainService.SetData<bool>(domainData);
-            }
-            if (signal.DataType == Domain.DataType.String)
-            {
-                var domainData = data.ToDomain<IEnumerable<DataAccess.GenericInstantiations.DatumString>>().ToArray();
-                foreach (var x in domainData)
-                {
-                    x.Signal = signal;
-                }
-                signalsDomainService.SetData<string>(domainData);
-            }
-
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)

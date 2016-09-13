@@ -74,8 +74,10 @@ namespace Domain.Services.Implementation
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase domainMissingValuePolicy)
         {
             if (signal == null)
-                throw new ArgumentException("no signal with this id");
-
+            {
+                throw new CouldntGetASignalException();
+            }
+            
             try
             {
                 typeof(SignalsDomainService)
@@ -94,7 +96,7 @@ namespace Domain.Services.Implementation
         {
             if (signal == null)
             {
-                throw new ArgumentException("no signal with this id");
+                throw new CouldntGetASignalException();
             }
             var mvp = missingValuePolicyRepository.Get(signal);
 
@@ -107,8 +109,13 @@ namespace Domain.Services.Implementation
                 as MissingValuePolicy.MissingValuePolicyBase;
         }
 
-        public void SetData<T>(IEnumerable<Datum<T>> domainData)
+        public void SetData<T>(Signal signal, IEnumerable<Datum<T>> domainData)
         {
+            foreach (var x in domainData)
+            {
+                x.Signal = signal;
+            }
+
             CheckDatasDateTimeCorrection(domainData);
 
             signalsDataRepository.SetData<T>(domainData);
@@ -117,7 +124,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            CheckTimestampsCorrection(signal.Granularity, fromIncludedUtc);
+            SignalUtils.CheckCorrectionOfTimestamp(fromIncludedUtc, signal.Granularity);
 
             var getData = signalsDataRepository
                 .GetData<T>(signal, fromIncludedUtc, toExcludedUtc)
@@ -183,8 +190,12 @@ namespace Domain.Services.Implementation
                 else
                     result = new Datum<T>() { Quality = datum.Quality, Value = datum.Value, Timestamp = timestamp };
             }
-            else  if (mvp is FirstOrderMissingValuePolicy<int> || mvp is FirstOrderMissingValuePolicy<double> || mvp is FirstOrderMissingValuePolicy<decimal>)
+            else  if (mvp is FirstOrderMissingValuePolicy<T>)
             {
+                if (typeof(T) == typeof(bool) || typeof(T) == typeof(string))
+                {
+                    throw new StringAndBooleanException();
+                }
                 var olderDatum = signalsDataRepository.GetDataOlderThan<T>(signal, timestamp, 1).FirstOrDefault();
                 var newerDatum = signalsDataRepository.GetDataNewerThan<T>(signal, timestamp, 1).FirstOrDefault();
                 if (olderDatum != null && newerDatum != null)
@@ -223,67 +234,67 @@ namespace Domain.Services.Implementation
         {
             foreach (var d in data)
             {
-                CheckTimestampsCorrection(d.Signal.Granularity, d.Timestamp);
+                SignalUtils.CheckCorrectionOfTimestamp(d.Timestamp, d.Signal.Granularity);
             }
-        }
-
-        private void CheckTimestampsCorrection(Granularity granularity, DateTime dateTime)
-        {
-            if ((granularity == Granularity.Second && dateTime.Millisecond != 0)
-                || (granularity == Granularity.Minute && (dateTime.Second != 0 || dateTime.Millisecond != 0) )
-                || (granularity == Granularity.Hour && (dateTime.Minute != 0 || dateTime.Second != 0 || dateTime.Millisecond != 0) )
-                || (granularity == Granularity.Day && dateTime.TimeOfDay.Ticks != 0)
-                || (granularity == Granularity.Week && (dateTime.TimeOfDay.Ticks != 0 || dateTime.DayOfWeek != DayOfWeek.Monday) )
-                || (granularity == Granularity.Month
-                    && (dateTime.TimeOfDay.Ticks != 0 || DateTime.Compare(dateTime, new DateTime(dateTime.Year, dateTime.Month, 1)) != 0))
-                || (granularity == Granularity.Year 
-                    && (dateTime.TimeOfDay.Ticks != 0 || DateTime.Compare(dateTime, new DateTime(dateTime.Year, 1, 1)) != 0)) )
-                throw new IncorrectTimeStampException();
         }
 
         public void Delete(int signalId)
         {
             var signal = GetById(signalId);
             if (signal == null)
-                throw new ArgumentException("Signal with given Id does not exist.");
+            { 
+                throw new CouldntGetASignalException();
+            }
 
             this.missingValuePolicyRepository.Set(signal, null);
-            switch (signal.DataType)
+            try
             {
-                case DataType.Boolean:
-                    this.signalsDataRepository.DeleteData<bool>(signal);
-                    break;
-                case DataType.Integer:
-                    this.signalsDataRepository.DeleteData<int>(signal);
-                    break;
-                case DataType.Double:
-                    this.signalsDataRepository.DeleteData<double>(signal);
-                    break;
-                case DataType.Decimal:
-                    this.signalsDataRepository.DeleteData<decimal>(signal);
-                    break;
-                case DataType.String:
-                    this.signalsDataRepository.DeleteData<string>(signal);
-                    break;
-                default:
-                    this.signalsDataRepository.DeleteData<bool>(signal);
-                    break;
+                typeof(ISignalsDataRepository)
+                .GetMethod("DeleteData")
+                .MakeGenericMethod(DataTypeUtils.GetNativeType(signal.DataType))
+                .Invoke(signalsDataRepository, new object[] { signal });
+            }
+            catch (TargetInvocationException e)
+            {
+                throw e.InnerException;
             }
 
             this.signalsRepository.Delete(signal);
         }
 
-        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        private void CheckCorrectionOfGetCoarseDataArguments(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            CheckTimestampsCorrection(granularity, fromIncludedUtc);
-            CheckTimestampsCorrection(granularity, toExcludedUtc);
+            SignalUtils.CheckCorrectionOfTimestamp(fromIncludedUtc, granularity);
+            SignalUtils.CheckCorrectionOfTimestamp(toExcludedUtc, granularity);
 
             if (signal.Granularity > granularity)
+            {
                 throw new IncorrectGranularityException();
+            }
 
             if (signal.DataType == DataType.Boolean ||
                 signal.DataType == DataType.String)
-                throw new InvalidDataTypeForGetCoarseDataException();
+            {
+                throw new StringAndBooleanException();
+            }
+        }
+
+        private Quality GetLowerQualityWithSpecialBehaviourOfNone(Quality main, Quality sub)
+        {
+            if (main != Quality.None)
+            {
+                if (sub == Quality.None)
+                    main = sub;
+                else if (sub > main)
+                    main = sub;
+            }
+
+            return main;
+        }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            CheckCorrectionOfGetCoarseDataArguments(signal,granularity,fromIncludedUtc,toExcludedUtc);
 
             IEnumerable<Datum<T>> data = GetData<T>(signal,fromIncludedUtc,toExcludedUtc);
             List<Datum<T>> coarsedData = new List<Datum<T>>();
@@ -322,13 +333,7 @@ namespace Domain.Services.Implementation
                 if (datum != null) {
                     value += datum.Value;
                     numberOfValues++;
-                    if (lowestQuality != Quality.None)
-                    {
-                        if (datum.Quality == Quality.None)
-                            lowestQuality = datum.Quality;
-                        else if (datum.Quality > lowestQuality)
-                            lowestQuality = datum.Quality;
-                    }
+                    lowestQuality = GetLowerQualityWithSpecialBehaviourOfNone(lowestQuality,datum.Quality);
                 }
                 date = SignalUtils.GetNextDate(date, signal.Granularity);
             }

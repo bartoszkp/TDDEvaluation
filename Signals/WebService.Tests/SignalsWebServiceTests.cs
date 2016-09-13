@@ -103,7 +103,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(CouldntGetASignalException))]
             public void SetMissingValuePolicy_SignalWithGivenIdDoesntExist_ThrowException()
             {
                 GivenNoSignals();
@@ -121,7 +121,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(CouldntGetASignalException))]
             public void GetMissingValuePolicy_NoSignalsWithGivenId_ThrowException()
             {
                 GivenNoSignals();
@@ -173,7 +173,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(CouldntGetASignalException))]
             public void SetData_NoSignalsWithGivenId_ThrowException()
             {
                 GivenNoSignals();
@@ -196,7 +196,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(CouldntGetASignalException))]
             public void GetData_NoSignalWithGivenId_ThrowException()
             {
                 GivenNoSignals();
@@ -702,7 +702,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
+            [ExpectedException(typeof(CouldntGetASignalException))]
             public void GivenNoSignals_WhenDeletingASignal_ArgumentExceptionIsThrown()
             {
                 GivenNoSignals();
@@ -907,7 +907,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(InvalidDataTypeForGetCoarseDataException))]
+            [ExpectedException(typeof(StringAndBooleanException))]
             public void GivenASignalAndData_WhenGettingCoarseData_ThrowsInvalidDataTypeForGetCoarseDataException()
             {
                 var signal = SignalWith(1, Dto.DataType.Boolean, Dto.Granularity.Day, new Dto.Path() { Components = new[] { "x", "y9" } });
@@ -920,13 +920,13 @@ namespace WebService.Tests
             {
                 var data = new Datum<double>[]
                 {
-                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,4), Value = 0.4d },
-                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,5), Value = 1.4d },
-                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,6), Value = 4.5d },
-                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,7), Value = 8.6d },
-                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,8), Value = 6.4d },
-                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,9), Value = 2.1d },
-                    new Datum<double>() { Quality = Quality.Fair,Timestamp = new DateTime(2015,5,10), Value = 1.5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2015,5,4), Value = 0.4d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2015,5,5), Value = 1.4d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2015,5,6), Value = 4.5d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2015,5,7), Value = 8.6d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2015,5,8), Value = 6.4d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2015,5,9), Value = 2.1d },
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2015,5,10), Value = 1.5d },
                 };
 
                 SetupGetData(data);
@@ -956,7 +956,7 @@ namespace WebService.Tests
             }
 
             private void SetupSignalsDataRepositoryMock<T>(){
-                signalsDataRepositryMock.Setup(x=>x.SetData<T>(It.IsAny<IEnumerable<Domain.Datum<T>>>()));
+                signalsDataRepositryMock.Setup(x => x.SetData<T>(It.IsAny<IEnumerable<Domain.Datum<T>>>()));
                 signalsDataRepositryMock.Setup(x => x.GetData<T>(It.IsAny<Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()));
             }
 
