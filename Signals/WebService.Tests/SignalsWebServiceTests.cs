@@ -1542,26 +1542,26 @@ namespace WebService.Tests
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
-                signalsWebService.SetMissingValuePolicy(signal1.Id.Value, shadowPolicy1);
+                signalsWebService.SetMissingValuePolicy(signal1.Id.Value, shadowPolicy1.ToDto<Dto.MissingValuePolicy.ShadowMissingValuePolicy>());
             }
 
-            private Dto.MissingValuePolicy.ShadowMissingValuePolicy GetShadowPolicy(Dto.Signal signal, Dto.Signal shadowSignal)
+            private DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean GetShadowPolicy(Dto.Signal signal, Dto.Signal shadowSignal)
             {
-                return new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
-                { Signal = signal, ShadowSignal = shadowSignal };
+                return new DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean()
+                { Signal = signal.ToDomain<Domain.Signal>(), ShadowSignal = shadowSignal.ToDomain<Domain.Signal>() };
             }
 
-            private void SetupSetShadowPolicy(Dto.Signal signal, Dto.MissingValuePolicy.ShadowMissingValuePolicy shadowPolicy)
+            private void SetupSetShadowPolicy(Dto.Signal signal, DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean shadowPolicy)
             {
                 missingValuePolicyRepositoryMock
                     .Setup(mvp => mvp.Set(signal.ToDomain<Domain.Signal>(), shadowPolicy.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>()));
             }
 
-            private void SetupGetShadowPolicy(int id, Dto.MissingValuePolicy.ShadowMissingValuePolicy shadowPolicy)
+            private void SetupGetShadowPolicy(int id, DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean shadowPolicy)
             {
                 missingValuePolicyRepositoryMock
                     .Setup(mvp => mvp.Get(It.Is<Domain.Signal>(s => s.Id == id)))
-                    .Returns(shadowPolicy.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>());
+                    .Returns(shadowPolicy);
             }
 
             private void SetupGetById(Dto.Signal signal)
