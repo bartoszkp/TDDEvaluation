@@ -61,6 +61,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GranularityNotGreaterThanSignalsGranularityException.cs" />
     <Compile Include="InvalidSignalId.cs" />
     <Compile Include="ISignalsWebService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

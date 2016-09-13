@@ -82,7 +82,27 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+            if (signal == null) throw new InvalidSignalId();
+            if (!(granularity > signal.Granularity.ToDto<Dto.Granularity>())) throw new GranularityNotGreaterThanSignalsGranularityException();
+
+            Domain.Granularity domainGranularity = granularity.ToDomain<Domain.Granularity>();
+
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Integer:
+                    return signalsDomainService.GetCoarseData<int>(signal, domainGranularity, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToArray().OrderBy(d => d.Timestamp);
+                case Domain.DataType.Double:
+                    return signalsDomainService.GetCoarseData<double>(signal, domainGranularity, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToArray().OrderBy(d => d.Timestamp);
+                case Domain.DataType.Decimal:
+                    return signalsDomainService.GetCoarseData<decimal>(signal, domainGranularity, fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToArray().OrderBy(d => d.Timestamp);
+                case Domain.DataType.Boolean: throw new Exception();
+                case Domain.DataType.String: throw new Exception();
+                default: throw new NotImplementedException();
+            }
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
@@ -124,5 +144,7 @@ namespace WebService
             var domainPolicyBase = policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
             this.signalsDomainService.SetMVP(domainSetMVPSignal, domainPolicyBase);
         }
+
+
     }
 }

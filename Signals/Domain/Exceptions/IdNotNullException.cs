@@ -51,4 +51,12 @@ namespace Domain.Exceptions
         }
     }
 
+    public class DependencyCycleException : Exception
+    {
+        public DependencyCycleException() : base("Setting this shadow for this signal would cause in dependency cycle.")
+        {
+
+        }
+    }
+
 }
