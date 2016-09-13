@@ -376,6 +376,34 @@ namespace WebService.Tests
 
             Assert.AreEqual(result.Count(),0);
         }
+
+        [TestMethod]
+        public void GivenASignal_GetCoarseDataWhenGranularityGreaterThanSignalGranularity_ThrowsException()
+        {
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Day,
+                Path = Path.FromString("r/vbc")
+            };
+            List<Datum<bool>> existingDatumFirst = new List<Datum<bool>>();
+            existingDatumFirst.Add(new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2018, 12, 12), Value = true });
+            existingDatumFirst.Add(new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2018, 12, 13), Value = true });
+            existingDatumFirst.Add(new Datum<bool>() { Quality = Quality.Good, Timestamp = new DateTime(2018, 12, 14), Value = true });
+
+            signalsRepoMock = new Mock<ISignalsRepository>();
+            GivenASignal(signal);
+            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<bool>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2018, 12, 12), new DateTime(2018, 12, 15)))
+                            .Returns(existingDatumFirst);           
+            var signalsDomainService = new SignalsDomainService(
+                    signalsRepoMock.Object,
+                    signalsDataRepoMock.Object,
+                    null);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+            var result = signalsWebService.GetCoarseData<bool>(1, Dto.Granularity.Month, new DateTime(2018, 12, 12), new DateTime(2018, 12, 15));
+        }
         private void GivenNoSignals()
         {
             signalsRepoMock = new Mock<ISignalsRepository>();

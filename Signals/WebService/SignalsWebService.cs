@@ -103,9 +103,7 @@ namespace WebService
             if (signal == null)
                 throw new NoSuchSignalException("Could not get data for not existing signal");
             if (fromIncludedUtc > toExcludedUtc)
-            {
                 return new List<Datum>();
-            }
             return null;
         }
 

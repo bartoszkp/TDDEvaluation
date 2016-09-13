@@ -13,4 +13,12 @@ namespace Domain.Exceptions
 
         }
     }
+
+    public class NoSuchGranularityException: Exception
+    {
+        public NoSuchGranularityException(): base("Wrong Granularity. Granularity must be less then granularity signal ")
+        {
+
+        }
+    }
 }
