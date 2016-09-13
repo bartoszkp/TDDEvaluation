@@ -1234,12 +1234,22 @@ namespace WebService.Tests
 
             [TestMethod]
             [ExpectedException(typeof(IncorrectTimestampException))]
-            public void GivenASignal_WhenGettingCoarseData_IfDateIsInvalid_ThrowsException()
+            public void GivenASignal_WhenGettingCoarseData_IfFromDateIsInvalid_ThrowsException()
             {
                 var dummyId = 1;
                 GivenASignal(SignalWith(dummyId, DataType.Decimal, Granularity.Hour, null));
 
                 signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Month, new DateTime(2000, 1, 5), new DateTime(2000, 2, 1));
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(IncorrectTimestampException))]
+            public void GivenASignal_WhenGettingCoarseData_IfToDateIsInvalid_ThrowsException()
+            {
+                var dummyId = 1;
+                GivenASignal(SignalWith(dummyId, DataType.Decimal, Granularity.Hour, null));
+
+                signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 2, 5));
             }
 
             [TestMethod]
