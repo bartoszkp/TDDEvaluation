@@ -105,7 +105,15 @@ namespace WebService
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum>();
             GranularityMatch(signal, granularity);
-            return null;
+            var domainSignal = signal.ToDomain<Domain.Signal>();
+            switch (signal.DataType)
+            {    
+                case DataType.Double:
+                    return signalsDomainService.GetCoarseData<double>(domainSignal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
+                                            ?.ToDto<IEnumerable<Dto.Datum>>();            
+                default:
+                    return null;
+            }
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)

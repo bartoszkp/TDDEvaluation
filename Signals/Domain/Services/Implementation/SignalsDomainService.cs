@@ -823,7 +823,11 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            
+            var datums = signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            if (signal.Granularity == granularity)
+            {
+                return datums;
+            }
             return null;
         }
 

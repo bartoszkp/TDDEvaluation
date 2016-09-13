@@ -434,11 +434,12 @@ namespace WebService.Tests
                     null);
             signalsWebService = new SignalsWebService(signalsDomainService);
             var result = signalsWebService.GetCoarseData<double>(signal.Id.Value,Dto.Granularity.Day, new DateTime(2018, 12, 12), new DateTime(2018, 12, 15));
+            
             int index = 0;
             foreach (var fd in existingDatumFirst)
             {
-                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
-                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
+                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality.ToDomain<Domain.Quality>());
+                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp.ToDomain<DateTime>());
                 Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
                 index++;
             }
