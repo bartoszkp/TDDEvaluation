@@ -146,6 +146,10 @@ namespace Domain.Services.Implementation
             return res.OrderBy(x => x.Timestamp);
         }
 
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            return null;
+        }
         public void Set<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
             if(missingValuePolicy is ShadowMissingValuePolicy<T>)

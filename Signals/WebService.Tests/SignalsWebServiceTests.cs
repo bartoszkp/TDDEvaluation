@@ -1339,6 +1339,26 @@ namespace WebService.Tests
 
 
             #endregion
+            #region Issue #30 (Feature: Getting coarse data for signal )
+
+            [TestMethod]
+            [ExpectedException(typeof(NotImplementedException))]
+            public void GivenASignal_GetCoarseData_ThrowsNotImplementedException()
+            {
+                int signalId = 5;
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = signalId,
+                    DataType = Domain.DataType.Double,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("x/y")
+                });
+
+                signalsWebService.GetCoarseData(signalId, Dto.Granularity.Month, new DateTime(2015, 1, 1), new DateTime(2015, 1, 2));
+            }
+
+
+            #endregion
             [TestMethod]
             public void GivenASignal_GivenNoData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
             {

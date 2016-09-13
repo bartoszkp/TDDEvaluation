@@ -94,7 +94,38 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var sig = signalsDomainService.GetById(signalId);
+
+            if (sig == null) throw new ArgumentException();
+
+            Domain.Granularity domainGranularity = granularity.ToDomain<Domain.Granularity>();
+            switch (sig.DataType)
+            {
+                case Domain.DataType.Boolean:
+                    return signalsDomainService.
+                        GetCoarseData<Boolean>(sig, domainGranularity, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+
+                case Domain.DataType.Integer:
+                    return signalsDomainService.
+                        GetCoarseData<int>(sig, domainGranularity, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+
+                case Domain.DataType.Double:
+                    return signalsDomainService
+                        .GetCoarseData<double>(sig, domainGranularity, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+
+                case Domain.DataType.Decimal:
+                    return signalsDomainService.
+                        GetCoarseData<decimal>(sig, domainGranularity, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+
+                case Domain.DataType.String:
+                    return signalsDomainService.
+                        GetCoarseData<string>(sig, domainGranularity, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
+
+                default:
+                    break;
+            }
+
+            throw new ArgumentException("Datatype is not supported");
         }
 
         private bool VerifyTimeStamp(Domain.Signal signal, DateTime timestamp)
