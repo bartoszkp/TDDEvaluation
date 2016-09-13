@@ -1617,6 +1617,36 @@ namespace WebService.Tests
                     new DateTime(), new DateTime());
             }
 
+            [TestMethod]
+            public void GivenADailySignal_WhenGettingCoarseData_WithWeekGranularity_CorrectlyFillsMissingData_AndCorrectlyReturnsData()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Domain.Path.FromString("example/path"),
+                };
+                var existingDatum = GetExistingDatumWithMissingValuesForGetCoarseDataWeek();
+
+                SetupNoneMissingValuePolicyForGetCoarseData(existingSignal);
+                SetupGetData(existingSignal, existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
+
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week,
+                    new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
+
+                var expectedDatum = GetExpectedDatumWithMissingValuesForGetCoarseDataWeek();
+                AssertDatum(result, expectedDatum.ToArray());
+            }
+
+            private void SetupNoneMissingValuePolicyForGetCoarseData(Signal signal)
+            {
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(signal))
+                    .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
+            }
+
             private void SetupGetData(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
@@ -1631,7 +1661,7 @@ namespace WebService.Tests
                     .Returns(existingDatum);
 
                 var signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
-                    signalsDataRepositoryMock.Object, null);
+                    signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
 
                 signalsWebService = new SignalsWebService(signalDomainService);
             }
@@ -1643,6 +1673,16 @@ namespace WebService.Tests
                     new Dto.Datum() {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 },
                     new Dto.Datum() {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 11), Value = 4 },
                     new Dto.Datum() {Quality = Dto.Quality.Bad, Timestamp = new DateTime(2016, 1, 18), Value = 3 },
+                };
+            }
+
+            private IEnumerable<Dto.Datum> GetExpectedDatumWithMissingValuesForGetCoarseDataWeek()
+            {
+                return new List<Dto.Datum>()
+                {
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 4), Value = 1 },
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 11), Value = 3 },
+                    new Dto.Datum() {Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 18), Value = 2 },
                 };
             }
 
@@ -1671,6 +1711,27 @@ namespace WebService.Tests
                     new Datum<int>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016,1,21), Value = 5 },
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,22), Value = 0 },
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,23), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,24), Value = 0 },
+                };
+            }
+
+            private IEnumerable<Domain.Datum<int>> GetExistingDatumWithMissingValuesForGetCoarseDataWeek()
+            {
+                return new List<Domain.Datum<int>>() {
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 4), Value = 2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 6), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 8), Value = 3 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 9), Value = 1 },
+
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016,1,11), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,12), Value = 6 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,14), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,16), Value = 2 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,17), Value = 3 },
+
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,18), Value = 7 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,19), Value = 5 },
+                    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,23), Value = 2 },
                     new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,24), Value = 0 },
                 };
             }
