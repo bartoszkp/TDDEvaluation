@@ -69,13 +69,9 @@ namespace Domain.Services.Implementation
             Signal signal = this.signalsRepository.Get(signalId);
             if (signal == null) throw new ArgumentException();
 
-            if (IsShadowMVP(signal.DataType, policy))
-            {
-                if (IsShadowMVPAppropriate(policy, signal)) missingValuePolicyRepository.Set(signal, policy);
-                else throw new ShadowMissingValuePolicyException();
-            }
+            CheckShadow(signal, policy);
 
-            else missingValuePolicyRepository.Set(signal, policy);
+            missingValuePolicyRepository.Set(signal, policy);
         }
 
         public MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(int signalID)
@@ -233,54 +229,32 @@ namespace Domain.Services.Implementation
             }
         }
 
-        private bool IsShadowMVP(DataType dataType, MissingValuePolicyBase policy)
+        private void CheckShadow(Signal signal, MissingValuePolicyBase policy)
         {
-            switch(dataType)
+            switch(signal.DataType)
             {
-                case DataType.Boolean: if (policy is ShadowMissingValuePolicy<bool>) return true; else return false;
-                case DataType.Decimal: if (policy is ShadowMissingValuePolicy<decimal>) return true; else return false;
-                case DataType.Double: if (policy is ShadowMissingValuePolicy<double>) return true; else return false;
-                case DataType.Integer: if (policy is ShadowMissingValuePolicy<int>) return true; else return false;
-                case DataType.String: if (policy is ShadowMissingValuePolicy<string>) return true; else return false;
-                default: return false;
+                case DataType.Boolean: if (policy is ShadowMissingValuePolicy<bool>)    ShadowSignalIsCorrectly<bool>   (signal, policy as ShadowMissingValuePolicy<bool>); break;
+                case DataType.Decimal: if (policy is ShadowMissingValuePolicy<decimal>) ShadowSignalIsCorrectly<decimal>(signal, policy as ShadowMissingValuePolicy<decimal>); break;
+                case DataType.Double:  if (policy is ShadowMissingValuePolicy<double>)  ShadowSignalIsCorrectly<double> (signal, policy as ShadowMissingValuePolicy<double>); break;
+                case DataType.Integer: if (policy is ShadowMissingValuePolicy<int>)     ShadowSignalIsCorrectly<int>    (signal, policy as ShadowMissingValuePolicy<int>); break;
+                case DataType.String:  if (policy is ShadowMissingValuePolicy<string>)  ShadowSignalIsCorrectly<string> (signal, policy as ShadowMissingValuePolicy<string>); break;
             }
         }
 
-        private bool IsShadowMVPAppropriate(MissingValuePolicyBase policy, Signal signal)
-        {
-            Signal shadowSignal = new Signal();
+        private void ShadowSignalIsCorrectly<T>(Signal signal, ShadowMissingValuePolicy<T> policy)
+        {            
+            Signal shadowSignal = policy.ShadowSignal;
 
-            if(policy is ShadowMissingValuePolicy<bool>)
+            if (signal.DataType != shadowSignal.DataType || signal.Granularity != shadowSignal.Granularity) throw new ShadowMissingValuePolicyException();
+            
+            while(shadowSignal != null)
             {
-                var shadowPolicy = (ShadowMissingValuePolicy<bool>)policy;
-                shadowSignal = shadowPolicy.ShadowSignal;
-            }
+                if (shadowSignal.Id == signal.Id) throw new ShadowMissingCyclePolicyException();
 
-            if (policy is ShadowMissingValuePolicy<decimal>)
-            {
-                var shadowPolicy = (ShadowMissingValuePolicy<decimal>)policy;
-                shadowSignal = shadowPolicy.ShadowSignal;
+                var ShadowSignalPolicy = missingValuePolicyRepository.Get(shadowSignal) as ShadowMissingValuePolicy<T>;
+                if (ShadowSignalPolicy == null) break;
+                else shadowSignal = ShadowSignalPolicy.ShadowSignal;
             }
-
-            if (policy is ShadowMissingValuePolicy<double>)
-            {
-                var shadowPolicy = (ShadowMissingValuePolicy<double>)policy;
-                shadowSignal = shadowPolicy.ShadowSignal;
-            }
-
-            if (policy is ShadowMissingValuePolicy<int>)
-            {
-                var shadowPolicy = (ShadowMissingValuePolicy<int>)policy;
-                shadowSignal = shadowPolicy.ShadowSignal;
-            }
-
-            if (policy is ShadowMissingValuePolicy<string>)
-            {
-                var shadowPolicy = (ShadowMissingValuePolicy<string>)policy;
-                shadowSignal = shadowPolicy.ShadowSignal;
-            }
-
-            if (signal.DataType == shadowSignal.DataType && signal.Granularity == shadowSignal.Granularity) return true; else return false; 
         }
     }
 }

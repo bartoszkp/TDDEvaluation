@@ -9,4 +9,12 @@ namespace Domain.Exceptions
         {
         }
     }
+
+    public class ShadowMissingCyclePolicyException : Exception
+    {
+        public ShadowMissingCyclePolicyException()
+             : base("Signal already used in some shadows")
+        {
+        }
+    }
 }
