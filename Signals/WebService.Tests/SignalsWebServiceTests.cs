@@ -1382,6 +1382,30 @@ namespace WebService.Tests
                 signalsWebService.SetData(signalId, new Dto.Datum[] { new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2018, 1, 2), Value = 2.2} });
             }
 
+            [ExpectedException(typeof(ShadowDependencyCycleException))]
+            [TestMethod]
+            public void GivenMultipleSignals_SettingShadowMVPCreatingADependencyCycle_ThrowsException()
+            {
+                var signal_ids = new int[] { 1, 2, 3 };
+                var signals = new Signal[] {
+                    new Signal() { Id = signal_ids[0], DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("root/s1") },
+                    new Signal() { Id = signal_ids[1], DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("root/s2") },
+                    new Signal() { Id = signal_ids[2], DataType = DataType.Double, Granularity = Granularity.Month, Path = Path.FromString("root/s3") },
+                };
+                GivenExisitingSignals(signals);
+                GivenMissingValuePolicy(signal_ids[0], new ShadowMissingValuePolicyDouble { Signal = signals[0], ShadowSignal = signals[1] });
+                GivenMissingValuePolicy(signal_ids[1], new ShadowMissingValuePolicyDouble { Signal = signals[1], ShadowSignal = signals[2] });
+
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy
+                {
+                    DataType = Dto.DataType.Double,
+                    Signal = signals[2].ToDto<Dto.Signal>(),
+                    ShadowSignal = signals[0].ToDto<Dto.Signal>()
+                };
+
+                signalsWebService.SetMissingValuePolicy(signal_ids[2], policy);
+            }
+
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
