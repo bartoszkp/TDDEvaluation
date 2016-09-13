@@ -308,7 +308,7 @@ namespace Domain.Services.Implementation
                 averageValue += Convert.ToDecimal(item.Value);
                 howManyValues++;
 
-                if (item.Quality > quality || item.Quality == Quality.None)
+                if ((item.Quality > quality || item.Quality == Quality.None) && quality != Quality.None)
                     quality = item.Quality;
 
                 dateTime = AddOrSubtractDateTime(dateTime, signal.Granularity, 1);
