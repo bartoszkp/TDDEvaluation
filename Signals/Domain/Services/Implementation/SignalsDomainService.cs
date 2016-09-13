@@ -278,7 +278,10 @@ namespace Domain.Services.Implementation
                                     int valueIteration = Convert.ToInt16(SetTotalSteps(toExcludedUtc, fromIncludedUtc, signal.Granularity));
                                     for (int i = 0; i < valueIteration; i++)
                                     {
-                                        value = value + substractValue / Convert.ToDecimal(substractTime);
+                                        if (quality == Quality.None)
+                                            value = 0;
+                                        else
+                                            value = value + substractValue / Convert.ToDecimal(substractTime);
                                         datumsFirst.Add(new Datum<T>()
                                         {
                                             Quality = quality,
@@ -293,7 +296,11 @@ namespace Domain.Services.Implementation
                                 {
                                     for (int i = 0; i < Convert.ToInt16(substractTime); i++)
                                     {
-                                        value = value + substractValue / Convert.ToDecimal(substractTime);
+                                        
+                                        if (quality == Quality.None)
+                                            value = 0;
+                                        else
+                                            value = value + substractValue / Convert.ToDecimal(substractTime);
                                         datumsFirst.Add(new Datum<T>()
                                         {
                                             Quality = quality,
@@ -316,7 +323,10 @@ namespace Domain.Services.Implementation
                                     int valueIteration = Convert.ToInt16(SetTotalSteps(toExcludedUtc, fromIncludedUtc, signal.Granularity));
                                     for (int i = 0; i < valueIteration; i++)
                                     {
-                                        value = value + substractValue / (substractTime);
+                                        if (quality == Quality.None)
+                                            value = 0;
+                                        else
+                                            value = value + substractValue / Convert.ToDouble(substractTime);
                                         datumsFirst.Add(new Datum<T>()
                                         {
                                             Quality = quality,
@@ -331,7 +341,10 @@ namespace Domain.Services.Implementation
                                 {
                                     for (int i = 0; i < Convert.ToInt16(substractTime); i++)
                                     {
-                                        value = value + substractValue / (substractTime);
+                                        if (quality == Quality.None)
+                                            value = 0;
+                                        else
+                                            value = value + substractValue / Convert.ToDouble(substractTime);
                                         datumsFirst.Add(new Datum<T>()
                                         {
                                             Quality = quality,
@@ -355,7 +368,10 @@ namespace Domain.Services.Implementation
                                     {
                                         Quality quality = ChoiseQuality(dataNewer.ElementAt(0).Quality, dataOlder.ElementAt(0).Quality);
 
-                                        value = value + Convert.ToInt32(substractValue) / Convert.ToInt32(substractTime);
+                                        if (quality == Quality.None)
+                                            value = 0;
+                                        else
+                                            value = value + substractValue / Convert.ToInt16(substractTime);
                                         datumsFirst.Add(new Datum<T>()
                                         {
                                             Quality = quality,
@@ -373,7 +389,10 @@ namespace Domain.Services.Implementation
                                     {
                                         Quality quality = ChoiseQuality(dataNewer.ElementAt(0).Quality, dataOlder.ElementAt(0).Quality);
 
-                                        value = value + Convert.ToInt32(substractValue) / Convert.ToInt32(substractTime);
+                                        if (quality == Quality.None)
+                                            value = 0;
+                                        else
+                                            value = value + substractValue / Convert.ToInt16(substractTime);
                                         datumsFirst.Add(new Datum<T>()
                                         {
                                             Quality = quality,

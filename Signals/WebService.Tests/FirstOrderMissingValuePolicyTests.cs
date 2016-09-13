@@ -1050,9 +1050,9 @@ namespace WebService.Tests
             {
                         
                         new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 1),  Value = (int)10 },
-                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 2),  Value = (int)15},
-                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 3),  Value = (int)20 },
-                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 4),  Value = (int)25 },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 2),  Value = (int)0},
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 3),  Value = (int)0 },
+                        new Dto.Datum {Quality = Dto.Quality.None, Timestamp = new DateTime(2000, 1, 4),  Value = (int)0 },
                         new Dto.Datum {Quality = Dto.Quality.Fair, Timestamp = new DateTime(2000, 1, 5),  Value = (int)30}
             };
             signalsRepositoryMock = new Mock<ISignalsRepository>();
