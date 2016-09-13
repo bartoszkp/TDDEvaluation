@@ -820,5 +820,10 @@ namespace Domain.Services.Implementation
             missingValuePolicyRepository.Set(signal, null);
             signalsRepository.Delete(signal);
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace WebService
         IEnumerable<Datum> GetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
         [OperationContract]
-        IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc);
+        IEnumerable<Datum> GetCoarseData<T>(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc);
 
         [OperationContract]
         void SetData(int signalId, IEnumerable<Datum> data);

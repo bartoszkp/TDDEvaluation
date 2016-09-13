@@ -362,8 +362,19 @@ namespace WebService.Tests
             SetupWebService();
             signalsRepoMock.Setup(sr => sr.Get(1)).Returns((Signal)null);
 
-            var result = signalsWebService.GetCoarseData(1,new Dto.Granularity(), new DateTime(), new DateTime());
+            var result = signalsWebService.GetCoarseData<bool>(1,new Dto.Granularity(), new DateTime(), new DateTime());
 
+        }
+
+        [TestMethod]
+        public void GivenASignal_WhenTimeStampIsEmpty_ReturmEmptyList()
+        {
+            SetupWebService();
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns(new Signal() { Id = 1, DataType = DataType.Double });
+
+            var result = signalsWebService.GetCoarseData<double>(1, Dto.Granularity.Day, new DateTime(2000, 2, 1), new DateTime(2000, 1, 1));
+
+            Assert.IsNull(result);
         }
         private void GivenNoSignals()
         {
