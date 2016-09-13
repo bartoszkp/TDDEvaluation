@@ -352,6 +352,32 @@ namespace Domain.Services.Implementation
 
         }
 
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+            var result = new List<Datum<T>>();
+            var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy<T>;
+
+            int i = 0;
+            for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;)
+            {
+                currentDate = mvp.AddTime(granularity, currentDate);
+                var indexFirstDatum = i;
+                T value = default(T);
+                for (;i<data.Length && data[i].Timestamp < currentDate; ++i)
+                {
+                    value = addValue(value, data[i].Value);
+                }
+                result.Add(new Datum<T>()
+                {
+                    Quality = data[indexFirstDatum].Quality,
+                    Timestamp = mvp.AddTime(granularity, currentDate, -1),
+                    Value = divideValue(value, i - indexFirstDatum)
+                });
+            }
+            return result;
+
+        }
 
         private bool ValidateTimestamp(DateTime timestamp, Granularity granularity)
         {
@@ -421,7 +447,7 @@ namespace Domain.Services.Implementation
 
         public int TimeDifference(Granularity granularity, DateTime newer, DateTime older)
         {
-            switch(granularity)
+            switch (granularity)
             {
                 case Granularity.Day:
                     return (int)(newer - older).TotalDays;
@@ -446,6 +472,52 @@ namespace Domain.Services.Implementation
             }
 
             throw new NotSupportedException("Granularity " + granularity.ToString() + " is not supported");
+        }
+
+        private T addValue<T>(T value1, T value2)
+        {
+            if (typeof(T) == typeof(int))
+            {
+                var result = (int)Convert.ChangeType(value1, typeof(int)) + (int)Convert.ChangeType(value2, typeof(int));
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                var result = (double)Convert.ChangeType(value1, typeof(double)) + (double)Convert.ChangeType(value2, typeof(double));
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+
+            if (typeof(T) == typeof(decimal))
+            {
+                var result = (decimal)Convert.ChangeType(value1, typeof(decimal)) + (decimal)Convert.ChangeType(value2, typeof(decimal));
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+
+            throw new NotSupportedException("Type " + typeof(T).ToString() + " is not supported");
+        }
+
+        private T divideValue<T>(T value1, int value2)
+        {
+            if (typeof(T) == typeof(int))
+            {
+                var result = (int)Convert.ChangeType(value1, typeof(int)) / value2;
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+
+            if (typeof(T) == typeof(double))
+            {
+                var result = (double)Convert.ChangeType(value1, typeof(double)) / value2;
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+
+            if (typeof(T) == typeof(decimal))
+            {
+                var result = (decimal)Convert.ChangeType(value1, typeof(decimal)) / value2;
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+
+            throw new NotSupportedException("Type " + typeof(T).ToString() + " is not supported");
         }
     }
 }

@@ -89,7 +89,26 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = this.signalsDomainService?.GetById(signalId);
+            if (signal == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            switch (signal.DataType)
+            {
+                case Domain.DataType.Decimal:
+                    return signalsDomainService.GetCoarseData<decimal>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Double:
+                    return signalsDomainService.GetCoarseData<double>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                case Domain.DataType.Integer:
+                    return signalsDomainService.GetCoarseData<int>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
+                        .Select(d => d.ToDto<Dto.Datum>()).ToList();
+                default:
+                    throw new KeyNotFoundException();
+            }
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
