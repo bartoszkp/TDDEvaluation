@@ -1,6 +1,7 @@
 ﻿using Domain;
 using Domain.Repositories;
 using Domain.Services.Implementation;
+using Dto.Conversions;
 using Dto.MissingValuePolicy;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -39,8 +40,8 @@ namespace WebService.Tests
                 }
             };
 
-            setupWebService();
-            setupGet(signal);
+            SetupWebService();
+            SetupGet(signal);
 
             signalsWebService.SetMissingValuePolicy(signal.Id.Value, shadowMVP);
         }
@@ -67,8 +68,8 @@ namespace WebService.Tests
                 }
             };
 
-            setupWebService();
-            setupGet(signal);
+            SetupWebService();
+            SetupGet(signal);
 
             signalsWebService.SetMissingValuePolicy(signal.Id.Value, shadowMVP);
         }
@@ -104,11 +105,11 @@ namespace WebService.Tests
                 new Datum<decimal>() { Quality = Quality.Bad, Timestamp = new DateTime(2000, 9, 1), Value = 7.0m }
             };
 
-            setupWebService();
-            setupGet(signal);
-            setupGet(shadowSignal);
-            setupGetData(signal, datums);
-            setupGetData(shadowSignal, shadowDatums);
+            SetupWebService();
+            SetupGet(signal);
+            SetupGet(shadowSignal);
+            SetupGetData(signal, datums);
+            SetupGetData(shadowSignal, shadowDatums);
 
             missingValuePolicyRepositoryMock
                 .Setup(mvpr => mvpr.Get(It.Is<Signal>(s => s.Id == signal.Id)))
@@ -141,21 +142,63 @@ namespace WebService.Tests
             }
         }
 
-        private void setupWebService()
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void WhenSetMVPToShadowMVPAndyTryCreateADependencyCycle_ThrowsException()
+        {
+            var signal1 = new Domain.Signal()
+            {
+                Id = 1,
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Month,
+                Path = Path.FromString("cycle/signal1")
+            };
+            var signal2 = new Domain.Signal()
+            {
+                Id = 2,
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Month,
+                Path = Path.FromString("cycle/signal2")
+            };
+            var signal3 = new Domain.Signal()
+            {
+                Id = 3,
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Month,
+                Path = Path.FromString("cycle/signal3")
+            };
+            SetupWebService();
+            SetupGet(signal1);
+            SetupGet(signal2);
+            SetupGet(signal3);
+
+            missingValuePolicyRepositoryMock
+                .Setup(mvrp => mvrp.Get(It.Is<Signal>(s => s.Id == signal1.Id)))
+                .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean() { ShadowSignal = signal2 });
+
+            missingValuePolicyRepositoryMock
+                .Setup(mvrp => mvrp.Get(It.Is<Signal>(s => s.Id == signal2.Id)))
+                .Returns(new DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean() { ShadowSignal = signal3 });
+
+            signalsWebService.SetMissingValuePolicy(signal3.Id.Value, 
+                new Dto.MissingValuePolicy.ShadowMissingValuePolicy { ShadowSignal = signal1.ToDto<Dto.Signal>() });
+        }
+
+        private void SetupWebService()
         {
             var signalsDomainService = new SignalsDomainService(
                 signalsRepositoryMock.Object, signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
             signalsWebService = new SignalsWebService(signalsDomainService);
         }
 
-        private void setupGet(Domain.Signal signal)
+        private void SetupGet(Domain.Signal signal)
         {
             signalsRepositoryMock
                 .Setup(sr => sr.Get(signal.Id.Value))
                 .Returns(signal);
         }
 
-        private void setupGetData<T>(Signal signal, Datum<T>[] datums)
+        private void SetupGetData<T>(Signal signal, Datum<T>[] datums)
         {
             signalsDataRepositoryMock
                 .Setup(sdr => sdr.GetData<T>(
