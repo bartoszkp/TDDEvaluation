@@ -62,7 +62,7 @@ namespace WebService
 
                 if (sig == null) throw new ArgumentException();
 
-                if (!VerifyTimeStamp(sig, fromIncludedUtc))
+                if (!signalsDomainService.VerifyTimeStamp(sig, fromIncludedUtc))
                     throw new ArgumentException();
 
                 var k = sig.DataType;
@@ -128,55 +128,18 @@ namespace WebService
             throw new ArgumentException("Datatype is not supported");
         }
 
-        private bool VerifyTimeStamp(Domain.Signal signal, DateTime timestamp)
-        {
-            if (signal.Granularity == Domain.Granularity.Year && timestamp != new DateTime(timestamp.Year, 1, 1))
-                return false;
-
-            if (signal.Granularity == Domain.Granularity.Month && timestamp != new DateTime(timestamp.Year, timestamp.Month, 1))
-                return false;
-
-            if (signal.Granularity == Domain.Granularity.Week
-                && (timestamp.DayOfWeek != DayOfWeek.Monday
-                    || timestamp.Millisecond != 0
-                    || timestamp.Second != 0
-                    || timestamp.Minute != 0
-                    || timestamp.Hour != 0))
-                return false;
-
-            if (signal.Granularity == Domain.Granularity.Day && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day))
-                return false;
-
-            if (signal.Granularity == Domain.Granularity.Hour
-                && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, 0, 0))
-                return false;
-
-            if (signal.Granularity == Domain.Granularity.Minute
-                && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, 0))
-                return false;
-
-            if (signal.Granularity == Domain.Granularity.Second
-                && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, timestamp.Second))
-                return false;
-
-            return true;
-        }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
         {
             if (data == null || data.Count() == 0) return;
 
-
-
-            if (signalsDomainService != null)
-            {
                 var result = signalsDomainService.GetById(signalId);
 
                 if (result == null) throw new ArgumentException();
 
                 foreach (var d in data)
                 {
-                    if (!VerifyTimeStamp(result, d.Timestamp))
+                    if (!signalsDomainService.VerifyTimeStamp(result, d.Timestamp))
                         throw new ArgumentException();
                 }
 
@@ -216,7 +179,7 @@ namespace WebService
                         break;
                     default:
                         break;
-                }
+                
 
             }
 

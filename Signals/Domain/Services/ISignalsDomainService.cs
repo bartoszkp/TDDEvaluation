@@ -23,5 +23,6 @@ namespace Domain.Services
 
         PathEntry GetPathEntry(Path path);
         void Delete(int signalId);
+        bool VerifyTimeStamp(Signal sig, DateTime fromIncludedUtc);
     }
 }

@@ -237,6 +237,40 @@ namespace Domain.Services.Implementation
             return new PathEntry(resultSignals, resultSubPaths.Distinct());
         }
 
+        public bool VerifyTimeStamp(Domain.Signal signal, DateTime timestamp)
+        {
+            if (signal.Granularity == Domain.Granularity.Year && timestamp != new DateTime(timestamp.Year, 1, 1))
+                return false;
+
+            if (signal.Granularity == Domain.Granularity.Month && timestamp != new DateTime(timestamp.Year, timestamp.Month, 1))
+                return false;
+
+            if (signal.Granularity == Domain.Granularity.Week
+                && (timestamp.DayOfWeek != DayOfWeek.Monday
+                    || timestamp.Millisecond != 0
+                    || timestamp.Second != 0
+                    || timestamp.Minute != 0
+                    || timestamp.Hour != 0))
+                return false;
+
+            if (signal.Granularity == Domain.Granularity.Day && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day))
+                return false;
+
+            if (signal.Granularity == Domain.Granularity.Hour
+                && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, 0, 0))
+                return false;
+
+            if (signal.Granularity == Domain.Granularity.Minute
+                && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, 0))
+                return false;
+
+            if (signal.Granularity == Domain.Granularity.Second
+                && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, timestamp.Second))
+                return false;
+
+            return true;
+        }
+
         private Path GetSubPath(Signal signal, int deep)
         {
             return Path.FromString(string.Join("/", signal.Path.Components.Take(deep).ToArray()));

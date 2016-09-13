@@ -166,17 +166,6 @@ namespace WebService.Tests
                 Assert.IsNull(result);
             }
 
-
-            [TestMethod]
-            public void GivenNoData_WhenSettingData_DoesNotThrowException()
-            {
-                //arrange
-                var dummyData = MakeData(Dto.Quality.Fair, new DateTime(2000, 1, 1), 1.0);
-                signalsWebService = new SignalsWebService(null);
-                //act
-                signalsWebService.SetData(dummyInt,dummyData);
-                //assert
-            }
             [TestMethod]
             [ExpectedException(typeof(ArgumentException))]
             public void GivenNoId_WhenSettingData_ThrowsException()
