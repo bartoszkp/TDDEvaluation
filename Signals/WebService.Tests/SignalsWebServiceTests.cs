@@ -1282,6 +1282,29 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Month, new DateTime(), new DateTime());
             }
 
+            [TestMethod]
+            public void GivenASignalAndData_WhenGettingCoarseData_ReturnsCorrectData()
+            {
+                var dummyId = 1;
+                GivenASignal(SignalWith(dummyId, DataType.Integer, Granularity.Day, null));
+
+                GivenData<int>(dummyId, 
+                    new[] {
+                        new Datum<int> { Value = 1, Timestamp = new DateTime(2000, 1, 3), Quality = Quality.Good},
+                        new Datum<int> { Value = 2, Timestamp = new DateTime(2000, 1, 4), Quality = Quality.Good},
+                        new Datum<int> { Value = 3, Timestamp = new DateTime(2000, 1, 5), Quality = Quality.Fair},
+                        new Datum<int> { Value = 4, Timestamp = new DateTime(2000, 1, 6), Quality = Quality.Good},
+                        new Datum<int> { Value = 5, Timestamp = new DateTime(2000, 1, 7), Quality = Quality.Good},
+                        new Datum<int> { Value = 6, Timestamp = new DateTime(2000, 1, 8), Quality = Quality.Good},
+                        new Datum<int> { Value = 7, Timestamp = new DateTime(2000, 1, 9), Quality = Quality.Good}
+                    });
+
+                var result = signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Week, new DateTime(2000, 1, 3), new DateTime(2000, 1, 10)).Single();
+
+                Assert.AreEqual(Dto.Quality.Fair, result.Quality);
+                Assert.AreEqual(4, result.Value);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
