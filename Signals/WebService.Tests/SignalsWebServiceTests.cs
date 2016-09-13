@@ -1687,10 +1687,12 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, new DateTime(2016, 9, 5),
                     new DateTime(2016, 9, 5));
 
-                Assert.AreEqual(1, result.Count());
-                Assert.AreEqual(Dto.Quality.None, result.ElementAt(0).Quality);
-                Assert.AreEqual(new DateTime(2016, 9, 5), result.ElementAt(0).Timestamp);
-                Assert.AreEqual(1, result.ElementAt(0).Value);
+                AssertDatum(result, new Dto.Datum[] { new Dto.Datum()
+                {
+                    Quality = Dto.Quality.None,
+                    Timestamp = new DateTime(2016, 9, 5),
+                    Value = 1,
+                } });
             }
 
             private void SetupNoneMissingValuePolicyForGetCoarseData(Signal signal)
