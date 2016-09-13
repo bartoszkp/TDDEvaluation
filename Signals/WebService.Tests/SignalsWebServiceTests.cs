@@ -1669,6 +1669,30 @@ namespace WebService.Tests
                 Assert.AreEqual(0, result.Count());
             }
 
+            [TestMethod]
+            public void WhenGettingCoarseData_WithSameFromAndToTimestamp_ReturnsSingleDatum()
+            {
+                var existingSignal = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                };
+                var existingDatum = new List<Datum<int>>()
+                {
+                    new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2016, 9, 5), Value = 7 }
+                };
+                SetupNoneMissingValuePolicyForGetCoarseData(existingSignal);
+                SetupGetDataWithMissingPolicy(existingSignal, existingDatum, new DateTime(2016, 9, 5), new DateTime(2016, 9, 12));
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, new DateTime(2016, 9, 5),
+                    new DateTime(2016, 9, 5));
+
+                Assert.AreEqual(1, result.Count());
+                Assert.AreEqual(Dto.Quality.None, result.ElementAt(0).Quality);
+                Assert.AreEqual(new DateTime(2016, 9, 5), result.ElementAt(0).Timestamp);
+                Assert.AreEqual(1, result.ElementAt(0).Value);
+            }
+
             private void SetupNoneMissingValuePolicyForGetCoarseData(Signal signal)
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
@@ -1677,7 +1701,8 @@ namespace WebService.Tests
                     .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
             }
 
-            private void SetupGetDataWithMissingPolicy(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
+            private void SetupGetDataWithMissingPolicy(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, 
+                DateTime fromIncluded, DateTime toExcluded)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
