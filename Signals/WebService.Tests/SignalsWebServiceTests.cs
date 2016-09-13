@@ -1181,6 +1181,33 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            public void WhenGettingCoarseDataForOneTimestamp_ReturnsIt()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 984,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day
+                };
+
+                var data = new Domain.Datum<int>[]
+                {
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 4), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 5), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 6), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 7), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 8), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 9), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1,10), Value = 1 },
+                };
+
+                SetupGetCoarseData(signal, data);
+
+                var result = signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 4));
+
+                var d = result.First();
+            }
 
             private void SetupGetCoarseData<T>(Domain.Signal signal, Domain.Datum<T>[] data)
             {
