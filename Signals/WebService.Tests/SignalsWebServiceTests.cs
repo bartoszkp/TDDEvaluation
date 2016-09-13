@@ -1639,6 +1639,19 @@ namespace WebService.Tests
                 AssertDatum(result, expectedDatum.ToArray());
             }
 
+            [ExpectedException(typeof(Domain.Exceptions.GettingDataOfNotExistingSignal))]
+            [TestMethod]
+            public void WhenGettingCoarseData_FromSignalThatDoesNotExists_ThrowsAnException()
+            {
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(1));
+                var sigDomSer = new SignalsDomainService(signalsRepositoryMock.Object, null, null);
+                signalsWebService = new SignalsWebService(sigDomSer);
+
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Day, new DateTime(), new DateTime());
+            }
+
             private void SetupNoneMissingValuePolicyForGetCoarseData(Signal signal)
             {
                 missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
