@@ -1261,27 +1261,27 @@ namespace WebService.Tests
 
             #endregion
             #region Issue #29 (Feature: Setting ShadowMissingValuePolicy should not create a dependency cycle ) 
+
             [TestMethod]
-            [ExpectedException(typeof(NotImplementedException))]
-            public void GivenTwoSignalsAndShadowMVP_WhenSettingMissingValuePolicy_ThrowsException()
+            public void GivenTwoSignalsAndShadowMVP_WhenSettingMissingValuePolicy_CheckIfAreSignalsTheSameMethodWorksProperly()
             {
                 int signalId = 5;
-                int shadowSignalId = 8;
-                Dto.Signal shadowSignal = new Dto.Signal()
-                {
-                    Id = shadowSignalId,
-                    DataType = Dto.DataType.Boolean,
-                    Granularity = Dto.Granularity.Day,
-                    Path = new Dto.Path { Components = new[] { "a", "b" } }
-                };
-     
-                GivenASignal(new Domain.Signal()
+                Domain.Signal signal = new Domain.Signal()
                 {
                     Id = signalId,
                     DataType = Domain.DataType.Boolean,
                     Granularity = Domain.Granularity.Day,
                     Path = Domain.Path.FromString("x/y")
-                });
+                };
+
+                GivenASignal(signal);
+                Dto.Signal shadowSignal = new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path { Components = new[] { "x", "y" } }
+                };
+
                 ShadowMissingValuePolicy shadowmvp = new ShadowMissingValuePolicy() { ShadowSignal = shadowSignal };
 
                 signalsWebService.SetMissingValuePolicy(signalId, shadowmvp);
