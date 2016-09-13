@@ -24,5 +24,7 @@ namespace Domain.Services
 
         Type GetSignalType(int signalId);
         void Delete<T>(int signalId);
+
+        IEnumerable<Datum<T>> GetCoarseData<T>(int signalId,Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }

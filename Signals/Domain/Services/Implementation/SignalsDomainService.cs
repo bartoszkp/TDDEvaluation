@@ -73,6 +73,7 @@ namespace Domain.Services.Implementation
                     dateTime = dateTime.AddYears(1);
                     break;
             }
+            
         }
 
         public void SetData<T>(int signalId, IEnumerable<Datum<T>> data)
@@ -376,5 +377,67 @@ namespace Domain.Services.Implementation
                 throw new ArgumentException("Signals Datatypes or Granularities are not the same");
         }
 
+        public IEnumerable<Datum<T>> GetCoarseData<T>(int signalId,Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+
+
+
+            CheckTimestamp(fromIncludedUtc, granularity);
+            CheckTimestamp(toExcludedUtc, granularity);
+
+            var result = new List<Datum<T>>();
+
+            var datum = GetData<T>(signalId, fromIncludedUtc, toExcludedUtc).ToArray(); 
+
+            var signal = signalsRepository.Get(signalId);
+
+            CheckGranularities(granularity, signal.Granularity);
+
+            for (DateTime date = fromIncludedUtc; date < toExcludedUtc; )
+            {
+                var newDateTime = date;
+                AddToDateTime( ref newDateTime, granularity);
+                var actualDatum = datum.Select(x => x).Where(x => x.Timestamp >= date && x.Timestamp < newDateTime);
+
+                int j = 0;
+                dynamic sum=0;
+                Quality quality=Quality.Good;
+                foreach (var i in actualDatum)
+                {
+                    sum += i.Value;
+                    j++;
+                    quality = CheckWorseQuality(quality, i.Quality);
+
+                }
+
+
+                result.Add(new Datum<T>() { Timestamp = date, Value = sum / j, Signal = signal, Id = signalId, Quality = quality });
+
+                date = newDateTime;
+            }
+
+
+
+            return result;
+        }
+
+        private void CheckGranularities(Granularity granularity1, Granularity granularity2)
+        {
+            if (granularity1 < granularity2)
+            {
+                throw new ArgumentException();
+            }
+        }
+
+        private Quality CheckWorseQuality(Quality quality1, Quality quality2)
+        {
+            if (quality1 == Quality.None || quality2 == Quality.None) return Quality.None;
+            if (quality1 == Quality.Bad || quality2 == Quality.Bad) return Quality.Bad;
+            if (quality1 == Quality.Poor || quality2 == Quality.Poor) return Quality.Poor;
+            if (quality1 == Quality.Fair || quality2 == Quality.Fair) return Quality.Fair;
+
+           return Quality.Good;
+
+        }
     }
 }

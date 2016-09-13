@@ -79,9 +79,23 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+
+            var g = granularity.ToDomain<Domain.Granularity>();
+            return (IEnumerable<Datum>)RunGenericMethod(GetSignalType(signalId),
+                "GetCoarseDataGeneric", signalId,g, fromIncludedUtc, toExcludedUtc);
+
+         
+         
         }
 
+        public IEnumerable<Datum> GetCoarseDataGeneric<T>(int signalId,Domain.Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+           
+
+            return signalsDomainService
+                .GetCoarseData<T>(signalId, granularity,fromIncludedUtc, toExcludedUtc)
+                .ToDto<IEnumerable<Datum>>();
+        }
         public void SetData(int signalId, IEnumerable<Dto.Datum> data)
         {
             RunGenericMethod(GetSignalType(signalId), "SetDataGeneric", signalId, data);
