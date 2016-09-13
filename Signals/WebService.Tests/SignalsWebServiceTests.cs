@@ -1462,6 +1462,16 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(id2, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(InvalidCoarseGranularityException))]
+            public void GivenASignal_GettingCoarseDataWithIrregularTimePeriod_ThrowsException()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
+
+                signalsWebService.GetCoarseData(1, Dto.Granularity.Week, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
+            }
+
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
