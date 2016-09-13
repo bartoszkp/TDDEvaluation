@@ -151,13 +151,13 @@ namespace Domain.Services.Implementation
             if(missingValuePolicy is ShadowMissingValuePolicy<T>)
             {
                 (missingValuePolicy as ShadowMissingValuePolicy<T>).CheckSignalDataTypeAndGranularity(signal);
-                CheckIfSignalIsOwnShadow(missingValuePolicy, signal); //throws ArgumentException
+                CheckIfSignalIsOwnShadow<T>(missingValuePolicy, signal); //throws ArgumentException
             }
 
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }
 
-        private void CheckIfSignalIsOwnShadow(MissingValuePolicyBase missingValuePolicy, Signal signal)
+        private void CheckIfSignalIsOwnShadow<T>(MissingValuePolicyBase missingValuePolicy, Signal signal)
         {
             throw new NotImplementedException();
         }
