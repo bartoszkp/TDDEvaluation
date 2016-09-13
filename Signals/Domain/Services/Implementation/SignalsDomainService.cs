@@ -89,35 +89,40 @@ namespace Domain.Services.Implementation
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<bool>;
                 if (signal.DataType != ShadowMVP.ShadowSignal.DataType
-                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity
+                    || CreateADependencyCycle(signal, ShadowMVP))
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<decimal>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<decimal>;
                 if (signal.DataType != ShadowMVP.ShadowSignal.DataType
-                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity
+                    || CreateADependencyCycle(signal, ShadowMVP))
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<double>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<double>;
                 if (signal.DataType != ShadowMVP.ShadowSignal.DataType
-                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity
+                    || CreateADependencyCycle(signal, ShadowMVP))
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<int>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<int>;
                 if (signal.DataType != ShadowMVP.ShadowSignal.DataType
-                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity
+                    || CreateADependencyCycle(signal, ShadowMVP))
                     throw new ArgumentException();
             }
             if (missingValuePolicy is ShadowMissingValuePolicy<string>)
             {
                 var ShadowMVP = missingValuePolicy as ShadowMissingValuePolicy<string>;
                 if (signal.DataType != ShadowMVP.ShadowSignal.DataType
-                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity)
+                    || signal.Granularity != ShadowMVP.ShadowSignal.Granularity
+                    || CreateADependencyCycle(signal, ShadowMVP))
                     throw new ArgumentException();
             }
             this.missingValuePolicyRepository.Set(signal, missingValuePolicy);
@@ -368,7 +373,7 @@ namespace Domain.Services.Implementation
                 var indexFirstDatum = i;
                 T value = default(T);
                 Quality quality = data[i].Quality;
-                for (;i<data.Length && data[i].Timestamp < currentDate; ++i)
+                for (; i < data.Length && data[i].Timestamp < currentDate; ++i)
                 {
                     value = addValue(value, data[i].Value);
                     quality = lessQuality(quality, data[i].Quality);
@@ -531,6 +536,19 @@ namespace Domain.Services.Implementation
                 return Quality.None;
 
             return q1 > q2 ? q1 : q2;
+        }
+
+        private bool CreateADependencyCycle<T>(Signal signal, ShadowMissingValuePolicy<T> mvp)
+        {
+            if (mvp.ShadowSignal.Id == signal.Id)
+                return true;
+
+            var shadowSignalMVP = GetMissingValuePolicy(mvp.ShadowSignal);
+            if (shadowSignalMVP != null && shadowSignalMVP is ShadowMissingValuePolicy<T>
+                && CreateADependencyCycle(signal, shadowSignalMVP as ShadowMissingValuePolicy<T>))
+                return true;
+
+            return false;
         }
     }
 }
