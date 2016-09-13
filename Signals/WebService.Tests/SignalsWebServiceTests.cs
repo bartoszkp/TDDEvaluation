@@ -1301,6 +1301,43 @@ namespace WebService.Tests
 
                 missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<MissingValuePolicyBase>()));
             }
+
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenTwoSignalsAndShadowMVP_WhenSettingMissingValuePolicyAndSignalsAreTheSame_ExpectedException()
+            {
+                int signalId = 5;
+                int shadowSignalId = 6;
+                Domain.Signal signal = new Domain.Signal()
+                {
+                    Id = signalId,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("x/y")
+                };
+
+                GivenASignal(signal);
+                Dto.Signal shadowSignal = new Dto.Signal()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path { Components = new[] { "x", "y" } }
+                };
+
+                Domain.Signal shadowSignalDomain = new Domain.Signal()
+                {
+                    Id = shadowSignalId,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("x/y")
+                };
+
+                ShadowMissingValuePolicy shadowmvp = new ShadowMissingValuePolicy() { ShadowSignal = shadowSignal };
+
+                signalsWebService.SetMissingValuePolicy(signalId, shadowmvp);
+            }
+
+
             #endregion
             [TestMethod]
             public void GivenASignal_GivenNoData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
