@@ -1496,6 +1496,60 @@ namespace WebService.Tests
                 AssertDatum(result, filledDatum);
             }
 
+            [ExpectedException(typeof(Domain.Exceptions.SettingShadowPolicyCreatesADependencyCycle))]
+            [TestMethod]
+            public void WhenSettinShadowPolicy_IfItCreatesADependencyCycle_ThrowsAnException()
+            {
+                var signal1 = new Dto.Signal()
+                {
+                    Id = 1,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "signal1" } },
+                };
+                var signal2 = new Dto.Signal()
+                {
+                    Id = 1,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "signal2" } },
+                };
+                var signal3 = new Dto.Signal()
+                {
+                    Id = 1,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path() { Components = new[] { "signal3" } },
+                };
+
+                var shadowPolicy1 = new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                { Signal = signal1, ShadowSignal = signal2 };
+
+                var shadowPolicy2 = new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                { Signal = signal2, ShadowSignal = signal3 };
+
+                var shadowPolicy3 = new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                { Signal = signal3, ShadowSignal = signal1 };
+
+                missingValuePolicyRepositoryMock = new Mock<IMissingValuePolicyRepository>();
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Set(signal1.ToDomain<Domain.Signal>(), shadowPolicy1.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>()));
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Set(signal2.ToDomain<Domain.Signal>(), shadowPolicy2.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>()));
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Set(signal3.ToDomain<Domain.Signal>(), shadowPolicy3.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>()));
+
+                var signalsDomainService = new SignalsDomainService(null, null, missingValuePolicyRepositoryMock.Object);
+                signalsWebService = new SignalsWebService(signalDomainService);
+
+                signalsWebService.SetMissingValuePolicy(signal1.Id.Value, shadowPolicy1);
+                signalsWebService.SetMissingValuePolicy(signal2.Id.Value, shadowPolicy2);
+                signalsWebService.SetMissingValuePolicy(signal3.Id.Value, shadowPolicy3);
+            }
+
             #endregion
 
             #region PathEntry
