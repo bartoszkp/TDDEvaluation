@@ -397,7 +397,7 @@ namespace WebService.Tests
             GivenASignal(signal);
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
             signalsDataRepoMock.Setup(sdrm => sdrm.GetData<bool>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2018, 12, 12), new DateTime(2018, 12, 15)))
-                            .Returns(existingDatumFirst);           
+                            .Returns(existingDatumFirst);
             var signalsDomainService = new SignalsDomainService(
                     signalsRepoMock.Object,
                     signalsDataRepoMock.Object,
@@ -405,6 +405,45 @@ namespace WebService.Tests
             signalsWebService = new SignalsWebService(signalsDomainService);
             var result = signalsWebService.GetCoarseData<bool>(1, Dto.Granularity.Month, new DateTime(2018, 12, 12), new DateTime(2018, 12, 15));
         }
+
+        [TestMethod]
+        public void GivenASignalAndDatum_WhenGetCoarseDataWithInTheSameGranularity_ReturnThisDatum()
+        {
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Double,
+                Granularity = Granularity.Day,
+                Path = Path.FromString("r/vbc")
+            };
+
+            List<Datum<double>> existingDatumFirst = new List<Datum<double>>();
+            existingDatumFirst.Add(new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2018, 12, 12), Value = 1.0 });
+            existingDatumFirst.Add(new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2018, 12, 13), Value = 2.0 });
+            existingDatumFirst.Add(new Datum<double>() { Quality = Quality.Good, Timestamp = new DateTime(2018, 12, 14), Value = 3.0 });
+
+            signalsRepoMock = new Mock<ISignalsRepository>();
+            GivenASignal(signal);
+            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<double>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2018, 12, 12), new DateTime(2018, 12, 15)))
+                            .Returns(existingDatumFirst);
+            
+            var signalsDomainService = new SignalsDomainService(
+                    signalsRepoMock.Object,
+                    signalsDataRepoMock.Object,
+                    null);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+            var result = signalsWebService.GetCoarseData<double>(signal.Id.Value,Dto.Granularity.Day, new DateTime(2018, 12, 12), new DateTime(2018, 12, 15));
+            int index = 0;
+            foreach (var fd in existingDatumFirst)
+            {
+                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality);
+                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp);
+                Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
+                index++;
+            }
+        }
+        
         private void GivenNoSignals()
         {
             signalsRepoMock = new Mock<ISignalsRepository>();
