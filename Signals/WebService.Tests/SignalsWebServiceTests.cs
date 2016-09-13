@@ -16,7 +16,6 @@ namespace WebService.Tests
         public class SignalsWebServiceTests
         {
             private ISignalsWebService signalsWebService;
-            private SignalsDomainService signalDomainService;
 
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.IdNotNullException))]
