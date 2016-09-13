@@ -11,7 +11,7 @@ namespace ExampleSignalClient
 
             var id = client.Add(new Signal() { Granularity = Granularity.Day, Path = new Path() { Components = new[] { String.Empty } } }).Id.Value;
 
-            var result = client.GetById(id);
+            var result = client.GetById(345);
 
             if (result != null)
             {

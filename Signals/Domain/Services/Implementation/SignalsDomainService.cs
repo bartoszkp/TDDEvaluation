@@ -294,6 +294,9 @@ namespace Domain.Services.Implementation
 
             CheckArguments<T>(signal.Granularity, granularity, fromIncludedUtc, toExcludedUtc);
 
+            if (fromIncludedUtc == toExcludedUtc)
+                toExcludedUtc = AddOrSubtractDateTime(fromIncludedUtc, granularity, 1);
+
             decimal averageValue = 0.0m;
             var quality = Domain.Quality.Good;
             var dateTime = fromIncludedUtc;
