@@ -103,6 +103,10 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            var signal = GetById(signalId);
+            if (signal == null)
+                throw new SignalNotFoundException(signalId);
+
             throw new NotImplementedException();
         }
 
