@@ -1357,6 +1357,21 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(signalId, Dto.Granularity.Month, new DateTime(2015, 1, 1), new DateTime(2015, 1, 2));
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_GetCoarseDataWhenGivenGranularityIsMoreConcentrated_ThrowsException()
+            {
+                int signalId = 5;
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = signalId,
+                    DataType = Domain.DataType.Decimal,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("x/y")
+                });
+
+                signalsWebService.GetCoarseData(signalId, Dto.Granularity.Minute, new DateTime(2015, 1, 1), new DateTime(2015, 1, 2));
+            }
 
             #endregion
             [TestMethod]
