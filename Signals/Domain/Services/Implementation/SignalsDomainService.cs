@@ -151,6 +151,8 @@ namespace Domain.Services.Implementation
             if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                 throw new ArgumentException("This Datatype is not supported");
 
+            if (signal.Granularity >= granularity)
+                throw new ArgumentException("Given granularity is more precise than signal granularity");
             return null;
         }
         public void Set<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
