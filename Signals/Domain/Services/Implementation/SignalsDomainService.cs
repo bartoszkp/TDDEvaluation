@@ -88,11 +88,11 @@ namespace Domain.Services.Implementation
             dataFillStrategy.FillMissingData(signal,items, fromIncludedUtc, toExcludedUtc,this.signalsDataRepository);
 
 
-            var result = from d in items
-                         orderby d.Timestamp
-                         select d;
+            var sortedDatums = items?.OrderBy(datum => datum.Timestamp).ToList();
+            var lastIndex = sortedDatums.Count() - 1;
+            sortedDatums.RemoveAt(lastIndex);
 
-            return result;
+            return sortedDatums.OrderBy(datum => datum.Timestamp);
 
         }
 
