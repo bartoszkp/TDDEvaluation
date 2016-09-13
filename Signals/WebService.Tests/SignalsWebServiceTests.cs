@@ -1069,11 +1069,11 @@ namespace WebService.Tests
 
             #endregion
 
+            #region GetCoarseData()
 
             [TestMethod]
             public void WhenGettingCoarseData_ReturnsIt()
             {
-                GivenASignalSetupAddSignal();
                 var signal = new Domain.Signal()
                 {
                     Id = 984,
@@ -1081,7 +1081,7 @@ namespace WebService.Tests
                     Granularity = Domain.Granularity.Day
                 };
 
-                var datums = new Domain.Datum<int>[]
+                var data = new Domain.Datum<int>[]
                 {
                     new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 4), Value = 1 },
                     new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 5), Value = 1 },
@@ -1092,6 +1092,51 @@ namespace WebService.Tests
                     new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1,10), Value = 1 },
                 };
 
+                SetupGetCoarseData(signal, data);
+                
+                var result = signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 11));
+
+                var d = result.First();
+                Assert.AreEqual(Dto.Quality.Fair, d.Quality);
+                Assert.AreEqual(new DateTime(2016, 1, 4), d.Timestamp);
+                Assert.AreEqual(1, d.Value);
+            }
+
+            [TestMethod]
+            public void WhenGettingCoarseData_ReturnsItWithCorrectQuality()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 785,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day
+                };
+
+                var data = new Domain.Datum<int>[]
+                {
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 4), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Bad, Timestamp = new DateTime(2016,1, 5), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 6), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 7), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 8), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 9), Value = 1 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1,10), Value = 1 },
+                };
+
+                SetupGetCoarseData(signal, data);
+
+                var result = signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 11));
+
+                var d = result.First();
+                Assert.AreEqual(Dto.Quality.Bad, d.Quality);
+                Assert.AreEqual(new DateTime(2016, 1, 4), d.Timestamp);
+                Assert.AreEqual(1, d.Value);
+            }
+            
+            private void SetupGetCoarseData<T>(Domain.Signal signal, Domain.Datum<T>[] data)
+            {
+                GivenASignalSetupAddSignal();
+
                 signalsRepositoryMock
                     .Setup(sr => sr.Get(It.IsAny<int>()))
                     .Returns(signal);
@@ -1101,16 +1146,11 @@ namespace WebService.Tests
                     .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
 
                 signalsDataRepositoryMock
-                    .Setup(sdr => sdr.GetData<int>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(datums);
-
-                var result = signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 11));
-
-                var d = result.First();
-                Assert.AreEqual(Dto.Quality.Fair, d.Quality);
-                Assert.AreEqual(new DateTime(2016, 1, 4), d.Timestamp);
-                Assert.AreEqual(1, d.Value);
+                    .Setup(sdr => sdr.GetData<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(data);
             }
+
+            #endregion
 
             private void SetupMockDeleteFunction()
             {
