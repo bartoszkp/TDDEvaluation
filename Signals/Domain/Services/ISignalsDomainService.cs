@@ -18,7 +18,11 @@ namespace Domain.Services
         void SetData<T>(int signalId, IEnumerable<Datum<T>> dataDomain);
 
         PathEntry GetPathEntry(Path prefixPath);
+
         void Delete(int signalId);
+
         MissingValuePolicyBase GetMissingValuePolicy(Signal signal);
+
+        IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }

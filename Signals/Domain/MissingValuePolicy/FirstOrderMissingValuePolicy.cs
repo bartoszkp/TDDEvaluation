@@ -187,12 +187,7 @@ namespace Domain.MissingValuePolicy
             }
             return datumsFirst;
         }
-
         
-        
-
-        
-
         private DateTime AddingTimespanToDataTime(DateTime addedData, Granularity granularitySignal)
         {
             var checkGranularity = new Dictionary<Granularity, Action>()

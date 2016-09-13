@@ -88,7 +88,26 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            Signal signal = GetById(signalId);
+            if (signal == null)
+                throw new NoSuchSignalException();
+
+            var domainSignal = signal.ToDomain<Domain.Signal>();
+            var domainGranularity = granularity.ToDomain<Domain.Granularity>();
+            switch (signal.DataType)
+            {
+                case (DataType.Decimal):
+                    return signalsDomainService.GetCoarseData<decimal>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Datum>>();
+                case (DataType.Double):
+                    return signalsDomainService.GetCoarseData<double>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Datum>>();
+                case (DataType.Integer):
+                    return signalsDomainService.GetCoarseData<int>(domainSignal, domainGranularity, fromIncludedUtc, toExcludedUtc).ToDto<IEnumerable<Datum>>();
+                case (DataType.String):
+                    throw new ArgumentException();
+                case (DataType.Boolean):
+                    throw new ArgumentException();
+            }
+            return null;
         }
 
         public IEnumerable<Datum> GetData<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)

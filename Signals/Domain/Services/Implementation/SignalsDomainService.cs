@@ -95,9 +95,9 @@ namespace Domain.Services.Implementation
         {
             var signal = GetById(signalId);
             Datum<T> secondaryItem = new Datum<T>() { Signal = signal, Timestamp = fromIncludedUtc };
-            VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
+            VerifyTimeStamp<T>(signal.Granularity, secondaryItem.Timestamp);
             secondaryItem = new Datum<T>() { Signal = signal, Timestamp = toExcludedUtc };
-            VerifyTimeStamp<T>(signal.Granularity, secondaryItem);
+            VerifyTimeStamp<T>(signal.Granularity, secondaryItem.Timestamp);
             DateTime dataFrom= new DateTime();
             var dataOlder = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1);
             if(dataOlder.Count()!=0)
@@ -116,7 +116,7 @@ namespace Domain.Services.Implementation
 
             foreach (var item in data)
             {
-                VerifyTimeStamp<T>(signal.Granularity, item);
+                VerifyTimeStamp<T>(signal.Granularity, item.Timestamp);
             }
             if (fromIncludedUtc == toExcludedUtc)
             {
@@ -155,7 +155,7 @@ namespace Domain.Services.Implementation
             if ((dataDomain != null) && (signal != null))
                 foreach (var item in dataDomain)
                 {
-                    VerifyTimeStamp<T>(signal.Granularity, item);
+                    VerifyTimeStamp<T>(signal.Granularity, item.Timestamp);
                 }
             signalsDataRepository.SetData(dataDomain);
         }
@@ -221,68 +221,193 @@ namespace Domain.Services.Implementation
 
 
         #region SetupGranularity
-        public void VerifyTimeStamp<T>(Granularity granularity, Datum<T> checkingElement)
+        public void VerifyTimeStamp<T>(Granularity granularity, DateTime timestamp)
         {
             var checkGranularity = new Dictionary<Granularity, Action>
             {
-                {Granularity.Second, () => GranularitySecond<T>(checkingElement) },
-                {Granularity.Hour, () => GranularityHour<T>(checkingElement) },
-                {Granularity.Minute, () => GranularityMinute<T>(checkingElement) },
-                {Granularity.Day, () => GranularityDay<T>(checkingElement) },
-                {Granularity.Week, () => GranularityWeek<T>(checkingElement) },
-                {Granularity.Month, () => GranularityMonth<T>(checkingElement) },
-                {Granularity.Year, () => GranularityYear<T>(checkingElement) }
+                {Granularity.Second, () => GranularitySecond<T>(timestamp) },
+                {Granularity.Hour, () => GranularityHour<T>(timestamp) },
+                {Granularity.Minute, () => GranularityMinute<T>(timestamp) },
+                {Granularity.Day, () => GranularityDay<T>(timestamp) },
+                {Granularity.Week, () => GranularityWeek<T>(timestamp) },
+                {Granularity.Month, () => GranularityMonth<T>(timestamp) },
+                {Granularity.Year, () => GranularityYear<T>(timestamp) }
             };
             checkGranularity[granularity].Invoke();
         }
-        private void GranularitySecond<T>(Datum<T> checkingElement)
+        private void GranularitySecond<T>(DateTime timestamp)
         {
-            if (checkingElement.Timestamp.Millisecond != 0)
+            if (timestamp.Millisecond != 0)
                 throw new TimestampHaveWrongFormatException();
         }
-        private void GranularityMinute<T>(Datum<T> checkingElement)
+        private void GranularityMinute<T>(DateTime timestamp)
         {
-            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0))
+            if ((timestamp.Millisecond != 0) || (timestamp.Second != 0))
             {
                 throw new TimestampHaveWrongFormatException();
             }
         }
-        private void GranularityHour<T>(Datum<T> checkingElement)
+        private void GranularityHour<T>(DateTime timestamp)
         {
-            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0))
+            if ((timestamp.Millisecond != 0) || (timestamp.Second != 0) || (timestamp.Minute != 0))
             {
                 throw new TimestampHaveWrongFormatException();
             }
         }
-        private void GranularityDay<T>(Datum<T> checkingElement)
+        private void GranularityDay<T>(DateTime timestamp)
         {
-            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0))
+            if ((timestamp.Millisecond != 0) || (timestamp.Second != 0) || (timestamp.Minute != 0) || (timestamp.Hour != 0))
             {
                 throw new TimestampHaveWrongFormatException();
             }
         }
-        private void GranularityWeek<T>(Datum<T> checkingElement)
+        private void GranularityWeek<T>(DateTime timestamp)
         {
-            DateTime dd = new DateTime(2000, 1, 1, 0, 0, 0);
-            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.DayOfWeek != DayOfWeek.Monday))
+            if ((timestamp.Millisecond != 0) || (timestamp.Second != 0) || (timestamp.Minute != 0) || (timestamp.Hour != 0) || (timestamp.DayOfWeek != DayOfWeek.Monday))
             {
                 throw new TimestampHaveWrongFormatException();
             }
         }
-        private void GranularityMonth<T>(Datum<T> checkingElement)
+        private void GranularityMonth<T>(DateTime timestamp)
         {
-            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.Day != 1))
+            if ((timestamp.Millisecond != 0) || (timestamp.Second != 0) || (timestamp.Minute != 0) || (timestamp.Hour != 0) || (timestamp.Day != 1))
             {
                 throw new TimestampHaveWrongFormatException();
             }
         }
-        private void GranularityYear<T>(Datum<T> checkingElement)
+        private void GranularityYear<T>(DateTime timestamp)
         {
-            if ((checkingElement.Timestamp.Millisecond != 0) || (checkingElement.Timestamp.Second != 0) || (checkingElement.Timestamp.Minute != 0) || (checkingElement.Timestamp.Hour != 0) || (checkingElement.Timestamp.Day != 1) || (checkingElement.Timestamp.Month != 1))
+            if ((timestamp.Millisecond != 0) || (timestamp.Second != 0) || (timestamp.Minute != 0) || (timestamp.Hour != 0) || (timestamp.Day != 1) || (timestamp.Month != 1))
             {
                 throw new TimestampHaveWrongFormatException();
             }
         }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            if(fromIncludedUtc > toExcludedUtc)
+            {
+                return new List<Datum<T>>() { new Datum<T>() { Quality = Quality.None, Timestamp = fromIncludedUtc, Value = default(T) } }.ToArray();
+            }
+
+
+            VerifyTimeStamp<T>(granularity, fromIncludedUtc);
+            VerifyTimeStamp<T>(granularity, toExcludedUtc);
+
+            var policy = GetMissingValuePolicy(signal) as MissingValuePolicy.MissingValuePolicy<T>;
+
+            int count;
+            dateTimeList = new List<DateTime>();
+
+            if(fromIncludedUtc == toExcludedUtc)
+            {
+                CreateDateTimeList(fromIncludedUtc, granularity, 1);
+                return CreateCoarseDataEnumerable(signal, policy);
+            }
+
+            switch (granularity)
+            {
+                case Granularity.Second:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalSeconds;
+                    CreateDateTimeList(fromIncludedUtc, granularity, count);
+                    break;
+                case Granularity.Minute:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalMinutes;
+                    CreateDateTimeList(fromIncludedUtc, granularity, count);
+                    break;
+                case Granularity.Hour:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).Hours;
+                    CreateDateTimeList(fromIncludedUtc, granularity, count);
+                    break;
+                case Granularity.Day:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays;
+                    CreateDateTimeList(fromIncludedUtc, granularity, count);
+                    break;
+                case Granularity.Week:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 7;
+                    CreateDateTimeList(fromIncludedUtc, granularity, count);
+                    break;
+                case Granularity.Month:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 30;
+                    CreateDateTimeList(fromIncludedUtc, granularity, count);
+                    break;
+                case Granularity.Year:
+                    count = (int)toExcludedUtc.Subtract(fromIncludedUtc).TotalDays / 365;
+                    CreateDateTimeList(fromIncludedUtc, granularity, count);
+                    break;
+            }
+            
+            return CreateCoarseDataEnumerable(signal, policy);
+        }
+
+        private IEnumerable<Datum<T>> CreateCoarseDataEnumerable<T>(Signal signal, MissingValuePolicy<T> policy)
+        {
+            List<Datum<T>> coarseDataList = new List<Datum<T>>();
+            IEnumerable<Datum<T>> data;
+            IEnumerable<Datum<T>> filledData;
+            Quality quality;
+            T value;
+
+            int index = 1;
+
+            foreach(var timestamp in dateTimeList)
+            {
+                data = signalsDataRepository.GetData<T>(signal, timestamp, dateTimeList.ElementAt(index));
+                filledData = policy.FillData(signal, data, timestamp, dateTimeList.ElementAt(index), signalsDataRepository);
+
+                quality = SetOutQuality(filledData);
+                value = SetOutValue(filledData);
+
+                coarseDataList.Add(new Datum<T>() { Quality = quality, Timestamp = timestamp, Value = value });
+                if (dateTimeList.ElementAt(index) == dateTimeList.Last())
+                    break;
+                index++;
+            }
+
+            return coarseDataList.ToArray();
+        }
+
+        private T SetOutValue<T>(IEnumerable<Datum<T>> filledData)
+        {
+            return (T)Convert.ChangeType(filledData.Average(d => Convert.ToDecimal(d.Value)), typeof(T));
+        }
+
+        private Quality SetOutQuality<T>(IEnumerable<Datum<T>> filledData)
+        {
+            var tempQuality = Quality.Good;
+            foreach (var item in filledData)
+            {
+                if (item.Quality == Quality.None)
+                    return Quality.None;
+                else if (item.Quality > tempQuality)
+                    tempQuality = item.Quality;
+            }
+            return tempQuality;
+        }
+
+        private void CreateDateTimeList(DateTime fromIncludedUtc, Granularity granularity, int count)
+        {
+            var timestamp = fromIncludedUtc;
+            for (int i = 0; i < count + 1; i++)
+            {
+                dateTimeList.Add(timestamp);
+                timestamp = granularityToTimestampDictionary[granularity](timestamp);
+            }
+        }
+
+        private Dictionary<Granularity, Func<DateTime, DateTime>> granularityToTimestampDictionary =
+            new Dictionary<Granularity, Func<DateTime, DateTime>>()
+        {
+                {Granularity.Second, time => time.AddSeconds(1) },
+                {Granularity.Minute, time => time.AddMinutes(1) },
+                {Granularity.Hour, time => time.AddHours(1) },
+                {Granularity.Day, time => time.AddDays(1) },
+                {Granularity.Week, time => time.AddDays(7) },
+                {Granularity.Month, time => time.AddMonths(1) },
+                {Granularity.Year, time => time.AddYears(1) }
+        };
+
+        private List<DateTime> dateTimeList;
 
         #endregion
     }
