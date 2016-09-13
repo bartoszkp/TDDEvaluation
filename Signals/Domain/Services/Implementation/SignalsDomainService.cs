@@ -148,7 +148,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            return null;
+            throw new NotImplementedException();
         }
         public void Set<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
