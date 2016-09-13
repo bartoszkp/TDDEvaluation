@@ -188,12 +188,26 @@ namespace Domain.Services.Implementation
                     return true;
                 else
                 {
-                    tmpPolicy = (ShadowMissingValuePolicy<T>)missingValuePolicyRepository.Get(signalToCheck);
+                    var isShadowPolicy = missingValuePolicyRepository.Get(signalToCheck);
 
-                    if (tmpPolicy == null)
+                    if (IsShadowPolicy(isShadowPolicy.GetType().Name))
+                        tmpPolicy = (ShadowMissingValuePolicy<T>)isShadowPolicy;
+                    else
                         return false;
                 }
             }
+        }
+
+        private bool IsShadowPolicy(string name)
+        {
+            if (name == "ShadowMissingValuePolicyBoolean" ||
+                name == "ShadowMissingValuePolicyInteger" ||
+                name == "ShadowMissingValuePolicyDouble" ||
+                name == "ShadowMissingValuePolicyDecimal" ||
+                name == "ShadowMissingValuePolicyString")
+                return true;
+
+            return false;
         }
 
         public MissingValuePolicyBase GetMissingValuePolicy(Signal signal)
