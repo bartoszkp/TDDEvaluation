@@ -1630,7 +1630,7 @@ namespace WebService.Tests
                 var existingDatum = GetExistingDatumWithMissingValuesForGetCoarseDataWeek();
 
                 SetupNoneMissingValuePolicyForGetCoarseData(existingSignal);
-                SetupGetData(existingSignal, existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
+                SetupGetDataWithMissingPolicy(existingSignal, existingDatum, new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
 
                 var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week,
                     new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
@@ -1647,7 +1647,7 @@ namespace WebService.Tests
                     .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
             }
 
-            private void SetupGetData(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
+            private void SetupGetDataWithMissingPolicy(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
             {
                 signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
                 signalsRepositoryMock = new Mock<ISignalsRepository>();
@@ -1662,6 +1662,25 @@ namespace WebService.Tests
 
                 var signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
                     signalsDataRepositoryMock.Object, missingValuePolicyRepositoryMock.Object);
+
+                signalsWebService = new SignalsWebService(signalDomainService);
+            }
+
+            private void SetupGetData(Signal existingSignal, IEnumerable<Domain.Datum<int>> existingDatum, DateTime fromIncluded, DateTime toExcluded)
+            {
+                signalsDataRepositoryMock = new Mock<ISignalsDataRepository>();
+                signalsRepositoryMock = new Mock<ISignalsRepository>();
+
+                signalsRepositoryMock
+                    .Setup(sr => sr.Get(existingSignal.Id.Value))
+                    .Returns(existingSignal);
+
+                signalsDataRepositoryMock
+                    .Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(s => s.Id == 1), fromIncluded, toExcluded))
+                    .Returns(existingDatum);
+
+                var signalDomainService = new SignalsDomainService(signalsRepositoryMock.Object,
+                    signalsDataRepositoryMock.Object, null);
 
                 signalsWebService = new SignalsWebService(signalDomainService);
             }
