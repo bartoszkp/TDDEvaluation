@@ -20,6 +20,44 @@ namespace Domain.MissingValuePolicy
         [NHibernateIgnore]
         public override Type NativeDataType { get { return typeof(T); } }
 
-        public abstract Datum<T> GetDatumToFill(DateTime timestamp);
+        public virtual Datum<T> GetDatumToFill(DateTime timestamp)
+        {
+            return new Datum<T>()
+            {
+                Quality = Quality.None,
+                Value = default(T),
+                Timestamp = timestamp
+            };
+        }
+
+        public virtual DateTime AddTime(Granularity granularity, DateTime time, int timeToAdd = 1)
+        {
+            switch (granularity)
+            {
+                case Granularity.Day:
+                    return time.AddDays(timeToAdd);
+
+                case Granularity.Hour:
+                    return time.AddHours(timeToAdd);
+
+                case Granularity.Minute:
+                    return time.AddMinutes(timeToAdd);
+
+                case Granularity.Month:
+                    return time.AddMonths(timeToAdd);
+
+                case Granularity.Second:
+                    return time.AddSeconds(timeToAdd);
+
+                case Granularity.Week:
+                    return time.AddDays(7 * timeToAdd);
+
+                case Granularity.Year:
+                    return time.AddYears(timeToAdd);
+            }
+
+            throw new NotSupportedException("Granularity " + granularity.ToString() + " is not supported");
+        }
+
     }
 }

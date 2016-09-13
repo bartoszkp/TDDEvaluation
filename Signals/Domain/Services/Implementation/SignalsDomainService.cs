@@ -165,7 +165,7 @@ namespace Domain.Services.Implementation
 
             if (fromIncludedUtc == toExcludedUtc)
             {
-                toExcludedUtc = addTime(signal.Granularity, toExcludedUtc);
+                toExcludedUtc = policy.AddTime(signal.Granularity, toExcludedUtc);
             }
 
             if (policy != null)
@@ -174,6 +174,13 @@ namespace Domain.Services.Implementation
                 var returnList = new List<Datum<T>>();
                 var granulitary = signal.Granularity;
                 DateTime checkedDateTime = fromIncludedUtc;
+
+                if (policy is ShadowMissingValuePolicy<T>)
+                {
+                    var shadowMVP = policy as ShadowMissingValuePolicy<T>;
+                    var shadowData = GetData<T>(shadowMVP.ShadowSignal, fromIncludedUtc, toExcludedUtc);
+                    return shadowMVP.FillData(signal, fromIncludedUtc, toExcludedUtc, gettingList, shadowData);
+                }
 
                 int countElementOfList = TimeDifference(granulitary, toExcludedUtc, fromIncludedUtc);
                 if (countElementOfList + 1 == gettingList?.Length)
@@ -287,13 +294,13 @@ namespace Domain.Services.Implementation
                                             };
 
                                             returnList.Add(itemToAdd);
-                                            checkedDateTime = addTime(signal.Granularity, checkedDateTime);
+                                            checkedDateTime = policy.AddTime(signal.Granularity, checkedDateTime);
                                         }
                                     }
                                 }
                                 i--;
 
-                                checkedDateTime = addTime(signal.Granularity, checkedDateTime, -1);
+                                checkedDateTime = policy.AddTime(signal.Granularity, checkedDateTime, -1);
                             }
                             addingItem = null;
                         }
@@ -307,7 +314,7 @@ namespace Domain.Services.Implementation
                     }
                     else
                         returnList.Add(xx);
-                    checkedDateTime = addTime(signal.Granularity, checkedDateTime);
+                    checkedDateTime = policy.AddTime(signal.Granularity, checkedDateTime);
                 }
 
                 return returnList;
@@ -410,35 +417,6 @@ namespace Domain.Services.Implementation
             }
 
             signalsRepository.Delete(signalToDelete);
-        }
-
-        public DateTime addTime(Granularity granularity, DateTime time, int timeToAdd = 1)
-        {
-            switch (granularity)
-            {
-                case Granularity.Day:
-                    return time.AddDays(timeToAdd);
-
-                case Granularity.Hour:
-                    return time.AddHours(timeToAdd);
-
-                case Granularity.Minute:
-                    return time.AddMinutes(timeToAdd);
-
-                case Granularity.Month:
-                    return time.AddMonths(timeToAdd);
-
-                case Granularity.Second:
-                    return time.AddSeconds(timeToAdd);
-
-                case Granularity.Week:
-                    return time.AddDays(7 * timeToAdd);
-
-                case Granularity.Year:
-                    return time.AddYears(timeToAdd);
-            }
-
-            throw new NotSupportedException("Granularity " + granularity.ToString() + " is not supported");
         }
 
         public int TimeDifference(Granularity granularity, DateTime newer, DateTime older)
