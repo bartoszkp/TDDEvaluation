@@ -404,7 +404,48 @@ namespace Domain.Services.Implementation
             if (!IsTimestampRegular(granularity, fromIncludedUtc) || !IsTimestampRegular(granularity, toExcludedUtc))
                 throw new IncorrectTimestampException();
 
-            return default(IEnumerable<Datum<T>>);
+            var data = GetData<T>(signalId, fromIncludedUtc, toExcludedUtc);
+
+            return CalculateCoarseData(signal, data, granularity, fromIncludedUtc, toExcludedUtc);
+        }
+
+        private IEnumerable<Datum<T>> CalculateCoarseData<T>(Signal signal, IEnumerable<Datum<T>> data, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            var periods = NumberOfPeriods(fromIncludedUtc, toExcludedUtc, granularity);
+            var array = new Datum<T>[periods];
+            var dateModifier = DateModifier(granularity);
+            var tmp = fromIncludedUtc;
+
+            var i = 0;
+            while(tmp < toExcludedUtc)
+            {
+                var dataFromPeriod = data.Where(d => d.Timestamp >= tmp && d.Timestamp < dateModifier(tmp));
+                var quality = dataFromPeriod.Select(d => d.Quality).Max(); //lowest quality
+                T average = (T)GetAverageValue(dataFromPeriod);
+                array[i] = new Datum<T>
+                {
+                    Signal = signal,
+                    Timestamp = tmp,
+                    Value = average,
+                    Quality = quality
+                };
+
+                tmp = dateModifier(tmp);
+                i++;
+            }
+
+            return array;
+        }
+
+        private dynamic GetAverageValue<T>(IEnumerable<Datum<T>> dataFromPeriod)
+        {
+            if(typeof(T) == typeof(int))
+                return dataFromPeriod.Select(d => d.Value).Cast<int>().Average();
+            if (typeof(T) == typeof(double))
+                return dataFromPeriod.Select(d => d.Value).Cast<double>().Average();
+            if (typeof(T) == typeof(decimal))
+                return dataFromPeriod.Select(d => d.Value).Cast<decimal>().Average();
+            return 0;
         }
     }
 }
