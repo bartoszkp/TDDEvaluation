@@ -78,7 +78,10 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+            if (signal.Granularity == granularity.ToDomain<Domain.Granularity>())
+                throw new ArgumentException("The granularity for coarse data has to be smaller than signal's granularity.");
+            else return default(IEnumerable<Datum>);
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
