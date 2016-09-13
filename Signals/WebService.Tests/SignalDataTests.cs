@@ -354,6 +354,17 @@ namespace WebService.Tests
                 index++;
             }
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(NoSuchSignalException))]
+        public void SignalNotExists_GetCoarseData_ThrowsException()
+        {
+            SetupWebService();
+            signalsRepoMock.Setup(sr => sr.Get(1)).Returns((Signal)null);
+
+            var result = signalsWebService.GetCoarseData(1,new Dto.Granularity(), new DateTime(), new DateTime());
+
+        }
         private void GivenNoSignals()
         {
             signalsRepoMock = new Mock<ISignalsRepository>();

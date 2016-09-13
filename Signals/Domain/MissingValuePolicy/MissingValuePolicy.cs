@@ -15,6 +15,11 @@ namespace Domain.MissingValuePolicy
 
         public virtual Signal GetShadowSignal() { return null; }
 
+        public virtual Quality GetQuality() { return Quality.None; }
+
+        public virtual void SetQuality(Quality quality) { }
+
+
         [NHibernateIgnore]
         public abstract Type NativeDataType { get; }
         

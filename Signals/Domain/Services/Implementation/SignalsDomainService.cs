@@ -91,7 +91,7 @@ namespace Domain.Services.Implementation
             var signal = GetById(signalId);
             if (signal == null)
                 throw new NoSuchSignalException("Attempted to set missing value policy to a non exsisting signal");
-
+            
             policy.CheckGranularityAndDataType(signal);
 
             this.missingValuePolicyRepository.Set(signal, policy);
@@ -166,7 +166,7 @@ namespace Domain.Services.Implementation
             if (date == toExcludedUtc)
             {
                 if ((mvp.GetType() == typeof(SpecificValueMissingValuePolicy<T>)))
-                    datums.Add(new Datum<T>() { Signal = signal, Quality = mvpSpec.Quality, Timestamp = date, Value = mvpSpec.Value });
+                    datums.Add(new Datum<T>() { Signal = signal, Quality = mvpSpec.GetQuality(), Timestamp = date, Value = mvpSpec.Value });
             }
             else
             {
