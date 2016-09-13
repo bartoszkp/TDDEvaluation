@@ -364,13 +364,15 @@ namespace Domain.Services.Implementation
                 currentDate = mvp.AddTime(granularity, currentDate);
                 var indexFirstDatum = i;
                 T value = default(T);
+                Quality quality = data[i].Quality;
                 for (;i<data.Length && data[i].Timestamp < currentDate; ++i)
                 {
                     value = addValue(value, data[i].Value);
+                    quality = lessQuality(quality, data[i].Quality);
                 }
                 result.Add(new Datum<T>()
                 {
-                    Quality = data[indexFirstDatum].Quality,
+                    Quality = quality,
                     Timestamp = mvp.AddTime(granularity, currentDate, -1),
                     Value = divideValue(value, i - indexFirstDatum)
                 });
@@ -518,6 +520,14 @@ namespace Domain.Services.Implementation
             }
 
             throw new NotSupportedException("Type " + typeof(T).ToString() + " is not supported");
+        }
+
+        private Quality lessQuality(Quality q1, Quality q2)
+        {
+            if (q1 == Quality.None || q2 == Quality.None)
+                return Quality.None;
+
+            return q1 > q2 ? q1 : q2;
         }
     }
 }
