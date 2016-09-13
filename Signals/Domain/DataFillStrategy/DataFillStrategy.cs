@@ -33,6 +33,8 @@ namespace Domain.DataFillStrategy
                 SetupZeroOrderMissingValuePolicy(datums, dict, signal, signalsDataRepository, after, before, datum);
             else if (this.missingValuePolicy is MissingValuePolicy.ShadowMissingValuePolicy<T>)
                 SetupShadowMissingValuePolicy(datums, dict, signalsDataRepository, after, before);
+            else if (this.missingValuePolicy is MissingValuePolicy.FirstOrderMissingValuePolicy<T>)
+                SetupFirstOrderMissingValuePolicy(datums, signal, signalsDataRepository, after, before, datumsFirst);
         }
 
         private void SetupShadowMissingValuePolicy<T>(List<Datum<T>> datums, Dictionary<DateTime, Datum<T>> dict, ISignalsDataRepository signalsDataRepository, DateTime after, DateTime before)
@@ -87,6 +89,22 @@ namespace Domain.DataFillStrategy
 
         public void SetupFirstOrderMissingValuePolicy<T>(List<Datum<T>> datums, Signal signal, ISignalsDataRepository signalsDataRepository, DateTime after,DateTime before, List<Domain.Datum<T>> datumsFirst)
         {
+                if (after == before)
+                {
+                    Datum<T> datumFirst = new Datum<T>()
+                    {
+                        Quality = datums.ElementAt(0).Quality,
+                        Value = datums.ElementAt(0).Value,
+                        Timestamp = datums.ElementAt(0).Timestamp,
+                    };
+
+                    datums.Clear();
+                    datums.Add(datumFirst);
+
+                return;
+                }
+
+
             while (after < before)
             {
                 var dataOlder = signalsDataRepository.GetDataOlderThan<T>(signal, after, 1);
@@ -123,10 +141,7 @@ namespace Domain.DataFillStrategy
                     after = AddingTimespanToDataTime(after, signal.Granularity);
                 }
                 else
-                {
-                    
-                    
-
+                { 
                     switch (signal.DataType)
                     {
                         case DataType.Boolean:
