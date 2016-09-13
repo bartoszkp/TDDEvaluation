@@ -1426,6 +1426,17 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(10, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
             }
 
+            [TestMethod]
+            public void GivenASignal_GettingCoarseDataWithFromDateOlderThanToDate_ReturnsEmptyDatumContainer()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
+
+                var result = signalsWebService.GetCoarseData(10, Dto.Granularity.Month, new DateTime(2000, 1, 10), new DateTime(2000, 1, 3));
+
+                Assert.AreEqual(0, result.Count());
+            }
+
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
