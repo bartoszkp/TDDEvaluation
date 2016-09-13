@@ -62,7 +62,7 @@ namespace WebService
 
                 if (sig == null) throw new ArgumentException();
 
-                if (!signalsDomainService.VerifyTimeStamp(sig, fromIncludedUtc))
+                if (!signalsDomainService.VerifyTimeStamp(sig.Granularity, fromIncludedUtc))
                     throw new ArgumentException();
 
                 var k = sig.DataType;
@@ -139,7 +139,7 @@ namespace WebService
 
                 foreach (var d in data)
                 {
-                    if (!signalsDomainService.VerifyTimeStamp(result, d.Timestamp))
+                    if (!signalsDomainService.VerifyTimeStamp(result.Granularity, d.Timestamp))
                         throw new ArgumentException();
                 }
 

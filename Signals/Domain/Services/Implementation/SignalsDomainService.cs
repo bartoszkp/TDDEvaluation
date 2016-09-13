@@ -153,6 +153,9 @@ namespace Domain.Services.Implementation
 
             if (signal.Granularity >= granularity)
                 throw new ArgumentException("Given granularity is more precise than signal granularity");
+
+            if (!VerifyTimeStamp(granularity, fromIncludedUtc) || !VerifyTimeStamp(granularity, toExcludedUtc))
+                throw new ArgumentException("Timestamp not match to given granularity");
             return null;
         }
         public void Set<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
@@ -237,15 +240,15 @@ namespace Domain.Services.Implementation
             return new PathEntry(resultSignals, resultSubPaths.Distinct());
         }
 
-        public bool VerifyTimeStamp(Domain.Signal signal, DateTime timestamp)
+        public bool VerifyTimeStamp(Granularity granularity, DateTime timestamp)
         {
-            if (signal.Granularity == Domain.Granularity.Year && timestamp != new DateTime(timestamp.Year, 1, 1))
+            if (granularity == Domain.Granularity.Year && timestamp != new DateTime(timestamp.Year, 1, 1))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Month && timestamp != new DateTime(timestamp.Year, timestamp.Month, 1))
+            if (granularity == Domain.Granularity.Month && timestamp != new DateTime(timestamp.Year, timestamp.Month, 1))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Week
+            if (granularity == Domain.Granularity.Week
                 && (timestamp.DayOfWeek != DayOfWeek.Monday
                     || timestamp.Millisecond != 0
                     || timestamp.Second != 0
@@ -253,18 +256,18 @@ namespace Domain.Services.Implementation
                     || timestamp.Hour != 0))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Day && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day))
+            if (granularity == Domain.Granularity.Day && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Hour
+            if (granularity == Domain.Granularity.Hour
                 && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, 0, 0))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Minute
+            if (granularity == Domain.Granularity.Minute
                 && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, 0))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Second
+            if (granularity == Domain.Granularity.Second
                 && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, timestamp.Second))
                 return false;
 

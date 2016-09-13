@@ -1375,7 +1375,7 @@ namespace WebService.Tests
                     Path = Domain.Path.FromString("x/y")
                 });
 
-                signalsWebService.GetCoarseData(signalId, Dto.Granularity.Week, new DateTime(2016, 1, 5), new DateTime(2015, 1, 25));
+                signalsWebService.GetCoarseData(signalId, Dto.Granularity.Week, new DateTime(2016, 1, 5), new DateTime(2016, 1, 25));
             }
 
             #endregion
