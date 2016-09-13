@@ -159,9 +159,21 @@ namespace Domain.Services.Implementation
 
         private void CheckIfSignalIsOwnShadow<T>(MissingValuePolicyBase missingValuePolicy, Signal signal)
         {
-            var shadowMvp = missingValuePolicy as ShadowMissingValuePolicy<T>;
-            var shadowSignal = shadowMvp.ShadowSignal;
-            AreSignalsTheSame(signal, shadowSignal);
+            if (missingValuePolicy is ShadowMissingValuePolicy<T>)
+            {
+                var shadowMvp = missingValuePolicy as ShadowMissingValuePolicy<T>;
+                var shadowSignal = shadowMvp.ShadowSignal;
+                while (true)
+                {
+                    if (AreSignalsTheSame(signal, shadowSignal))
+                        throw new ArgumentException("signal is own shadow");
+                    shadowMvp = Get(shadowSignal) as ShadowMissingValuePolicy<T>;
+                    if (shadowMvp == null)
+                        break;
+
+                    shadowSignal = shadowMvp.ShadowSignal;
+                }
+            }
         }
 
         private bool AreSignalsTheSame(Signal signal1, Signal signal2)

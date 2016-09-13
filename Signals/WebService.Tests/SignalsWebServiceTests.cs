@@ -10,6 +10,7 @@ using System;
 using DataAccess.GenericInstantiations;
 using System.Collections.Generic;
 using Dto.MissingValuePolicy;
+using Domain.MissingValuePolicy;
 
 namespace WebService.Tests
 {
@@ -1263,9 +1264,10 @@ namespace WebService.Tests
             #region Issue #29 (Feature: Setting ShadowMissingValuePolicy should not create a dependency cycle ) 
 
             [TestMethod]
-            public void GivenTwoSignalsAndShadowMVP_WhenSettingMissingValuePolicy_CheckIfAreSignalsTheSameMethodWorksProperly()
+            public void GivenTwoSignalsAndShadowMVP_WhenSettingMissingValuePolicy_IsAddingProperly()
             {
                 int signalId = 5;
+                int shadowSignalId = 6;
                 Domain.Signal signal = new Domain.Signal()
                 {
                     Id = signalId,
@@ -1279,12 +1281,25 @@ namespace WebService.Tests
                 {
                     DataType = Dto.DataType.Boolean,
                     Granularity = Dto.Granularity.Day,
-                    Path = new Dto.Path { Components = new[] { "x", "y" } }
+                    Path = new Dto.Path { Components = new[] { "a", "b" } }
                 };
+
+                Domain.Signal shadowSignalDomain = new Domain.Signal()
+                {
+                    Id = shadowSignalId,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("a/b")
+                };
+
+
+                SetupShadowMVPTest(signal, shadowSignalDomain);
 
                 ShadowMissingValuePolicy shadowmvp = new ShadowMissingValuePolicy() { ShadowSignal = shadowSignal };
 
                 signalsWebService.SetMissingValuePolicy(signalId, shadowmvp);
+
+                missingValuePolicyRepositoryMock.Verify(mvp => mvp.Set(It.IsAny<Domain.Signal>(), It.IsAny<MissingValuePolicyBase>()));
             }
             #endregion
             [TestMethod]
