@@ -9,6 +9,7 @@ using Dto;
 using System;
 using DataAccess.GenericInstantiations;
 using System.Collections.Generic;
+using Dto.MissingValuePolicy;
 
 namespace WebService.Tests
 {
@@ -1259,7 +1260,33 @@ namespace WebService.Tests
             }
 
             #endregion
+            #region Issue #29 (Feature: Setting ShadowMissingValuePolicy should not create a dependency cycle ) 
+            [TestMethod]
+            [ExpectedException(typeof(NotImplementedException))]
+            public void GivenTwoSignalsAndShadowMVP_WhenSettingMissingValuePolicy_ThrowsException()
+            {
+                int signalId = 5;
+                int shadowSignalId = 8;
+                Dto.Signal shadowSignal = new Dto.Signal()
+                {
+                    Id = shadowSignalId,
+                    DataType = Dto.DataType.Boolean,
+                    Granularity = Dto.Granularity.Day,
+                    Path = new Dto.Path { Components = new[] { "a", "b" } }
+                };
+     
+                GivenASignal(new Domain.Signal()
+                {
+                    Id = signalId,
+                    DataType = Domain.DataType.Boolean,
+                    Granularity = Domain.Granularity.Day,
+                    Path = Domain.Path.FromString("x/y")
+                });
+                ShadowMissingValuePolicy shadowmvp = new ShadowMissingValuePolicy() { ShadowSignal = shadowSignal };
 
+                signalsWebService.SetMissingValuePolicy(signalId, shadowmvp);
+            }
+            #endregion
             [TestMethod]
             public void GivenASignal_GivenNoData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
             {
