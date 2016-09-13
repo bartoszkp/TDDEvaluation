@@ -1417,6 +1417,15 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(signal_ids[2], policy);
             }
 
+
+            [TestMethod]
+            [ExpectedException(typeof(SignalNotFoundException))]
+            public void GivenNoSignals_GettingCoarseData_ThrowsSignalNotFoundException()
+            {
+                GivenNoSignals();
+                signalsWebService.GetCoarseData(10, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));
+            }
+
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
