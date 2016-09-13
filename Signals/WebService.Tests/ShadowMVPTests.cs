@@ -144,7 +144,7 @@ namespace WebService.Tests
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void WhenSetMVPToShadowMVPAndyTryCreateADependencyCycle_ThrowsException()
+        public void WhenSetMVPToShadowMVPAndTryCreateADependencyCycle_ThrowsException()
         {
             var signal1 = new Domain.Signal()
             {
