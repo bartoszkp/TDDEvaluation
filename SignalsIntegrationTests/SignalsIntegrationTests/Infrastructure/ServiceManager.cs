@@ -63,6 +63,7 @@ namespace SignalsIntegrationTests.Infrastructure
             };
 
             serviceProcess = Process.Start(psi);
+            System.Threading.Thread.Sleep(5000);
         }
 
         public void RestartService()
