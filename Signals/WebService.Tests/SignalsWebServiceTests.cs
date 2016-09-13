@@ -1417,7 +1417,6 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(signal_ids[2], policy);
             }
 
-
             [TestMethod]
             [ExpectedException(typeof(SignalNotFoundException))]
             public void GivenNoSignals_GettingCoarseData_ThrowsSignalNotFoundException()
@@ -1435,6 +1434,16 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Month, new DateTime(2000, 1, 10), new DateTime(2000, 1, 3));
 
                 Assert.AreEqual(0, result.Count());
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(InvalidCoarseGranularityException))]
+            public void GivenASignal_GettingCoarseDataForGranularitySmallerThanSignals_ThrowsInvalidCoarseGranularityException()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
+
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Second, new DateTime(2000, 1, 1), new DateTime(2000, 1, 3));                
             }
 
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
