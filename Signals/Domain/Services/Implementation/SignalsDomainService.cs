@@ -358,6 +358,9 @@ namespace Domain.Services.Implementation
             var result = new List<Datum<T>>();
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy<T>;
 
+            if (fromIncludedUtc == toExcludedUtc)
+                toExcludedUtc = mvp.AddTime(granularity, toExcludedUtc);
+
             int i = 0;
             for (DateTime currentDate = fromIncludedUtc; currentDate < toExcludedUtc;)
             {
