@@ -148,7 +148,10 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
+                throw new ArgumentException("This Datatype is not supported");
+
+            return null;
         }
         public void Set<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
