@@ -146,35 +146,13 @@ namespace Domain.Services.Implementation
             return res.OrderBy(x => x.Timestamp);
         }
 
-        public void Set(Signal signal, MissingValuePolicyBase missingValuePolicy)
+        public void Set<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
-            switch (signal.DataType)
+            if(missingValuePolicy is ShadowMissingValuePolicy<T>)
             {
-                case DataType.Boolean:
-                    if (missingValuePolicy is ShadowMissingValuePolicy<bool>)
-                        (missingValuePolicy as ShadowMissingValuePolicy<bool>).CheckSignalDataTypeAndGranularity(signal);
-                    break;
-                case DataType.Integer:
-                    if (missingValuePolicy is ShadowMissingValuePolicy<int>)
-                        (missingValuePolicy as ShadowMissingValuePolicy<int>).CheckSignalDataTypeAndGranularity(signal);
-                    break;
-                case DataType.Double:
-                    if (missingValuePolicy is ShadowMissingValuePolicy<double>)
-                        (missingValuePolicy as ShadowMissingValuePolicy<double>).CheckSignalDataTypeAndGranularity(signal);
-                    break;
-                case DataType.Decimal:
-                    if (missingValuePolicy is ShadowMissingValuePolicy<decimal>)
-                        (missingValuePolicy as ShadowMissingValuePolicy<decimal>).CheckSignalDataTypeAndGranularity(signal);
-                    break;
-                case DataType.String:
-                    if (missingValuePolicy is ShadowMissingValuePolicy<string>)
-                        (missingValuePolicy as ShadowMissingValuePolicy<string>).CheckSignalDataTypeAndGranularity(signal);
-                    break;
-                default:
-                    break;
+                (missingValuePolicy as ShadowMissingValuePolicy<T>).CheckSignalDataTypeAndGranularity(signal);
+                CheckIfSignalIsOwnShadow(missingValuePolicy, signal); //throws ArgumentException
             }
-
-            CheckIfSignalIsOwnShadow(missingValuePolicy, signal); //throws ArgumentException
 
             missingValuePolicyRepository.Set(signal, missingValuePolicy);
         }

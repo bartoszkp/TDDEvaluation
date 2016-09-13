@@ -22,12 +22,12 @@ namespace WebService
 
         public SignalsWebService(ISignalsDomainService signalsDomainService)
         {
-             this.signalsDomainService = signalsDomainService;
-        }     
+            this.signalsDomainService = signalsDomainService;
+        }
 
         public Signal Get(Path pathDto)
         {
-         return signalsDomainService.Get(pathDto.ToDomain<Domain.Path>())?.ToDto<Dto.Signal>();
+            return signalsDomainService.Get(pathDto.ToDomain<Domain.Path>())?.ToDto<Dto.Signal>();
         }
 
         public Signal GetById(int signalId)
@@ -70,26 +70,26 @@ namespace WebService
                 {
                     case Domain.DataType.Boolean:
                         return signalsDomainService.GetData<Boolean>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
-                        
+
                     case Domain.DataType.Integer:
                         return signalsDomainService.GetData<int>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
-                       
+
                     case Domain.DataType.Double:
                         return signalsDomainService.GetData<double>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
-                     
+
                     case Domain.DataType.Decimal:
                         return signalsDomainService.GetData<decimal>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
-                       
+
                     case Domain.DataType.String:
                         return signalsDomainService.GetData<string>(sig, fromIncludedUtc, toExcludedUtc).Select(s => s.ToDto<Dto.Datum>());
-                      
+
                     default:
                         break;
                 }
 
-              
+
             }
-            return new Datum[] { new Datum()};
+            return new Datum[] { new Datum() };
         }
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -105,10 +105,10 @@ namespace WebService
             if (signal.Granularity == Domain.Granularity.Month && timestamp != new DateTime(timestamp.Year, timestamp.Month, 1))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Week 
-                && (timestamp.DayOfWeek != DayOfWeek.Monday 
-                    || timestamp.Millisecond != 0 
-                    || timestamp.Second != 0 
+            if (signal.Granularity == Domain.Granularity.Week
+                && (timestamp.DayOfWeek != DayOfWeek.Monday
+                    || timestamp.Millisecond != 0
+                    || timestamp.Second != 0
                     || timestamp.Minute != 0
                     || timestamp.Hour != 0))
                 return false;
@@ -116,11 +116,11 @@ namespace WebService
             if (signal.Granularity == Domain.Granularity.Day && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Hour 
+            if (signal.Granularity == Domain.Granularity.Hour
                 && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, 0, 0))
                 return false;
 
-            if (signal.Granularity == Domain.Granularity.Minute 
+            if (signal.Granularity == Domain.Granularity.Minute
                 && timestamp != new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, 0))
                 return false;
 
@@ -159,7 +159,7 @@ namespace WebService
 
                     case Domain.DataType.Boolean:
                         if (type != typeof(Boolean)) throw new ArgumentException();
-                        var list = (data.Select(s => {Domain.Datum<Boolean> sr= s.ToDomain<Domain.Datum<Boolean>>(); sr.Signal=result; return sr; }).ToList());
+                        var list = (data.Select(s => { Domain.Datum<Boolean> sr = s.ToDomain<Domain.Datum<Boolean>>(); sr.Signal = result; return sr; }).ToList());
                         signalsDomainService.SetData<Boolean>(list);
                         break;
                     case Domain.DataType.Integer:
@@ -170,7 +170,7 @@ namespace WebService
                     case Domain.DataType.Double:
                         if (type != typeof(double)) throw new ArgumentException();
                         var list3 = (data.Select(s => { Domain.Datum<double> sr = s.ToDomain<Domain.Datum<double>>(); sr.Signal = result; return sr; }).ToList());
-                        
+
                         signalsDomainService.SetData<double>(list3);
                         break;
                     case Domain.DataType.Decimal:
@@ -188,7 +188,7 @@ namespace WebService
                 }
 
             }
-           
+
         }
 
         public MissingValuePolicy GetMissingValuePolicy(int signalId)
@@ -196,19 +196,34 @@ namespace WebService
             var sig = signalsDomainService.GetById(signalId);
             if (sig == null) throw new ArgumentException();
 
-             return    signalsDomainService.Get(sig.ToDomain<Domain.Signal>())?.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
+            return signalsDomainService.Get(sig.ToDomain<Domain.Signal>())?.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>();
         }
 
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
-            
-            var sig= signalsDomainService.GetById(signalId);
+            var sig = signalsDomainService.GetById(signalId);
             if (sig == null) throw new ArgumentException();
 
             policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>();
 
-            signalsDomainService.Set(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
-
+            switch (policy.DataType)
+            {
+                case Dto.DataType.Boolean:
+                    signalsDomainService.Set<bool>(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+                    break;
+                case Dto.DataType.Decimal:
+                    signalsDomainService.Set<decimal>(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+                    break;
+                case Dto.DataType.Double:
+                    signalsDomainService.Set<double>(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+                    break;
+                case Dto.DataType.Integer:
+                    signalsDomainService.Set<int>(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+                    break;
+                case Dto.DataType.String:
+                    signalsDomainService.Set<string>(sig, policy.ToDomain<Domain.MissingValuePolicy.MissingValuePolicyBase>());
+                    break;
+            }
         }
     }
 }
