@@ -1213,6 +1213,25 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Week, new DateTime(), new DateTime());
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGettingCoarseData_IfGranularityIsLessThanSignals_ThrowsException()
+            {
+                var dummyId = 1;
+                GivenASignal(SignalWith(dummyId, DataType.Decimal, Granularity.Year, null));
+
+                var count = 0;
+                for (var i = 0; i < (int)Granularity.Year; i++)
+                    try
+                    {
+                        signalsWebService.GetCoarseData(dummyId, (Dto.Granularity)i, new DateTime(), new DateTime());
+                    }
+                    catch (ArgumentException)
+                    {
+                        count++;
+                    }
+                Assert.AreEqual(6, count);
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
