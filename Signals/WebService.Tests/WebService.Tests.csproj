@@ -61,6 +61,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="GetCoarsDataTests.cs" />
     <Compile Include="NoneQualityDataFillTests.cs" />
     <Compile Include="GetDataTests.cs" />
     <Compile Include="PathEntryTests.cs" />
