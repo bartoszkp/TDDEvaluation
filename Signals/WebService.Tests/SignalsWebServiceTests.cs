@@ -1509,14 +1509,14 @@ namespace WebService.Tests
                 };
                 var signal2 = new Dto.Signal()
                 {
-                    Id = 1,
+                    Id = 2,
                     DataType = Dto.DataType.Boolean,
                     Granularity = Dto.Granularity.Day,
                     Path = new Dto.Path() { Components = new[] { "signal2" } },
                 };
                 var signal3 = new Dto.Signal()
                 {
-                    Id = 1,
+                    Id = 3,
                     DataType = Dto.DataType.Boolean,
                     Granularity = Dto.Granularity.Day,
                     Path = new Dto.Path() { Components = new[] { "signal3" } },
@@ -1543,6 +1543,16 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock
                     .Setup(mvp => mvp.Set(signal3.ToDomain<Domain.Signal>(), shadowPolicy3.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>()));
 
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.Is<Domain.Signal>(s => s.Id == 2)))
+                    .Returns(shadowPolicy2.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>());
+
+                missingValuePolicyRepositoryMock
+                    .Setup(mvp => mvp.Get(It.Is<Domain.Signal>(s => s.Id == 3)))
+                    .Returns(shadowPolicy3.ToDomain<Domain.MissingValuePolicy.ShadowMissingValuePolicy<bool>>());
+
+
                 signalsRepositoryMock
                     .Setup(srm => srm.Get(signal1.Id.Value))
                     .Returns(signal1.ToDomain<Domain.Signal>());
@@ -1552,15 +1562,13 @@ namespace WebService.Tests
                     .Returns(signal2.ToDomain<Domain.Signal>());
 
                 signalsRepositoryMock
-                .Setup(srm => srm.Get(signal3.Id.Value))
-                .Returns(signal3.ToDomain<Domain.Signal>());
+                    .Setup(srm => srm.Get(signal3.Id.Value))
+                    .Returns(signal3.ToDomain<Domain.Signal>());
 
                 var signalsDomainService = new SignalsDomainService(signalsRepositoryMock.Object, null, missingValuePolicyRepositoryMock.Object);
                 signalsWebService = new SignalsWebService(signalsDomainService);
 
                 signalsWebService.SetMissingValuePolicy(signal1.Id.Value, shadowPolicy1);
-                signalsWebService.SetMissingValuePolicy(signal2.Id.Value, shadowPolicy2);
-                signalsWebService.SetMissingValuePolicy(signal3.Id.Value, shadowPolicy3);
             }
 
             #endregion
