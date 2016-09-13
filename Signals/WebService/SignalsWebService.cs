@@ -108,6 +108,8 @@ namespace WebService
                 throw new SignalNotFoundException(signalId);
             if (granularity < signal.Granularity)
                 throw new InvalidCoarseGranularityException();
+            if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
+                throw new InvalidSignalTypeException();
             
             var filledList = new List<Datum>();
             if (fromIncludedUtc > toExcludedUtc)
