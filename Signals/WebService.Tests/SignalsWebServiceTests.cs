@@ -1342,14 +1342,14 @@ namespace WebService.Tests
             #region Issue #30 (Feature: Getting coarse data for signal )
 
             [TestMethod]
-            [ExpectedException(typeof(NotImplementedException))]
-            public void GivenASignal_GetCoarseData_ThrowsNotImplementedException()
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_GetCoarseDataForDataTypeBool_ThrowsArgumentException()
             {
                 int signalId = 5;
                 GivenASignal(new Domain.Signal()
                 {
                     Id = signalId,
-                    DataType = Domain.DataType.Double,
+                    DataType = Domain.DataType.Boolean,
                     Granularity = Domain.Granularity.Day,
                     Path = Domain.Path.FromString("x/y")
                 });
