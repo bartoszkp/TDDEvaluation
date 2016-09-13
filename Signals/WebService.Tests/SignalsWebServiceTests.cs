@@ -1431,7 +1431,7 @@ namespace WebService.Tests
                 int signalId = 1;
                 GivenASignal(SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal")));
 
-                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Month, new DateTime(2000, 1, 10), new DateTime(2000, 2, 1));
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Month, new DateTime(2000, 1, 1), new DateTime(2000, 2, 1));
 
                 Assert.AreEqual(0, result.Count());
             }

@@ -106,7 +106,7 @@ namespace WebService
             var signal = GetById(signalId);
             if (signal == null)
                 throw new SignalNotFoundException(signalId);
-            if (granularity < signal.Granularity)
+            if (granularity < signal.Granularity || !TimePeriodIsRegular(granularity, fromIncludedUtc, toExcludedUtc))
                 throw new InvalidCoarseGranularityException();
             if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                 throw new InvalidSignalTypeException();
@@ -114,6 +114,8 @@ namespace WebService
             var filledList = new List<Datum>();
             if (fromIncludedUtc > toExcludedUtc)
                 return filledList;
+            
+
 
 
             return filledList;
@@ -209,6 +211,40 @@ namespace WebService
                 dto_data[i++] = datum.ToDto<Dto.Datum>();
 
             return dto_data;
+        }
+        private bool TimePeriodIsRegular(Granularity granularity, DateTime from, DateTime to)
+        {
+            if (from == to)
+                return true;
+
+            switch(granularity)
+            {
+                case Granularity.Minute:
+                    if ((to.Second - from.Second) % 60 != 0)
+                        return false;
+                    break;
+                case Granularity.Hour:
+                    if ((to.Minute - from.Minute) % 60 != 0)
+                        return false;
+                    break;
+                case Granularity.Day:
+                    if ((to.Hour - from.Hour) % 24 != 0)
+                        return false;
+                    break;
+                case Granularity.Week:
+                    if ((to.Day - from.Day) % 7 != 0)
+                        return false;
+                    break;
+                case Granularity.Month:
+                    if ((to.Day - from.Day) % 30 != 0 || (to.Day - from.Day) % 31 != 0)
+                        return false;
+                    break;
+                case Granularity.Year:
+                    if ((to.Month - from.Month) % 12 != 0)
+                        return false;
+                    break;
+            }
+            return true;
         }
     }
 }
