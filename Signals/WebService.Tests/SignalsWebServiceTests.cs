@@ -1031,6 +1031,57 @@ namespace WebService.Tests
             }
 
 
+            [TestMethod]
+            public void GivenASignal_GetDataWithFirstOrderMVP_WhenDateNotSort_ReturnsCorrectlyFillsData()
+            {
+                int dummyId = 1;
+                var newSignal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("some/signal/firstOrderBugTest")
+                };
+
+                var signalDatum = new Datum<double>[]
+                {
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 7, 1), Value = (double)2.5 },
+                    new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }
+                };
+
+                var older = new Datum<double>[]
+                {
+                    new Datum<double>() { Quality = Quality.Poor, Timestamp = new DateTime(2000, 2, 1), Value = (double)1.5 }
+                };
+
+                var newer = new Datum<double>[]
+                {
+                    new Datum<double>() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 7, 1), Value = (double)2.5 }
+                };
+
+                GivenASignal(newSignal);
+
+                missingValuePolicyRepositoryMock
+                    .Setup(s => s.Get(It.Is<Domain.Signal>((i => i.Id == dummyId))))
+                    .Returns(new DataAccess.GenericInstantiations.FirstOrderMissingValuePolicyDouble());
+
+                signalsDataRepositoryMock
+                    .Setup(s => s.GetData<double>(It.Is<Domain.Signal>((i => i.Id == dummyId)), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(signalDatum);
+
+                signalsDataRepositoryMock.Setup(a => a.GetDataOlderThan<double>(It.Is<Domain.Signal>((i => i.Id == dummyId)), new DateTime(2000, 2, 1), 1)).Returns(new List<Datum<double>>());
+                signalsDataRepositoryMock.Setup(a => a.GetDataNewerThan<double>(It.Is<Domain.Signal>((i => i.Id == dummyId)), new DateTime(2000, 7, 1), 1)).Returns(newer);
+
+                var result = signalsWebService.GetData(dummyId, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+
+                Assert.AreEqual(5, result.Count());
+                Assert.AreEqual((double)0,   result.ElementAt(0).Value);
+                Assert.AreEqual((double)1.5, result.ElementAt(1).Value);
+                Assert.AreEqual((double)1.7, result.ElementAt(2).Value);
+                Assert.AreEqual((double)1.9, result.ElementAt(3).Value);
+                Assert.AreEqual((double)2.1, result.ElementAt(4).Value);
+            }
+
 
 
 
