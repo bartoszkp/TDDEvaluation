@@ -14,7 +14,6 @@ namespace Domain.MissingValuePolicy
         {
             var currentDate = new DateTime(fromIncludedUtc.Ticks);
             List<Datum<T>> result = new List<Datum<T>>(data);
-
             while (currentDate < toExcludedUtc)
             {
                 if (result.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
