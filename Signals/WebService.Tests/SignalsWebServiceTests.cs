@@ -1203,6 +1203,16 @@ namespace WebService.Tests
                 Assert.AreEqual(1.4, result.ElementAt(4).Value);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGettingCoarseData_IfGranularityIsEqualSignals_ThrowsException()
+            {
+                var dummyId = 1;
+                GivenASignal(SignalWith(dummyId, DataType.Decimal, Granularity.Week, null));
+
+                signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Week, new DateTime(), new DateTime());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
