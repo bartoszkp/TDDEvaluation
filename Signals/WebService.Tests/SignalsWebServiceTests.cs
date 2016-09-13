@@ -1132,7 +1132,39 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2016, 1, 4), d.Timestamp);
                 Assert.AreEqual(1, d.Value);
             }
-            
+
+            [TestMethod]
+            public void WhenGettingCoarseData_ReturnsItWithCorrectValue()
+            {
+                var signal = new Domain.Signal()
+                {
+                    Id = 785,
+                    DataType = Domain.DataType.Integer,
+                    Granularity = Domain.Granularity.Day
+                };
+
+                var data = new Domain.Datum<int>[]
+                {
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 4), Value = 5 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 5), Value = 5 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 6), Value = 5 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 7), Value = 5 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 8), Value = 5 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1, 9), Value = 2 },
+                    new Domain.Datum<int>() { Quality = Domain.Quality.Fair, Timestamp = new DateTime(2016,1,10), Value = 1 },
+                };
+
+                SetupGetCoarseData(signal, data);
+
+                var result = signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 11));
+
+                var d = result.First();
+                Assert.AreEqual(Dto.Quality.Fair, d.Quality);
+                Assert.AreEqual(new DateTime(2016, 1, 4), d.Timestamp);
+                Assert.AreEqual(4, d.Value);
+            }
+
+
             private void SetupGetCoarseData<T>(Domain.Signal signal, Domain.Datum<T>[] data)
             {
                 GivenASignalSetupAddSignal();
