@@ -1252,6 +1252,16 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Month, new DateTime(), new DateTime());
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_WhenGettingCoarseDataOfString_ThrowsException()
+            {
+                var dummyId = 1;
+                GivenASignal(SignalWith(dummyId, DataType.String, Granularity.Hour, null));
+
+                signalsWebService.GetCoarseData(dummyId, Dto.Granularity.Month, new DateTime(), new DateTime());
+            }
+
             private Dto.Signal SignalWith(Dto.DataType dataType, Dto.Granularity granularity, Dto.Path path)
             {
                 return new Dto.Signal()
