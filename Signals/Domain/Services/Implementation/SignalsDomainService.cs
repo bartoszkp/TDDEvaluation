@@ -401,7 +401,7 @@ namespace Domain.Services.Implementation
             if (signal.Granularity >= granularity)
                 throw new ArgumentException("The granularity for coarse data has to be smaller than signal's granularity.");
 
-            if (!IsTimestampRegular(granularity, fromIncludedUtc))
+            if (!IsTimestampRegular(granularity, fromIncludedUtc) || !IsTimestampRegular(granularity, toExcludedUtc))
                 throw new IncorrectTimestampException();
 
             return default(IEnumerable<Datum<T>>);
