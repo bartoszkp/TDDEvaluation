@@ -107,7 +107,7 @@ namespace WebService
                     return signalsDomainService.GetCoarseData<int>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
                         .Select(d => d.ToDto<Dto.Datum>()).ToList();
                 default:
-                    throw new KeyNotFoundException();
+                    throw new NotSupportedException("DataType "+signal.DataType.ToString()+" is not supported");
             }
         }
 
