@@ -25,5 +25,7 @@ namespace Domain.Services
         PathEntry GetPathEntry(Path path);
 
         void Delete(int signalId);
+
+        IEnumerable<Datum<T>> GetCoarseData<T>(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }

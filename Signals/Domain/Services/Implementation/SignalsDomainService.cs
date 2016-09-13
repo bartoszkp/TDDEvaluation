@@ -17,8 +17,8 @@ namespace Domain.Services.Implementation
         private readonly IMissingValuePolicyRepository missingValuePolicyRepository;
 
         public SignalsDomainService(
-            ISignalsRepository signalsRepository, 
-            ISignalsDataRepository signalsDataRepository, 
+            ISignalsRepository signalsRepository,
+            ISignalsDataRepository signalsDataRepository,
             IMissingValuePolicyRepository missingValuePolicyRepository)
         {
             this.signalsRepository = signalsRepository;
@@ -37,8 +37,8 @@ namespace Domain.Services.Implementation
             {
                 throw new IdNotNullException();
             }
-            
-            var result= this.signalsRepository.Add(newSignal);
+
+            var result = this.signalsRepository.Add(newSignal);
 
             var dataType = result.DataType;
 
@@ -79,7 +79,7 @@ namespace Domain.Services.Implementation
             var signal = MissingValuePolicySignal(signalId);
 
             CheckIfShadowMissingValuePolicy(signal, policy);
-                    
+
             missingValuePolicyRepository.Set(signal, policy);
         }
 
@@ -155,14 +155,14 @@ namespace Domain.Services.Implementation
 
             if (!VerifyTimestamp(fromIncludedUtc, signal.Granularity))
                 throw new InvalidTimestampException();
-                      
+
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             var sortedList = result.OrderBy(x => x.Timestamp).ToList();
 
             result = AddMissingData(sortedList, fromIncludedUtc, toExcludedUtc, signal);
 
-            return result.OrderBy(s=>s.Timestamp);
+            return result.OrderBy(s => s.Timestamp);
         }
 
         public Type GetDataTypeById(int signalId)
@@ -184,7 +184,7 @@ namespace Domain.Services.Implementation
 
             List<Signal> signalsFromSubdirectory = GetSignalsFromSubdirectory(allSignalsWithPathPrefix, numberOfPathComponents);
             List<Path> pathsFromSubdirectory = GetPathsFromSubdirectory(allSignalsWithPathPrefix, numberOfPathComponents);
-            
+
             return new PathEntry(signalsFromSubdirectory, pathsFromSubdirectory);
         }
 
@@ -223,7 +223,7 @@ namespace Domain.Services.Implementation
             return datumsList;
         }
 
-        private void AddMissingDataDependsOnMissingValuePolicy<T>(ref List<Datum<T>> datumsList, DateTime fromIncludedUtc, 
+        private void AddMissingDataDependsOnMissingValuePolicy<T>(ref List<Datum<T>> datumsList, DateTime fromIncludedUtc,
             DateTime toExcludedUtc, Signal signal, MissingValuePolicy<T> mvp)
         {
             if (mvp is NoneQualityMissingValuePolicy<T>)
@@ -246,13 +246,13 @@ namespace Domain.Services.Implementation
                 var olderData = signalsDataRepository.GetDataOlderThan<T>(signal, fromIncludedUtc, 1).SingleOrDefault();
                 var newerData = signalsDataRepository.GetDataNewerThan<T>(signal, fromIncludedUtc, 1).SingleOrDefault();
                 Datum<T>[] additionalDatums = new Datum<T>[] { olderData, newerData };
-                mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal,null,additionalDatums);
+                mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal, null, additionalDatums);
             }
 
             else if (mvp is ShadowMissingValuePolicy<T>)
             {
                 ShadowMissingValuePolicy<T> shadowMvp = mvp as ShadowMissingValuePolicy<T>;
-                IEnumerable<Datum<T>> additionalDatums = GetData<T>(shadowMvp.ShadowSignal.Id.Value,fromIncludedUtc,toExcludedUtc);
+                IEnumerable<Datum<T>> additionalDatums = GetData<T>(shadowMvp.ShadowSignal.Id.Value, fromIncludedUtc, toExcludedUtc);
                 mvp.FillDatums(ref datumsList, fromIncludedUtc, toExcludedUtc, signal, null, additionalDatums);
             }
         }
@@ -355,5 +355,52 @@ namespace Domain.Services.Implementation
 
             signalsRepository.Delete(signal);
         }
-    } 
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            List<Datum<T>> newDatum = new List<Datum<T>>();
+            IEnumerable<Datum<T>> oldDatum = GetData<T>(signalId, fromIncludedUtc, toExcludedUtc);
+            var signal = GetById(signalId);
+            dynamic totalValue = 0;
+            Quality quality = Quality.Good;
+            var count = 0;
+
+            if (typeof(T) == typeof(string) || typeof(T) == typeof(bool))
+                throw new ArgumentException();
+
+            if (!VerifyTimestamp(fromIncludedUtc, granularity) || !VerifyTimestamp(toExcludedUtc, granularity) || !VerifyTimestamp(toExcludedUtc, signal.Granularity))
+                throw new InvalidTimestampException();
+
+            if (signal == null)
+                throw new SignalDoesntExistException();
+
+            if ((int)granularity < (int)signal.Granularity)
+                throw new ArgumentException();
+
+            if (fromIncludedUtc == toExcludedUtc)
+                oldDatum = GetData<T>(signalId, fromIncludedUtc, ShiftTime(granularity, toExcludedUtc));
+
+            if (fromIncludedUtc == toExcludedUtc) toExcludedUtc = toExcludedUtc.AddTicks(1);
+
+            for (DateTime begin = fromIncludedUtc; begin < toExcludedUtc; begin = ShiftTime(granularity, begin))
+            {
+                for (DateTime timeForItems = begin; timeForItems < ShiftTime(granularity, begin); timeForItems = ShiftTime(signal.Granularity, timeForItems))
+                {
+                    var datum = oldDatum.First(x => x.Timestamp == timeForItems);
+                    totalValue += (dynamic)datum.Value;
+
+                    if ((int)datum.Quality < (int)quality) quality = datum.Quality;
+
+                    count++;
+                }
+                newDatum.Add(new Datum<T>() { Value = totalValue / count, Timestamp = begin, Quality = quality });
+
+                totalValue = 0;
+                count = 0;
+            }
+            return newDatum;
+        }
+
+    }
 }
+
