@@ -10,31 +10,53 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal() { Path = new Path() { Components = new[] { string.Empty } } })
-                .Id.Value;
-
-            var result = client.GetById(id);
-
-            if (result != null)
+            var signal1 = client.Add(new Signal()
             {
-                Console.WriteLine("Sygnał poprawnie utworzony");
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal1" } }
+            });
+            var signal2 = client.Add(new Signal()
+            {
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal2" } }
+            });
+            var signal3 = client.Add(new Signal()
+            {
+                DataType = DataType.Decimal,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal3" } }
+            });
+
+            client.SetMissingValuePolicy(
+                    signal1.Id.Value,
+                    new ShadowMissingValuePolicy()
+                    {
+                        DataType = DataType.Decimal,
+                        ShadowSignal = signal2
+                    });
+            client.SetMissingValuePolicy(
+                    signal2.Id.Value,
+                    new ShadowMissingValuePolicy()
+                    {
+                        DataType = DataType.Decimal,
+                        ShadowSignal = signal3
+                    });
+
+            try
+            {
+                client.SetMissingValuePolicy(
+                      signal3.Id.Value,
+                      new ShadowMissingValuePolicy()
+                      {
+                          DataType = DataType.Decimal,
+                          ShadowSignal = signal1
+                      });
             }
-            else
+            catch (Exception)
             {
-                Console.WriteLine("Błąd - nie udało się utworzyć sygnału");
-            }
-
-            client.Delete(id);
-
-            result = client.GetById(id);
-
-            if (result == null)
-            {
-                Console.WriteLine("Sygnał poprawnie skasowany");
-            }
-            else
-            {
-                Console.WriteLine("Błąd - sygnał nadal istnieje");
+                Console.WriteLine("Failed to assign");
             }
 
             Console.ReadKey();
