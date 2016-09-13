@@ -84,6 +84,7 @@ namespace Domain.DataFillStrategy
             {
                 dict.Add(item.Timestamp, item);
             }
+            dict.Remove(before);
             CreateReturnsListDatum(after, before, datums, datum, dict);
         }
 
