@@ -997,6 +997,26 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_GetCoarseData_WithBadGranularity_ThrowsException()
+            {
+                int dummyId = 1;
+
+                var signal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("someSignal")
+                };
+
+                GivenASignal(signal);
+
+                signalsWebService.GetCoarseData(1, It.IsAny<Dto.Granularity>(), new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+
+            }
+
             private void setupGetByPathEntry(IEnumerable<string> paths)
             {
                 paths = paths.ToList();
