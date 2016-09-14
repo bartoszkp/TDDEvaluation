@@ -399,7 +399,7 @@ namespace Domain.Services.Implementation
                     var datum = oldDatum.First(x => x.Timestamp == timeForItems);
                     totalValue += (dynamic)datum.Value;
 
-                    if ((int)datum.Quality < (int)quality) quality = datum.Quality;
+                    if ((int)datum.Quality > (int)quality) quality = datum.Quality;
 
                     count++;
                 }
@@ -407,6 +407,7 @@ namespace Domain.Services.Implementation
 
                 totalValue = 0;
                 count = 0;
+                quality = Quality.Good;
             }
             return newDatum;
         }
