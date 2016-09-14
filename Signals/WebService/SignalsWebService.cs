@@ -104,7 +104,20 @@ namespace WebService
                 throw new NoSuchSignalException("Could not get data for not existing signal");
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum>();
-            
+            else if (fromIncludedUtc == toExcludedUtc)
+            {
+                var addToTime = new Dictionary<Granularity, Action>()
+                {
+                    {Granularity.Second,()=>toExcludedUtc=toExcludedUtc.AddSeconds(1) },
+                    {Granularity.Minute,()=>toExcludedUtc=toExcludedUtc.AddMinutes(1) },
+                    {Granularity.Month,()=>toExcludedUtc=toExcludedUtc.AddMonths(1) },
+                    {Granularity.Hour,()=>toExcludedUtc=toExcludedUtc.AddHours(1) },
+                    {Granularity.Day,()=>toExcludedUtc=toExcludedUtc.AddDays(1) },
+                    {Granularity.Week,()=>toExcludedUtc=toExcludedUtc.AddDays(6) },
+                    {Granularity.Year,()=>toExcludedUtc=toExcludedUtc.AddYears(1) },
+                };
+                addToTime[granularity].Invoke();
+            }
             GranularityMatch(signal, granularity);
             var domainSignal = signal.ToDomain<Domain.Signal>();
             switch (signal.DataType)
