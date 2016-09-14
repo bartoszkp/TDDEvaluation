@@ -12,14 +12,18 @@ namespace Domain.MissingValuePolicy
             DateTime fromIncludedUtc, DateTime toExcludedUtc,
             Datum<T> olderDatum = null, Datum<T> neverDatum = null, SignalsDomainService service = null)
         {
+            T value = default(T);
+            Quality quality = Quality.None;
+
+            Datum<T> missingDatum;
+
             var currentDate = new DateTime(fromIncludedUtc.Ticks);
             List<Datum<T>> result = new List<Datum<T>>(data);
             while (currentDate < toExcludedUtc)
             {
-                if (result.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0) == null)
+                var currentItem = result.Find(d => DateTime.Compare(d.Timestamp, currentDate) == 0);
+                if (currentItem == null)
                 {
-                    Datum<T> missingDatum = null;
-
                     if (olderDatum != null)
                     {
                         missingDatum = new Datum<T>()
@@ -33,14 +37,20 @@ namespace Domain.MissingValuePolicy
                     {
                         missingDatum = new Datum<T>()
                         {
-                            Value = default(T),
+                            Value = value,
                             Timestamp = currentDate,
-                            Quality = Quality.None
+                            Quality = quality
                         };
                     }
 
                     result.Add(missingDatum);
                 }
+                else
+                {
+                    value = currentItem.Value;
+                    quality = currentItem.Quality;
+                }
+
 
                 currentDate = AddTime(currentDate, signal.Granularity);
             }
