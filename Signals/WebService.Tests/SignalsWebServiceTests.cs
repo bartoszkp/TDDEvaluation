@@ -1502,10 +1502,10 @@ namespace WebService.Tests
 
                 Func<int, DateTime> timeChange = (i) => new DateTime().AddDays(i);
                 var data = new List<Datum<int>>();
-                for (int i = 0; i < 14; ++i)
+                for (int i = 0; i < 7; ++i)
                     data.Add(new Datum<int>() { Id = i + 1, Quality = Quality.Bad, Timestamp = timeChange(i), Value = i + 1 });
 
-                GivenDatum(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 15), data);
+                GivenDatum(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 8), data);
                 var result = signalsWebService
                     .GetCoarseData(1, Dto.Granularity.Week, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1))
                     .ToArray();

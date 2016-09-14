@@ -153,6 +153,25 @@ namespace Domain.Services.Implementation
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, int periodSize)
         {
             var filledList = new List<Datum<T>>();
+
+            if(fromIncludedUtc == toExcludedUtc)
+            {
+                var timeChange = GetTimeNextMethod(signal.Granularity);
+                DateTime actualToDate = fromIncludedUtc;
+                for (int i = 0; i < periodSize; ++i)
+                    actualToDate = timeChange(actualToDate);
+
+                var fragData = GetData<T>(signal, fromIncludedUtc, actualToDate).ToList();
+                var coarseDatum = new Datum<T>()
+                {
+                    Quality = fragData.Select(d => d.Quality).Min(),
+                    Timestamp = fromIncludedUtc,
+                    Value = GetMeanValue(fragData, periodSize)
+                };
+                filledList.Add(coarseDatum);
+                return filledList;
+            }
+
             var data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToList();            
             int coarseLength = data.Count / periodSize;
 
@@ -323,6 +342,27 @@ namespace Domain.Services.Implementation
                 return years;
 
             return false;
+        }
+
+        private int TimePeriodSize(Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Minute:
+                    return 60;
+                case Granularity.Hour:
+                    return 60;
+                case Granularity.Day:
+                    return 24;
+                case Granularity.Week:
+                    return 7;
+                case Granularity.Month:
+                    return 31;
+                case Granularity.Year:
+                    return 12;
+                default:
+                    throw new Exception("Invalid granularity");
+            }
         }
 
         private dynamic GetStep<T>(Signal signal, Datum<T> currentDatum, Datum<T> nextDatum)
