@@ -42,7 +42,7 @@ namespace Domain.MissingValuePolicy
             }
         }
 
-        private int FindNumberOfPeriodsBetweenTwoDates(DateTime dateTime1, DateTime dateTime2, Granularity granularity)
+        public static int FindNumberOfPeriodsBetweenTwoDates(DateTime dateTime1, DateTime dateTime2, Granularity granularity)
         {
             int numberOfPeriods = 0;
 

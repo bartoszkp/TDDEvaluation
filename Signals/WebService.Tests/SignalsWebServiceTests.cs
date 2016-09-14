@@ -1480,7 +1480,7 @@ namespace WebService.Tests
 
                 Func<int, DateTime> timeChange = (i) => new DateTime().AddDays(i);
                 var data = new List<Datum<int>>();
-                for(int i = 0; i < 16; ++i)                
+                for(int i = 0; i < 14; ++i)                
                     data.Add(new Datum<int>() { Id = i + 1, Quality = Quality.Bad, Timestamp = timeChange(i), Value = i+1 });
 
                 GivenDatum(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 15), data);
@@ -1489,7 +1489,7 @@ namespace WebService.Tests
                     .ToArray();
 
                 Assert.AreEqual(2, result.Length);
-                Assert.AreEqual(Dto.Quality.None, result[0].Quality);
+                Assert.AreEqual(data[0].Quality.ToDto<Dto.Quality>(), result[0].Quality);
                 Assert.AreEqual((1 + 2 + 3 + 4 + 5 + 6 + 7)/7, result[0].Value);
                 Assert.AreEqual((8 + 9 + 10 + 11 + 12 + 13 + 14)/7, result[1].Value);
             }

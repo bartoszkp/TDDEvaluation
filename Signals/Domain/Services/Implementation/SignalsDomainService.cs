@@ -92,14 +92,15 @@ namespace Domain.Services.Implementation
                 throw new DatumTimestampException();
 
             var result = this.signalsDataRepository.GetData<T>(signal, fromIncluded, toExcluded);
-            if (result != null) result.OrderBy(s=>s.Timestamp);
+            if (result != null)
+                result = result.OrderBy(s=>s.Timestamp);
             var policy = GetMissingValuePolicy(signal);
 
             if (policy == null)
                 return result;
             if (fromIncluded > toExcluded)
-                return new List<Datum<T>>();
-            
+                return new List<Datum<T>>();            
+
             DateTime tmp = fromIncluded;
             var timeNextMethod = GetTimeNextMethod(signal.Granularity);
             var filledData = new List<Datum<T>>();
@@ -120,6 +121,9 @@ namespace Domain.Services.Implementation
                 filledData.Add(mvp.FillMissingValue(signal, tmp, result, previousDatum, nextDatum, shadowData));            
             else
             {
+                if (FirstOrderMissingValuePolicy<T>.FindNumberOfPeriodsBetweenTwoDates(fromIncluded, toExcluded, signal.Granularity) == result.Count())
+                    return result;
+
                 while (tmp < toExcluded)
                 {
                     if(mvp is FirstOrderMissingValuePolicy<T> || mvp is ZeroOrderMissingValuePolicy<T>)
