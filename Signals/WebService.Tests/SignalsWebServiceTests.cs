@@ -1494,6 +1494,27 @@ namespace WebService.Tests
                 Assert.AreEqual((8 + 9 + 10 + 11 + 12 + 13 + 14)/7, result[1].Value);
             }
 
+            [TestMethod]
+            public void GivenASignalWithData_GettingCoarseDataWithSameTimestamp_ReturnsCoarseDataOfOneElement()
+            {
+                int signalId = 1;
+                GivenASignal(SignalWith(signalId, DataType.Integer, Granularity.Day, Path.FromString("root/signal")));
+
+                Func<int, DateTime> timeChange = (i) => new DateTime().AddDays(i);
+                var data = new List<Datum<int>>();
+                for (int i = 0; i < 14; ++i)
+                    data.Add(new Datum<int>() { Id = i + 1, Quality = Quality.Bad, Timestamp = timeChange(i), Value = i + 1 });
+
+                GivenDatum(signalId, new DateTime(2000, 1, 1), new DateTime(2000, 1, 15), data);
+                var result = signalsWebService
+                    .GetCoarseData(1, Dto.Granularity.Week, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1))
+                    .ToArray();
+
+                Assert.AreEqual(1, result.Length);
+                Assert.AreEqual(data[0].Quality.ToDto<Dto.Quality>(), result[0].Quality);
+                Assert.AreEqual((1 + 2 + 3 + 4 + 5 + 6 + 7) / 7, result[0].Value);
+            }
+
             private void GivenExisitingSignals(IEnumerable<Signal> signals)
             {
                 GivenNoSignals();
