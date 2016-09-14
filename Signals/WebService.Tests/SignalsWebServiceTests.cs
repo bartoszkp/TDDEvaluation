@@ -1169,6 +1169,82 @@ namespace WebService.Tests
                 });
             }
 
+            [TestMethod]
+            public void GivenASignal_WhenGetCoarseData_ReturnDatums()
+            {
+                GivenASignal(SignalWith(1, DataType.Integer, Granularity.Day , Path.FromString("x")));
+
+                var data = new Datum<int>[]
+            {
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 4), Value = 1 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 5), Value = 1 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 6), Value = 1 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 7), Value = 1 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 8), Value = 1 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1, 9), Value = 1 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,10), Value = 1 },
+
+    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016,1,11), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,12), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,13), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,14), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,15), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,16), Value = 2 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,17), Value = 1 },
+
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,18), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,19), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,20), Value = 5 },
+    new Datum<int>() { Quality = Quality.Bad,  Timestamp = new DateTime(2016,1,21), Value = 5 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,22), Value = 0 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,23), Value = 1 },
+    new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,24), Value = 0 },
+            };
+
+                SetupDataRepository<int>(1, data);
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 25)).ToArray<Dto.Datum>().ToArray();
+
+
+                Assert.AreEqual(1, result.ElementAt(0).Value);
+                Assert.AreEqual(4, result.ElementAt(1).Value);
+                Assert.AreEqual(3, result.ElementAt(2).Value);
+                Assert.AreEqual(Dto.Quality.Fair, result.ElementAt(0).Quality);
+                Assert.AreEqual(Dto.Quality.Fair, result.ElementAt(1).Quality);
+                Assert.AreEqual(Dto.Quality.Bad, result.ElementAt(2).Quality);
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.GetCoarseDataGranularityExceptions))]
+            public void GivenASignal_WhenGetCoarseData_WithInvalidGranularity_ThrowException()
+            {
+                GivenASignal(SignalWith(1, DataType.Integer, Granularity.Month, Path.FromString("x")));
+
+                var data = new Datum<int>[]
+            {
+                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 1 },
+                new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 2, 1), Value = 1 },
+            };
+
+                SetupDataRepository<int>(1, data);
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Day, new DateTime(2016, 1, 1), new DateTime(2016, 2, 1)).ToArray<Dto.Datum>().ToArray();
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.GetCoarseDataTypeExceptions))]
+            public void GivenASignal_WhenGetCoarseData_WithStringDataType_ThrowException()
+            {
+                GivenASignal(SignalWith(1, DataType.String, Granularity.Day, Path.FromString("x")));
+
+                var data = new Datum<string>[]
+            {
+                new Datum<string>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = "1" },
+                new Datum<string>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 2, 1), Value = "1"},
+            };
+
+                SetupDataRepository<string>(1, data);
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Month, new DateTime(2016, 1, 1), new DateTime(2016, 2, 1)).ToArray<Dto.Datum>().ToArray();
+            }
+
 
 
             private void SetupDataRepository<T>(int signalId = 1, IEnumerable<Datum<T>> data = null)

@@ -43,7 +43,7 @@ namespace ExampleSignalClient
     new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,24), Value = 0 },
             });
 
-            var result = client.GetCoarseData(id, Granularity.Week, new DateTime(2016, 1, 11), new DateTime(2016, 1, 11));
+            var result = client.GetCoarseData(id, Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 25));
 
             foreach (var d in result)
             {

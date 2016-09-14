@@ -261,7 +261,9 @@ namespace Domain.Services.Implementation
         {
             if (fromIncludedUtc == toExcludedUtc) toExcludedUtc = IncreaseDateTime(granularity, toExcludedUtc);
             var sourseData = this.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
-            if (signal.Granularity > granularity) throw new Exception();
+
+            if (signal.Granularity > granularity) throw new GetCoarseDataGranularityExceptions();
+            if (typeof(T) == typeof(bool) || typeof(T) == typeof(string)) throw new GetCoarseDataTypeExceptions();
 
             List<Datum<T>> newDatumList = new List<Datum<T>>();
 
@@ -276,20 +278,25 @@ namespace Domain.Services.Implementation
         }
         private Datum<T> calculateAVGDatum<T>(Signal signal, Datum<T>[] datums, DateTime currentDate, DateTime endsDate)
         {
-            var targetDatums = datums.Where(q => q.Timestamp >= currentDate && q.Timestamp <= endsDate);
+            var targetDatums = datums.Where(q => q.Timestamp >= currentDate && q.Timestamp < endsDate);
 
             Quality quality;
             if (targetDatums.Select(s => s.Quality).Contains(Quality.None)) quality = Quality.None;
             else quality = targetDatums.Max(m => m.Quality);
 
-            var AVG = targetDatums.Average(a => (dynamic)a.Value);
+            
+            dynamic summ = default(T);
+            foreach (var i in targetDatums)
+            { summ = summ + i.Value; }
+
+            T AVG = summ / targetDatums.Count();
 
             return new Datum<T>()
             {
                 Quality = quality,
                 Signal  =signal,
                 Timestamp = currentDate,
-                Value = (T)(dynamic)AVG,
+                Value = AVG,
             };
         }
     }
