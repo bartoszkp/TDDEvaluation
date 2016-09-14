@@ -829,37 +829,40 @@ namespace Domain.Services.Implementation
             {
                 return datums;
             }
-            int correctValue = 0;
+            
             var checkCorrectDatums = new Dictionary<Granularity, Action>()
             {
-                {Granularity.Week, ()=> correctValue=7 }
+                {Granularity.Week, ()=> setupGetCoarseGranularityWeek<T>(datums,7,ref newListReturn) }
             };
             checkCorrectDatums[granularity].Invoke();
-            if (datums.Count() % correctValue == 0)
-            {
-                int iMax = datums.Count() / correctValue;
-                for(int i = 0; i < iMax; i++)
-                {
-                    Quality quality=Quality.Good;
-                    int value = 0;
-                    int sumOfWeek = 0;
-                    for(int j = 0; j < 7; j++)
-                    {
-                        int actualQuality = SetValueToQuality(quality);
-                        int newQuality = SetValueToQuality(datums.ElementAt(j+i*7).Quality);
-
-                        if (actualQuality > newQuality)
-                            quality= datums.ElementAt(j + i * 7).Quality;
-                        sumOfWeek += Convert.ToInt16(datums.ElementAt(j + i * 7).Value);
-                    }
-                    value = sumOfWeek / 7;
-                    newListReturn.Add(new Datum<T>() {Timestamp=datums.ElementAt(i*7).Timestamp, Quality=quality, Value = (T)(value).Adapt(value.GetType(), typeof(int)) });
-
-                }
-            }
             return newListReturn;
         }
 
+        private void setupGetCoarseGranularityWeek<T>(IEnumerable<Datum<T>> datums, int valueGranurality,ref List<Datum<T>> newListReturn)
+        {
+            int correctValue = valueGranurality;
+            if (datums.Count() % correctValue == 0)
+            {
+                int iMax = datums.Count() / correctValue;
+                for (int i = 0; i < iMax; i++)
+                {
+                    Quality quality = Quality.Good;
+                    int value = 0;
+                    int sumOfWeek = 0;
+                    for (int j = 0; j < 7; j++)
+                    {
+                        int actualQuality = SetValueToQuality(quality);
+                        int newQuality = SetValueToQuality(datums.ElementAt(j + i * 7).Quality);
+
+                        if (actualQuality > newQuality)
+                            quality = datums.ElementAt(j + i * 7).Quality;
+                        sumOfWeek += Convert.ToInt16(datums.ElementAt(j + i * 7).Value);
+                    }
+                    value = sumOfWeek / 7;
+                    newListReturn.Add(new Datum<T>() { Timestamp = datums.ElementAt(i * 7).Timestamp, Quality = quality, Value = (T)(value).Adapt(value.GetType(), typeof(int)) });
+                }
+            }
+        }
         
     }
 }
