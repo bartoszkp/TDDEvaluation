@@ -110,7 +110,8 @@ namespace WebService
             {    
                 case DataType.Double:
                     return signalsDomainService.GetCoarseData<double>(domainSignal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
-                                            ?.ToDto<IEnumerable<Dto.Datum>>();            
+                                            ?.ToDto<IEnumerable<Dto.Datum>>();
+                
                 default:
                     return null;
             }
@@ -172,7 +173,7 @@ namespace WebService
         {
             int valueSignalGranularity = SetValueToGranularity(signal.Granularity);
             int valueGranularity = SetValueToGranularity(granularity);
-            if (valueGranularity > valueSignalGranularity)
+            if (valueSignalGranularity > valueGranularity)
             {
                 throw new NoSuchGranularityException();
             }
