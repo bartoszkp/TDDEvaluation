@@ -359,6 +359,9 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            if (!ValidateTimestamp(fromIncludedUtc, granularity) || !ValidateTimestamp(toExcludedUtc, signal.Granularity))
+                throw new InvalidTimestampException();
+
             var data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
             var result = new List<Datum<T>>();
             var mvp = GetMissingValuePolicy(signal) as MissingValuePolicy<T>;
