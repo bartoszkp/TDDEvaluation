@@ -157,6 +157,9 @@ namespace Domain.Services.Implementation
             if (!VerifyTimeStamp(coarseGranularity, fromIncludedUtc) || !VerifyTimeStamp(coarseGranularity, toExcludedUtc))
                 throw new ArgumentException("Timestamp not match to given granularity");
 
+            if (fromIncludedUtc == toExcludedUtc)
+                toExcludedUtc = AddTime(coarseGranularity, toExcludedUtc);
+
             IEnumerable<Datum<T>> data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
 
             List<Datum<T>> returnedData = new List<Datum<T>>();
