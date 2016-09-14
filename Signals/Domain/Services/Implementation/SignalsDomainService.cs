@@ -285,11 +285,32 @@ namespace Domain.Services.Implementation
             if (!CheckCorrectnessOfDate(granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(granularity, toExcludedUtc)) throw new ArgumentException();
             if (!CheckCorrectnessOfDate(signal.Granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(signal.Granularity, toExcludedUtc)) throw new ArgumentException();
 
+            IEnumerable<Datum<T>> signalData;
+            if (fromIncludedUtc == toExcludedUtc)
+            {
+                signalData = GetData<T>(signal, fromIncludedUtc, CalculateCoarseDataDatetime(granularity, fromIncludedUtc));
+                return GenerateCoarseData<T>(signalData, granularity, GetDateDiff(granularity, fromIncludedUtc, CalculateCoarseDataDatetime(granularity, fromIncludedUtc)));
+            }
+            else
+            {
+                signalData = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+                return GenerateCoarseData<T>(signalData, granularity, GetDateDiff(granularity, fromIncludedUtc, toExcludedUtc));
+            }
+        }
 
-            var signalData = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
-            var coarseData = GenerateCoarseData<T>(signalData, granularity, GetDateDiff(granularity, fromIncludedUtc, toExcludedUtc));
-
-            return coarseData;
+        private DateTime CalculateCoarseDataDatetime(Granularity granularity, DateTime datetime)
+        {
+            switch(granularity)
+            {
+                case Granularity.Day: return datetime.AddDays(1);
+                case Granularity.Hour: return datetime.AddHours(1);
+                case Granularity.Minute: return datetime.AddMinutes(1);
+                case Granularity.Month: return datetime.AddMonths(1);
+                case Granularity.Second: return datetime.AddSeconds(1);
+                case Granularity.Week: return datetime.AddDays(7);
+                case Granularity.Year: return datetime.AddYears(1);
+                default: throw new NotImplementedException();
+            }
         }
 
         private int GetDateDiff(Granularity granularity, DateTime fromIncludedUtc, DateTime toExludedUtc)

@@ -1037,7 +1037,7 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            public void ()
+            public void GivenASignal_GetCoarseData_WithEqualDateTimes_ReturnsProperData()
             {
                 int dummyId = 1;
 
