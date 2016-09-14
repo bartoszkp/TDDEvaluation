@@ -65,6 +65,7 @@
     <Compile Include="SignalDeletionTests.cs" />
     <Compile Include="SignalsWebServiceTests.cs" />
     <Compile Include="SpecificDataFillTests.cs" />
+    <Compile Include="ZeroFillTests.cs" />
     <Compile Include="ZeroOrderDataFillTests.cs" />
   </ItemGroup>
   <ItemGroup>
