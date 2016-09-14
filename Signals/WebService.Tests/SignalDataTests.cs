@@ -518,43 +518,50 @@ namespace WebService.Tests
                 Granularity = Granularity.Day,
                 Path = Path.FromString("r/vbc")
             };
-            var policy = new DataAccess.GenericInstantiations.SpecificValueMissingValuePolicyInteger()
-            {
-                Value = 2,
-                Quality = Quality.Good
-            };
             List<Datum<int>> existingDatum = new List<Datum<int>>();
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 2), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 3), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 5), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 6), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 7), Value = 1 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 8), Value = 1 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 9), Value = 1 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 10), Value = 1 });
-
             existingDatum.Add(new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 13), Value = 5 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 2 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 15), Value = 1 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1 });
-
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5 });
-            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 21), Value = 0 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 22), Value = 5 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 5 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 2 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 25), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 26), Value = 2 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 27), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 28), Value = 5 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 29), Value = 5 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 30), Value = 1 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 31), Value = 0 });
 
             List<Datum<int>> filledDatum = new List<Datum<int>>();
-            filledDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 1 });
+            filledDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 1), Value = 2 });
             signalsRepoMock = new Mock<ISignalsRepository>();
             GivenASignal(signal);
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
             signalsDataRepoMock.Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
                             .Returns(existingDatum);
-            missingValueRepoMock = new Mock<IMissingValuePolicyRepository>();
-            missingValueRepoMock
-                .Setup(mvprm => mvprm.Get(It.IsAny<Domain.Signal>()))
-                .Returns(policy);
             var signalsDomainService = new SignalsDomainService(
                     signalsRepoMock.Object,
                     signalsDataRepoMock.Object,
-                    missingValueRepoMock.Object);
+                    null);
             signalsWebService = new SignalsWebService(signalsDomainService);
             var result = signalsWebService.GetCoarseData<double>(signal.Id.Value, Dto.Granularity.Month, new DateTime(2016, 1, 1), new DateTime(2016, 1, 31));
 
@@ -567,6 +574,53 @@ namespace WebService.Tests
                 index++;
             }
         }
+
+
+        [TestMethod]
+        public void GivenASignalGranularityDayAndDatumWihoutPolicy_WhenGetCoarseDataWithNewGranuralityWeek_AndTimeStampInTheSame_ReturnNewGranularity()
+        {
+            var signal = new Signal()
+            {
+                Id = 1,
+                DataType = DataType.Integer,
+                Granularity = Granularity.Day,
+                Path = Path.FromString("r/vbc")
+            };
+
+            List<Datum<int>> existingDatum = new List<Datum<int>>();
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 5), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 6), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 7), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 8), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 9), Value = 1 });
+            existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 10), Value = 1 });
+
+            List<Datum<int>> filledDatum = new List<Datum<int>>();
+            filledDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 });
+            signalsRepoMock = new Mock<ISignalsRepository>();
+            GivenASignal(signal);
+            signalsDataRepoMock = new Mock<ISignalsDataRepository>();
+            signalsDataRepoMock.Setup(sdrm => sdrm.GetData<int>(It.Is<Domain.Signal>(x => x.Id == 1), new DateTime(2016, 1, 4), new DateTime(2016, 1, 10)))
+                            .Returns(existingDatum);
+
+            var signalsDomainService = new SignalsDomainService(
+                    signalsRepoMock.Object,
+                    signalsDataRepoMock.Object,
+                    null);
+            signalsWebService = new SignalsWebService(signalsDomainService);
+            var result = signalsWebService.GetCoarseData<double>(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 4));
+
+            int index = 0;
+            foreach (var fd in filledDatum)
+            {
+                Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality.ToDomain<Domain.Quality>());
+                Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp.ToDomain<DateTime>());
+                Assert.AreEqual(fd.Value, result.ElementAt(index).Value);
+                index++;
+            }
+        
+         }
 
         private void GivenNoSignals()
         {

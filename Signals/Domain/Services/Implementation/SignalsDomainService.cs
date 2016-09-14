@@ -830,15 +830,100 @@ namespace Domain.Services.Implementation
                 return datums;
             }
             
+            
             var checkCorrectDatums = new Dictionary<Granularity, Action>()
             {
-                {Granularity.Week, ()=> setupGetCoarseGranularityWeek<T>(datums,7,ref newListReturn) }
+                {Granularity.Minute,()=>setupGetCoarseGranularity<T>(datums,sumOfIterationMinute(signal), ref newListReturn) },
+                {Granularity.Hour,()=>setupGetCoarseGranularity<T>(datums,sumOfIterationHour(signal), ref newListReturn) },
+                {Granularity.Day,()=>setupGetCoarseGranularity<T>(datums,sumOfIterationDay(signal), ref newListReturn) },
+                {Granularity.Week, ()=> setupGetCoarseGranularity<T>(datums,sumOfIterationWeek(signal),ref newListReturn) },
+                {Granularity.Month, ()=>setupGetCoarseGranularity<T>(datums,sumOfIterationMonth(signal), ref newListReturn) },
+                {Granularity.Year,()=> setupGetCoarseGranularity<T>(datums,sumOfIterationYear(signal,fromIncludedUtc), ref newListReturn)}
+
             };
             checkCorrectDatums[granularity].Invoke();
             return newListReturn;
         }
 
-        private void setupGetCoarseGranularityWeek<T>(IEnumerable<Datum<T>> datums, int valueGranurality,ref List<Datum<T>> newListReturn)
+        private int sumOfIterationMinute(Signal signal)
+        {
+            int iteration = 0;
+            var choiseGranurality = new Dictionary<Granularity, Action>()
+            {
+                {Granularity.Second,() => iteration=60 }
+            };
+            choiseGranurality[signal.Granularity].Invoke();
+            return iteration;
+        }
+        private int sumOfIterationHour(Signal signal)
+        {
+            int iteration = 0;
+            var choiseGranurality = new Dictionary<Granularity, Action>()
+            {
+                {Granularity.Minute,() => iteration=60 },
+                {Granularity.Second,() => iteration=60*60 }
+            };
+            choiseGranurality[signal.Granularity].Invoke();
+            return iteration;
+        }
+        private int sumOfIterationDay(Signal signal)
+        {
+            int iteration = 0;
+            var choiseGranurality = new Dictionary<Granularity, Action>()
+            {
+                {Granularity.Day,() => iteration=7 },
+                {Granularity.Hour,() => iteration=24 },
+                {Granularity.Minute,() => iteration=24*60 },
+                {Granularity.Second,() => iteration=24*60*60 }
+            };
+            choiseGranurality[signal.Granularity].Invoke();
+            return iteration;
+        }
+
+        private int sumOfIterationWeek(Signal signal)
+        {
+            int iteration = 0;
+            var choiseGranurality = new Dictionary<Granularity, Action>()
+            {
+                {Granularity.Day,() => iteration=7 },
+                {Granularity.Hour,() => iteration=7*24 },
+                {Granularity.Minute,() => iteration=7*24*60 },
+                {Granularity.Second,() => iteration=7*24*60*60 }
+            };
+            choiseGranurality[signal.Granularity].Invoke();
+            return iteration;
+        }
+
+        private int sumOfIterationMonth(Signal signal)
+        {
+            int iteration = 0;
+            var choiseGranurality = new Dictionary<Granularity, Action>()
+            {
+                {Granularity.Day,() => iteration=31 },
+                {Granularity.Hour,() => iteration=31*24 },
+                {Granularity.Minute,() => iteration=31*24*60 },
+                {Granularity.Second,() => iteration=31*24*60*60 }
+            };
+            choiseGranurality[signal.Granularity].Invoke();
+            return iteration;
+        }
+        private int sumOfIterationYear(Signal signal, DateTime fromIncludedUtc)
+        {
+            
+            int iteration = 0;
+            var choiseGranurality = new Dictionary<Granularity, Action>()
+            {
+                {Granularity.Month, ()=>iteration=12},
+                {Granularity.Day,() => iteration=12*DateTime.DaysInMonth(fromIncludedUtc.Year,fromIncludedUtc.Month) },
+                {Granularity.Hour,() => iteration=12*DateTime.DaysInMonth(fromIncludedUtc.Year,fromIncludedUtc.Month)*24 },
+                {Granularity.Minute,() => iteration=12*DateTime.DaysInMonth(fromIncludedUtc.Year,fromIncludedUtc.Month)*24*60 },
+                {Granularity.Second,() => iteration=12*DateTime.DaysInMonth(fromIncludedUtc.Year,fromIncludedUtc.Month)*24*60*60 }
+            };
+            choiseGranurality[signal.Granularity].Invoke();
+            return iteration;
+        }
+
+        private void setupGetCoarseGranularity<T>(IEnumerable<Datum<T>> datums, int valueGranurality,ref List<Datum<T>> newListReturn)
         {
             int correctValue = valueGranurality;
             if (datums.Count() % correctValue == 0)
@@ -849,7 +934,7 @@ namespace Domain.Services.Implementation
                     Quality quality = Quality.Good;
                     int value = 0;
                     int sumOfWeek = 0;
-                    for (int j = 0; j < 7; j++)
+                    for (int j = 0; j < valueGranurality; j++)
                     {
                         int actualQuality = SetValueToQuality(quality);
                         int newQuality = SetValueToQuality(datums.ElementAt(j + i * 7).Quality);
@@ -858,7 +943,7 @@ namespace Domain.Services.Implementation
                             quality = datums.ElementAt(j + i * 7).Quality;
                         sumOfWeek += Convert.ToInt16(datums.ElementAt(j + i * 7).Value);
                     }
-                    value = sumOfWeek / 7;
+                    value = sumOfWeek / valueGranurality;
                     newListReturn.Add(new Datum<T>() { Timestamp = datums.ElementAt(i * 7).Timestamp, Quality = quality, Value = (T)(value).Adapt(value.GetType(), typeof(int)) });
                 }
             }

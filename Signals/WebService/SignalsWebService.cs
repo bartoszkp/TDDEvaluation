@@ -104,6 +104,7 @@ namespace WebService
                 throw new NoSuchSignalException("Could not get data for not existing signal");
             if (fromIncludedUtc > toExcludedUtc)
                 return new List<Datum>();
+            
             GranularityMatch(signal, granularity);
             var domainSignal = signal.ToDomain<Domain.Signal>();
             switch (signal.DataType)
@@ -114,6 +115,13 @@ namespace WebService
                 case DataType.Integer:
                     return signalsDomainService.GetCoarseData<int>(domainSignal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
                                             ?.ToDto<IEnumerable<Dto.Datum>>();
+                case DataType.Decimal:
+                    return signalsDomainService.GetCoarseData<decimal>(domainSignal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
+                                            ?.ToDto<IEnumerable<Dto.Datum>>();
+                case DataType.String:
+                    throw new NoSuchDataTypeException();
+                case DataType.Boolean:
+                    throw new NoSuchGranularityException();
                 default:
                     return null;
             }

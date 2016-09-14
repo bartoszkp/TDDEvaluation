@@ -21,4 +21,12 @@ namespace Domain.Exceptions
 
         }
     }
+
+    public class NoSuchDataTypeException : Exception
+    {
+        public NoSuchDataTypeException() : base("Wrong DataType. DataType must be less then granularity signal ")
+        {
+
+        }
+    }
 }
