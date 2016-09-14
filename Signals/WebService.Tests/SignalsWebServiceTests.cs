@@ -317,8 +317,8 @@ namespace WebService.Tests
 
                 var policy = new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyDecimal();
                 GivenMVP(signalId, policy);
-                                
-                var data = new Datum<decimal>[] 
+
+                var data = new Datum<decimal>[]
                 {
                     new Datum<decimal>() { Timestamp = new DateTime(2000, 2, 1), Quality = Quality.Fair, Value = 10M }
                 };
@@ -371,7 +371,7 @@ namespace WebService.Tests
                 int signalId = 1;
                 GivenASignal(SignalWith(signalId, DataType.Decimal, Granularity.Month, Path.FromString("root/signal")));
 
-                var data = new Datum<decimal>[] 
+                var data = new Datum<decimal>[]
                 {
                     new Datum<decimal>() { Timestamp = new DateTime(2000, 2, 1), Quality = Quality.Poor, Value = 10M }
                 };
@@ -636,9 +636,9 @@ namespace WebService.Tests
                 {
                     Assert.AreEqual(data[0].Value, result[i].Value);
                     Assert.AreEqual(data[0].Quality.ToDto<Dto.Quality>(), result[i].Quality);
-                }                
+                }
             }
-            
+
             [TestMethod]
             [ExpectedException(typeof(Domain.Exceptions.SignalNotFoundException))]
             public void GivenNoSignals_WhenDeletingSignal_SignalNotFoundExceptionIsThrown()
@@ -654,7 +654,7 @@ namespace WebService.Tests
                 int signalId = 1;
                 var signal = SignalWith(signalId, DataType.Double, Granularity.Day, Path.FromString("root/signal"));
                 GivenASignal(signal);
-                
+
                 signalsWebService.Delete(signalId);
 
                 signalsRepositoryMock.Verify(s => s.Delete(signal));
@@ -690,7 +690,7 @@ namespace WebService.Tests
                     data[1].ToDto<Dto.Datum>(),
                     data[2].ToDto<Dto.Datum>(),
                     new Dto.Datum() {Quality = Dto.Quality.None, Value = default(double)}
-                };                
+                };
 
                 var result = signalsWebService.GetData(signalId, fromDate, toDate).ToArray();
 
@@ -740,7 +740,7 @@ namespace WebService.Tests
                 Assert.AreEqual(fromDate, result[0].Timestamp);
                 Assert.AreEqual(expectedResults[0].Quality, result[0].Quality);
                 Assert.AreEqual(Math.Round(Convert  .ToDouble(expectedResults[0].Value),4), result[0].Value);
-                
+
             }
 
             [TestMethod]
@@ -800,7 +800,7 @@ namespace WebService.Tests
                 var toDate = new DateTime(2000, 1, 1);
                 SetupGetOlderData<double>(signalId, fromDate);
                 SetupGetNewerData<double>(signalId, toDate, new Datum<double>[] { data[0] });
-                
+
                 var expectedResults = new Dto.Datum[] {
                     new Dto.Datum() {Quality = Dto.Quality.None, Value = default(double)}
                 };
@@ -862,7 +862,7 @@ namespace WebService.Tests
                     DataType = Dto.DataType.Double,
                     ShadowSignal = new Dto.Signal()
                     {
-                        Id = dummyId,
+                        Id = dummyId + 1,
                         DataType = Dto.DataType.Double,
                         Granularity = Dto.Granularity.Day,
                         Path = new Dto.Path() { Components = new[] { "shadow", "signal" } }
@@ -1082,11 +1082,35 @@ namespace WebService.Tests
                 Assert.AreEqual((double)2.1, result.ElementAt(4).Value);
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.ShadowMissingCyclePolicyException))]
+            public void GivenASignal_WhenSettingShadowMVPWithSameSignal_ThrewException()
+            {
+                int Id = 1;
+                var newSignal = new Signal()
+                {
+                    Id = Id,
+                    DataType = DataType.Double,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("shadow/signal")
+                };
 
+                var policy = new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    Id = Id,
+                    DataType = Dto.DataType.Double,
+                    ShadowSignal = new Dto.Signal()
+                    {
+                        Id = Id,
+                        DataType = Dto.DataType.Double,
+                        Granularity = Dto.Granularity.Day,
+                        Path = new Dto.Path() { Components = new[] { "shadow", "signal" } }
+                    }
+                };
 
-
-
-
+                GivenASignal(newSignal);
+                signalsWebService.SetMissingValuePolicy(Id, policy);
+            }
 
             private void SetupDataRepository<T>(int signalId = 1, IEnumerable<Datum<T>> data = null)
             {
