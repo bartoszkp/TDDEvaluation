@@ -128,7 +128,7 @@ namespace Domain.Services.Implementation
                             if (datum == null) newDatumList.Add(ShadowDatum<T>(shadowSignal, tmpTime).First());
                             else newDatumList.Add(datum);
 
-                            tmpTime = IncreaseDateTime(signal, tmpTime);
+                            tmpTime = IncreaseDateTime(signal.Granularity, tmpTime);
                         }
 
                         return newDatumList;
@@ -139,11 +139,11 @@ namespace Domain.Services.Implementation
             return result;
         }
 
-        private DateTime IncreaseDateTime(Signal signal, DateTime datetime)
+        private DateTime IncreaseDateTime(Granularity granularity, DateTime datetime)
         {
             DateTime newDate = new DateTime();
 
-            switch(signal.Granularity)
+            switch(granularity)
             {
                 case Granularity.Day: return newDate = datetime.AddDays(1);
                 case Granularity.Hour: return newDate = datetime.AddHours(1);
@@ -255,6 +255,42 @@ namespace Domain.Services.Implementation
                 if (ShadowSignalPolicy == null) break;
                 else shadowSignal = ShadowSignalPolicy.ShadowSignal;
             }
+        }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            if (fromIncludedUtc == toExcludedUtc) toExcludedUtc = IncreaseDateTime(granularity, toExcludedUtc);
+            var sourseData = this.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+            if (signal.Granularity > granularity) throw new Exception();
+
+            List<Datum<T>> newDatumList = new List<Datum<T>>();
+
+            DateTime tmpTime = fromIncludedUtc;
+
+            while (tmpTime < toExcludedUtc)
+            {
+                newDatumList.Add(calculateAVGDatum<T>(signal, sourseData, tmpTime, IncreaseDateTime(granularity, tmpTime)));
+                tmpTime = IncreaseDateTime(granularity, tmpTime);
+            }
+            return newDatumList;
+        }
+        private Datum<T> calculateAVGDatum<T>(Signal signal, Datum<T>[] datums, DateTime currentDate, DateTime endsDate)
+        {
+            var targetDatums = datums.Where(q => q.Timestamp >= currentDate && q.Timestamp <= endsDate);
+
+            Quality quality;
+            if (targetDatums.Select(s => s.Quality).Contains(Quality.None)) quality = Quality.None;
+            else quality = targetDatums.Max(m => m.Quality);
+
+            var AVG = targetDatums.Average(a => (dynamic)a.Value);
+
+            return new Datum<T>()
+            {
+                Quality = quality,
+                Signal  =signal,
+                Timestamp = currentDate,
+                Value = (T)(dynamic)AVG,
+            };
         }
     }
 }

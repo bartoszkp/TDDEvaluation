@@ -95,7 +95,25 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            Domain.Signal signal = this.GetById(signalId)?.ToDomain<Domain.Signal>();
+
+            Type signalType = signal.DataType.GetNativeType();
+
+            if (signalType == typeof(bool))
+            { return GetCoarseDataWithType<bool>(signal, granularity, fromIncludedUtc, toExcludedUtc); }
+            else
+            if (signalType == typeof(int))
+            { return GetCoarseDataWithType<int>(signal, granularity, fromIncludedUtc, toExcludedUtc); }
+            else
+            if (signalType == typeof(double))
+            { return GetCoarseDataWithType<double>(signal, granularity, fromIncludedUtc, toExcludedUtc); }
+            else
+            if (signalType == typeof(decimal))
+            { return GetCoarseDataWithType<decimal>(signal, granularity, fromIncludedUtc, toExcludedUtc); }
+            else
+            if (signalType == typeof(string))
+            { return GetCoarseDataWithType<string>(signal, granularity, fromIncludedUtc, toExcludedUtc); }
+            else return null;
         }
 
         private IEnumerable<Dto.Datum> GetDataWithType<T>(Domain.Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -103,6 +121,17 @@ namespace WebService
             CheckTimestamp(fromIncludedUtc, signal.Granularity);
 
             IEnumerable<Domain.Datum<T>> result = signalsDomainService.GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToArray();
+
+            result = result.OrderBy(dat => dat.Timestamp).ToArray();
+            return result.ToDto<IEnumerable<Dto.Datum>>();
+        }
+
+        private IEnumerable<Dto.Datum> GetCoarseDataWithType<T>(Domain.Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            CheckTimestamp(fromIncludedUtc, signal.Granularity);
+            CheckTimestamp(toExcludedUtc, signal.Granularity);
+
+            IEnumerable<Domain.Datum<T>> result = signalsDomainService.GetCoarseData<T>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).ToArray();
 
             result = result.OrderBy(dat => dat.Timestamp).ToArray();
             return result.ToDto<IEnumerable<Dto.Datum>>();
