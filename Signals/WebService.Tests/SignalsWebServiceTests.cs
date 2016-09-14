@@ -11,6 +11,7 @@ using DataAccess;
 using DataAccess.GenericInstantiations;
 using Dto;
 using Domain.MissingValuePolicy;
+using Domain.Exceptions;
 
 namespace WebService.Tests
 {
@@ -1207,6 +1208,14 @@ namespace WebService.Tests
                 var result = signalsWebService.GetCoarseData(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 4));
 
                 var d = result.First();
+            }
+
+            [TestMethod]
+            [ExpectedException(typeof(InvalidTimestampException))]
+            public void WhenGettingCoarseDataForNotCorrectDate_ThrowsException()
+            {
+                SetupGetCoarseData<decimal>(new Domain.Signal() { Id = 312, DataType = Domain.DataType.Decimal }, null);
+                signalsWebService.GetCoarseData(312, Dto.Granularity.Month, new DateTime(2016, 07, 21), new DateTime(2016, 09, 1));
             }
 
             private void SetupGetCoarseData<T>(Domain.Signal signal, Domain.Datum<T>[] data)
