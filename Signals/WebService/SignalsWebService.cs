@@ -111,7 +111,9 @@ namespace WebService
                 case DataType.Double:
                     return signalsDomainService.GetCoarseData<double>(domainSignal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
                                             ?.ToDto<IEnumerable<Dto.Datum>>();
-                
+                case DataType.Integer:
+                    return signalsDomainService.GetCoarseData<int>(domainSignal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc)
+                                            ?.ToDto<IEnumerable<Dto.Datum>>();
                 default:
                     return null;
             }

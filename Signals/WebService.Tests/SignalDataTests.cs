@@ -481,6 +481,10 @@ namespace WebService.Tests
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1 });
             existingDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0 });
 
+            List<Datum<int>> filledDatum = new List<Datum<int>>();
+            filledDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 });
+            filledDatum.Add(new Datum<int>() { Quality = Quality.Fair, Timestamp = new DateTime(2016, 1, 11), Value = 4 });
+            filledDatum.Add(new Datum<int>() { Quality = Quality.Bad, Timestamp = new DateTime(2016, 1, 18), Value = 3 });
             signalsRepoMock = new Mock<ISignalsRepository>();
             GivenASignal(signal);
             signalsDataRepoMock = new Mock<ISignalsDataRepository>();
@@ -495,7 +499,7 @@ namespace WebService.Tests
             var result = signalsWebService.GetCoarseData<double>(signal.Id.Value, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 24));
 
             int index = 0;
-            foreach (var fd in existingDatum)
+            foreach (var fd in filledDatum)
             {
                 Assert.AreEqual(fd.Quality, result.ElementAt(index).Quality.ToDomain<Domain.Quality>());
                 Assert.AreEqual(fd.Timestamp, result.ElementAt(index).Timestamp.ToDomain<DateTime>());
