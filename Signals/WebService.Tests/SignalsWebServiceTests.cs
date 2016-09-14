@@ -1378,6 +1378,58 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(signalId, Dto.Granularity.Week, new DateTime(2016, 1, 5), new DateTime(2016, 1, 25));
             }
 
+            [TestMethod]
+            public void GivenASignal_GetCoarseData_CheckIfWorksProperly()
+            {
+                SetupWebService();
+
+                var signal = ReturnDefaultSignal_IntegerDay();
+
+                signal.Id = 7;
+                Dto.Datum[] data = new Dto.Datum[]{
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 5), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 6), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 7), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 8), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 9), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 10), Value = 1 },
+
+                    new Dto.Datum() { Quality = Dto.Quality.Good, Timestamp = new DateTime(2016, 1, 11), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 12), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 13), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 14), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 15), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 16), Value = 2 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 17), Value = 1 },
+
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 18), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 19), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 20), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Bad, Timestamp = new DateTime(2016, 1, 21), Value = 5 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 22), Value = 0 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 23), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 24), Value = 0 },
+                };
+
+                SetupMocks_ForCheckingDatums<int>(signal, data);
+
+                List<Datum> result =
+                    signalsWebService.GetCoarseData((int)signal.Id, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 25)).ToList();
+
+                Assert.AreEqual(Dto.Quality.None, result[0].Quality);
+                Assert.AreEqual(1, result[0].Value);
+                Assert.AreEqual(new DateTime(2016, 1, 4), result[0].Timestamp);
+
+                Assert.AreEqual(Dto.Quality.Fair, result[1].Quality);
+                Assert.AreEqual(4, result[1].Value);
+                Assert.AreEqual(new DateTime(2016, 1, 11), result[1].Timestamp);
+
+                Assert.AreEqual(Dto.Quality.Bad, result[2].Quality);
+                Assert.AreEqual(3, result[2].Value);
+                Assert.AreEqual(new DateTime(2016, 1, 18), result[2].Timestamp);
+            }
+
             #endregion
             [TestMethod]
             public void GivenASignal_GivenNoData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
@@ -1786,7 +1838,8 @@ namespace WebService.Tests
             }
 
             private void DataRepositoryMock_SetupGetData<T>(IEnumerable<Dto.Datum> data)
-            {
+            { 
+
                 dataRepositoryMock
                     .Setup(x => x.GetData<T>(It.IsAny<Domain.Signal>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns<Domain.Signal, DateTime, DateTime>((sig, from, to) =>
