@@ -104,8 +104,7 @@ namespace WebService
         public void SetMissingValuePolicy(int signalId, MissingValuePolicy policy)
         {
             var domainPolicy = policy?.ToDomain<MissingValuePolicyBase>();
-
-            this.signalsDomainService.SetMissingValuePolicy(signalId, domainPolicy);
+            RunGenericMethod("SetMissingValuePolicyGeneric",signalId,domainPolicy);
         }
 
         public IEnumerable<Datum> GetDataGeneric<T>(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
@@ -129,6 +128,11 @@ namespace WebService
             var domainData = data.ToDomain<IEnumerable<Domain.Datum<T>>>();
 
             this.signalsDomainService.SetData(signalId, domainData);
+        }
+
+        public void SetMissingValuePolicyGeneric<T>(int signalId, Domain.MissingValuePolicy.MissingValuePolicyBase policy)
+        {
+            this.signalsDomainService.SetMissingValuePolicy<T>(signalId, policy);
         }
     }
 }

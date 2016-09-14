@@ -70,20 +70,19 @@ namespace Domain.Services.Implementation
         {
             var result = this.signalsRepository.Get(signalPath);
 
-
             return result;
         }
 
-        public void SetMissingValuePolicy(int signalId, MissingValuePolicyBase policy)
+        public void SetMissingValuePolicy<T>(int signalId, MissingValuePolicyBase policy)
         {
             var signal = MissingValuePolicySignal(signalId);
 
-            CheckIfShadowMissingValuePolicy(signal, policy);
+            CheckIfShadowMissingValuePolicy<T>(signal, policy);
 
             missingValuePolicyRepository.Set(signal, policy);
         }
 
-        private void CheckIfShadowMissingValuePolicy(Signal signal, MissingValuePolicyBase policy)
+        private void CheckIfShadowMissingValuePolicy<T>(Signal signal, MissingValuePolicyBase policy)
         {
             dynamic shadow;
             switch (signal.DataType)
@@ -113,6 +112,17 @@ namespace Domain.Services.Implementation
             if (shadow.ShadowSignal.DataType != signal.DataType ||
                 shadow.ShadowSignal.Granularity != signal.Granularity)
                 throw new ShadowSignalDoesntMatchASignalException();
+
+            var nextLevel = missingValuePolicyRepository.Get(shadow.ShadowSignal);
+
+            while (nextLevel is MissingValuePolicy.ShadowMissingValuePolicy<T>)
+            {
+                if ((nextLevel as MissingValuePolicy.ShadowMissingValuePolicy<T>).ShadowSignal.Id == signal.Id)
+                    throw new ArgumentException("cannot assign shadow signal to the same signal");
+
+                nextLevel = missingValuePolicyRepository.Get((nextLevel as MissingValuePolicy.ShadowMissingValuePolicy<T>).ShadowSignal);
+            }
+
         }
 
         private ShadowMissingValuePolicy<T> GetShadowMissingValuePolicyWithCorrectType<T>(MissingValuePolicyBase policy)
@@ -344,7 +354,7 @@ namespace Domain.Services.Implementation
             if (signal == null)
                 throw new ArgumentException("This signal does not exist.");
 
-            SetMissingValuePolicy(signalId, null);
+            SetMissingValuePolicy<Type>(signalId, null);
 
             var dataType = signal.DataType.GetNativeType();
             var deleteDataMethod = signalsDataRepository

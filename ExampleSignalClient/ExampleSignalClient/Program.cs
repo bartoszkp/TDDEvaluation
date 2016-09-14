@@ -9,49 +9,85 @@ namespace ExampleSignalClient
         {
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
-            var id = client.Add(new Signal()
+            //var signal1 = client.Add(new Signal()
+            //{
+            //    DataType = DataType.Boolean,
+            //    Granularity = Granularity.Month,
+            //    Path = new Path() { Components = new[] { "cycle", "signal1" } }
+            //});
+
+            //client.SetMissingValuePolicy(
+            //          signal1.Id.Value,
+            //          new NoneQualityMissingValuePolicy()
+            //          {
+            //              DataType = DataType.Boolean,
+            //          });
+
+            //client.Delete(signal1.Id.Value);
+
+            var signal1 = client.Add(new Signal()
             {
-                DataType = DataType.Integer,
+                DataType = DataType.Boolean,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "CoarseTestsYear4" } }
-            }).Id.Value;
-
-            client.SetData(id, new Datum[]
+                Path = new Path() { Components = new[] { "cycle", "signal1" } }
+            });
+            var signal2 = client.Add(new Signal()
             {
-    new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2016,1, 1), Value = 2 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,2, 1), Value = 3 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,3, 1), Value = 33 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,4, 1), Value = 13 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,5, 1), Value = 11 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,6, 1), Value = 12 },
-
-    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2016,7,1), Value = 4 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,8,1), Value = 8 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,9,1), Value = 64 },
-    new Datum() { Quality = Quality.None, Timestamp = new DateTime(2016,10,1), Value = 58 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,11,1), Value = 16 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,12,1), Value = 23 },
-
-      new Datum() { Quality = Quality.Bad, Timestamp = new DateTime(2017,1, 1), Value = 2 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,2, 1), Value = 3 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,3, 1), Value = 33 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,4, 1), Value = 13 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,5, 1), Value = 11 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,6, 1), Value = 121 },
-
-    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2017,7,1), Value = 4 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,8,1), Value = 8 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,9,1), Value = 64 },
-    new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2017,10,1), Value = 58 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,11,1), Value = 16 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2017,12,1), Value = 23 },
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal2" } }
+            });
+            var signal3 = client.Add(new Signal()
+            {
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal3" } }
+            });
+            var signal4 = client.Add(new Signal()
+            {
+                DataType = DataType.Boolean,
+                Granularity = Granularity.Month,
+                Path = new Path() { Components = new[] { "cycle", "signal4" } }
             });
 
-            var result = client.GetCoarseData(id, Granularity.Year, new DateTime(2016, 1, 1), new DateTime(2018, 1, 1));
+            client.SetMissingValuePolicy(
+                    signal1.Id.Value,
+                    new ShadowMissingValuePolicy()
+                    {
+                        DataType = DataType.Boolean,
+                        ShadowSignal = signal2
+                    });
+            client.SetMissingValuePolicy(
+                    signal2.Id.Value,
+                    new ShadowMissingValuePolicy()
+                    {
+                        DataType = DataType.Boolean,
+                        ShadowSignal = signal3
+                    });
 
-            foreach (var d in result)
+            client.SetMissingValuePolicy(
+                     signal3.Id.Value,
+                     new ShadowMissingValuePolicy()
+                     {
+                         DataType = DataType.Boolean,
+                         ShadowSignal = signal4
+                     });
+
+           
+
+            try
             {
-                Console.WriteLine(d.Timestamp + ": " + d.Value + " (" + d.Quality + ")");
+                client.SetMissingValuePolicy(
+                  signal4.Id.Value,
+                  new ShadowMissingValuePolicy()
+                  {
+                      DataType = DataType.Boolean,
+                      ShadowSignal = signal1
+                  });
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Failed to assign");
             }
 
             Console.ReadKey();
