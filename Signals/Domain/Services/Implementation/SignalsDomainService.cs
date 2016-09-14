@@ -105,44 +105,25 @@ namespace Domain.Services.Implementation
 
         public void SetMVP(Signal domainSetMVPSignal, MissingValuePolicyBase domainPolicyBase)
         {
-            if(domainPolicyBase.GetType().GetGenericTypeDefinition() == typeof(ShadowMissingValuePolicy<>))
+            if (domainPolicyBase.GetType().GetGenericTypeDefinition() == typeof(ShadowMissingValuePolicy<>))
             {
                 dynamic shadowPolicy = domainPolicyBase;
                 if (shadowPolicy.ShadowSignal.Granularity != domainSetMVPSignal.Granularity || shadowPolicy.ShadowSignal.DataType != domainSetMVPSignal.DataType)
                     throw new InvalidSignalForShadowing();
 
-                // ----------------------------------------------------------------------
+                List<Signal> shadowsOfSignalWhichHasToBeShadow = new List<Signal>();
+                shadowsOfSignalWhichHasToBeShadow.Add((domainPolicyBase as ShadowMissingValuePolicy<bool>).ShadowSignal);
+                Signal nextShadow;
 
-                if (domainPolicyBase.NativeDataType == typeof(bool))
+                do
                 {
-                    Signal shadowOfSignalWhichHasToBeShadow =
-                    (missingValuePolicyRepository.Get
-                    ((domainPolicyBase as ShadowMissingValuePolicy<bool>).ShadowSignal) as ShadowMissingValuePolicy<bool>).ShadowSignal;
+                    nextShadow = null;
+                    dynamic mvp = GetSuitableShadowMVP(domainPolicyBase.NativeDataType, shadowsOfSignalWhichHasToBeShadow);
+                    if (mvp != null) nextShadow = mvp.ShadowSignal;
+                    if (nextShadow != null) shadowsOfSignalWhichHasToBeShadow.Add(nextShadow);
+                } while (nextShadow != null);
 
-                    if (shadowOfSignalWhichHasToBeShadow == null) return;
-                    if (shadowOfSignalWhichHasToBeShadow.Id == domainSetMVPSignal.Id) throw new Exception();
-                }
-                /*if (domainPolicyBase.NativeDataType == typeof(int))
-                {
-                    var shadowOfSignalWhichHasToBeShadow = (domainPolicyBase as ShadowMissingValuePolicy<int>).ShadowSignal;
-                    if (shadowOfSignalWhichHasToBeShadow == domainSetMVPSignal) throw new Exception();
-                }
-                if (domainPolicyBase.NativeDataType == typeof(double))
-                {
-                    var shadowOfSignalWhichHasToBeShadow = (domainPolicyBase as ShadowMissingValuePolicy<double>).ShadowSignal;
-                    if (shadowOfSignalWhichHasToBeShadow == domainSetMVPSignal) throw new Exception();
-                }
-                if (domainPolicyBase.NativeDataType == typeof(decimal))
-                {
-                    var shadowOfSignalWhichHasToBeShadow = (domainPolicyBase as ShadowMissingValuePolicy<decimal>).ShadowSignal;
-                    if (shadowOfSignalWhichHasToBeShadow == domainSetMVPSignal) throw new Exception();
-                }
-                if (domainPolicyBase.NativeDataType == typeof(string))
-                {
-                    var shadowOfSignalWhichHasToBeShadow = (domainPolicyBase as ShadowMissingValuePolicy<string>).ShadowSignal;
-                    if (shadowOfSignalWhichHasToBeShadow == domainSetMVPSignal) throw new Exception();
-                }*/
-
+                if (shadowsOfSignalWhichHasToBeShadow.Last().Id == domainSetMVPSignal.Id) throw new DependencyCycleException();
             }
             this.missingValuePolicyRepository.Set(domainSetMVPSignal, domainPolicyBase);
         }
@@ -153,8 +134,6 @@ namespace Domain.Services.Implementation
             if (result == null) return null;
             else return TypeAdapter.Adapt(result, result.GetType(), result.GetType().BaseType) as MissingValuePolicy.MissingValuePolicyBase;
         }
-
-       
 
         public void SetData<T>(Signal setDataSignal, IEnumerable<Datum<T>> datum)
         {
@@ -241,6 +220,15 @@ namespace Domain.Services.Implementation
 
 
 
+        private MissingValuePolicyBase GetSuitableShadowMVP(Type nativeDataType, List<Signal> shadowsOfSignalWhichHasToBeShadow)
+        {
+            if (nativeDataType == typeof(bool)) return (missingValuePolicyRepository.Get(shadowsOfSignalWhichHasToBeShadow.Last()) as ShadowMissingValuePolicy<bool>);
+            if (nativeDataType == typeof(int)) return (missingValuePolicyRepository.Get(shadowsOfSignalWhichHasToBeShadow.Last()) as ShadowMissingValuePolicy<int>);
+            if (nativeDataType == typeof(double)) return (missingValuePolicyRepository.Get(shadowsOfSignalWhichHasToBeShadow.Last()) as ShadowMissingValuePolicy<double>);
+            if (nativeDataType == typeof(decimal)) return (missingValuePolicyRepository.Get(shadowsOfSignalWhichHasToBeShadow.Last()) as ShadowMissingValuePolicy<decimal>);
+            if (nativeDataType == typeof(string)) return (missingValuePolicyRepository.Get(shadowsOfSignalWhichHasToBeShadow.Last()) as ShadowMissingValuePolicy<string>);
+            return null;
+        }
 
         private void SetDefaultMVPForSignal(Signal signal)
         {
