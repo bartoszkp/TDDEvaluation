@@ -1112,6 +1112,65 @@ namespace WebService.Tests
                 signalsWebService.SetMissingValuePolicy(Id, policy);
             }
 
+
+
+            [TestMethod]
+            [ExpectedException(typeof(Domain.Exceptions.ShadowMissingCyclePolicyException))]
+            public void GivenASignal_WhenSettingShadowMVPWithSignalWhichTheUsedAlready_ThrowException()
+            {
+                var signal1 = new Signal()
+                {
+                    Id = 1,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("cycle/signal1")
+                };
+                var signal2 = new Signal()
+                {
+                    Id = 2,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("cycle/signal2")
+                };
+                var signal3 = new Signal()
+                {
+                    Id = 3,
+                    DataType = DataType.Boolean,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("cycle/signal3")
+                };
+                GivenASignals(signal1, signal2, signal3);
+                Dictionary<Signal, Signal> relationSignal_Shadow = new Dictionary<Signal, Signal>()
+                {
+                    {signal1, signal2},
+                    {signal2, signal3},
+                    {signal3, signal1}
+                };
+                missingValuePolicyRepositoryMock
+                    .Setup(s => s.Get(It.IsAny<Signal>()))
+                    .Returns<Signal>(s => new DataAccess.GenericInstantiations.ShadowMissingValuePolicyBoolean() { ShadowSignal = relationSignal_Shadow.First(q => q.Key.Id == s.Id).Value });
+
+                signalsWebService.SetMissingValuePolicy(signal1.Id.Value, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = signal2.ToDto<Dto.Signal>()
+                });
+
+                signalsWebService.SetMissingValuePolicy(signal2.Id.Value, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = signal3.ToDto<Dto.Signal>()
+                });
+
+                signalsWebService.SetMissingValuePolicy(signal3.Id.Value, new Dto.MissingValuePolicy.ShadowMissingValuePolicy()
+                {
+                    DataType = Dto.DataType.Boolean,
+                    ShadowSignal = signal1.ToDto<Dto.Signal>()
+                });
+            }
+
+
+
             private void SetupDataRepository<T>(int signalId = 1, IEnumerable<Datum<T>> data = null)
             {
                 if (data == null)
@@ -1243,6 +1302,25 @@ namespace WebService.Tests
                 missingValuePolicyRepositoryMock
                     .Setup(s => s.Get(It.IsAny<Signal>()))
                     .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
+            }
+            private void GivenASignals(params Signal[] signals)
+            {
+                GivenNoSignals();
+
+                foreach (var signal in signals)
+                {
+                    signalsRepositoryMock
+                    .Setup(sr => sr.Get(signal.Id.Value))
+                    .Returns(signal);
+
+                    signalsRepositoryMock
+                        .Setup(sr => sr.Get(signal.Path))
+                        .Returns(signal);
+
+                    missingValuePolicyRepositoryMock
+                        .Setup(s => s.Get(It.IsAny<Signal>()))
+                        .Returns(new DataAccess.GenericInstantiations.NoneQualityMissingValuePolicyInteger());
+                }
             }
 
             private void GivenMVP(int signalId, MissingValuePolicyBase policy)
