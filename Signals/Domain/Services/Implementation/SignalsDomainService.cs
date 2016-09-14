@@ -146,17 +146,48 @@ namespace Domain.Services.Implementation
             return res.OrderBy(x => x.Timestamp);
         }
 
-        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity coarseGranularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             if (signal.DataType == DataType.Boolean || signal.DataType == DataType.String)
                 throw new ArgumentException("This Datatype is not supported");
 
-            if (signal.Granularity >= granularity)
+            if (signal.Granularity >= coarseGranularity)
                 throw new ArgumentException("Given granularity is more precise than signal granularity");
 
-            if (!VerifyTimeStamp(granularity, fromIncludedUtc) || !VerifyTimeStamp(granularity, toExcludedUtc))
+            if (!VerifyTimeStamp(coarseGranularity, fromIncludedUtc) || !VerifyTimeStamp(coarseGranularity, toExcludedUtc))
                 throw new ArgumentException("Timestamp not match to given granularity");
-            return null;
+
+            IEnumerable<Datum<T>> data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+
+            List<Datum<T>> returnedData = new List<Datum<T>>();
+
+            for (DateTime i = fromIncludedUtc; i < toExcludedUtc; i = AddTime(coarseGranularity, i))
+            {
+                int numberOfIteration = 0;
+                dynamic result = 0;
+                Quality lowestQuality = Quality.Good;
+                Datum<T> currentDatum;
+                for (DateTime j = i; j < AddTime(coarseGranularity, i); j = AddTime(signal.Granularity, j))
+                {
+                    numberOfIteration++;
+                    currentDatum = data.Where(d => ((d.Timestamp.Ticks - j.Ticks) == 0)).FirstOrDefault();
+                    result += currentDatum.Value;
+                    if ((currentDatum.Quality > lowestQuality && lowestQuality != Quality.None) || currentDatum.Quality == Quality.None)
+                        lowestQuality = currentDatum.Quality;
+                }
+
+                result = result / numberOfIteration;
+
+                returnedData.Add(new Datum<T>()
+                {
+                    Quality = lowestQuality,
+                    Timestamp = new DateTime(i.Ticks),
+                    Signal = signal,
+                    Value = result
+                });
+            }
+
+            return returnedData;
         }
         public void Set<T>(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
