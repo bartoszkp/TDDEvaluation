@@ -1017,6 +1017,25 @@ namespace WebService.Tests
 
             }
 
+            [TestMethod]
+            [ExpectedException(typeof(ArgumentException))]
+            public void GivenASignal_GetCoarseData_WithFromDateBiggerThenToDate_ThrowsException()
+            {
+                int dummyId = 1;
+
+                var signal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Month,
+                    Path = Path.FromString("someSignal")
+                };
+
+                GivenASignal(signal);
+
+                signalsWebService.GetCoarseData(1, Dto.Granularity.Year, new DateTime(2000, 2, 1), new DateTime(2000, 1, 1));
+            }
+
             private void setupGetByPathEntry(IEnumerable<string> paths)
             {
                 paths = paths.ToList();
