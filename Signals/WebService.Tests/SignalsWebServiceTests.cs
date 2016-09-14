@@ -1430,6 +1430,34 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2016, 1, 18), result[2].Timestamp);
             }
 
+            [TestMethod]
+            public void GivenASignal_GetCoarseDataWhenFromAndToDateTimesAreTheSame_CheckIfWorksProperly()
+            {
+                SetupWebService();
+
+                var signal = ReturnDefaultSignal_IntegerDay();
+
+                signal.Id = 7;
+                Dto.Datum[] data = new Dto.Datum[]{
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 4), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 5), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 6), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 7), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.None, Timestamp = new DateTime(2016, 1, 8), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 9), Value = 1 },
+                    new Dto.Datum() { Quality = Dto.Quality.Fair, Timestamp = new DateTime(2016, 1, 10), Value = 1 },
+                };
+
+                SetupMocks_ForCheckingDatums<int>(signal, data);
+
+                List<Datum> result =
+                    signalsWebService.GetCoarseData((int)signal.Id, Dto.Granularity.Week, new DateTime(2016, 1, 4), new DateTime(2016, 1, 4)).ToList();
+
+                Assert.AreEqual(Dto.Quality.None, result[0].Quality);
+                Assert.AreEqual(1, result[0].Value);
+                Assert.AreEqual(new DateTime(2016, 1, 4), result[0].Timestamp);
+            }
+
             #endregion
             [TestMethod]
             public void GivenASignal_GivenNoData_WhenGettingDataWithEqualTimestamps_SingleDatumWithDefaultValuesIsReturned()
