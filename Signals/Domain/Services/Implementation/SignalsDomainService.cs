@@ -68,6 +68,7 @@ namespace Domain.Services.Implementation
                     throw new TypeMismatchException();
                 policy.Signal = signal;
             }
+            
             this.missingValuePolicyRepository.Set(signal, policy);
         }
 
@@ -275,6 +276,123 @@ namespace Domain.Services.Implementation
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            if (signal.Granularity > granularity) throw new ArgumentException();
+            if (!CheckCorrectnessOfDate(granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(granularity, toExcludedUtc)) throw new ArgumentException();
+            if (!CheckCorrectnessOfDate(signal.Granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(signal.Granularity, toExcludedUtc)) throw new ArgumentException();
+
+            var signalData = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
+            var coarseData = GenerateCoarseData<T>(signalData, granularity, GetDateDiff(granularity, fromIncludedUtc, toExcludedUtc));
+
+            return coarseData;
+        }
+
+        private int GetDateDiff(Granularity granularity, DateTime fromIncludedUtc, DateTime toExludedUtc)
+        {
+            switch(granularity)
+            {
+                case Granularity.Day: return Convert.ToInt32((toExludedUtc - fromIncludedUtc).TotalDays);
+                case Granularity.Hour: return Convert.ToInt32((toExludedUtc - fromIncludedUtc).TotalHours);
+                case Granularity.Minute: return Convert.ToInt32((toExludedUtc - fromIncludedUtc).TotalMinutes);
+                case Granularity.Month: return ((toExludedUtc.Year - fromIncludedUtc.Year) * 12) + toExludedUtc.Month - fromIncludedUtc.Month;
+                case Granularity.Second: return Convert.ToInt32((toExludedUtc - fromIncludedUtc).TotalSeconds);
+                case Granularity.Week: return Convert.ToInt32((toExludedUtc - fromIncludedUtc).TotalDays/7);
+                case Granularity.Year: return toExludedUtc.Year - fromIncludedUtc.Year;
+                default: throw new NotImplementedException();
+            }
+        }
+
+        private IEnumerable<Datum<T>> GenerateCoarseData<T>(IEnumerable<Datum<T>> signalData, Granularity granularity, int dataSets)
+        {
+            List<Datum<T>> result = new List<Datum<T>>();
+            var dataSetsElementQuantity = signalData.Count() / dataSets;
+            var countQuantity = signalData.Count() / dataSets;
+            var counter = 0;
+
+            for(int i = counter; i < signalData.Count(); i += countQuantity)
+            {
+                Quality quality = new Quality();
+                quality = signalData.ElementAt(i).Quality;
+
+                for (int j = counter; j < dataSetsElementQuantity; j++)
+                {
+                    if (quality == Quality.None) break;
+                    if (signalData.ElementAt(j).Quality == Quality.None) { quality = Quality.None; break; }
+                    else
+                    {
+                        if (signalData.ElementAt(j).Quality > quality) quality = signalData.ElementAt(j).Quality;
+                    }
+                }
+
+                result.Add(new Datum<T>() { Timestamp = signalData.ElementAt(counter).Timestamp, Quality = quality, Value = SumValue<T>(counter, dataSetsElementQuantity, signalData) });
+                counter = dataSetsElementQuantity;
+                dataSetsElementQuantity += countQuantity;
+            }
+
+            return result;
+        }
+
+
+
+        private T SumValue<T>(int i, int j, IEnumerable<Datum<T>> signalData)
+        {
+            if (signalData.First().Value is bool) throw new NotImplementedException("This function doesnt handle bool type values");
+            if (signalData.First().Value is string) throw new NotImplementedException("This function doesnt handle string type values");
+            if (signalData.First().Value is decimal)
+            {
+                List<Datum<decimal>> tmpList = new List<Datum<decimal>>();
+                signalData.ToList().ForEach(d => { tmpList.Add(new Datum<decimal>() { Value = Convert.ToDecimal(d.Value) }); });
+                decimal tmpAverage = 0;
+                int count = 0;
+
+                for (int k = i; k < j; k++)
+                {
+                    tmpAverage = +tmpList[k].Value;
+                    count++;
+                }
+
+                tmpAverage = tmpAverage / count;
+                return (T)tmpAverage.Adapt(typeof(decimal), typeof(T));
+            }
+
+            if (signalData.First().Value is double)
+            {
+                List<Datum<double>> tmpList = new List<Datum<double>>();
+                signalData.ToList().ForEach(d => { tmpList.Add(new Datum<double>() { Value = Convert.ToDouble(d.Value) }); });
+                double tmpAverage = 0;
+                int count = 0;
+
+                for (int k = i; k < j; k++)
+                {
+                    tmpAverage = +tmpList[k].Value;
+                    count++;
+                }
+
+                tmpAverage = tmpAverage / count;
+                return (T)tmpAverage.Adapt(typeof(double), typeof(T));
+            }
+
+            if (signalData.First().Value is int)
+            {
+                List<Datum<int>> tmpList = new List<Datum<int>>();
+                signalData.ToList().ForEach(d => { tmpList.Add(new Datum<int>() { Value = Convert.ToInt32(d.Value) }); });
+                int tmpAverage = 0;
+                int count = 0;
+
+                for (int k = i; k < j; k++)
+                {
+                    tmpAverage += tmpList[k].Value;
+                    count++;
+                }
+
+                tmpAverage = tmpAverage / count;
+                return (T)tmpAverage.Adapt(typeof(int), typeof(T));
+            }
+
+            else throw new NotImplementedException();
         }
     }
 }

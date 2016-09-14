@@ -22,5 +22,7 @@ namespace Domain.Services
         IEnumerable<Signal> GetPathEntry(Path pathDomain);
 
         void Delete(int signalId);
+
+        IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc);
     }
 }

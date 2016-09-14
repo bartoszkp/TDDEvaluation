@@ -100,7 +100,18 @@ namespace WebService
 
         public IEnumerable<Datum> GetCoarseData(int signalId, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            throw new NotImplementedException();
+            var signal = signalsDomainService.GetById(signalId);
+            if (signal == null) throw new SignalNotFoundException(signalId);
+
+            switch(signal.DataType)
+            {
+                case Domain.DataType.Boolean: return signalsDomainService.GetCoarseData<bool>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.Decimal: return signalsDomainService.GetCoarseData<decimal>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.Double: return signalsDomainService.GetCoarseData<double>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.Integer: return signalsDomainService.GetCoarseData<int>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                case Domain.DataType.String: return signalsDomainService.GetCoarseData<string>(signal, granularity.ToDomain<Domain.Granularity>(), fromIncludedUtc, toExcludedUtc).Select(d => d.ToDto<Dto.Datum>()).ToList().OrderBy(t => t.Timestamp);
+                default: throw new NotImplementedException();
+            }
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
