@@ -114,11 +114,23 @@ namespace WebService
             var filledList = new List<Datum>();
             if (fromIncludedUtc > toExcludedUtc)
                 return filledList;
-            
 
-
-
-            return filledList;
+            if (signal.DataType == DataType.Double)
+            {
+                var result = signalsDomainService.GetCoarseData<double>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc, TimePeriodSize(granularity));
+                return ConvertCollectionDomainToDto(result);
+            }
+            else if (signal.DataType == DataType.Integer)
+            {
+                var result = signalsDomainService.GetCoarseData<int>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc, TimePeriodSize(granularity));
+                return ConvertCollectionDomainToDto(result);
+            }
+            else if (signal.DataType == DataType.Decimal)
+            {
+                var result = signalsDomainService.GetCoarseData<decimal>(signal.ToDomain<Domain.Signal>(), fromIncludedUtc, toExcludedUtc, TimePeriodSize(granularity));
+                return ConvertCollectionDomainToDto(result);
+            }
+            else return filledList;
         }
 
         public void SetData(int signalId, IEnumerable<Datum> data)
@@ -212,6 +224,26 @@ namespace WebService
 
             return dto_data;
         }
+        private int TimePeriodSize(Granularity granularity)
+        {
+            switch (granularity)
+            {
+                case Granularity.Minute:
+                    return 60;                    
+                case Granularity.Hour:
+                    return 60;                    
+                case Granularity.Day:
+                    return 24;                    
+                case Granularity.Week:
+                    return 7;
+                case Granularity.Month:
+                    return 31;                    
+                case Granularity.Year:
+                    return 12;
+                default:
+                    throw new Exception("Invalid granularity");
+            }
+        }
         private bool TimePeriodIsRegular(Granularity granularity, DateTime from, DateTime to)
         {
             if (from == to)
@@ -220,27 +252,27 @@ namespace WebService
             switch(granularity)
             {
                 case Granularity.Minute:
-                    if ((to.Second - from.Second) % 60 != 0)
+                    if ((to.Second - from.Second) % TimePeriodSize(granularity) != 0)
                         return false;
                     break;
                 case Granularity.Hour:
-                    if ((to.Minute - from.Minute) % 60 != 0)
+                    if ((to.Minute - from.Minute) % TimePeriodSize(granularity) != 0)
                         return false;
                     break;
                 case Granularity.Day:
-                    if ((to.Hour - from.Hour) % 24 != 0)
+                    if ((to.Hour - from.Hour) % TimePeriodSize(granularity) != 0)
                         return false;
                     break;
                 case Granularity.Week:
-                    if ((to.Day - from.Day) % 7 != 0)
+                    if ((to.Day - from.Day) % TimePeriodSize(granularity) != 0)
                         return false;
                     break;
                 case Granularity.Month:
-                    if ((to.Day - from.Day) % 30 != 0 || (to.Day - from.Day) % 31 != 0)
+                    if ((to.Day - from.Day) % TimePeriodSize(granularity) != 0)
                         return false;
                     break;
                 case Granularity.Year:
-                    if ((to.Month - from.Month) % 12 != 0)
+                    if ((to.Month - from.Month) % TimePeriodSize(granularity) != 0)
                         return false;
                     break;
             }

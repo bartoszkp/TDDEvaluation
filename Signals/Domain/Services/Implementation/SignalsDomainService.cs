@@ -144,7 +144,29 @@ namespace Domain.Services.Implementation
             }
 
             return filledData;          
-        }  
+        }
+        
+        public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, int periodSize)
+        {
+            var filledList = new List<Datum<T>>();
+            var data = GetData<T>(signal, fromIncludedUtc, toExcludedUtc).ToList();            
+            int coarseLength = data.Count / periodSize;
+
+            for (int i = 0; i < coarseLength; ++i)
+            {
+                var fragmentData = data.GetRange(i * periodSize, periodSize);
+                
+                var coarseDatum = new Datum<T>()
+                {
+                    Quality = fragmentData.Select(d => d.Quality).Min(),
+                    Timestamp = data[i * periodSize].Timestamp,
+                    Value = GetMeanValue(fragmentData, periodSize)
+                };
+                filledList.Add(coarseDatum);
+            }
+
+            return filledList;
+        }        
 
         public void SetMissingValuePolicy(Signal signal, MissingValuePolicyBase missingValuePolicy)
         {
@@ -316,6 +338,16 @@ namespace Domain.Services.Implementation
             var valuesDifference = (dynamic)nextDatum.Value - (dynamic)currentDatum.Value;
             if (timeDifference == 0) timeDifference = 1;
             return valuesDifference / timeDifference;
+        }
+
+        private T GetMeanValue<T>(List<Datum<T>> data, int div)
+        {
+            dynamic sum = 0;
+            foreach (var datum in data)
+                sum += datum.Value;
+
+            var mean = sum / div;
+            return mean;
         }
     }
 }

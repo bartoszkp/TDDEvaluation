@@ -15,6 +15,8 @@ namespace Domain.Services
 
         IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncluded, DateTime toExcluded);
 
+        IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc, int periodSize);
+
         void SetMissingValuePolicy(Signal signal, MissingValuePolicy.MissingValuePolicyBase missingValuePolicy);
 
         MissingValuePolicy.MissingValuePolicyBase GetMissingValuePolicy(Signal signal);
