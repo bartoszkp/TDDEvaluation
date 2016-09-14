@@ -1036,6 +1036,41 @@ namespace WebService.Tests
                 signalsWebService.GetCoarseData(1, Dto.Granularity.Year, new DateTime(2000, 2, 1), new DateTime(2000, 1, 1));
             }
 
+            [TestMethod]
+            public void ()
+            {
+                int dummyId = 1;
+
+                var signal = new Signal()
+                {
+                    Id = dummyId,
+                    DataType = DataType.Integer,
+                    Granularity = Granularity.Day,
+                    Path = Path.FromString("someSignal")
+                };
+
+                var domainData = new[]
+                {
+                    new Datum<int>() {Quality = Quality.Good, Timestamp = new DateTime(2016,1,11), Value = 5 },
+                    new Datum<int>() {Quality = Quality.Good, Timestamp = new DateTime(2016,1,12), Value = 3  },
+                    new Datum<int>() {Quality = Quality.Fair, Timestamp = new DateTime(2016,1,13), Value = 4  },
+                    new Datum<int>() {Quality = Quality.Good, Timestamp = new DateTime(2016,1,14), Value = 6  },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016,1,15), Value = 2 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016,1,16), Value = 1 },
+                    new Datum<int>() { Quality = Quality.Good, Timestamp = new DateTime(2016,1,17), Value = 5 }
+                };
+
+                GivenASignal(signal);
+
+                signalsDataRepositoryMock.Setup(f => f.GetData<int>(It.Is<Domain.Signal>(id => id.Id == 1), new DateTime(2016, 1, 11), new DateTime(2016, 1, 18))).Returns(domainData);
+
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Week, new DateTime(2016, 1, 11), new DateTime(2016, 1, 11));
+
+                Assert.AreEqual(Dto.Quality.Fair, result.First().Quality);
+                Assert.AreEqual(new DateTime(2016, 1, 11), result.First().Timestamp);
+                Assert.AreEqual(3, result.First().Value);
+            }
+
             private void setupGetByPathEntry(IEnumerable<string> paths)
             {
                 paths = paths.ToList();

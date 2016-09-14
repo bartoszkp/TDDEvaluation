@@ -285,6 +285,7 @@ namespace Domain.Services.Implementation
             if (!CheckCorrectnessOfDate(granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(granularity, toExcludedUtc)) throw new ArgumentException();
             if (!CheckCorrectnessOfDate(signal.Granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(signal.Granularity, toExcludedUtc)) throw new ArgumentException();
 
+
             var signalData = GetData<T>(signal, fromIncludedUtc, toExcludedUtc);
             var coarseData = GenerateCoarseData<T>(signalData, granularity, GetDateDiff(granularity, fromIncludedUtc, toExcludedUtc));
 
