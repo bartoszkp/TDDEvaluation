@@ -399,7 +399,8 @@ namespace Domain.Services.Implementation
                     var datum = oldDatum.First(x => x.Timestamp == timeForItems);
                     totalValue += (dynamic)datum.Value;
 
-                    if ((int)datum.Quality > (int)quality) quality = datum.Quality;
+                    if ((int)datum.Quality > (int)quality && quality != Quality.None) quality = datum.Quality;
+                    if (datum.Quality == Quality.None) quality = Quality.None;
 
                     count++;
                 }

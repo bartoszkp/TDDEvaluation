@@ -29,7 +29,7 @@ namespace ExampleSignalClient
     new Datum() { Quality = Quality.Good, Timestamp = new DateTime(2016,1,11), Value = 5 },
     new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,12), Value = 5 },
     new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,13), Value = 5 },
-    new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,14), Value = 5 },
+    new Datum() { Quality = Quality.None, Timestamp = new DateTime(2016,1,14), Value = 5 },
     new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,15), Value = 5 },
     new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,16), Value = 2 },
     new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2016,1,17), Value = 1 },
