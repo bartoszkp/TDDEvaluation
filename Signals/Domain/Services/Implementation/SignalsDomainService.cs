@@ -344,27 +344,6 @@ namespace Domain.Services.Implementation
             return false;
         }
 
-        private int TimePeriodSize(Granularity granularity)
-        {
-            switch (granularity)
-            {
-                case Granularity.Minute:
-                    return 60;
-                case Granularity.Hour:
-                    return 60;
-                case Granularity.Day:
-                    return 24;
-                case Granularity.Week:
-                    return 7;
-                case Granularity.Month:
-                    return 31;
-                case Granularity.Year:
-                    return 12;
-                default:
-                    throw new Exception("Invalid granularity");
-            }
-        }
-
         private dynamic GetStep<T>(Signal signal, Datum<T> currentDatum, Datum<T> nextDatum)
         {
             int timeDifference = 0;
