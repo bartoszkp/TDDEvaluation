@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,7 @@ namespace SignalsIntegrationTests.Infrastructure
         private const string InMemoryDatabaseSettingName = "InMemoryDatabase";
 
         private Process serviceProcess = null;
+        private bool processOwner = false;
 
         public static void RebuildDatabase()
         {
@@ -45,6 +47,16 @@ namespace SignalsIntegrationTests.Infrastructure
 
             var serviceExecutable = GetExecutableFromSetting(ExecutableHostPathSettingName);
 
+            var existing = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(serviceExecutable.FullName))
+                .SingleOrDefault(p => p.MainModule.FileName.Equals(serviceExecutable.FullName));
+
+            if (existing != null)
+            {
+                processOwner = false;
+                serviceProcess = existing;
+                return;
+            }
+
             var arguments = new List<string>() { "tcp" };
 
             if (ShouldUseInMemoryDatabase())
@@ -63,6 +75,7 @@ namespace SignalsIntegrationTests.Infrastructure
             };
 
             serviceProcess = Process.Start(psi);
+            processOwner = true;
             System.Threading.Thread.Sleep(5000);
         }
 
@@ -72,10 +85,8 @@ namespace SignalsIntegrationTests.Infrastructure
             {
                 if (!serviceProcess.HasExited)
                 {
-                    serviceProcess.Kill();
+                    StopService();
                 }
-
-                serviceProcess = null;
             }
 
             StartService();
@@ -88,6 +99,11 @@ namespace SignalsIntegrationTests.Infrastructure
 
         public void StopService()
         {
+            if (!processOwner)
+            {
+                return;
+            }
+
             if (serviceProcess == null)
             {
                 throw new InvalidOperationException();
