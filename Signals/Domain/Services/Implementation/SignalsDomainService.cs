@@ -280,7 +280,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            if (fromIncludedUtc > toExcludedUtc) throw new ArgumentException();
+            if (fromIncludedUtc > toExcludedUtc) return new List<Datum<T>>();
             if (signal.Granularity > granularity) throw new ArgumentException();
             if (!CheckCorrectnessOfDate(granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(granularity, toExcludedUtc)) throw new ArgumentException();
             if (!CheckCorrectnessOfDate(signal.Granularity, fromIncludedUtc) || !CheckCorrectnessOfDate(signal.Granularity, toExcludedUtc)) throw new ArgumentException();
