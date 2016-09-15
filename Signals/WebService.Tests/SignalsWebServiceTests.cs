@@ -1018,7 +1018,6 @@ namespace WebService.Tests
             }
 
             [TestMethod]
-            [ExpectedException(typeof(ArgumentException))]
             public void GivenASignal_GetCoarseData_WithFromDateBiggerThenToDate_ThrowsException()
             {
                 int dummyId = 1;
@@ -1033,7 +1032,8 @@ namespace WebService.Tests
 
                 GivenASignal(signal);
 
-                signalsWebService.GetCoarseData(1, Dto.Granularity.Year, new DateTime(2000, 2, 1), new DateTime(2000, 1, 1));
+                var result = signalsWebService.GetCoarseData(1, Dto.Granularity.Year, new DateTime(2000, 2, 1), new DateTime(2000, 1, 1));
+                Assert.AreEqual(0, result.Count());
             }
 
             [TestMethod]
@@ -1070,6 +1070,8 @@ namespace WebService.Tests
                 Assert.AreEqual(new DateTime(2016, 1, 11), result.First().Timestamp);
                 Assert.AreEqual(3, result.First().Value);
             }
+
+
 
             private void setupGetByPathEntry(IEnumerable<string> paths)
             {
