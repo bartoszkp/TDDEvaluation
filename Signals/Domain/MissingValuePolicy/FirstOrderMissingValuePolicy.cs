@@ -88,9 +88,12 @@ namespace Domain.MissingValuePolicy
 
                         result.Add(missingDatum);
                     }
+
                 }
 
                 currentDate = AddTime(currentDate, signal.Granularity);
+                olderDatum = service.GetDataOlderThan<T>(signal, currentDate, 1).FirstOrDefault();
+                newerDatum = service.GetDataNewerThan<T>(signal, currentDate, 1).FirstOrDefault();
             }
 
             return result;

@@ -8,14 +8,13 @@ namespace ExampleSignalClient
 
         static void Main(string[] args)
         {
-            var rng = new Random();
             SignalsWebServiceClient client = new SignalsWebServiceClient("BasicHttpBinding_ISignalsWebService");
 
             var id = client.Add(new Signal()
             {
                 DataType = DataType.Double,
                 Granularity = Granularity.Month,
-                Path = new Path() { Components = new[] { "FirstOrderBugTests"  + rng.Next().ToString() } }
+                Path = new Path() { Components = new[] { "FirstOrderBugTest22s23aa1232" } }
             }).Id.Value;
 
             client.SetMissingValuePolicy(id, new FirstOrderMissingValuePolicy() { DataType = DataType.Double });
@@ -26,7 +25,7 @@ namespace ExampleSignalClient
     new Datum() { Quality = Quality.Fair, Timestamp = new DateTime(2000, 7, 1), Value = (double)2.5 }
             });
 
-                var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
+            var result = client.GetData(id, new DateTime(2000, 1, 1), new DateTime(2000, 6, 1));
 
             foreach (var d in result)
             {
