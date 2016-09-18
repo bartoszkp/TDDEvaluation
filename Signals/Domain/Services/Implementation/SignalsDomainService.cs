@@ -157,8 +157,8 @@ namespace Domain.Services.Implementation
         {
             // TODO validate granularity > Signal.granularity
             // TODO throw on String? and on Bool
-            granularity.ValidateTimestamp(fromIncludedUtc); // TODO tests?
-            granularity.ValidateTimestamp(toExcludedUtc); // TODO ? / tests?
+            granularity.ValidateTimestamp(fromIncludedUtc); // TODO tests
+            granularity.ValidateTimestamp(toExcludedUtc); // TODO tests
 
             var fromTimestampCoarse = fromIncludedUtc;
             var coarseToTimestampEnumerator
@@ -175,7 +175,7 @@ namespace Domain.Services.Implementation
                     Signal = signal,
                     Timestamp = fromTimestampCoarse,
                     Value = (T)Convert.ChangeType(samples.Average(d => Convert.ToDecimal(d.Value)), typeof(T)),
-                    Quality = samples.Select(d => d.Quality).Aggregate(GranularityUtils.GetMinQuality),
+                    Quality = samples.Select(d => d.Quality).Aggregate(QualityUtils.GetMinQuality),
                 };
 
                 fromTimestampCoarse = toTimestampCoarse;

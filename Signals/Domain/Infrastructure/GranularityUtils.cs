@@ -71,16 +71,5 @@ namespace Domain.Infrastructure
             if (timestamp.Month != 1)
                 throw new ArgumentException("Not first Month", "timestamp");
         }
-
-        public static Quality GetMinQuality(Quality a, Quality b)
-        {
-            if (a == Quality.None || b == Quality.None)
-                return Quality.None;
-
-            return Enum
-                .GetValues(typeof(Quality))
-                .Cast<Quality>()
-                .Last(q => q == a || q == b);
-        }
     }
 }

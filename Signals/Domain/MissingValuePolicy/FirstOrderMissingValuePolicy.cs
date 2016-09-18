@@ -44,7 +44,7 @@ namespace Domain.MissingValuePolicy
 
         private Datum<T> Interpolate(Datum<T> older, Datum<T> newer, DateTime currentTs)
         {
-            var resultQuality = GranularityUtils.GetMinQuality(older.Quality, newer.Quality);
+            var resultQuality = QualityUtils.GetMinQuality(older.Quality, newer.Quality);
 
             if (resultQuality == Quality.None)
                 return Datum<T>.CreateNone(Signal, currentTs);
