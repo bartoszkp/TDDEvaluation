@@ -66,6 +66,7 @@
     <Compile Include="Exceptions\IdNotNullException.cs" />
     <Compile Include="Exceptions\IncompatibleSignalGranularity.cs" />
     <Compile Include="Exceptions\IncorrectDataType.cs" />
+    <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\IInjectionMembersFactory.cs" />
     <Compile Include="Infrastructure\NHibernateIgnoreAttribute.cs" />
     <Compile Include="Infrastructure\NoInjectionMembers.cs" />

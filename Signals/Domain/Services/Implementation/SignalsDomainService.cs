@@ -163,8 +163,8 @@ namespace Domain.Services.Implementation
             var fromTimestampCoarse = fromIncludedUtc;
             var coarseToTimestampEnumerator
                 = new TimeEnumerator(
-                    GetNextDate(fromIncludedUtc, granularity),
-                    GetNextDate(toExcludedUtc, granularity),
+                    fromIncludedUtc.AddSteps(granularity, 1),
+                    toExcludedUtc.AddSteps(granularity, 1),
                     granularity);
             foreach (var toTimestampCoarse in coarseToTimestampEnumerator)
             {
@@ -180,29 +180,6 @@ namespace Domain.Services.Implementation
 
                 fromTimestampCoarse = toTimestampCoarse;
             }
-        }
-
-        private DateTime GetNextDate(DateTime time, Granularity granularity)
-        {
-            switch (granularity)
-            {
-                case Granularity.Second:
-                    return time.AddSeconds(1);
-                case Granularity.Minute:
-                    return time.AddMinutes(1);
-                case Granularity.Hour:
-                    return time.AddHours(1);
-                case Granularity.Day:
-                    return time.AddDays(1);
-                case Granularity.Week:
-                    return time.AddDays(7);
-                case Granularity.Month:
-                    return time.AddMonths(1);
-                case Granularity.Year:
-                    return time.AddYears(1);
-            }
-
-            throw new InvalidOperationException();
         }
     }
 }
