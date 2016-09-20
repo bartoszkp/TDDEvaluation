@@ -223,7 +223,7 @@ namespace SignalsIntegrationTests
 
             client.Delete(signalId);
 
-            Assertions.AssertThrows(() => client.GetData(signalId, ts, ts.AddYears(1)));
+            Assertions.AssertThrows(() => ClientGetData(signalId, ts, ts.AddYears(1)));
         }
     }
 }

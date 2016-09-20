@@ -41,7 +41,7 @@
     </Reference>
     <Reference Include="Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Signals\Domain\bin\Debug\Domain.dll</HintPath>
+      <HintPath>C:\Users\bartoszp\Documents\Cs\TDDEvaluation\Signals\Domain\bin\Debug\Domain.dll</HintPath>
     </Reference>
     <Reference Include="Dto">
       <HintPath>..\..\Signals\Dto\bin\Debug\Dto.dll</HintPath>
@@ -88,6 +88,7 @@
     <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\GenericTestBase.cs" />
     <Compile Include="Infrastructure\ShadowPolicyTestsBase.cs" />
+    <Compile Include="Infrastructure\TimeoutRegistry.cs" />
     <Compile Include="MissingValuePolicyBasicTests.cs" />
     <Compile Include="GetDataArgumentsTests.cs" />
     <Compile Include="Infrastructure\TimeEnumerator.cs" />

@@ -659,8 +659,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -679,8 +679,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -699,8 +699,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -719,8 +719,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -739,8 +739,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -759,8 +759,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -779,8 +779,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -799,8 +799,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -819,8 +819,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -839,8 +839,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -859,8 +859,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -879,8 +879,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -899,8 +899,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -919,8 +919,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -939,8 +939,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -959,8 +959,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -979,8 +979,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -999,8 +999,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1019,8 +1019,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1039,8 +1039,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1059,8 +1059,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1079,8 +1079,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1099,8 +1099,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1119,8 +1119,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1139,8 +1139,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1159,8 +1159,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1179,8 +1179,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);
@@ -1199,8 +1199,8 @@ namespace SignalsIntegrationTests
             GivenData(new Datum<T>() { Timestamp = UniversalBeginTimestamp, Value = Value(1), Quality = quality });
             var signalId2 = signalId;
 
-            var result1 = client.GetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
-            var result2 = client.GetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result1 = ClientGetData(signalId1, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
+            var result2 = ClientGetData(signalId2, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 1));
 
             Assert.AreEqual(Value(0), result1.SingleOrDefault()?.Value);
             Assert.AreEqual(Value(1), result2.SingleOrDefault()?.Value);

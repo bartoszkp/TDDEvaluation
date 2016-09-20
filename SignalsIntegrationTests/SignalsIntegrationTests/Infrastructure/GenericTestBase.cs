@@ -11,7 +11,7 @@ namespace SignalsIntegrationTests.Infrastructure
     {
         public void WhenReadingData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            whenReadingDataResult = client.GetData(signalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<T>[]>();
+            whenReadingDataResult = ClientGetData(signalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<T>[]>();
         }
 
         public void WhenReadingCoarseData(Granularity coarseGranularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)

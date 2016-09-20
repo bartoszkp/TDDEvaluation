@@ -54,7 +54,7 @@ namespace SignalsIntegrationTests
             GivenASignalWith(DataType.String, Granularity.Hour);
             GivenData(new Dto.Datum() { Timestamp = timestamp });
 
-            var result = client.GetData(signalId, timestamp, timestamp.AddSteps(Granularity.Hour, 1))
+            var result = ClientGetData(signalId, timestamp, timestamp.AddSteps(Granularity.Hour, 1))
                 .SingleOrDefault();
 
             Assert.IsNotNull(result);
@@ -2309,7 +2309,7 @@ namespace SignalsIntegrationTests
 
         private void WhenGettigData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            getData = () => client.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+            getData = () => ClientGetData(signalId, fromIncludedUtc, toExcludedUtc);
         }
 
         private void ThenRequestThrows()

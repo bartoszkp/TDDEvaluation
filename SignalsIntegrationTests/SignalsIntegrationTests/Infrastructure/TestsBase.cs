@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Domain;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,6 +9,8 @@ namespace SignalsIntegrationTests.Infrastructure
     [TestClass]
     public abstract class TestsBase
     {
+        public TestContext TestContext { get; set; }
+
         private static IDisposable serviceGuard;
         protected WS.SignalsWebServiceClient client;
 
@@ -22,10 +25,15 @@ namespace SignalsIntegrationTests.Infrastructure
         [TestInitialize]
         public void InitializeClient()
         {
+            if (TimeoutRegistry.ContainsAll(GetCurrentCategories()))
+            {
+                Assert.Fail("One of previous tests from this category failed due to TimeoutException");
+            }
+
             ServiceManagerGuard.EnsureRunning();
             client = new WS.SignalsWebServiceClient("NetTcpBinding_ISignalsWebService");
-            client.Endpoint.Binding.SendTimeout = new TimeSpan(0, 0, 5);
-            client.Endpoint.Binding.OpenTimeout = new TimeSpan(0, 0, 5);
+            client.Endpoint.Binding.SendTimeout = new TimeSpan(0, 0, 15);
+            client.Endpoint.Binding.OpenTimeout = new TimeSpan(0, 0, 15);
         }
 
         [TestCleanup]
@@ -126,8 +134,6 @@ namespace SignalsIntegrationTests.Infrastructure
             return (Quality)values.GetValue(((int)quality + 1) % values.Length);
         }
 
-        protected int signalId;
-
         protected DateTime UniversalBeginTimestamp { get { return new DateTime(2018, 1, 1); } }
 
         protected DateTime UniversalEndTimestamp(Granularity granularity)
@@ -139,5 +145,37 @@ namespace SignalsIntegrationTests.Infrastructure
         {
             return UniversalBeginTimestamp.AddSteps(granularity, 2);
         }
+
+        protected Dto.Datum[] ClientGetData(int signalId, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            try
+            {
+                return client.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+            }
+            catch (TimeoutException)
+            {
+                Timeout();
+                throw;
+            }
+        }
+
+        protected void Timeout()
+        {
+            TimeoutRegistry.RegisterTimeout(GetCurrentCategories());
+        }
+
+        private string[] GetCurrentCategories()
+        {
+            var currentMethod = Type.GetType(TestContext.FullyQualifiedTestClassName)
+                .GetMethod(TestContext.TestName);
+
+            return currentMethod
+                .GetCustomAttributes(typeof(TestCategoryAttribute), false)
+                .Cast<TestCategoryAttribute>()
+                .SelectMany(tca => tca.TestCategories)
+                .ToArray();
+        }
+
+        protected int signalId;
     }
 }
