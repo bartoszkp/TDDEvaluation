@@ -41,10 +41,11 @@
     </Reference>
     <Reference Include="Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\bartoszp\Documents\Cs\TDDEvaluation\Signals\Domain\bin\Debug\Domain.dll</HintPath>
+      <HintPath>Libraries\Domain.dll</HintPath>
     </Reference>
-    <Reference Include="Dto">
-      <HintPath>..\..\Signals\Dto\bin\Debug\Dto.dll</HintPath>
+    <Reference Include="Dto, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\Dto.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
