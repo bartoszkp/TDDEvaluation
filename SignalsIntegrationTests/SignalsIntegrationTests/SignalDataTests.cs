@@ -1,7 +1,5 @@
-using System;
 using System.Linq;
 using Domain;
-using Domain.Infrastructure;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;

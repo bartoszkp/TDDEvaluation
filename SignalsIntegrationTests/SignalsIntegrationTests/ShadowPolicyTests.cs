@@ -1,6 +1,5 @@
 ﻿using Domain;
 using Dto.Conversions;
-using Domain.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 using System.Collections.Generic;

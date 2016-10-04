@@ -36,8 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bootstrapper">
-      <HintPath>..\..\Signals\Bootstrapper\bin\Debug\Bootstrapper.dll</HintPath>
+    <Reference Include="Bootstrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\Bootstrapper.dll</HintPath>
     </Reference>
     <Reference Include="Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -86,6 +87,7 @@
   <ItemGroup>
     <Compile Include="GetCoarseDataTests.cs" />
     <Compile Include="GetSingleDatumConventionTests.cs" />
+    <Compile Include="Infrastructure\DataTypeUtils.cs" />
     <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\GenericTestBase.cs" />
     <Compile Include="Infrastructure\ShadowPolicyTestsBase.cs" />

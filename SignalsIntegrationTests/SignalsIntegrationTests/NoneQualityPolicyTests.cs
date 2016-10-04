@@ -1,5 +1,4 @@
 using Domain;
-using Domain.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 
