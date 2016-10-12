@@ -32,6 +32,12 @@ namespace DataAccess.Repositories
 
         public IEnumerable<Datum<T>> GetData<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
+            return GetDataAsGenericInstantiation<T>(signal, fromIncludedUtc, toExcludedUtc)
+                .Select(d => d.Adapt<Datum<T>>());
+        }
+
+        private IEnumerable<Datum<T>> GetDataAsGenericInstantiation<T>(Signal signal, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
             var concreteDatumType = GetConcreteDatumType<T>();
 
             var signalPropertyName = GetDatumPropertyName<T>(d => d.Signal);
@@ -69,7 +75,7 @@ namespace DataAccess.Repositories
             var lastTimestamp = data.Max(d => d.Timestamp);
 
             var existingData = data.Any()
-                       ? GetData<T>(data.First().Signal, firstTimestamp, lastTimestamp.AddSeconds(1))
+                       ? GetDataAsGenericInstantiation<T>(data.First().Signal, firstTimestamp, lastTimestamp.AddSeconds(1))
                          .ToDictionary(d => d.Timestamp)
                        : new Dictionary<DateTime, Datum<T>>();
 

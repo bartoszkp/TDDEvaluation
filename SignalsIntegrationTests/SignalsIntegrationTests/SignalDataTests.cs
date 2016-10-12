@@ -2519,7 +2519,6 @@ namespace SignalsIntegrationTests
                 new Datum<T>() { Timestamp = UniversalBeginTimestamp.AddSteps(granularity, 3), Value = Value(3), Quality = quality },
             };
 
-
             WhenReadingData(UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(granularity, 4));
 
             Assertions.AreEqual(expectedData, whenReadingDataResult);
