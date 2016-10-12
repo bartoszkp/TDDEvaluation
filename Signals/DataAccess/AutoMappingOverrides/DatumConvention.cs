@@ -3,6 +3,7 @@ using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.AcceptanceCriteria;
 using FluentNHibernate.Conventions.Inspections;
 using FluentNHibernate.Conventions.Instances;
+using NHibernate.Type;
 
 namespace DataAccess.AutoMappingOverrides
 {
@@ -30,6 +31,7 @@ namespace DataAccess.AutoMappingOverrides
         public void Apply(IPropertyInstance instance)
         {
             instance.UniqueKey(GetConstraintName(instance.EntityType));
+            instance.CustomType<UtcDateTimeType>();
         }
 
         private void AcceptDatumInstantiations<T>(IAcceptanceCriteria<T> criteria) where T : IInspector

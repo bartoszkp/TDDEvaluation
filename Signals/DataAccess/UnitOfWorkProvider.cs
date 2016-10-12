@@ -80,7 +80,7 @@ namespace DataAccess
 
             this.NHibernateConfiguration = Fluently
                 .Configure()
-                .Database(FluentNHibernate.Cfg.Db.SQLiteConfiguration.Standard.InMemory())
+                .Database(FluentNHibernate.Cfg.Db.SQLiteConfiguration.Standard.InMemory().ConnectionString("Data Source=:memory:;Version=3;New=True;DateTimeFormat=Ticks;"))
                 .Mappings(m => m.AutoMappings.Add(mappings))
                 .BuildConfiguration();
 
