@@ -10,6 +10,11 @@ namespace SignalsIntegrationTests.Infrastructure
     [TestClass]
     public abstract class GenericTestBase<T> : TestsBase
     {
+        protected virtual void GivenASignal(Granularity granularity)
+        {
+            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+        }
+
         public void WhenReadingData(DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             whenReadingDataResult = ClientGetData(signalId, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<T>[]>();

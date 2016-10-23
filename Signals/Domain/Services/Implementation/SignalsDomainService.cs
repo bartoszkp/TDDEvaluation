@@ -181,7 +181,8 @@ namespace Domain.Services.Implementation
 
         private static void ValidateGetCoarseDataArguments(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            // TODO throw on String? and on Bool
+            if (signal.DataType == DataType.String || signal.DataType == DataType.Boolean)
+                throw new InvalidAverageOperationException(signal.DataType.ToString());
             if (!granularity.IsCoarserThan(signal.Granularity))
                 throw new FinerGranularityException();
             granularity.ValidateTimestamp(fromIncludedUtc);

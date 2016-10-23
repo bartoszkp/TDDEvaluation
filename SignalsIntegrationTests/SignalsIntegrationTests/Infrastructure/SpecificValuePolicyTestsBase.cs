@@ -1,6 +1,5 @@
 ﻿using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SignalsIntegrationTests.Infrastructure;
 
 namespace SignalsIntegrationTests.Infrastructure
 {
@@ -141,7 +140,5 @@ namespace SignalsIntegrationTests.Infrastructure
                 .StartingWith(Value(1410), OtherThan(quality))
                 .WithValueAt(Value(42), quality, UniversalMiddleTimestamp(granularity)));
         }
-
-        protected abstract void GivenASignal(Granularity granularity);
     }
 }

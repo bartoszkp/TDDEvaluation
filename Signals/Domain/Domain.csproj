@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\FinerGranularityException.cs" />
+    <Compile Include="Exceptions\InvalidAverageOperationException.cs" />
     <Compile Include="Exceptions\MissingValuePolicyDependencyCycleException.cs" />
     <Compile Include="Exceptions\IncompatibleSignalDataType.cs" />
     <Compile Include="Exceptions\IdNotNullException.cs" />

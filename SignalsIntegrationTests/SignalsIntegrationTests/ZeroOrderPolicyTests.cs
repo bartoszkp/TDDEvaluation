@@ -19,9 +19,9 @@ namespace SignalsIntegrationTests
             GenericTestBase<T>.ClassCleanup();
         }
 
-        private void GivenASignal(Granularity granularity)
+        protected override void GivenASignal(Granularity granularity)
         {
-            GivenASignalWith(typeof(T).FromNativeType(), granularity);
+            base.GivenASignal(granularity);
 
             WithMissingValuePolicy(new Domain.MissingValuePolicy.ZeroOrderMissingValuePolicy<T>());
         }

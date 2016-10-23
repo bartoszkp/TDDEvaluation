@@ -103,11 +103,6 @@ namespace SignalsIntegrationTests
                 .ForRange(UniversalBeginTimestamp, UniversalEndTimestamp(coarseGranularity), coarseGranularity)
                 .WithValue(Value(42)).WithQuality(Quality.Fair));
         }
-
-        private void GivenASignal(Granularity granularity)
-        {
-            GivenASignalWith(typeof(T).FromNativeType(), granularity);
-        }
     }
 
     [TestClass]
@@ -155,6 +150,56 @@ namespace SignalsIntegrationTests
         public static new void ClassCleanup()
         {
             GetCoarseDataTests<double>.ClassCleanup();
+        }
+    }
+
+    [TestClass]
+    public class GetCoarseDataStringTests : GenericTestBase<string>
+    {
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            GenericTestBase<string>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            GenericTestBase<string>.ClassCleanup();
+        }
+
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenAStringSignal_WhenReadingCoarseData_ExceptionIsThrown()
+        {
+            GivenASignal(Granularity.Day);
+
+            Assertions.AssertThrows(() => WhenReadingCoarseData(Granularity.Week, UniversalBeginTimestamp, UniversalEndTimestamp(Granularity.Week)));
+        }
+    }
+
+    [TestClass]
+    public class GetCoarseDataBooleanTests : GenericTestBase<bool>
+    {
+        [ClassInitialize]
+        public static new void ClassInitialize(TestContext testContext)
+        {
+            GenericTestBase<bool>.ClassInitialize(testContext);
+        }
+
+        [ClassCleanup]
+        public static new void ClassCleanup()
+        {
+            GenericTestBase<bool>.ClassCleanup();
+        }
+
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenABooleanSignal_WhenReadingCoarseData_ExceptionIsThrown()
+        {
+            GivenASignal(Granularity.Day);
+
+            Assertions.AssertThrows(() => WhenReadingCoarseData(Granularity.Week, UniversalBeginTimestamp, UniversalEndTimestamp(Granularity.Week)));
         }
     }
 }
