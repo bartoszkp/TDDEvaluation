@@ -113,7 +113,6 @@
     <Compile Include="Infrastructure\DatumArray.cs" />
     <Compile Include="Infrastructure\DatumExtensions.cs" />
     <Compile Include="NoneQualityPolicyTests.cs" />
-    <Compile Include="Infrastructure\MissingValuePolicyTestsBase.cs" />
     <Compile Include="Infrastructure\Assertions.cs" />
     <Compile Include="Infrastructure\ServiceManager.cs" />
     <Compile Include="Infrastructure\ServiceManagerGuard.cs" />

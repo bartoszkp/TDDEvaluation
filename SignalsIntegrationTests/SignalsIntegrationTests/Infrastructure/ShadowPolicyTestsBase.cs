@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace SignalsIntegrationTests.Infrastructure
 {
     [TestClass]
-    public abstract class ShadowPolicyTestsBase<T> : MissingValuePolicyTestsBase<T>
+    public abstract class ShadowPolicyTestsBase<T> : GenericTestBase<T>
     {
         protected virtual T[] ShadowValues { get; }
 
@@ -13,13 +13,13 @@ namespace SignalsIntegrationTests.Infrastructure
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolicyTestsBase<T>.ClassInitialize(testContext);
+            GenericTestBase<T>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolicyTestsBase<T>.ClassCleanup();
+            GenericTestBase<T>.ClassCleanup();
         }
 
         protected void GivenASignalWithNoData_WhenReadingData_ReturnsShadowValuesForTheWholeRange(Granularity granularity)

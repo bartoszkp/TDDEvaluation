@@ -5,7 +5,7 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests.Infrastructure
 {
     [TestClass]
-    public abstract class SpecificValuePolicyTestsBase<T> : MissingValuePolicyTestsBase<T>
+    public abstract class SpecificValuePolicyTestsBase<T> : GenericTestBase<T>
     {
         protected virtual T SpecificValue { get; }
 
@@ -14,13 +14,13 @@ namespace SignalsIntegrationTests.Infrastructure
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolicyTestsBase<T>.ClassInitialize(testContext);
+            GenericTestBase<T>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolicyTestsBase<T>.ClassCleanup();
+            GenericTestBase<T>.ClassCleanup();
         }
 
         protected void GivenASignalWithNoData_WhenReadingData_ReturnsSpecificValueForTheWholeRange(Granularity granularity)

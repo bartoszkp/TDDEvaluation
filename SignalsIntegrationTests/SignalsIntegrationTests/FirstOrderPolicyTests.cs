@@ -7,18 +7,18 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public abstract class FirstOrderPolicyTests<T> : MissingValuePolicyTestsBase<T>
+    public abstract class FirstOrderPolicyTests<T> : GenericTestBase<T>
     {
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolicyTestsBase<T>.ClassInitialize(testContext);
+            GenericTestBase<T>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolicyTestsBase<T>.ClassCleanup();
+            GenericTestBase<T>.ClassCleanup();
         }
 
         [TestMethod]

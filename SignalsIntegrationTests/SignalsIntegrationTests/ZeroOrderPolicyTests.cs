@@ -5,18 +5,18 @@ using SignalsIntegrationTests.Infrastructure;
 namespace SignalsIntegrationTests
 {
     [TestClass]
-    public abstract class ZeroOrderPolicyTests<T> : MissingValuePolicyTestsBase<T>
+    public abstract class ZeroOrderPolicyTests<T> : GenericTestBase<T>
     {
         [ClassInitialize]
         public static new void ClassInitialize(TestContext testContext)
         {
-            MissingValuePolicyTestsBase<T>.ClassInitialize(testContext);
+            GenericTestBase<T>.ClassInitialize(testContext);
         }
 
         [ClassCleanup]
         public static new void ClassCleanup()
         {
-            MissingValuePolicyTestsBase<T>.ClassCleanup();
+            GenericTestBase<T>.ClassCleanup();
         }
 
         private void GivenASignal(Granularity granularity)
