@@ -155,11 +155,7 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            // TODO throw on String? and on Bool
-            if (!granularity.IsCoarserThan(signal.Granularity))
-                throw new FinerGranularityException();
-            granularity.ValidateTimestamp(fromIncludedUtc); // TODO tests
-            granularity.ValidateTimestamp(toExcludedUtc); // TODO tests
+            ValidateGetCoarseDataArguments(signal, granularity, fromIncludedUtc, toExcludedUtc);
 
             var fromTimestampCoarse = fromIncludedUtc;
             var coarseToTimestampEnumerator
@@ -181,6 +177,15 @@ namespace Domain.Services.Implementation
 
                 fromTimestampCoarse = toTimestampCoarse;
             }
+        }
+
+        private static void ValidateGetCoarseDataArguments(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
+        {
+            // TODO throw on String? and on Bool
+            if (!granularity.IsCoarserThan(signal.Granularity))
+                throw new FinerGranularityException();
+            granularity.ValidateTimestamp(fromIncludedUtc);
+            granularity.ValidateTimestamp(toExcludedUtc);
         }
     }
 }

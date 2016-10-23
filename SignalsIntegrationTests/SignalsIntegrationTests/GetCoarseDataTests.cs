@@ -41,6 +41,34 @@ namespace SignalsIntegrationTests
             GivenASignal_WhenReadingItWithFinerGranularity_ThenExceptionIsThrown(Granularity.Hour, Granularity.Minute);
         }
 
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenADaySignal_WhenReadingCoarseDataUsingIncorrectBegin_ThenExceptionIsThrown()
+        {
+            GivenASignal_WhenReadingCoarseDataUsingIncorrectBegin_ThenExceptionIsThrown(Granularity.Day, Granularity.Year);
+        }
+
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenADaySignal_WhenReadingCoarseDataUsingIncorrectEnd_ThenExceptionIsThrown()
+        {
+            GivenASignal_WhenReadingCoarseDataUsingIncorrectEnd_ThenExceptionIsThrown(Granularity.Day, Granularity.Year);
+        }
+
+        private void GivenASignal_WhenReadingCoarseDataUsingIncorrectBegin_ThenExceptionIsThrown(Granularity granularity, Granularity coarseGranularity)
+        {
+            GivenASignal(granularity);
+
+            Assertions.AssertThrows(() => WhenReadingCoarseData(coarseGranularity, UniversalBeginTimestamp.AddSeconds(1), UniversalEndTimestamp(coarseGranularity)));
+        }
+
+        private void GivenASignal_WhenReadingCoarseDataUsingIncorrectEnd_ThenExceptionIsThrown(Granularity granularity, Granularity coarseGranularity)
+        {
+            GivenASignal(granularity);
+
+            Assertions.AssertThrows(() => WhenReadingCoarseData(coarseGranularity, UniversalBeginTimestamp, UniversalEndTimestamp(coarseGranularity).AddSeconds(1)));
+        }
+
         private void GivenASignal_WhenReadingItWithFinerGranularity_ThenExceptionIsThrown(Granularity granularity, Granularity fineGranularity)
         {
             GivenASignal(granularity);
