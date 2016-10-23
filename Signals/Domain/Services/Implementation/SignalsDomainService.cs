@@ -155,8 +155,9 @@ namespace Domain.Services.Implementation
 
         public IEnumerable<Datum<T>> GetCoarseData<T>(Signal signal, Granularity granularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
-            // TODO validate granularity > Signal.granularity
             // TODO throw on String? and on Bool
+            if (!granularity.IsCoarserThan(signal.Granularity))
+                throw new FinerGranularityException();
             granularity.ValidateTimestamp(fromIncludedUtc); // TODO tests
             granularity.ValidateTimestamp(toExcludedUtc); // TODO tests
 

@@ -34,6 +34,20 @@ namespace SignalsIntegrationTests
             GivenASignalWithoutData_WhenReadingItWithCoarserGranularity_ThenMissingValuePolicyIsUsed(Granularity.Hour, Granularity.Day);
         }
 
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenAHourSignal_WhenReadingItWithMinuteGranularity_ThenExceptionIsThrown()
+        {
+            GivenASignal_WhenReadingItWithFinerGranularity_ThenExceptionIsThrown(Granularity.Hour, Granularity.Minute);
+        }
+
+        private void GivenASignal_WhenReadingItWithFinerGranularity_ThenExceptionIsThrown(Granularity granularity, Granularity fineGranularity)
+        {
+            GivenASignal(granularity);
+
+            Assertions.AssertThrows(() => WhenReadingCoarseData(fineGranularity, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(fineGranularity, 1)));
+        }
+
         private void GivenASignalWithoutData_WhenReadingItWithCoarserGranularity_ThenMissingValuePolicyIsUsed(Granularity granularity,
             Granularity coarseGranularity)
         {

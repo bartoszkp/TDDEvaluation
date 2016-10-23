@@ -38,6 +38,11 @@ namespace Domain.Infrastructure
             }
         }
 
+        public static bool IsCoarserThan(this Granularity @this, Granularity other)
+        {
+            return (int)@this > (int)other;
+        }
+
         private static void RequireAllZero(DateTime timestamp, params Expression<Func<DateTime, int>>[] expressions)
         {
             foreach (var expression in expressions)
