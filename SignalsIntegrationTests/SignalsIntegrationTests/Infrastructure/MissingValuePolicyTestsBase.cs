@@ -18,10 +18,5 @@ namespace SignalsIntegrationTests.Infrastructure
         {
             TestsBase.ClassCleanup();
         }
-
-        protected void WithMissingValuePolicy(MissingValuePolicyBase missingValuePolicy)
-        {
-            client.SetMissingValuePolicy(signalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
-        }
     }
 }

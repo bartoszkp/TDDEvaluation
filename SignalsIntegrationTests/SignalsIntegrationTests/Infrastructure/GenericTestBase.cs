@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Domain;
+using Domain.MissingValuePolicy;
 using Dto.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,6 +24,11 @@ namespace SignalsIntegrationTests.Infrastructure
         public void ThenResultEquals(IEnumerable<Datum<T>> expected)
         {
             Assertions.AreEqual(expected, whenReadingDataResult);
+        }
+
+        protected void WithMissingValuePolicy(MissingValuePolicyBase missingValuePolicy)
+        {
+            client.SetMissingValuePolicy(signalId, missingValuePolicy.ToDto<Dto.MissingValuePolicy.MissingValuePolicy>());
         }
 
         public static T NoValue()

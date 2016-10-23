@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Domain.MissingValuePolicy;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalsIntegrationTests.Infrastructure;
 
@@ -23,9 +24,32 @@ namespace SignalsIntegrationTests
         [TestCategory("issueCoarseData")]
         public void GivenADaySignalWithSingleValueOnWholeRange_WhenReadingItWithMonthGranularity_SameSingleValueIsReturnedForMonths()
         {
-            var granularity = Granularity.Day;
-            var coarseGranularity = Granularity.Month;
+            GivenASignalWithSingleValueOnWholeRange_WhenReadingItWithCoarserGranularity_SameSingleValueIsReturned(Granularity.Day, Granularity.Month);
+        }
 
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenAHourSignalWithoutData_WhenReadingItWithDayGranularity_ThenMissingValuePolicyIsUsed()
+        {
+            GivenASignalWithoutData_WhenReadingItWithCoarserGranularity_ThenMissingValuePolicyIsUsed(Granularity.Hour, Granularity.Day);
+        }
+
+        private void GivenASignalWithoutData_WhenReadingItWithCoarserGranularity_ThenMissingValuePolicyIsUsed(Granularity granularity,
+            Granularity coarseGranularity)
+        {
+            GivenASignal(granularity);
+            WithMissingValuePolicy(new SpecificValueMissingValuePolicy<T>() { Value = Value(753), Quality = Quality.Poor });
+
+            WhenReadingCoarseData(coarseGranularity, UniversalBeginTimestamp, UniversalEndTimestamp(coarseGranularity));
+
+            ThenResultEquals(DatumArray<T>
+                .ForRange(UniversalBeginTimestamp, UniversalEndTimestamp(coarseGranularity), coarseGranularity)
+                .WithValue(Value(753)).WithQuality(Quality.Poor));
+        }
+
+        private void GivenASignalWithSingleValueOnWholeRange_WhenReadingItWithCoarserGranularity_SameSingleValueIsReturned(Granularity granularity,
+            Granularity coarseGranularity)
+        {
             GivenASignal(granularity);
             GivenData(DatumArray<T>
                 .ForRange(UniversalBeginTimestamp, UniversalEndTimestamp(coarseGranularity), granularity)
