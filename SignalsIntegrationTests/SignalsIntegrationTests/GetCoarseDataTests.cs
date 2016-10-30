@@ -55,6 +55,37 @@ namespace SignalsIntegrationTests
             GivenASignal_WhenReadingCoarseDataUsingIncorrectEnd_ThenExceptionIsThrown(Granularity.Day, Granularity.Year);
         }
 
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenADaySignal_WhenReadingWeekData_ThenAverageIsCalculatedForAllSubranges()
+        {
+            GivenASignal_WhenReadingCoarseData_ThenAverageIsCalculatedForAllSubranges(Granularity.Day, Granularity.Week);
+        }
+
+        private void GivenASignal_WhenReadingCoarseData_ThenAverageIsCalculatedForAllSubranges(Granularity granularity, Granularity coarseGranularity)
+        {
+            GivenASignal(granularity);
+            GivenData(DatumArray<T>
+                .ForRange(UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(coarseGranularity, 1), granularity)
+                .WithValue(Value(15))
+                .WithQuality(Quality.Good)
+                .StartingWithGoodQualityValue(Value(10))
+                .EndingWithGoodQualityValue(Value(20)));
+            GivenData(DatumArray<T>
+                .ForRange(UniversalBeginTimestamp.AddSteps(coarseGranularity, 1), UniversalBeginTimestamp.AddSteps(coarseGranularity, 2), granularity)
+                .WithValue(Value(25))
+                .WithQuality(Quality.Good)
+                .StartingWithGoodQualityValue(Value(30))
+                .EndingWithGoodQualityValue(Value(20)));
+
+            WhenReadingCoarseData(coarseGranularity, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(coarseGranularity, 2));
+
+            ThenResultEquals(DatumArray<T>
+                .ForRange(UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(coarseGranularity, 2), coarseGranularity)
+                .StartingWithGoodQualityValue(Value(15))
+                .EndingWithGoodQualityValue(Value(25)));
+        }
+
         private void GivenASignal_WhenReadingCoarseDataUsingIncorrectBegin_ThenExceptionIsThrown(Granularity granularity, Granularity coarseGranularity)
         {
             GivenASignal(granularity);
