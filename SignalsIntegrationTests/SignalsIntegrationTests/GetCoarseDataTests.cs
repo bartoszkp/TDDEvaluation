@@ -62,6 +62,35 @@ namespace SignalsIntegrationTests
             GivenASignal_WhenReadingCoarseData_ThenAverageIsCalculatedForAllSubranges(Granularity.Day, Granularity.Week);
         }
 
+        [TestMethod]
+        [TestCategory("issueCoarseData")]
+        public void GivenASecondSignal_WhenReadingMinuteData_ThenMinimalQualityIsUsedInAllSubranges()
+        {
+            GivenASignal_WhenReadingCoarseData_ThenMinimalQualityIsUsedInAllSubranges(Granularity.Second, Granularity.Minute);
+        }
+
+        private void GivenASignal_WhenReadingCoarseData_ThenMinimalQualityIsUsedInAllSubranges(Granularity granularity, Granularity coarseGranularity)
+        {
+            GivenASignal(granularity);
+            GivenData(DatumArray<T>
+                .ForRange(UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(coarseGranularity, 1), granularity)
+                .WithQuality(Quality.Fair)
+                .StartingWith(default(T), Quality.Good)
+                .EndingWith(default(T), Quality.Poor));
+            GivenData(DatumArray<T>
+                .ForRange(UniversalBeginTimestamp.AddSteps(coarseGranularity, 1), UniversalBeginTimestamp.AddSteps(coarseGranularity, 2), granularity)
+                .WithQuality(Quality.Good)
+                .StartingWith(default(T), Quality.Bad)
+                .EndingWith(default(T), Quality.Fair));
+
+            WhenReadingCoarseData(coarseGranularity, UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(coarseGranularity, 2));
+
+            ThenResultEquals(DatumArray<T>
+                .ForRange(UniversalBeginTimestamp, UniversalBeginTimestamp.AddSteps(coarseGranularity, 2), coarseGranularity)
+                .StartingWith(default(T), Quality.Poor)
+                .EndingWith(default(T), Quality.Bad));
+        }
+
         private void GivenASignal_WhenReadingCoarseData_ThenAverageIsCalculatedForAllSubranges(Granularity granularity, Granularity coarseGranularity)
         {
             GivenASignal(granularity);
