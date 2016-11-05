@@ -30,7 +30,10 @@ namespace Hosting
 
                 if (tcpHosting)
                 {
-                    host.AddServiceEndpoint(typeof(ISignalsWebService), new System.ServiceModel.NetTcpBinding(), string.Empty);
+                    var binding = new System.ServiceModel.NetTcpBinding();
+                    binding.MaxBufferSize = int.MaxValue;
+                    binding.MaxReceivedMessageSize = int.MaxValue;
+                    host.AddServiceEndpoint(typeof(ISignalsWebService), binding, string.Empty);
                 }
 
                 host.Open();

@@ -2,6 +2,8 @@
 using System.Linq;
 using Domain;
 using Dto.Conversions;
+using Microsoft.Practices.Unity;
+using Microsoft.Practices.Unity.InterceptionExtension;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalsIntegrationTests.Infrastructure
@@ -12,14 +14,18 @@ namespace SignalsIntegrationTests.Infrastructure
         public TestContext TestContext { get; set; }
 
         private static IDisposable serviceGuard;
-        protected WS.SignalsWebServiceClient client;
+        protected static WebService.ISignalsWebService client;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            (new Bootstrapper.Bootstrapper()).Run(new Microsoft.Practices.Unity.UnityContainer());
+            var unityContainer = new UnityContainer();
+            (new Bootstrapper.Bootstrapper()).Run(unityContainer, true);
 
-            serviceGuard = ServiceManagerGuard.Attach();
+            client = Intercept.ThroughProxy<WebService.ISignalsWebService>(
+                unityContainer.Resolve<WebService.ISignalsWebService>(),
+                new InterfaceInterceptor(),
+                new[] { new WebServiceEmulationProxy(testContext) });
         }
 
         [TestInitialize]
@@ -29,11 +35,6 @@ namespace SignalsIntegrationTests.Infrastructure
             {
                 Assert.Fail("One of previous tests from this category failed due to TimeoutException");
             }
-
-            ServiceManagerGuard.EnsureRunning();
-            client = new WS.SignalsWebServiceClient("NetTcpBinding_ISignalsWebService");
-            client.Endpoint.Binding.SendTimeout = new TimeSpan(0, 0, 15);
-            client.Endpoint.Binding.OpenTimeout = new TimeSpan(0, 0, 15);
         }
 
         [TestCleanup]
@@ -44,7 +45,7 @@ namespace SignalsIntegrationTests.Infrastructure
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            serviceGuard.Dispose();
+            client = null;
         }
 
         protected void GivenASignal()
@@ -98,7 +99,10 @@ namespace SignalsIntegrationTests.Infrastructure
 
         protected void GivenData(params Dto.Datum[] datums)
         {
-            client.SetData(signalId, datums);
+            foreach (var data in datums.Batch(10000))
+            {
+                client.SetData(signalId, data.ToArray());
+            }
         }
 
         protected Dto.Signal AddNewIntegerSignal(Domain.Granularity granularity = Granularity.Second, Domain.Path path = null)
@@ -150,7 +154,7 @@ namespace SignalsIntegrationTests.Infrastructure
         {
             try
             {
-                return client.GetData(signalId, fromIncludedUtc, toExcludedUtc);
+                return client.GetData(signalId, fromIncludedUtc, toExcludedUtc).ToArray();
             }
             catch (TimeoutException)
             {

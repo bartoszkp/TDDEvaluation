@@ -83,6 +83,9 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebService">
+      <HintPath>Libraries\WebService.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -102,8 +105,10 @@
     <Compile Include="Infrastructure\DataTypeUtils.cs" />
     <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\GenericTestBase.cs" />
+    <Compile Include="Infrastructure\IEnumerableExtensions.cs" />
     <Compile Include="Infrastructure\ShadowPolicyTestsBase.cs" />
     <Compile Include="Infrastructure\TimeoutRegistry.cs" />
+    <Compile Include="Infrastructure\WebServiceEmulationProxy.cs" />
     <Compile Include="MissingValuePolicyBasicTests.cs" />
     <Compile Include="GetDataArgumentsTests.cs" />
     <Compile Include="Infrastructure\TimeEnumerator.cs" />
@@ -114,19 +119,12 @@
     <Compile Include="Infrastructure\DatumExtensions.cs" />
     <Compile Include="NoneQualityPolicyTests.cs" />
     <Compile Include="Infrastructure\Assertions.cs" />
-    <Compile Include="Infrastructure\ServiceManager.cs" />
-    <Compile Include="Infrastructure\ServiceManagerGuard.cs" />
     <Compile Include="Infrastructure\SignalPathGenerator.cs" />
     <Compile Include="PathStructureTests.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Service References\WS\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="SetDataArgumentsTests.cs" />
     <Compile Include="Infrastructure\TestsBase.cs" />
@@ -137,9 +135,6 @@
     <Compile Include="ShadowPolicyTests.cs" />
     <Compile Include="ZeroOrderPolicyTests.cs" />
     <Compile Include="SpecificValuePolicyTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -154,40 +149,6 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="Service References\WS\Signals.wsdl" />
-    <None Include="Service References\WS\signals.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\WS\signals1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\WS\signals2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\WS\signals3.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\WS\signals4.xsd">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\WS\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\WS\signals.disco" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\WS\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\WS\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\WS\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup />
