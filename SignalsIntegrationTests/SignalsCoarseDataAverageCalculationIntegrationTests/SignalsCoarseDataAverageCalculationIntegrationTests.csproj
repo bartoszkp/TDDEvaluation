@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{85F6909F-D262-4764-818E-B1FBB0549364}</ProjectGuid>
+    <ProjectGuid>{D7A737C4-4D49-412F-9F89-08631FEE944B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SignalsIntegrationTests</RootNamespace>
-    <AssemblyName>SignalsIntegrationTests</AssemblyName>
+    <RootNamespace>SignalsCoarseDataAverageCalculationIntegrationTests</RootNamespace>
+    <AssemblyName>SignalsCoarseDataAverageCalculationIntegrationTests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -16,7 +16,6 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -38,17 +37,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bootstrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\Bootstrapper.dll</HintPath>
+    <Reference Include="Domain">
+      <HintPath>..\SignalsIntegrationTests\Libraries\Domain.dll</HintPath>
     </Reference>
-    <Reference Include="Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\Domain.dll</HintPath>
-    </Reference>
-    <Reference Include="Dto, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\Dto.dll</HintPath>
+    <Reference Include="Dto">
+      <HintPath>..\SignalsIntegrationTests\Libraries\Dto.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
@@ -70,7 +63,6 @@
       <HintPath>..\packages\Mapster.2.5.0\lib\net45\Mapster.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
@@ -101,8 +93,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.SQLite, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SQLite.Core.1.0.103\lib\net46\System.Data.SQLite.dll</HintPath>
       <Private>True</Private>
@@ -114,12 +104,6 @@
     <Reference Include="System.Data.SQLite.Linq, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SQLite.Linq.1.0.103\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WebService">
-      <HintPath>Libraries\WebService.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -135,58 +119,19 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="GetCoarseDataExceptionalCasesTests.cs" />
-    <Compile Include="GetSingleDatumConventionTests.cs" />
-    <Compile Include="Infrastructure\DataTypeUtils.cs" />
-    <Compile Include="Infrastructure\DateTimeUtils.cs" />
-    <Compile Include="Infrastructure\GenericTestBase.cs" />
-    <Compile Include="Infrastructure\IEnumerableExtensions.cs" />
-    <Compile Include="Infrastructure\ShadowPolicyTestsBase.cs" />
-    <Compile Include="Infrastructure\TimeoutRegistry.cs" />
-    <Compile Include="Infrastructure\WebServiceEmulationProxy.cs" />
-    <Compile Include="MissingValuePolicyBasicTests.cs" />
-    <Compile Include="GetDataArgumentsTests.cs" />
-    <Compile Include="Infrastructure\TimeEnumerator.cs" />
-    <Compile Include="ShadowMissingValuePolicyAssignmentTests.cs" />
-    <Compile Include="ShadowWithMissingDataPolicyTests.cs" />
-    <Compile Include="SignalDataTests.cs" />
-    <Compile Include="Infrastructure\DatumArray.cs" />
-    <Compile Include="Infrastructure\DatumExtensions.cs" />
-    <Compile Include="NoneQualityPolicyTests.cs" />
-    <Compile Include="Infrastructure\Assertions.cs" />
-    <Compile Include="Infrastructure\SignalPathGenerator.cs" />
-    <Compile Include="PathStructureTests.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="SetDataArgumentsTests.cs" />
-    <Compile Include="Infrastructure\TestsBase.cs" />
-    <Compile Include="BasicSignalTests.cs" />
+    <Compile Include="GetCoarseDataAverageCalculationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FirstOrderPolicyTests.cs" />
-    <Compile Include="Infrastructure\SpecificValuePolicyTestsBase.cs" />
-    <Compile Include="ShadowPolicyTests.cs" />
-    <Compile Include="ZeroOrderPolicyTests.cs" />
-    <Compile Include="SpecificValuePolicyTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config" />
-    <None Include="Properties\DataSources\Dto.Datum.datasource" />
-    <None Include="Properties\DataSources\Dto.MissingValuePolicy.datasource" />
-    <None Include="Properties\DataSources\Dto.MissingValuePolicy.MissingValuePolicy.datasource" />
-    <None Include="Properties\DataSources\Dto.PathEntry.datasource" />
-    <None Include="Properties\DataSources\Dto.Signal.datasource" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+    <ProjectReference Include="..\SignalsIntegrationTests\SignalsIntegrationTests.csproj">
+      <Project>{85f6909f-d262-4764-818e-b1fbb0549364}</Project>
+      <Name>SignalsIntegrationTests</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Domain;
 using Dto.Conversions;
 using Microsoft.Practices.Unity;
@@ -170,7 +171,22 @@ namespace SignalsIntegrationTests.Infrastructure
 
         private string[] GetCurrentCategories()
         {
-            var currentMethod = Type.GetType(TestContext.FullyQualifiedTestClassName)
+            Type currentTestType = null;
+
+            foreach (var a in AppDomain
+                .CurrentDomain
+                .GetAssemblies())
+            {
+                currentTestType = a
+                    .GetType(TestContext.FullyQualifiedTestClassName);
+
+                if (currentTestType != null)
+                {
+                    break;
+                }
+            }
+
+            var currentMethod = currentTestType
                 .GetMethod(TestContext.TestName);
 
             return currentMethod

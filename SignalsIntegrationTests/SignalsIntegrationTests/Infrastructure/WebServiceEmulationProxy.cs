@@ -47,7 +47,22 @@ namespace SignalsIntegrationTests.Infrastructure
 
         private string[] GetCurrentTestCategories()
         {
-            var currentMethod = Type.GetType(testContext.FullyQualifiedTestClassName)
+            Type currentTestType = null;
+
+            foreach (var a in AppDomain
+                .CurrentDomain
+                .GetAssemblies())
+            {
+                currentTestType = a
+                    .GetType(testContext.FullyQualifiedTestClassName);
+
+                if (currentTestType != null)
+                {
+                    break;
+                }
+            }
+
+            var currentMethod = currentTestType
                 .GetMethod(testContext.TestName);
 
             return currentMethod
