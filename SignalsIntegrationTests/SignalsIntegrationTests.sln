@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalsCoarseDataAverageCal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalsCoarseDataSingleValueIntegrationTests", "SignalsCoarseDataSingleValueIntegrationTests\SignalsCoarseDataSingleValueIntegrationTests.csproj", "{1BFEEEAA-7749-42A6-B106-51A52F308474}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalsCoarseDataMissingValuePolicyIntegrationTests", "SignalsCoarseDataMissingValuePolicyIntegrationTests\SignalsCoarseDataMissingValuePolicyIntegrationTests.csproj", "{02BF20C8-FD3C-4FF4-8BB3-2785F4E3C898}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1BFEEEAA-7749-42A6-B106-51A52F308474}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BFEEEAA-7749-42A6-B106-51A52F308474}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BFEEEAA-7749-42A6-B106-51A52F308474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02BF20C8-FD3C-4FF4-8BB3-2785F4E3C898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02BF20C8-FD3C-4FF4-8BB3-2785F4E3C898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02BF20C8-FD3C-4FF4-8BB3-2785F4E3C898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02BF20C8-FD3C-4FF4-8BB3-2785F4E3C898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
