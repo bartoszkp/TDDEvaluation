@@ -876,20 +876,6 @@ namespace SignalsIntegrationTests
 
         [TestMethod]
         [TestCategory("issueCoarseData")]
-        public void GivenAWeekSignal_WhenReadingYearData_ThenAverageIsCalculatedForAllSubranges()
-        {
-            GivenASignal_WhenReadingCoarseData_ThenAverageIsCalculatedForAllSubranges(Granularity.Week, Granularity.Year);
-        }
-
-        [TestMethod]
-        [TestCategory("issueCoarseData")]
-        public void GivenAWeekSignal_WhenReadingYearData_ThenMinimalQualityIsUsedInAllSubranges()
-        {
-            GivenASignal_WhenReadingCoarseData_ThenMinimalQualityIsUsedInAllSubranges(Granularity.Week, Granularity.Year);
-        }
-
-        [TestMethod]
-        [TestCategory("issueCoarseData")]
         public void GivenAMonthSignal_WhenReadingYearData_ThenAverageIsCalculatedForAllSubranges()
         {
             GivenASignal_WhenReadingCoarseData_ThenAverageIsCalculatedForAllSubranges(Granularity.Month, Granularity.Year);
