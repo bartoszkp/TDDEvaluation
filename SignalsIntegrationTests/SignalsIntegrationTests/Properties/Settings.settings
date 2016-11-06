@@ -1,15 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SignalsIntegrationTests.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
   <Profiles />
-  <Settings>
-    <Setting Name="SignalsHostExecutablePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\..\..\Signals\Hosting\bin\Debug\Hosting.exe</Value>
-    </Setting>
-    <Setting Name="DatabaseMaintenanceToolExecutablePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\..\..\Signals\DatabaseMaintenanceTool\bin\Debug\DatabaseMaintenanceTool.exe</Value>
-    </Setting>
-    <Setting Name="InMemoryDatabase" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-  </Settings>
+  <Settings />
 </SettingsFile>

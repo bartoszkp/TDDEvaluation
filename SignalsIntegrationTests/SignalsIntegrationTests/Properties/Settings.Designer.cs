@@ -22,42 +22,5 @@ namespace SignalsIntegrationTests.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\..\\Signals\\Hosting\\bin\\Debug\\Hosting.exe")]
-        public string SignalsHostExecutablePath {
-            get {
-                return ((string)(this["SignalsHostExecutablePath"]));
-            }
-            set {
-                this["SignalsHostExecutablePath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\..\\Signals\\DatabaseMaintenanceTool\\bin\\Debug\\DatabaseMaintenanceTool.exe" +
-            "")]
-        public string DatabaseMaintenanceToolExecutablePath {
-            get {
-                return ((string)(this["DatabaseMaintenanceToolExecutablePath"]));
-            }
-            set {
-                this["DatabaseMaintenanceToolExecutablePath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool InMemoryDatabase {
-            get {
-                return ((bool)(this["InMemoryDatabase"]));
-            }
-            set {
-                this["InMemoryDatabase"] = value;
-            }
-        }
     }
 }
