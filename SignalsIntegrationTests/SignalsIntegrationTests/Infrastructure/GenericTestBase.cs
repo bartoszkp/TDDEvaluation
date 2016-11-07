@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Domain;
 using Domain.MissingValuePolicy;
@@ -23,7 +24,7 @@ namespace SignalsIntegrationTests.Infrastructure
         public void WhenReadingCoarseData(Granularity coarseGranularity, DateTime fromIncludedUtc, DateTime toExcludedUtc)
         {
             var coarseGranularityDto = coarseGranularity.ToDto<Dto.Granularity>();
-            whenReadingDataResult = client.GetCoarseData(signalId, coarseGranularityDto, fromIncludedUtc, toExcludedUtc).ToDomain<Domain.Datum<T>[]>();
+            whenReadingDataResult = client.GetCoarseData(signalId, coarseGranularityDto, fromIncludedUtc, toExcludedUtc).ToArray().ToDomain<Domain.Datum<T>[]>();
         }
 
         public void ThenResultEquals(IEnumerable<Datum<T>> expected)
