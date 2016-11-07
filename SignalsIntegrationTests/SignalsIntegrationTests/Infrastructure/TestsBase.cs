@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using Domain;
 using Dto.Conversions;
 using Microsoft.Practices.Unity;
@@ -14,19 +13,14 @@ namespace SignalsIntegrationTests.Infrastructure
     {
         public TestContext TestContext { get; set; }
 
-        private static IDisposable serviceGuard;
+        private static IDisposable serverGuard;
         protected static WebService.ISignalsWebService client;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-            var unityContainer = new UnityContainer();
-            (new Bootstrapper.Bootstrapper()).Run(unityContainer, true);
-
-            client = Intercept.ThroughProxy<WebService.ISignalsWebService>(
-                unityContainer.Resolve<WebService.ISignalsWebService>(),
-                new InterfaceInterceptor(),
-                new[] { new WebServiceEmulationProxy(testContext) });
+            serverGuard = ServerManagerGuard.Attach(testContext);
+            client = ServerManagerGuard.Client;
         }
 
         [TestInitialize]
@@ -47,6 +41,7 @@ namespace SignalsIntegrationTests.Infrastructure
         public static void ClassCleanup()
         {
             client = null;
+            serverGuard = null;
         }
 
         protected void GivenASignal()
