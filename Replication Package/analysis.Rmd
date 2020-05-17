@@ -1,0 +1,215 @@
+---
+title: "Experimental evaluation of test-driven development with interns working on a real industrial project"
+author: "Kamil Sijko, Bartosz Papis"
+date: "15th May 2020"
+output: 
+  html_notebook: 
+    theme: yeti
+    toc: yes
+---
+```{r}
+library(tidyverse)
+library(stargazer)
+library(lme4)
+data <-
+  read_csv("data.csv") %>% 
+  mutate(grade = as.factor(grade) %>% fct_recode(A = "4", B = "3", B = "2")) %>% 
+  mutate(technique = as.factor(technique) %>% fct_relevel("TLD")) %>% 
+  filter(technique != "NUT")
+```
+
+# Plots 
+## Competence group
+
+```{r nbugs, fig.cap= "\\label{fig:nbugs}Number of bugs vs competene group"}
+data %>% 
+    ggplot(aes(x = competence, y = bugs_end)) +
+    geom_boxplot() +
+    labs(x = NULL, y = "number of bugs at the end of the iteration")
+ggsave("competence_group.pdf", width = 4, height = 4)
+```
+
+```{r nbugs_competence_technique, fig.cap= "\\label{fig:nbugs}Number of bugs vs competence group and technique used"}
+data %>% 
+    ggplot(aes(x = technique, y = bugs_end)) +
+    geom_boxplot() +
+    labs(x = NULL, y = "number of bugs at the end of the iteration") +
+    facet_grid(competence~technique, scales = "free_x") +
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+ggsave("technique_competence_group.pdf", width = 4, height = 4)
+```
+
+## Iteration number
+
+```{r time, fig.cap= "\\label{fig:time}Effect of time on bugs"}
+data %>% 
+    ggplot(aes(x = iteration, y = bugs_end, colour = competence)) + 
+    geom_jitter(height = 0, width = 0.2) + 
+    geom_smooth(technique = lm) +
+    labs(x = "iteration", y = "number of bugs at the end of the iteration", colour = "Group")
+ggsave("iteration_bugs.pdf", width = 8, height = 4)
+```
+
+## Technique (TDD vs TLD) in tasks
+
+```{r technique, fig.cap= "\\label{fig:technique}Effect of technique on different tasks"}
+data %>% 
+    mutate(technique = as.factor(technique)) %>% 
+    ggplot(aes(x = technique, y = bugs_end)) +
+    geom_boxplot() + 
+    facet_wrap(~tID) +
+    labs(x = NULL, y = "number of bugs at the end of the iteration")
+ggsave("tasks.pdf", width = 4, height = 4)
+```
+
+## NUT
+```{r}
+data_nut <-
+  read_csv("data.csv") %>% 
+  mutate(grade = as.factor(grade) %>% fct_recode(A = "4", B = "3", B = "2")) %>% 
+  mutate(technique = as.factor(technique) %>% fct_relevel("NUT"))
+
+bugs <- lmer(bugs_end ~ technique + bugs_start + 
+                  crashcount_start  + competence +
+                  (1 | pID) + (1 | tID), data_nut)
+stargazer(bugs,
+          header = FALSE,
+          type = "text")
+```
+
+## Number of bugs
+
+```{r}
+bugs_reference <- lmer(bugs_end ~ iteration + bugs_start + coverage_start + 
+                  crashcount_start  + competence +
+                  (1 | pID ) + (1 | tID), data)
+bugs_TDD <- lmer(bugs_end ~ technique + iteration + bugs_start + coverage_start + 
+                  crashcount_start  + competence +
+                  (1 | pID) + (1 | tID), data)
+bugs_TDD_conformance <- lmer(bugs_end ~ technique + conformance + iteration + bugs_start + coverage_start + 
+                  crashcount_start  + competence +
+                  (1 | pID) + (1 | tID), data)
+stargazer(bugs_reference, bugs_TDD, bugs_TDD_conformance,
+          header = FALSE,
+          type = "text")
+```
+
+```{r}
+anova(bugs_reference, bugs_TDD)
+```
+
+```{r}
+anova(bugs_reference, bugs_TDD_conformance)
+```
+
+## coverage
+
+```{r message=FALSE, warning=FALSE, results='asis'}
+coverage_reference <- lmer(coverage_end ~ iteration + bugs_start + coverage_start + 
+                  crashcount_start  + competence + (1 | pID) + (1 | tID), data)
+coverage_TDD <- lmer(coverage_end ~ technique + iteration + bugs_start + coverage_start + 
+                  crashcount_start  + competence + (1 | pID) + (1 | tID), data)
+coverage_TDD_conformance <- lmer(coverage_end ~ technique + conformance + iteration + bugs_start + coverage_start + 
+                  crashcount_start  + competence + (1 | pID) + (1 | tID), data)
+stargazer(coverage_reference, coverage_TDD, coverage_TDD_conformance,
+          header = FALSE,
+          type= "text")
+```
+
+```{r}
+anova(coverage_reference, coverage_TDD)
+```
+
+```{r}
+anova(coverage_reference, coverage_TDD_conformance)
+```
+
+```{r}
+anova(coverage_TDD, coverage_TDD_conformance)
+```
+
+```{r}
+data %>% 
+  select(technique, coverage_end, conformance) %>%
+  mutate(conformance = conformance / 100,
+         coverage_end = coverage_end / 100) %>% 
+  ggplot(aes(conformance, coverage_end, colour = technique)) +
+  geom_point() +
+  geom_smooth() +
+  scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  ylab("coverage at the end of the iteration")
+ggsave("conformance_coverage.pdf", width = 6, height = 4)
+```
+
+```{r}
+data %>% 
+  select(technique, bugs_end, conformance) %>%
+  mutate(conformance = conformance / 100) %>% 
+  ggplot(aes(conformance, bugs_end, colour = technique)) +
+  geom_point() +
+  geom_smooth() +
+  scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
+  ylab("bugs at the end of the iteration")
+ggsave("conformance_bugs.pdf", width = 6, height = 4)
+```
+
+```{r}
+data %>% 
+  select(competence, technique, bugs_end, coverage_end) %>%
+  gather("outcome", "value", -competence, -technique) %>% 
+  ggplot(aes(technique, value)) +
+  geom_boxplot() +
+  # geom_jitter(height = 0, width = 0.2) +
+  facet_grid(outcome~competence, scales = "free") +
+  xlab("Technique") +
+  ylab("")
+ggsave("competence_group_effects.pdf", width = 4, height = 4)
+```
+
+# Side hypotheses
+
+```{r message=FALSE, warning=FALSE}
+TDD <- data %>% 
+  filter(technique == "TDD") %>%
+  mutate(competence = competence %>% as.factor %>% fct_relevel("mixed"))
+TLD <- data %>%
+  filter(technique == "TLD") %>%
+  mutate(competence = competence %>% as.factor %>% fct_relevel("mixed"))
+bugs_TDD_reference <- lmer(bugs_end ~ iteration + bugs_start + crashcount_start + coverage_start + (1 | pID) + (1 | tID), TDD)
+bugs_TDD_group <- lmer(bugs_end ~ iteration + bugs_start + crashcount_start + coverage_start + competence + (1 | pID) + (1 | tID), TDD)
+bugs_TLD_reference <- lmer(bugs_end ~ iteration + bugs_start + crashcount_start + coverage_start + (1 | pID) + (1 | tID), TLD)
+bugs_TLD_group <- lmer(bugs_end ~ iteration + bugs_start + crashcount_start + coverage_start + competence + (1 | pID) + (1 | tID), TLD)
+stargazer(bugs_TDD_reference, bugs_TDD_group, bugs_TLD_reference, bugs_TLD_group,
+          header = FALSE,
+          type= "text")
+```
+
+```{r}
+anova(bugs_TDD_reference, bugs_TDD_group)
+```
+
+```{r}
+anova(bugs_TLD_reference, bugs_TLD_group)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+coverage_TDD_reference <- lmer(coverage_end ~ iteration + bugs_start + crashcount_start + coverage_start + (1 | pID) + (1 | tID), TDD)
+coverage_TDD_group <- lmer(coverage_end ~ iteration + bugs_start + crashcount_start + coverage_start + competence + (1 | pID) + (1 | tID), TDD)
+coverage_TLD_reference <- lmer(coverage_end ~ iteration + bugs_start + crashcount_start + coverage_start + (1 | pID) + (1 | tID), TLD)
+coverage_TLD_group <- lmer(coverage_end ~ iteration + bugs_start + crashcount_start + coverage_start + competence + (1 | pID) + (1 | tID), TLD)
+stargazer(coverage_TDD_reference, coverage_TDD_group, coverage_TLD_reference, coverage_TLD_group,
+          header = FALSE,
+          type= "text")
+```
+
+```{r}
+anova(coverage_TDD_reference, coverage_TDD_group)
+```
+
+```{r}
+anova(coverage_TLD_reference, coverage_TLD_group)
+```

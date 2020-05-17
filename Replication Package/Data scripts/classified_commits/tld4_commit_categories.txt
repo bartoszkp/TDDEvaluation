@@ -1,0 +1,112 @@
+Good commits:
+(<git.Commit "3578422a1c518a36436fd57da1c6879f5637138f">, 'Mixed but no coverage loss', (54.96277915632754, '->', 72.36180904522612)) 2016-09-07 12:32:30 2016-09-11 20:51:31
+(<git.Commit "80ae841d8d0660ce0f50dfb35b79c4d8370c1463">, 'Mixed but no coverage loss', (52.10918114143921, '->', 54.96277915632754)) 2016-09-07 09:28:38 2016-09-11 20:51:30
+(<git.Commit "809284559a21dfee6fbc8c4fa3bf15c73631cce5">, 'Mixed but no coverage loss', (53.81984036488027, '->', 53.91527599486521)) 2016-09-06 12:16:13 2016-09-11 20:51:29
+(<git.Commit "3473a76e0eba3964a00e2b97a45800c2956407a7">, 'Mixed but no coverage loss', (44.606413994169095, '->', 46.445959104186954)) 2016-09-06 10:47:37 2016-09-11 20:51:28
+(<git.Commit "e72aba54d8b554e998bfcce1564306a7ae9f03a3">, 'Mixed but no coverage loss', (15.796831314072694, '->', 18.77022653721683)) 2016-08-31 11:51:26 2016-09-11 20:51:22
+(<git.Commit "cf25c6a53dae60aaeb4c1f8fba3c2f168ea781be">, 'Mixed but no coverage loss', (37.58949880668258, '->', 39.856801909307876)) 2016-08-29 12:12:56 2016-09-11 20:51:18
+(<git.Commit "e21743f6f3a73f66a71c42fd603b92c1e0340350">, 'Mixed but no coverage loss', (71.2430426716141, '->', 71.2430426716141)) 2016-08-29 07:02:54 2016-09-11 20:51:16
+(<git.Commit "4348cd406ac6abf1af64852735a75bba63624ced">, 'Mixed but no coverage loss', (63.3147113594041, '->', 74.487895716946)) 2016-08-23 12:43:03 2016-09-11 20:51:14
+(<git.Commit "755a29c581fb7f479ca4451a91873a25ccb001d0">, 'Mixed but no coverage loss', (77.5, '->', 77.5)) 2016-08-23 09:08:29 2016-09-11 20:51:08
+(<git.Commit "b13984fca32468bc68064e7fa5a376fc6eb9406c">, 'Mixed but no coverage loss', (69.92481203007519, '->', 70.14925373134328)) 2016-08-17 07:28:26 2016-09-11 20:50:57
+(<git.Commit "11a91814f0e985cd8a13af56ee67c3b411100493">, 'Mixed but no coverage loss', (57.983193277310924, '->', 66.38655462184875)) 2016-08-04 09:45:32 2016-09-11 20:50:27
+(<git.Commit "60890c6b0f43de79f2ba39b02042323dfe6f9738">, 'Mixed but no coverage loss', (43.80952380952381, '->', 55.23809523809524)) 2016-08-03 13:24:37 2016-09-11 20:50:24
+(<git.Commit "d65f0ba2886cd08383b8aa5e55ef42610cd16e97">, 'New implementation', (78.3177570093458, '->', 77.81885397412199)) 2016-09-14 09:53:09 2016-09-14 09:53:09
+(<git.Commit "bf744ccec46f636d60a2aab554fefa2af4575402">, 'New implementation', (78.55750487329435, '->', 77.39463601532567)) 2016-09-13 09:44:37 2016-09-13 09:44:37
+(<git.Commit "56b611f34eb6082a19e1a8959583e1ccb7142fdb">, 'New implementation', (59.04628330995792, '->', 56.76056338028169)) 2016-09-08 09:20:04 2016-09-11 20:51:32
+(<git.Commit "c10be79af7665c283b5685aa3ca982dbc272c51e">, 'New implementation', (72.36180904522612, '->', 59.04628330995792)) 2016-09-08 08:23:19 2016-09-11 20:51:32
+(<git.Commit "f15f2ad73fdadfcb492842fe9eba10351fc587a1">, 'New implementation', (53.91527599486521, '->', 52.10918114143921)) 2016-09-07 07:19:30 2016-09-11 20:51:30
+(<git.Commit "e8576c02e7834e157b41de151733189fc4462d2e">, 'REF', (21.875, '->', 21.953445915107256)) 2016-09-05 09:01:31 2016-09-11 20:51:26
+(<git.Commit "ac9bcdd38f8567e9959ef530d33ef1cc1c268590">, 'New implementation', (21.57043879907621, '->', 21.46139705882353)) 2016-09-05 07:09:42 2016-09-11 20:51:24
+(<git.Commit "f1cf00e039d47c56378186f45aafebfc58a4b870">, 'REF', (21.590383726306058, '->', 21.590383726306058)) 2016-09-01 11:08:44 2016-09-11 20:51:23
+(<git.Commit "06a97eecf8027bc826470c2e1b5226cec7c1eb69">, 'New implementation', (20.458660229330114, '->', 15.796831314072694)) 2016-08-31 10:54:29 2016-09-11 20:51:21
+(<git.Commit "45e264c0c7f266b4c656d60caa7c64ed7b2d26a7">, 'New implementation', (39.952718676122934, '->', 20.458660229330114)) 2016-08-31 10:13:55 2016-09-11 20:51:20
+(<git.Commit "9dc494facf0a93d3a92d26da8b8cd174b9e4d91a">, 'New implementation', (39.856801909307876, '->', 39.479905437352244)) 2016-08-29 12:44:49 2016-09-11 20:51:19
+(<git.Commit "74f551d7a635441f38493c00316e969164344f02">, 'New implementation', (74.487895716946, '->', 71.2430426716141)) 2016-08-29 06:55:22 2016-09-11 20:51:15
+(<git.Commit "159705ead3892e9ad338fcb2901c17e552e2b9a1">, 'REF', (63.3147113594041, '->', 63.3147113594041)) 2016-08-23 12:20:25 2016-09-11 20:51:13
+(<git.Commit "f10240627950c2164d23f2c3b8adad579aeddbc7">, 'New implementation', (76.00896860986548, '->', 63.3147113594041)) 2016-08-23 12:20:07 2016-09-11 20:51:12
+(<git.Commit "f054f55319ac00244033f7ac1ee6324f67f670fb">, 'New implementation', (77.5, '->', 74.66367713004485)) 2016-08-23 09:59:23 2016-09-11 20:51:10
+(<git.Commit "cf57d6428cb5ac766ea8226fcdd6bd9021886c16">, 'REF', (77.5, '->', 77.5)) 2016-08-23 09:19:03 2016-09-11 20:51:09
+(<git.Commit "9db413ce7bc8d468b14cc0eb3aec72607f784f64">, 'New implementation', (81.36645962732919, '->', 65.5)) 2016-08-22 13:47:20 2016-09-11 20:51:07
+(<git.Commit "e64bd534f0192532cad30f7a7130ff01bb6d5e4f">, 'New implementation', (74.58745874587459, '->', 70.1863354037267)) 2016-08-22 12:46:43 2016-09-11 20:51:06
+(<git.Commit "4eba3f8ad353a8a0ff0da4626981d4fa3257e0ea">, 'REF', (74.58745874587459, '->', 74.58745874587459)) 2016-08-22 11:10:09 2016-09-11 20:51:05
+(<git.Commit "67996bcdf49e9439b78d5bb000c82255c103196c">, 'REF', (74.67105263157895, '->', 74.58745874587459)) 2016-08-22 10:34:23 2016-09-11 20:51:04
+(<git.Commit "35c856bd8f577950c34d28d8c1478618bfe1fb07">, 'New implementation', (72.81879194630872, '->', 71.71052631578948)) 2016-08-22 10:15:31 2016-09-11 20:51:02
+(<git.Commit "4d6d29d44dd573f13da75fff2954a9973af7fefb">, 'New implementation', (72.78911564625851, '->', 72.48322147651007)) 2016-08-22 09:23:30 2016-09-11 20:51:01
+(<git.Commit "71fac5bbb36ba2b508333bbc2aebe74955abb169">, 'Failing tests fix', []) 2016-08-17 15:13:44 2016-09-11 20:50:59
+(<git.Commit "addd29b5298ac5125acd28bc200b4fe9364de357">, 'New implementation', (70.14925373134328, '->', 68.57142857142857)) 2016-08-17 14:33:11 2016-09-11 20:50:57
+(<git.Commit "2be07dd209a5d5ab9116ed268fbb908093ab4b03">, 'Failing tests fix', []) 2016-08-09 09:56:04 2016-09-11 20:50:45
+(<git.Commit "e2c1b96c1eb07557d891916338f114d256311438">, 'Failing tests fix', []) 2016-08-09 07:40:22 2016-09-11 20:50:43
+(<git.Commit "7d6eec50e470e185873afaccd5666e63bc5d4a2a">, 'New implementation', (75.15151515151516, '->', 70.55555555555556)) 2016-08-08 11:02:02 2016-09-11 20:50:37
+(<git.Commit "02166962547da9d2a4f2242d96ecddace5bc5618">, 'New implementation', (73.88535031847134, '->', 70.3030303030303)) 2016-08-08 10:49:45 2016-09-11 20:50:36
+(<git.Commit "1a4f133a26576d0e4736affefb665253069ea8dc">, 'New implementation', (70.28985507246377, '->', 64.3312101910828)) 2016-08-08 10:36:27 2016-09-11 20:50:33
+(<git.Commit "68b200a75a86d14301a96d48704c80688c8fd2a2">, 'New implementation', (54.36893203883495, '->', 50.450450450450454)) 2016-08-03 14:29:31 2016-09-11 20:50:25
+(<git.Commit "14d7bc30bc2f25c59d846953aebc624ee14ab382">, 'New implementation', (48.421052631578945, '->', 43.80952380952381)) 2016-08-03 11:22:36 2016-09-11 20:50:23
+(<git.Commit "315ec9df8402fd9a0b068d4ac5ad8f1fe3155997">, 'New tests', (77.81885397412199, '->', 80.40665434380776)) 2016-09-14 13:17:14 2016-09-14 13:17:14
+(<git.Commit "034c24f4855f4354e70875f96cf04432fc3ce2e9">, 'Test fix', []) 2016-09-13 11:21:24 2016-09-13 11:21:24
+(<git.Commit "04e965195a66a0b709eeec60fc8fa9872bf34582">, 'New tests', (77.39463601532567, '->', 77.96934865900383)) 2016-09-13 09:46:27 2016-09-13 09:46:27
+(<git.Commit "52d89a3aa7d4cd69289aa14c7c3eca8fc53a6d61">, 'New tests', (21.953445915107256, '->', 22.272934732998632)) 2016-09-05 09:27:45 2016-09-11 20:51:26
+(<git.Commit "c7569e88d6e76945609276a5cc5b41ea08ba8afe">, 'New tests', (21.46139705882353, '->', 21.875)) 2016-09-05 07:22:36 2016-09-11 20:51:25
+(<git.Commit "eb002c9207099afcba6e841e80b75c2e2b348e49">, 'New tests', (18.77022653721683, '->', 21.590383726306058)) 2016-09-01 07:54:47 2016-09-11 20:51:22
+(<git.Commit "4f85c31310d2bac22045a8243504e7add0f75d1a">, 'New tests', (39.479905437352244, '->', 39.952718676122934)) 2016-08-29 12:53:51 2016-09-11 20:51:19
+(<git.Commit "a22400441fc7bac0f7b293fc2240acd620df4957">, 'Tests REF or new tests, no coverage inc', (74.487895716946, '->', 74.487895716946)) 2016-08-23 12:43:17 2016-09-11 20:51:15
+(<git.Commit "66dda0684c329d378637218e4c18837d712617c4">, 'New tests', (75.56053811659193, '->', 76.00896860986548)) 2016-08-23 10:49:23 2016-09-11 20:51:12
+(<git.Commit "97f33b263083e8a411615d26db777140ff3cd8cc">, 'New tests', (74.66367713004485, '->', 75.56053811659193)) 2016-08-23 10:46:08 2016-09-11 20:51:11
+(<git.Commit "b22d1d15b14e13c54dc2ea67ff5fc41377880ba7">, 'Tests REF or new tests, no coverage inc', (74.66367713004485, '->', 74.66367713004485)) 2016-08-23 09:59:39 2016-09-11 20:51:10
+(<git.Commit "f1cfdfcbd70ad1a6e405db7b28145c43c77f72ee">, 'New tests', (65.5, '->', 77.5)) 2016-08-23 09:05:39 2016-09-11 20:51:08
+(<git.Commit "cee48c46504f7ee88132bd20270eb2ab1284b064">, 'New tests', (70.1863354037267, '->', 81.36645962732919)) 2016-08-22 13:20:31 2016-09-11 20:51:06
+(<git.Commit "815ac727356f52c96350c1c54709d0a3f3e2c584">, 'Tests REF or new tests, no coverage inc', (74.58745874587459, '->', 74.58745874587459)) 2016-08-22 10:39:36 2016-09-11 20:51:04
+(<git.Commit "49cce28ced34c73cbaac2b15b56cb9c8484d8701">, 'New tests', (71.71052631578948, '->', 74.67105263157895)) 2016-08-22 10:24:59 2016-09-11 20:51:03
+(<git.Commit "f30e2ea328d09fe301789ce7c81c44ff7f0e5c92">, 'New tests', (72.48322147651007, '->', 72.81879194630872)) 2016-08-22 09:53:15 2016-09-11 20:51:01
+(<git.Commit "acb07cb37ecf3cfba1f8e68258dd101744d5141a">, 'New tests', (66.66666666666667, '->', 72.78911564625851)) 2016-08-18 06:14:18 2016-09-11 20:51:00
+(<git.Commit "8d9150b8f7fc9a1d7c448039db4a27ab11199718">, 'Tests REF or new tests, no coverage inc', (70.14925373134328, '->', 70.14925373134328)) 2016-08-17 06:30:44 2016-09-11 20:50:55
+(<git.Commit "a07b94d2a241eba21d2d4c78c9ffee9a51f73c0d">, 'Test fix', []) 2016-08-11 10:52:16 2016-09-11 20:50:54
+(<git.Commit "61088045d7fce19d55da105a4b5e0423a44297aa">, 'New tests', (69.28838951310861, '->', 71.53558052434457)) 2016-08-11 10:06:01 2016-09-11 20:50:53
+(<git.Commit "761a703e3d59f4f9a04395f0743bc6633e31bd57">, 'Test fix', []) 2016-08-11 09:23:58 2016-09-11 20:50:52
+(<git.Commit "80c12876cd3b7ee5988f755efccf38acbc47abe9">, 'Test fix', []) 2016-08-11 09:15:15 2016-09-11 20:50:51
+(<git.Commit "a0b38ee908dde09a03159ea2510aca5581a0458f">, 'Tests REF or new tests, no coverage inc', (73.40425531914893, '->', 73.40425531914893)) 2016-08-09 11:50:30 2016-09-11 20:50:47
+(<git.Commit "a476d9bfbba7f96e536bc25c2c17d3618853d6ca">, 'New tests', (69.41747572815534, '->', 72.33009708737865)) 2016-08-09 09:56:42 2016-09-11 20:50:46
+(<git.Commit "58ac0cc286fb1773725324e1b55145b0663aa034">, 'New tests', (75.0, '->', 76.66666666666667)) 2016-08-08 11:09:36 2016-09-11 20:50:40
+(<git.Commit "e774b49e9e707cf7c25e5e10721640e4efd42373">, 'New tests', (73.88888888888889, '->', 75.0)) 2016-08-08 11:08:37 2016-09-11 20:50:39
+(<git.Commit "3688b18993ac9c331761aabc6bc259cea3e9e6b7">, 'New tests', (71.66666666666667, '->', 73.88888888888889)) 2016-08-08 11:07:25 2016-09-11 20:50:39
+(<git.Commit "3b4746b5a8e622d6cc253ca7c7dd2ff953e31cb6">, 'New tests', (70.55555555555556, '->', 71.66666666666667)) 2016-08-08 11:06:22 2016-09-11 20:50:38
+(<git.Commit "453f28518d45f0fa0d2dd272e6a3d97de833346c">, 'New tests', (70.3030303030303, '->', 75.15151515151516)) 2016-08-08 10:59:47 2016-09-11 20:50:37
+(<git.Commit "2495a91f720acbfe5bfc3e54db9deac9a879d202">, 'New tests', (71.3375796178344, '->', 73.88535031847134)) 2016-08-08 10:44:39 2016-09-11 20:50:35
+(<git.Commit "9e3a65e31b561f126e8d7e7b952b6f6e27328194">, 'New tests', (68.78980891719745, '->', 71.3375796178344)) 2016-08-08 10:43:26 2016-09-11 20:50:35
+(<git.Commit "06c3d2325493e84e133ced0fc245bfff60f6be80">, 'New tests', (66.24203821656052, '->', 68.78980891719745)) 2016-08-08 10:42:04 2016-09-11 20:50:34
+(<git.Commit "4bfc47e472f80224d841aec4fa107c59057c14c1">, 'New tests', (64.3312101910828, '->', 66.24203821656052)) 2016-08-08 10:40:25 2016-09-11 20:50:33
+(<git.Commit "17682783d48d05b0073151fb03571d287903d76c">, 'Test fix', []) 2016-08-08 10:32:37 2016-09-11 20:50:32
+(<git.Commit "c21da892fd65d4aa15f7fd78583d105726d5158b">, 'Tests REF or new tests, no coverage inc', (64.61538461538461, '->', 64.61538461538461)) 2016-08-08 09:20:09 2016-09-11 20:50:31
+(<git.Commit "8b2a5054cc2f6551599d7c442f97c05fdd1de32a">, 'Test fix', []) 2016-08-08 09:16:40 2016-09-11 20:50:30
+(<git.Commit "6e39c433974de7333b43a85e77833b2999299308">, 'New tests', (60.76923076923077, '->', 64.61538461538461)) 2016-08-04 12:56:48 2016-09-11 20:50:29
+(<git.Commit "3c70d38971fd944d0df2c0f7b57b07de1b0f7145">, 'New tests', (50.450450450450454, '->', 62.16216216216216)) 2016-08-03 15:09:16 2016-09-11 20:50:26
+Bad commits:
+(<git.Commit "8f55b2facfe18c977c3a4c93d520febe0a9d9438">, 'Break tests', '') 2016-08-29 11:24:56 2016-09-11 20:51:17
+(<git.Commit "cfcceeec1af23ad9e8412f28577a440f76fc8e48">, 'Break tests', '') 2016-08-29 10:22:27 2016-09-11 20:51:17
+(<git.Commit "b9e7f7ceb0cccce1508b9feccf1f820c9116c6f6">, 'Break tests', '') 2016-08-17 06:41:12 2016-09-11 20:50:56
+(<git.Commit "8b6a98d81ae192047df9c3d75bc25d9a730d3074">, 'Break tests', '') 2016-08-11 08:43:38 2016-09-11 20:50:50
+(<git.Commit "f00703cfae139796dff8d8f2c8fae6c47892ee6d">, 'Break tests', '') 2016-08-08 09:14:23 2016-09-11 20:50:29
+(<git.Commit "4b9fd45393582011cc9b7a7422d9f2706e8acdd8">, 'Reduced coverate', (66.38655462184875, '->', 60.76923076923077)) 2016-08-04 12:56:11 2016-09-11 20:50:28
+(<git.Commit "078e4e3b937b9192a0da8738f1cc267c22299d5a">, 'Reduced coverate', (62.16216216216216, '->', 57.983193277310924)) 2016-08-04 06:50:54 2016-09-11 20:50:26
+(<git.Commit "d2f72655567b613df66f0edb1d36184261c15054">, 'Reduced coverate', (55.23809523809524, '->', 54.36893203883495)) 2016-08-03 14:26:34 2016-09-11 20:50:24
+(<git.Commit "3118ae20f21cc20f5a805ae309952f7982eb058e">, 'Failing tests', ['WhenShadowMVPHaveCorrectSignal_CallsMVPRepository']) 2016-09-13 10:20:35 2016-09-13 10:20:35
+(<git.Commit "ec26c3834ffbad8ed64d5f54cff095e506d1f149">, 'Failing tests', ['GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData', 'GivenASignalAndDatumWithMissingData_WhenGettingData_FilledDatumIsReturned', 'GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData', 'GivenASignalAndDatumWithMissingData_WhenGettingData_FilledDatumIsReturned']) 2016-08-17 14:53:28 2016-09-11 20:50:59
+(<git.Commit "e9ccc04a0bd34c3b17721420866b3fc75007d694">, 'Failing tests', ['GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData', 'GivenASignalAndDatumWithMissingData_WhenGettingData_FilledDatumIsReturned']) 2016-08-17 14:42:34 2016-09-11 20:50:58
+(<git.Commit "458ac6e75044a69a4269ca73929920024ed18aca">, 'Failing tests', ['GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData', 'GivenASignalAndDatumWithMissingData_WhenGettingData_FilledDatumIsReturned']) 2016-08-11 10:27:05 2016-09-11 20:50:54
+(<git.Commit "e8f5e739343b57c64b2e283dc08f716718bc4ed2">, 'Failing tests', ['GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData']) 2016-08-11 08:09:23 2016-09-11 20:50:50
+(<git.Commit "33a6f470b0e6b6a7cee66cc7864d512a3f56a840">, 'Failing tests', ['GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData']) 2016-08-10 12:26:06 2016-09-11 20:50:49
+(<git.Commit "4860303481e60261242873fa644099ff1eb30f5d">, 'Failing tests', ['GivenASignal_WhenGettingBoolDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDecimalDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingDoubleDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingIntDataForSpecificSignal_ReturnsThisData', 'GivenASignal_WhenGettingStringDataForSpecificSignal_ReturnsThisData']) 2016-08-10 12:10:30 2016-09-11 20:50:48
+(<git.Commit "993b9d18292a17393433b71cde97dd9d85adb380">, 'Failing tests', ['GivenNoSignals_WhenAddASignal_CallsRepositoryAdd', 'GivenNoSignals_WhenAddASignal_ReturnsIt']) 2016-08-09 09:37:27 2016-09-11 20:50:44
+(<git.Commit "ba04a680771b7bdd926ccd58f384b5aebf6faa41">, 'Failing tests', ['GivenASignalAndNotSortedDatum_WhenSettingData_RepositorySetWithSortedDataIsCalled', 'WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException', 'GivenASignalAndNotSortedDatum_WhenSettingData_RepositorySetWithSortedDataIsCalled']) 2016-08-09 07:31:25 2016-09-11 20:50:42
+(<git.Commit "2528ee27c2dd214297ce867f300b97db3f2fd344">, 'Failing tests', ['WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException']) 2016-08-09 07:25:10 2016-09-11 20:50:41
+(<git.Commit "903eb6629b9a8c040c627efbb4a9ef5420a3f424">, 'Failing tests', ['WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException']) 2016-08-08 10:26:03 2016-09-11 20:50:31
+(<git.Commit "a97ab346396eab0d81ca46983ba20f10146985c9">, 'Break tests', ['GivenASignalAndDatumWithMissingData_WhenGettingData_FilledDatumIsReturned']) 2016-08-11 09:15:53 2016-09-11 20:50:52
+(<git.Commit "9d7eddacd489334ed87f30e4c918569eb4ca14ec">, 'Failing tests', ['GivenASignalAndNotSortedDatum_WhenSettingData_RepositorySetWithSortedDataIsCalled']) 2016-08-09 07:39:49 2016-09-11 20:50:43
+(<git.Commit "2d6fb3693c888a61135778e39ca3efbae029d23d">, 'Failing tests', ['GivenASignalAndNotSortedDatum_WhenSettingData_RepositorySetWithSortedDataIsCalled', 'WhenSettingDataForNonExistSignal_ThrowSignalWithThisIdNonExistException']) 2016-08-09 07:30:54 2016-09-11 20:50:41
+Unknown commits:
+(<git.Commit "1f80e7dba92af3875611b6817cfd922d408901de">, 'IMPL INCREASED COVERAGE?', (80.40665434380776, '->', 81.58379373848987)) 2016-09-15 11:40:45 2016-09-15 11:40:45
+(<git.Commit "08168ece1c42d52613b9b5315c9f5c70190b693b">, 'IMPL INCREASED COVERAGE?', (56.76056338028169, '->', 78.86497064579257)) 2016-09-08 10:03:55 2016-09-11 20:51:33
+(<git.Commit "d936ed2148deba80042d0e6907e700909cbbd5fe">, 'IMPL INCREASED COVERAGE?', (46.445959104186954, '->', 53.81984036488027)) 2016-09-06 12:03:47 2016-09-11 20:51:28
+(<git.Commit "c2f5954bdbb5875402c790e31dddb4901e07f9d7">, 'IMPL INCREASED COVERAGE?', (22.272934732998632, '->', 44.606413994169095)) 2016-09-06 09:47:49 2016-09-11 20:51:27
+(<git.Commit "d8699e00d3af600690c00a849c31830459642b42">, 'IMPL INCREASED COVERAGE?', (73.40425531914893, '->', 73.82198952879581)) 2016-08-09 13:25:39 2016-09-11 20:50:48
+(<git.Commit "a7afce620a2b526deae1891145c141f5c5d9f7a4">, 'IMPL INCREASED COVERAGE?', (72.33009708737865, '->', 73.40425531914893)) 2016-08-09 11:13:50 2016-09-11 20:50:46

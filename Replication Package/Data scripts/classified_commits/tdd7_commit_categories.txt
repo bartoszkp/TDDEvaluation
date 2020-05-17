@@ -1,0 +1,191 @@
+Good commits:
+(<git.Commit "a003e738241de34e340ebfadf83f1f729085d1a7">, 'Compilation fix', '') 2016-09-12 10:42:27 2016-09-12 10:42:27
+(<git.Commit "0757bc9b669c74eb9e8be4546e1d659f25a7cc2f">, 'Mixed but no coverage loss', (81.12676056338029, '->', 82.09366391184572)) 2016-09-05 20:33:20 2016-09-11 20:43:52
+(<git.Commit "dfc4afb6d93e0aedc5019dc3b0072f1d0450a449">, 'Mixed but no coverage loss', (81.22977346278317, '->', 81.58730158730158)) 2016-08-29 14:00:35 2016-09-11 20:43:30
+(<git.Commit "adbca091d834a4c930fce11a99422269eb6341e0">, 'Mixed but no coverage loss', (80.32786885245902, '->', 80.58252427184466)) 2016-08-29 12:15:08 2016-09-11 20:43:28
+(<git.Commit "99cd5f0f22f1f4b8b55c9905f28276067a8a1367">, 'Mixed but no coverage loss', (77.43190661478599, '->', 77.43190661478599)) 2016-08-16 11:30:32 2016-09-11 20:43:09
+(<git.Commit "a5e5d0ca9755d44be38f771c10e0567fd9ac5dd3">, 'Mixed but no coverage loss', (73.17073170731707, '->', 77.43190661478599)) 2016-08-16 11:23:13 2016-09-11 20:43:08
+(<git.Commit "dfa5622a8d53cc1d1a66114f022d796c6462d43c">, 'Mixed but no coverage loss', (72.16981132075472, '->', 73.54260089686099)) 2016-08-12 06:56:39 2016-09-11 20:42:55
+(<git.Commit "7979751a28c63b52b50a3b40743a5bed3c32665a">, 'Mixed but no coverage loss', (70.2247191011236, '->', 71.65775401069519)) 2016-08-10 07:32:11 2016-09-11 20:42:41
+(<git.Commit "4386d4f7a506a5484a553e676301c4bab44ea68d">, 'Mixed but no coverage loss', (69.54022988505747, '->', 69.54022988505747)) 2016-08-10 06:13:14 2016-09-11 20:42:37
+(<git.Commit "2855c695951ba2704e3021b84a461fa3ee743609">, 'Mixed but no coverage loss', (68.84422110552764, '->', 69.54022988505747)) 2016-08-10 06:01:35 2016-09-11 20:42:36
+(<git.Commit "056c2a7196a34dadb9ed2b9a3168685af19d1416">, 'Mixed but no coverage loss', (75.55555555555556, '->', 76.7605633802817)) 2016-08-05 10:18:54 2016-09-11 20:42:28
+(<git.Commit "b287695f2a2e7d8283aa20a452437315371c097f">, 'Mixed but no coverage loss', (66.9172932330827, '->', 69.46564885496183)) 2016-08-05 09:43:38 2016-09-11 20:42:24
+(<git.Commit "363d3699e15e7d4e4ebad058915ab58148264b46">, 'Mixed but no coverage loss', (67.22689075630252, '->', 70.67669172932331)) 2016-08-05 07:54:37 2016-09-11 20:42:22
+(<git.Commit "5b96fe8a1374fdaf12b2907ceeee19d1097be91c">, 'Mixed but no coverage loss', (63.06306306306306, '->', 65.54621848739495)) 2016-08-05 06:59:28 2016-09-11 20:42:18
+(<git.Commit "5f08f42e86abc7ce684546f3fc2c8481c85894cd">, 'Mixed but no coverage loss', (62.0, '->', 62.13592233009709)) 2016-08-04 07:27:56 2016-09-11 20:42:13
+(<git.Commit "0882c52799064f70ccdff6c230efa3699dcb48ee">, 'Mixed but no coverage loss', (48.91304347826087, '->', 60.0)) 2016-08-02 08:54:23 2016-09-11 20:42:09
+(<git.Commit "488eb82e9c21d59821c9db62b2cde8e80e70142d">, 'Fix tests', ['GivenASignalAndData_WhenGettingCoarseData_ReturnsCorrectData']) 2016-09-13 09:25:58 2016-09-13 09:25:58
+(<git.Commit "beb6fcda80a6876cd728a01f2722e42306797ff7">, 'Fix tests', ['GivenASignal_WhenGettingCoarseData_IfToDateIsInvalid_ThrowsException']) 2016-09-13 08:41:04 2016-09-13 08:41:04
+(<git.Commit "e79206899fa16361d65f41433d057db0f79461a2">, 'Fix tests', ['GivenNoSignals_WhenGettingCoarseData_ThrowsException']) 2016-09-13 08:34:34 2016-09-13 08:34:34
+(<git.Commit "58957525b66d58d568c03aba7b66fb13092b2d1e">, 'Fix tests', ['GivenASignal_WhenGettingCoarseDataOfString_ThrowsException']) 2016-09-13 08:31:41 2016-09-13 08:31:41
+(<git.Commit "842fa94494efb3b224c0546671b8609e29428e39">, 'Fix tests', ['GivenASignal_WhenGettingCoarseDataOfBoolean_ThrowsException']) 2016-09-13 08:29:39 2016-09-13 08:29:51
+(<git.Commit "b404e5afb31298e2814065ed5dd3f5c3c2a40605">, 'Fix tests', ['GivenASignal_WhenGettingCoarseData_IfDateIsInvalid_ThrowsException']) 2016-09-13 08:25:04 2016-09-13 08:25:04
+(<git.Commit "8d7d4c9b2e641af29798a2d7b41494defd4e333e">, 'Fix tests', ['GivenASignal_WhenGettingCoarseData_IfGranularityIsLessThanSignals_ThrowsException']) 2016-09-13 08:05:14 2016-09-13 08:05:14
+(<git.Commit "205de520cdd39457cae2dcb52b45f6c54d260fac">, 'Fix tests', ['GivenASignal_WhenGettingCoarseData_IfGranularityIsEqualSignals_ThrowsException']) 2016-09-13 07:46:15 2016-09-13 07:46:15
+(<git.Commit "b3b5ceaaa5e354fed6485f947aa054b3b64aef53">, 'Fix tests', ['GivenASignal_HavingBothEarlierAndOlderData_WhenGettingDataWithFirstOrderMVP_WithDataOfSameValueDifferentQuality_ReturnsProperData']) 2016-09-12 10:06:10 2016-09-12 10:06:10
+(<git.Commit "7f0b41c6be8d592c145f0e4731b26575787326de">, 'Fix tests', ['GivenASignal_WhenGettingDataWithShadowMVP_WhenSignalHaveNotDatum_TakeDatumFromShadowSignal']) 2016-09-08 13:24:54 2016-09-11 20:43:59
+(<git.Commit "764593a42dce193a9a0777998a64e79baa1e8d10">, 'Compilation fix', []) 2016-09-06 07:55:48 2016-09-11 20:43:54
+(<git.Commit "3857741868e345d6738ff029257bec20817cd652">, 'Fix tests', ['GivenASignal_HavingBothEalierAndOlderData_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfInteger_ReturnsDataWithWorstQuality']) 2016-08-31 09:26:14 2016-09-11 20:43:49
+(<git.Commit "92dde32c0f33083679158b92068638b73f3d59db">, 'Fix tests', ['GivenASignal_HavingBothEalierAndOlderData_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDifferentThenDoubleDecimalOrInteger_ThrowsException']) 2016-08-31 08:41:52 2016-09-11 20:43:47
+(<git.Commit "508dc53dd7549fb8bb56184e621f8520cdfba6c0">, 'Fix tests', ['GivenASignal_HavingBothEalierAndOlderData_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfInteger_ReturnsProperData']) 2016-08-31 08:36:39 2016-09-11 20:43:46
+(<git.Commit "a208243dc2807e2c012e43df06e4ec529d8d0ecb">, 'Fix tests', ['GivenASignal_WithNewerDataOfNoneQuality_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDouble_ReturnsNoneQualityData']) 2016-08-31 07:47:34 2016-09-11 20:43:42
+(<git.Commit "aba6754d44508f9f226b4a7a14250db491f91548">, 'Fix tests', ['GivenASignal_WithoutNewerDataOfNoneQuality_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDouble_ReturnsNoneQualityData']) 2016-08-31 07:40:50 2016-09-11 20:43:41
+(<git.Commit "da9ad42dbea7b69b37132177424663bf4e37d998">, 'Fix tests', ['GivenASignal_WithEalierDataOfNoneQuality_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDouble_ReturnsNoneQualityData']) 2016-08-31 06:35:51 2016-09-11 20:43:39
+(<git.Commit "0632f58a868de151b36e9432b580a4f1fcd95f5b">, 'Fix tests', ['GivenASignal_WithoutEalierData_WhenGettingDataWithFirstOrderMVP_ForDataTypeOfDouble_ReturnsNoneQualityData']) 2016-08-31 06:27:16 2016-09-11 20:43:38
+(<git.Commit "832fb58e3741486103dad631867a45dfd28746bc">, 'Fix tests', ['GivenASignal_WhenGettingDataWithFirstOrderMVP_ThrowException']) 2016-08-30 08:17:03 2016-09-11 20:43:35
+(<git.Commit "1a205167e25156b5f8c9602170ec0a5af44a46cc">, 'Fix tests', ['GivenASignal_WhenDeleteSignal_RepoDataDeleteIsCalled']) 2016-08-30 07:52:49 2016-09-11 20:43:33
+(<git.Commit "6b76b6cb5cca0a2bafcc372151a9ceea4f4f2e22">, 'Fix tests', ['GivenASignal_WhenDeleteSignal_RepoSetMVPIsCalled']) 2016-08-30 07:47:34 2016-09-11 20:43:32
+(<git.Commit "57cca8426086bf9acd9372b15215c9258bcb117f">, 'Fix tests', ['GivenASignalAndDataWithZOrderMVP_WhenGettingData_RepoGetDataOlderThanIsCalled']) 2016-08-29 12:09:10 2016-09-11 20:43:27
+(<git.Commit "efc98c8927ddc95f42e7fd46926bb3f7d0069e9b">, 'Fix tests', ['GivenASignal_WhenSettingDataWithCorrectTimestamp_RepoSetDataIsCalled']) 2016-08-29 08:12:31 2016-09-11 20:43:25
+(<git.Commit "e33c443de88c3308a01bf3ec653809266d4b16b1">, 'Fix tests', ['GivenASignalWithData_WhenGettingDataWithIncorrectDates_IncorrectTimestampExceptionIsThrown']) 2016-08-22 11:59:27 2016-09-11 20:43:23
+(<git.Commit "6cfe0bd744aabf275e421524faea455135e014ec">, 'Fix tests', ['GivenASignal_WhenSettingDataWithIncorrectTimestamps_IncorrectTimestampExceptionIsThrown']) 2016-08-22 11:47:40 2016-09-11 20:43:22
+(<git.Commit "a867dd83aec435012408c716f9ad91fab3252d96">, 'Fix tests', ['GivenASignalAndDataWithZOrderMVP_WhenGettingDataWithDatesEarlierThanTheFirstAvailable_ReturnsEarlierDatesAccordingToNoneQualityMVPAndTheRestAccordingToZeroOrderMVP']) 2016-08-22 10:53:34 2016-09-11 20:43:21
+(<git.Commit "c1671b7c1e588736aeee958e5e04f0e2c9a7798e">, 'Fix tests', ['GivenASignalAndDataWithZeroOrderMVP_WhenGettingData_ReturnsDataAccordingToZeroOrderMVP']) 2016-08-22 08:55:32 2016-09-11 20:43:18
+(<git.Commit "54538ee9100bde2ee181d0df230eb3d00f2243ac">, 'Fix tests', ['GivenASignalAndSpecificValueMVP_WhenGettingData_ReturnsCorrectData']) 2016-08-17 10:23:06 2016-09-11 20:43:16
+(<git.Commit "24a3dfdc2bbe431253d58c142d50befb44e69688">, 'Fix tests', ['GivenASignalAndData_WhenGettingDataWithToDateLessThanFromDate_ReturnEmptyIEnumerable']) 2016-08-17 10:00:18 2016-09-11 20:43:15
+(<git.Commit "d2172c4f754de46c81c31c32ad6b32f95d3754d0">, 'Fix tests', ['GivenNoSignal_WhenAddingASignalWithIdSet_ThrowsException']) 2016-08-17 09:48:13 2016-09-11 20:43:14
+(<git.Commit "320749315b3e3e64e6745adc124341bfb464a944">, 'Fix tests', ['GivenASignal_WhenSettingData_RepositoryIsCalledWithSignalReferences']) 2016-08-17 09:38:43 2016-09-11 20:43:12
+(<git.Commit "d58babc130111e6fae9bb9881dd0736c1427ca95">, 'Fix tests', ['GivenSomeSignals_WhenGettingPathEntry_ReturnsNotNull']) 2016-08-16 11:05:46 2016-09-11 20:43:07
+(<git.Commit "52f3869477a36afdeeb579e566dca88647db6b86">, 'Fix tests', ['GivenASignalWithData_WhenGettingDataFromAnEmptyPeriod_ReturnsCorrectAmountOfData']) 2016-08-16 09:48:35 2016-09-11 20:43:04
+(<git.Commit "1661729f4d319c51326b9313e2e9a7e5ba20c502">, 'Fix tests', ['GivenASignalWithData_WhenGettingDataWithIdenticalFromAndToDates_ReturnsASingleItem']) 2016-08-16 09:41:17 2016-09-11 20:43:03
+(<git.Commit "2de8662947fefa57ed137e92b21afc412c4ec096">, 'REF, increased coverage', (49.1686460807601, '->', 71.83673469387755)) 2016-08-16 09:24:38 2016-09-11 20:43:02
+(<git.Commit "79018f4601cbecb48d711cf5feffd7674eb07c43">, 'Fix tests', ['GivenASignal_WhenSettingMVPOfTheSignal_MVPRepositorySetMethodWasCalled']) 2016-08-12 08:16:22 2016-09-11 20:43:00
+(<git.Commit "89b341412c2368e516722bb24c7a7477d1467d0b">, 'Fix tests', ['GivenNoSignals_WhenSettingMVPOfAnySignal_ThrowedIsArgumentException']) 2016-08-12 07:01:05 2016-09-11 20:42:57
+(<git.Commit "a9cc7e2a3d4e2c92c5ff51fbd5f6bf133b6b2b02">, 'Fix tests', ['GivenANewlyAddedSignal_WhenGettingMVPOfTheSignal_ReturnedIsNull']) 2016-08-12 06:20:29 2016-09-11 20:42:53
+(<git.Commit "fe5bf9157aa48a19721fbd8b1c9a204b313b8d20">, 'Fix tests', ['GivenNoSignals_WhenGettingMVPOfAnySignal_ThrowedIsArgumentException']) 2016-08-12 06:10:17 2016-09-11 20:42:51
+(<git.Commit "2f3c2b40ec80fffb60ccd45e2256372ae3486f9e">, 'Fix tests', ['GivenANewlyAddedSignal_WhileAddingThatSignal_WasCalledSetMissingValuePolicyMethod']) 2016-08-11 10:14:46 2016-09-11 20:42:49
+(<git.Commit "306f14be29b95a9f4b3f2b436df03cc4d3b2e80c">, 'Fix tests', ['GivenSignalWithDataSetNotInDateOrder_WhenGettingDataOfTheSignal_ReturnedIsSortedArray']) 2016-08-11 08:24:57 2016-09-11 20:42:48
+(<git.Commit "e7c496234b8ff7dd08c94d4e39317c173c0f3f2f">, 'REF, increased coverage', (72.10526315789474, '->', 72.68041237113403)) 2016-08-10 10:01:22 2016-09-11 20:42:45
+(<git.Commit "3dc20f540373bc01ebcee5431bafe3106c4ba6a5">, 'Fix tests', ['GivenASignal_WhenSettingMVPOfTheSignal_ThrowedIsNotArgumentException']) 2016-08-10 09:59:07 2016-09-11 20:42:45
+(<git.Commit "665f9326bc8d384e127339f1cf78f94cf4c28503">, 'Fix tests', ['GivenNoSignals_WhenSettingMVPOfAnySignal_ThrowedIsArgumentException']) 2016-08-10 09:51:48 2016-09-11 20:42:43
+(<git.Commit "afe984c13b2ccec4ca7dea21277161cf32a0a849">, 'Fix tests', ['GivenASignalWithSetMVP_WhenGettingMVPOftheSignal_ReturnedIsTheMVP']) 2016-08-10 07:36:26 2016-09-11 20:42:41
+(<git.Commit "4c08c1b80d686445f2343646966a215ee0675403">, 'Fix tests', ['GivenANewlyAddedSignal_WhenGettingMVPOfTheSignal_ReturnedIsNull']) 2016-08-10 06:31:48 2016-09-11 20:42:39
+(<git.Commit "72f93e08dd53c15cfa02dd54a73b86084928f34a">, 'Fix tests', ['GivenNoSignals_WhenSettingMVPofAnySignal_ThrowedIsArgumentException']) 2016-08-05 10:00:43 2016-09-11 20:42:26
+(<git.Commit "50aa21cefe351a44eb1c41518990b0414849acfb">, 'Fix tests', ['GivenNoSignals_WhenSettingDataOfAnySignal_ThrowedIsArgumentException']) 2016-08-05 07:23:13 2016-09-11 20:42:19
+(<git.Commit "8ef3b524256bf2c9d64d4efb8fc08e5e3f30586a">, 'Fix tests', ['GivenNoSignals_WhenGettingDataOfAnySignal_ThrowedIsArgumentException']) 2016-08-05 06:29:55 2016-09-11 20:42:16
+(<git.Commit "28a8408f815d25a841ceb665489e735c7a3cdbb1">, 'Fix tests', ['GivenNoSignals_WhenGettingMissingValuePolicyOfAnySignal_ThrowedIsArgumentException']) 2016-08-04 06:05:34 2016-09-11 20:42:11
+(<git.Commit "f812275145d83998a46f8fccbf3c936427bf0d60">, 'Fix tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-02 08:15:24 2016-09-11 20:42:07
+Bad commits:
+(<git.Commit "568295be25676f43fc5c8cf3c0ac183e1bc58fa1">, 'Break tests', '') 2016-09-06 22:27:26 2016-09-11 20:43:56
+(<git.Commit "e94aa4fb2f94fbdb321d2ed7bbdbedec2814dbf3">, 'Break tests', '') 2016-09-06 21:40:23 2016-09-11 20:43:55
+(<git.Commit "9b9f8d85df169209c12d163204edaa556ede7655">, 'Break compilation', '') 2016-09-06 07:14:19 2016-09-11 20:43:53
+(<git.Commit "a162a13850831e7eccfa8b4fc50494bbe3ed6cf0">, 'Break tests', '') 2016-08-31 09:12:43 2016-09-11 20:43:48
+(<git.Commit "f699cffcc29db239ae103a752528732fd15c833d">, 'Reduced coverate', (80.92485549132948, '->', 80.69164265129683)) 2016-08-31 07:59:00 2016-09-11 20:43:44
+(<git.Commit "06c3a1885e7e618dcbfb2bac13340cb55de039db">, 'Break tests', '') 2016-08-31 07:40:22 2016-09-11 20:43:40
+(<git.Commit "ce889d36e6040ac86b5df06e6e3842b137891101">, 'Break tests', '') 2016-08-30 14:34:51 2016-09-11 20:43:35
+(<git.Commit "655f7a9aba0f6c070add60c6ef72c369b15d5da4">, 'Break tests', '') 2016-08-30 08:15:53 2016-09-11 20:43:34
+(<git.Commit "221991e9e63697200cb6a9f6d6c5aecea79506eb">, 'Break tests', '') 2016-08-22 11:24:00 2016-09-11 20:43:21
+(<git.Commit "439fe99bc49e1f68542a8f2adabbd30f212d7f72">, 'Reduced coverate', (77.43190661478599, '->', 75.88932806324111)) 2016-08-17 09:20:56 2016-09-11 20:43:11
+(<git.Commit "f5c226cc500eb21cc69e780d9ef2939e43b6498f">, 'Reduced coverate', (75.10917030567686, '->', 49.1686460807601)) 2016-08-12 11:53:32 2016-09-11 20:43:01
+(<git.Commit "6654e9852bdec8df6ebdc3b89366d0881df6bb7f">, 'Break tests', '') 2016-08-12 11:13:11 2016-09-11 20:43:00
+(<git.Commit "7538cda0173702e4101fd52dad953bb66580609f">, 'Break tests', '') 2016-08-12 08:14:10 2016-09-11 20:42:59
+(<git.Commit "811b99d1a52c08b80e073e6d57ef8b4fab198411">, 'Reduced coverate', (74.56896551724138, '->', 70.8133971291866)) 2016-08-12 06:05:15 2016-09-11 20:42:50
+(<git.Commit "ceb67ed7b56665e773460d7cf6dc9d9beaae2085">, 'Break tests', '') 2016-08-11 10:13:51 2016-09-11 20:42:49
+(<git.Commit "34516f8937fb8e3f72d36dc543537ce783917e0a">, 'Break tests', '') 2016-08-11 08:15:00 2016-09-11 20:42:47
+(<git.Commit "2080757b4c1337c12386e186135bf43cfc605274">, 'Break tests', '') 2016-08-10 09:50:31 2016-09-11 20:42:42
+(<git.Commit "32888fe4ff4d9472c8ffe1ef8a50401414797a12">, 'Break tests', '') 2016-08-09 09:09:15 2016-09-11 20:42:35
+(<git.Commit "ee837180851a8b12b6aad5c4c328278aef3cfa84">, 'Break tests', '') 2016-08-08 07:40:58 2016-09-11 20:42:29
+(<git.Commit "999f1108e3dbf84cca5e51b1a327cc7bd95203be">, 'Break compilation', '') 2016-08-05 09:58:34 2016-09-11 20:42:25
+(<git.Commit "c3f702a37f61888d3d5899005c6e560548aa6ac2">, 'Break tests', '') 2016-08-05 06:29:00 2016-09-11 20:42:15
+(<git.Commit "f67ddf574c31bed8a527db558d45f48b7f500e3b">, 'Break tests', '') 2016-08-05 06:08:43 2016-09-11 20:42:15
+(<git.Commit "69850654f9da19ab34d73655d223fd5775daa7a2">, 'Break tests', '') 2016-08-04 06:04:45 2016-09-11 20:42:11
+(<git.Commit "bb40768ac3ccbd099236b145f003973c27fad5f6">, 'REF, reduced coverage', (79.65686274509804, '->', 79.24050632911393)) 2016-09-12 09:45:37 2016-09-12 09:45:37
+(<git.Commit "245f5617a53400680a4283b1d00c131196c6e099">, 'REF, reduced coverage', (81.40161725067385, '->', 79.01554404145078)) 2016-09-06 15:43:37 2016-09-11 20:43:54
+(<git.Commit "02153bcc9dc512094f05a2b90514e2d260d574f3">, 'REF, reduced coverage', (81.58730158730158, '->', 81.46964856230032)) 2016-08-30 07:28:27 2016-09-11 20:43:31
+(<git.Commit "28655ae26189d5c5a7a2b7c147699dae8cc96d84">, 'REF, reduced coverage', (73.54260089686099, '->', 73.42342342342343)) 2016-08-12 06:58:14 2016-09-11 20:42:55
+(<git.Commit "58cbf243e9dd2171815db19e24f9f8f575ca8d96">, 'REF, reduced coverage', (60.0, '->', 57.142857142857146)) 2016-08-02 09:19:36 2016-09-11 20:42:10
+Unknown commits:
+(<git.Commit "55b19b6b96d372d89253787fe2bf9824f6faa217">, 'Nothing fixed', ['GivenASignal_HavingBothEalierAndOlderData_WhenGettingDataWithFirstOrderMVP_ForDatumsInReversOrder_ReturnsProperData']) 2016-09-06 22:13:15 2016-09-11 20:43:56
+(<git.Commit "1c139ee73f43741d832978770d1e28ebc2febf65">, 'Some fixed, some new failing', ['GivenASignal_WhenGettingDataWithFirstOrderMVP_ThrowException']) 2016-08-30 14:35:30 2016-09-11 20:43:36
+(<git.Commit "ac1ed2aabc4c9b31f970e81420bef1a9e4bb931d">, 'Some fixed, some new failing', ['GivenASignal_WhenGettingByPathWhichDoesNotExistInRepository_ThrowedIsArgumentException', 'GivenNoSignals_WhenGettingByAnyPath_ThrowedIsArgumentException']) 2016-08-08 07:42:15 2016-09-11 20:42:30
+(<git.Commit "77ac7d335442c958522123423b6116dd8b552205">, 'Nothing fixed', ['GivenASignalWithoutSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNull', 'GivenASignalWithSetMVP_WhenGettingMVPofTheSignal_ReturnedIsNotNullResult']) 2016-08-05 07:59:18 2016-09-11 20:42:22
+(<git.Commit "89cff808d77c23502f891c39f8c10f34b50a62e6">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 09:03:42 2016-09-13 09:25:40
+(<git.Commit "a6f4c85b4fdda0846a69c5b22827ccd49bc0d34c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 08:40:38 2016-09-13 08:40:38
+(<git.Commit "b8037f46e9e4acd7ddda9ebbdc43f83637cca406">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 08:34:20 2016-09-13 08:34:20
+(<git.Commit "8fe43be990024062c77f6d966f21e7ca42d2cf16">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 08:31:25 2016-09-13 08:31:25
+(<git.Commit "e9b608d41c8bae5fc9cb5ca1f8de0b170bd299bd">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 08:29:22 2016-09-13 08:29:22
+(<git.Commit "8671e855233002fa47810d234fa6b8022a4a262c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 08:24:21 2016-09-13 08:24:21
+(<git.Commit "631ae54d69db9f100e1c037aa8de4ba98edd6e46">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 07:55:33 2016-09-13 07:55:33
+(<git.Commit "04b6a5c6e98bf5397859dd2556dbdda357d64a4a">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-13 07:40:44 2016-09-13 07:40:44
+(<git.Commit "5183313266b8ae53c5fe918833d7b9bc253965ef">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-12 10:46:15 2016-09-12 10:48:03
+(<git.Commit "3439f63cc07225915779dc97b32a1ea7191d50df">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-12 10:30:08 2016-09-12 10:30:08
+(<git.Commit "83c4b9118d06edc1e31ba9d348ad28a8ddd65617">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-12 09:57:02 2016-09-12 10:04:27
+(<git.Commit "90ec0b55198033ea2a1320d01230dc5ebec8d86c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-08 13:13:41 2016-09-11 20:43:58
+(<git.Commit "881351755b5bb7d11b721cd1675507d402901405">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-06 22:31:04 2016-09-11 20:43:57
+(<git.Commit "21afbabce4eee8da56ba546feef39778a0cfab08">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-09-05 07:40:42 2016-09-11 20:43:52
+(<git.Commit "63a00c48fd270cb21fb41d298988e7c99cabe451">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 09:33:40 2016-09-11 20:43:50
+(<git.Commit "8f7affd8038d5c7b51670e52f168e79776b5994b">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 09:31:09 2016-09-11 20:43:50
+(<git.Commit "005e52aa9362440a65496be6c795d0ff9411986e">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 08:48:50 2016-09-11 20:43:48
+(<git.Commit "7f55942069026f576f42788eb42384ae416331ce">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 08:41:18 2016-09-11 20:43:46
+(<git.Commit "7f42b001ac7aed1f6689accb4bbddc83eb10e420">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 08:36:15 2016-09-11 20:43:45
+(<git.Commit "622883a62098b234b7c3837e370de01e5b3f9b55">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 08:07:44 2016-09-11 20:43:44
+(<git.Commit "4dcf88563b61520b848077b2775c6ccdc4001624">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 07:56:48 2016-09-11 20:43:43
+(<git.Commit "87d011d0e8c725e9786548eb046044be23566796">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 07:46:33 2016-09-11 20:43:42
+(<git.Commit "253fbe021d85df90093b097ece4b3861f340abfd">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 06:33:47 2016-09-11 20:43:39
+(<git.Commit "a9aae782adff24b42c1921380539d2b371ad4eb1">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-31 06:26:54 2016-09-11 20:43:37
+(<git.Commit "c7c7e97788d5f5f03f61413809bb43b2c7a8a16e">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-30 14:36:49 2016-09-11 20:43:37
+(<git.Commit "7d04edeca777236b152d3da47b25a165deb082dd">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-30 07:49:16 2016-09-11 20:43:33
+(<git.Commit "a60d7f1789ff5fc45b14afef63b9dee9a3ba6bcb">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-30 07:47:08 2016-09-11 20:43:31
+(<git.Commit "322866fd6b83b726bcd678140e23f3656e775a89">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-29 13:56:22 2016-09-11 20:43:29
+(<git.Commit "e819fd01ca54a2cdcee07567258a1a2dcc01fdcd">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-29 12:28:51 2016-09-11 20:43:29
+(<git.Commit "f4c1ee7fc44d9d074ab2d7f59fbb398fad9cf7ca">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-29 12:10:05 2016-09-11 20:43:27
+(<git.Commit "1a075f94403e67a03db452237b3449e36c4fbaae">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-29 12:08:07 2016-09-11 20:43:26
+(<git.Commit "44efbf7095fd70273097eaf46bf62a0aa0016bb5">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-29 08:40:29 2016-09-11 20:43:25
+(<git.Commit "8bf59264a89fffa27d6edbc81634a6b2473ed4fa">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-29 08:09:33 2016-09-11 20:43:24
+(<git.Commit "3744a8ec5a63df9522dca17cc5f48935a697a6eb">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-22 11:54:31 2016-09-11 20:43:23
+(<git.Commit "bb87adbc8a318e2358df1dd6e7e9283921b5b6a2">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-22 10:40:32 2016-09-11 20:43:20
+(<git.Commit "408b6ff23622d0acb7d1b859cfce2f23d4a1260a">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-22 10:25:26 2016-09-11 20:43:19
+(<git.Commit "52f3fc46272a360c008f840f25bddb0aecb82928">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-22 08:42:51 2016-09-11 20:43:18
+(<git.Commit "d123355fb8a725a479a62d7ef55472561cc781bf">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-22 08:10:23 2016-09-11 20:43:17
+(<git.Commit "de983227deacd75ecfa3dfcda451201f4c13ebd2">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-17 10:22:32 2016-09-11 20:43:16
+(<git.Commit "bd27995178a08ff7446a709940ba24ea781ebb0f">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-17 09:57:48 2016-09-11 20:43:14
+(<git.Commit "c0d354b1357bc7d3f7a9f21f6ed1389d1c6c0cee">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-17 09:47:21 2016-09-11 20:43:13
+(<git.Commit "a69125e0cde54a6d5d4d04a36159d62d3ab8014f">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-17 09:37:43 2016-09-11 20:43:12
+(<git.Commit "1f56f3575382c5d9b24a15b7b074ba49e4f7bb2f">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-17 08:07:41 2016-09-11 20:43:10
+(<git.Commit "942078d302a4d8db364d31ad5ba8661487e08c5d">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-16 11:33:00 2016-09-11 20:43:10
+(<git.Commit "50e86fec02c86846b9f713448dc40a7535acd3bc">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-16 11:06:28 2016-09-11 20:43:08
+(<git.Commit "164de3991495d575f9548e34ba2ce38b3897f12c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-16 11:05:07 2016-09-11 20:43:06
+(<git.Commit "5454023bca4096ebe9450c73caae0aabf1551596">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-16 10:44:41 2016-09-11 20:43:06
+(<git.Commit "89c0e3df79f9ddb266fc8c03bfaf269778c56a59">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-16 10:35:35 2016-09-11 20:43:05
+(<git.Commit "d3a8b5685c29937081db92ebc950c3975624b14b">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-16 09:45:12 2016-09-11 20:43:04
+(<git.Commit "8ece07533d973b7cc0673626979c3e46a467c02a">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-16 09:36:39 2016-09-11 20:43:02
+(<git.Commit "659220d1a635c3ab1693837cfb234ea08d39e40c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-12 07:09:27 2016-09-11 20:42:58
+(<git.Commit "2e72ae28707f137238f24f06ff97e8107fe33b33">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-12 07:02:48 2016-09-11 20:42:57
+(<git.Commit "34e1f823a11ca1afb7780a685266b45cc140ace8">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-12 07:00:33 2016-09-11 20:42:56
+(<git.Commit "a8c39fcb7f63c17ccee82d48ca888b3e82f03ecf">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-12 06:30:25 2016-09-11 20:42:54
+(<git.Commit "9034189b3ca0cff58e76173642ed4569e501fc74">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-12 06:18:57 2016-09-11 20:42:53
+(<git.Commit "4ddcfb43289bb4bfd40e8d1f0a81826b8cc0ef87">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-12 06:16:07 2016-09-11 20:42:52
+(<git.Commit "c4ad672046f47225b65fbd8563e5617f7a187a55">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-12 06:09:34 2016-09-11 20:42:51
+(<git.Commit "803e04523648e41406bb70d3ca7a9aadfdada81b">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-11 06:27:44 2016-09-11 20:42:47
+(<git.Commit "f0360eff6562315f6cc4c1f3bb78eafc909e527f">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-10 11:21:44 2016-09-11 20:42:46
+(<git.Commit "ba88c82baba4205a081fa7285dcf0c2ca638b205">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-10 09:58:19 2016-09-11 20:42:44
+(<git.Commit "185a6d3f8ff684a72dde84cd724f2702719ed15c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-10 09:55:02 2016-09-11 20:42:43
+(<git.Commit "07c1b69c808b20261dba92c6b599abccbe2e3ee9">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-10 06:43:46 2016-09-11 20:42:40
+(<git.Commit "0dfc9693664cb719d8c5a8817bfe52da14dd4eca">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-10 06:29:18 2016-09-11 20:42:39
+(<git.Commit "c5b0a63533ab4fa24cf8b240a36cb01d7d7293c3">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-10 06:24:10 2016-09-11 20:42:38
+(<git.Commit "fcc0976db1cbc436ea1b455b1c14c2e5c9e9b46a">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-10 06:11:49 2016-09-11 20:42:37
+(<git.Commit "a58822b2289b66742efe484eed1d4cc4de29e01c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-08 08:11:00 2016-09-11 20:42:34
+(<git.Commit "40de0c7b5177ee5c4429a5ce0cbb7d15351ed2bf">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-08 08:08:43 2016-09-11 20:42:34
+(<git.Commit "13e48402565e46919f6c5a41274e3c5ac9d85bfd">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-08 08:05:03 2016-09-11 20:42:33
+(<git.Commit "ea8a61bb43069d00e4907eee6f03207b09aabc86">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-08 08:03:06 2016-09-11 20:42:32
+(<git.Commit "000b835d056ed1f538e057962cea090660727d54">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-08 07:56:22 2016-09-11 20:42:32
+(<git.Commit "421e04f0893dd90d3a9ff17326e87700577fa168">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-08 07:53:44 2016-09-11 20:42:31
+(<git.Commit "6c38be0c62b86f0a2bd4a00b6f03462ec4565f18">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-08 07:45:31 2016-09-11 20:42:30
+(<git.Commit "a770f1ff5d3a699b55deca2a4b1c8355c77c2444">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 10:07:27 2016-09-11 20:42:28
+(<git.Commit "29649949d6e7a8950bea51952fe3c526bc8dbb2b">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 10:03:22 2016-09-11 20:42:27
+(<git.Commit "4e92cc73e0924907031e76d14cbc2e478dff088e">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 09:59:56 2016-09-11 20:42:26
+(<git.Commit "a26f7596f6e1d6b91a847989744831434f2cec3e">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 09:47:08 2016-09-11 20:42:24
+(<git.Commit "c45d799af273ea7d099fb20fd4025fe9ce2d8c94">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 09:40:36 2016-09-11 20:42:23
+(<git.Commit "800c741a875ed3b7c2aae5f8c90d6446cedb9751">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 07:49:02 2016-09-11 20:42:21
+(<git.Commit "e0740f897fb6fd2a338a54b060238f3fdb820277">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 07:25:54 2016-09-11 20:42:20
+(<git.Commit "a13ce8d2eafe85eeffb5be4156f563e630e408d8">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 07:22:17 2016-09-11 20:42:19
+(<git.Commit "fd48e04f2466ed4908ca31523d8b94d1723bf788">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 06:41:07 2016-09-11 20:42:17
+(<git.Commit "dc73e232fbe97cd77eb0ae59334972c827180a98">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-05 06:31:25 2016-09-11 20:42:17
+(<git.Commit "2bec7569fe95800b8e96f6dd8dd71942622d1b9a">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-04 08:40:58 2016-09-11 20:42:14
+(<git.Commit "3ad7b83cae7cde247d701cb80943854d10eafc6f">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-04 07:18:25 2016-09-11 20:42:13
+(<git.Commit "7f3a2a655bdf2c6d4591954de4d13b8aa985887c">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-04 06:13:28 2016-09-11 20:42:12
+(<git.Commit "005f101480c0c5b833b223b9f1b808e40d6a4070">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-02 08:57:14 2016-09-11 20:42:09
+(<git.Commit "b3baf845c0b7d6a9c90778254a75b5f4139865ee">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-02 08:24:55 2016-09-11 20:42:08
+(<git.Commit "523eb8c00b395a0716735f6e24b3b54fdb483697">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-02 08:20:17 2016-09-11 20:42:07
+(<git.Commit "cdc75873b4136b18e6f9fe1f021ffcf92689852d">, 'Still failing tests or fixed tests', ['GivenNoSignals_WhenGettingByPath_ThrowedIsArgumentException']) 2016-08-02 08:14:40 2016-09-11 20:42:06
