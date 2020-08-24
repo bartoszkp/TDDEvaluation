@@ -31,6 +31,7 @@ def count_commits(repo, datefrom = None, dateto = None):
 def calculate_conformance_from_commits(good, bad, unknown):
     total = len(good)+len(bad)+len(unknown)
     toremove = []
+#    return float(len(good)) / (len(good) + len(bad))
     return (float(len(good)) / float(len(good)+len(bad))) * (1 - float(len(unknown))/total)
 
 def calculate(repo, datefrom, dateto):

@@ -21,6 +21,7 @@ def calculate_participant_conformance(login):
         bad += b
         unknown += i
 
+    print('unknown:',len(unknown),'which is',(float(len(unknown))/(float(len(good)+len(bad)+len(unknown)))))
     return calculate_conformance_from_commits(good, bad, unknown)
 
 def calculate_participant_conformance_tdd(login):
